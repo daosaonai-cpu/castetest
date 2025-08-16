@@ -3,35 +3,276 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mobile View with Image</title>
-    <!-- Tailwind CSS for styling -->
+    <title>Lucky Draw Wheel</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts: Inter -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Apply Inter font to the body */
         body {
-            font-family: 'Inter', sans-serif;
+            font-family: 'Poppins', sans-serif;
+            overflow-x: hidden; /* Prevent horizontal scroll */
+        }
+        /* The pointer that indicates the winning segment */
+        #wheel-container::before {
+            content: '';
+            position: absolute;
+            top: -10px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 0;
+            height: 0;
+            border-left: 20px solid transparent;
+            border-right: 20px solid transparent;
+            border-top: 30px solid #facc15; /* yellow-400 */
+            z-index: 10;
+        }
+        /* The wheel itself, with a smooth transition for spinning */
+        #wheel {
+            transition: transform 6s cubic-bezier(0.25, 0.1, 0.25, 1);
         }
     </style>
 </head>
-<body class="bg-white text-gray-800">
+<body class="bg-gray-900 text-white min-h-screen flex flex-col items-center justify-center p-4">
 
-    <!-- Main container -->
-    <!-- This div uses flexbox to center the content vertically and horizontally. -->
-    <div class="min-h-screen flex items-center justify-center p-4">
-
-        <!-- Image container -->
-        <div>
-            <!-- The src attribute is updated with the new image link. -->
-            <img src='https://i.postimg.cc/VL3HK9q0/nami2-pdf-2.png' 
-                 alt='Document image'
-                 class="rounded-lg shadow-lg max-w-full h-auto">
+    <div class="w-full max-w-md flex flex-col items-center">
+        <div class="text-center mb-8">
+            <h1 class="text-2xl md:text-4xl font-bold text-yellow-400 tracking-wider">FACEBOOK PAGE :Bonoda Official</h1>
+            <p class="text-gray-400 mt-2">UPI ID: bonoproduction3@okaxis</p>
         </div>
-        
+
+        <!-- Container for the wheel and pointer. Its size will control the canvas size. -->
+        <div id="wheel-container" class="relative w-[300px] h-[300px] sm:w-[400px] sm:h-[400px] mb-8">
+            <!-- Canvas width and height will be set by JavaScript for sharpness -->
+            <canvas id="wheel" class="w-full h-full"></canvas>
+        </div>
+
+        <!-- Buttons Container -->
+        <div class="flex flex-col sm:flex-row items-center gap-4">
+             <!-- Payment Button - Now a button, not a link -->
+            <button id="pay-btn" class="bg-green-600 text-white font-bold py-3 px-10 rounded-full text-xl shadow-lg hover:bg-green-700 active:scale-95 transition-all duration-200">
+                Pay ₹10
+            </button>
+            <!-- Spin Button -->
+            <button id="spin-btn" class="bg-red-600 text-white font-bold py-3 px-10 rounded-full text-xl shadow-lg hover:bg-red-700 active:scale-95 transition-all duration-200 disabled:bg-gray-600 disabled:text-gray-400 disabled:cursor-not-allowed">
+                SPIN
+            </button>
+        </div>
     </div>
 
+
+    <!-- Modal for displaying the prize result -->
+    <div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+        <div class="bg-gray-800 border-2 border-yellow-400 p-8 rounded-2xl shadow-2xl text-center max-w-sm w-full transform scale-95 transition-transform duration-300">
+            <h2 id="modal-title" class="text-3xl font-bold mb-4">Congratulations!</h2>
+            <p id="modal-text" class="text-xl text-gray-300 mb-6">You've won a prize!</p>
+            <button id="close-modal-btn" class="bg-yellow-400 text-gray-900 font-bold py-2 px-8 rounded-full hover:bg-yellow-500 transition-colors">
+                Awesome!
+            </button>
+        </div>
+    </div>
+    
+    <!-- Modal for displaying the QR Code -->
+    <div id="qr-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+        <div class="bg-gray-800 border-2 border-yellow-400 p-8 rounded-2xl shadow-2xl text-center max-w-sm w-full relative">
+            <button id="close-qr-modal-btn" class="absolute top-2 right-4 text-gray-400 hover:text-white text-3xl font-bold">&times;</button>
+            <h2 class="text-2xl font-bold mb-4 text-yellow-400">Pay with UPI</h2>
+            <p class="text-gray-300 mb-4">Scan the QR code with your UPI app to pay ₹10.</p>
+            <div id="qrcode" class="bg-white p-4 rounded-lg inline-block">
+                <!-- QR Code image will be generated here by JavaScript -->
+            </div>
+            <p class="text-gray-400 mt-4 text-sm">Or use UPI ID: bonoproduction3@okaxis</p>
+        </div>
+    </div>
+
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            // --- DOM Elements ---
+            const wheelCanvas = document.getElementById('wheel');
+            const spinBtn = document.getElementById('spin-btn');
+            const modal = document.getElementById('modal');
+            const modalContent = modal.querySelector('div');
+            const modalTitle = document.getElementById('modal-title');
+            const modalText = document.getElementById('modal-text');
+            const closeModalBtn = document.getElementById('close-modal-btn');
+            const ctx = wheelCanvas.getContext('2d');
+            
+            // --- Payment Elements ---
+            const payBtn = document.getElementById('pay-btn');
+            const qrModal = document.getElementById('qr-modal');
+            const closeQrModalBtn = document.getElementById('close-qr-modal-btn');
+            const qrCodeContainer = document.getElementById('qrcode');
+
+
+            // --- Sound Synthesis Setup (Tone.js) ---
+            const tickSynth = new Tone.Synth({
+                oscillator: { type: 'sine' },
+                envelope: { attack: 0.005, decay: 0.1, sustain: 0, release: 0.1 }
+            }).toDestination();
+
+            const winSynth = new Tone.Synth({
+                oscillator: { type: 'triangle' },
+                envelope: { attack: 0.01, decay: 0.2, sustain: 0.1, release: 0.4 }
+            }).toDestination();
+            
+            let tickInterval = null;
+
+            // --- Configuration ---
+            const segments = [
+                { text: 'Bonoda membership', color: '#16a34a' },
+                { text: 'GIFT', color: '#4c1d95' },
+                { text: 'Bonoda membership', color: '#16a34a' },
+                { text: 'GIFT', color: '#6d28d9' },
+                { text: 'Bonoda membership', color: '#16a34a' },
+                { text: 'LUCKY DRAW', color: '#f59e0b' },
+                { text: 'Bonoda membership', color: '#16a34a' },
+                { text: 'GIFT', color: '#4c1d95' },
+                { text: 'Bonoda membership', color: '#16a34a' },
+                { text: 'Bonoda membership', color: '#16a34a' },
+            ];
+
+            // --- Dynamic Sizing & State Variables ---
+            const numSegments = segments.length;
+            const anglePerSegment = (2 * Math.PI) / numSegments;
+            let canvasSize = 0;
+            let radius = 0;
+            let currentRotation = 0;
+            let isSpinning = false;
+            let winningSegment = null;
+
+            // --- Drawing Functions ---
+
+            function setupCanvas() {
+                const container = document.getElementById('wheel-container');
+                const dpr = window.devicePixelRatio || 1;
+                const rect = container.getBoundingClientRect();
+                canvasSize = rect.width;
+                wheelCanvas.width = canvasSize * dpr;
+                wheelCanvas.height = canvasSize * dpr;
+                ctx.scale(dpr, dpr);
+                radius = canvasSize / 2 - 10;
+                drawWheel();
+            }
+            
+            function drawWheel() {
+                ctx.clearRect(0, 0, wheelCanvas.width, wheelCanvas.height);
+                ctx.font = `bold ${radius * 0.08}px Poppins`;
+                ctx.textBaseline = 'middle';
+                
+                segments.forEach((segment, i) => {
+                    const startAngle = i * anglePerSegment;
+                    const endAngle = startAngle + anglePerSegment;
+                    ctx.beginPath();
+                    ctx.moveTo(canvasSize / 2, canvasSize / 2);
+                    ctx.arc(canvasSize / 2, canvasSize / 2, radius, startAngle, endAngle);
+                    ctx.closePath();
+                    ctx.fillStyle = segment.color;
+                    ctx.fill();
+                    ctx.strokeStyle = '#374151';
+                    ctx.lineWidth = 4;
+                    ctx.stroke();
+                    ctx.save();
+                    ctx.fillStyle = 'white';
+                    ctx.translate(canvasSize / 2, canvasSize / 2);
+                    ctx.rotate(startAngle + anglePerSegment / 2);
+                    ctx.textAlign = 'right';
+                    ctx.fillText(segment.text, radius * 0.9, 0);
+                    ctx.restore();
+                });
+            }
+            
+            // --- Spin Logic ---
+            function spin() {
+                if (isSpinning) return;
+                Tone.start();
+                isSpinning = true;
+                spinBtn.disabled = true;
+                winningSegment = null;
+                tickInterval = setInterval(() => {
+                    tickSynth.triggerAttackRelease("G5", "32n");
+                }, 120);
+                const rand = Math.random();
+                let outcome;
+                if (rand < 0.1) { outcome = 'LUCKY DRAW'; }
+                else if (rand < 0.7) { outcome = 'Bonoda membership'; }
+                else { outcome = 'GIFT'; }
+                const possibleIndices = segments.map((seg, i) => seg.text === outcome ? i : -1).filter(i => i !== -1);
+                const targetIndex = possibleIndices[Math.floor(Math.random() * possibleIndices.length)];
+                winningSegment = segments[targetIndex];
+                const degreesPerSegment = 360 / numSegments;
+                const pointerAngle = 270; 
+                const targetSegmentCenterAngle = (targetIndex * degreesPerSegment) + (degreesPerSegment / 2);
+                const rotationToTarget = pointerAngle - targetSegmentCenterAngle;
+                const randomExtraSpins = Math.floor(Math.random() * 4) + 5;
+                const finalAngle = currentRotation + (randomExtraSpins * 360) + rotationToTarget;
+                wheelCanvas.style.transform = `rotate(${finalAngle}deg)`;
+            }
+
+            // --- Payment Logic ---
+            const upiLink = "upi://pay?pa=bonoproduction3@okaxis&pn=Bonoda%20Official&am=10&cu=INR&tn=Lucky%20Draw%20Spin";
+
+            function handlePayment() {
+                // Always show a QR code in a modal, regardless of device.
+                qrCodeContainer.innerHTML = ''; // Clear previous QR code if any
+                const qrImg = document.createElement('img');
+                // Use a QR code generation API to create the image
+                qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiLink)}`;
+                qrImg.alt = "UPI QR Code";
+                qrImg.onerror = () => { 
+                    qrCodeContainer.innerHTML = '<p class="text-red-500">Could not load QR Code.</p>';
+                };
+                qrCodeContainer.appendChild(qrImg);
+                qrModal.classList.remove('hidden');
+            }
+
+            // --- Event Handlers ---
+            function onSpinEnd() {
+                const transformMatrix = window.getComputedStyle(wheelCanvas).transform;
+                if (transformMatrix !== 'none') {
+                    const values = transformMatrix.split('(')[1].split(')')[0].split(',');
+                    currentRotation = Math.round(Math.atan2(values[1], values[0]) * (180 / Math.PI));
+                }
+                isSpinning = false;
+                spinBtn.disabled = false;
+                clearInterval(tickInterval);
+                if (!winningSegment) return;
+                winSynth.triggerAttackRelease("C5", "0.5s", Tone.now());
+                winSynth.triggerAttackRelease("G5", "0.5s", Tone.now() + 0.2);
+                if (winningSegment.text === 'LUCKY DRAW') {
+                    modalTitle.textContent = '🎉 LUCKY DRAW! 🎉';
+                    modalText.textContent = '69780';
+                } else if (winningSegment.text === 'Bonoda membership') {
+                    modalTitle.textContent = 'Fantastic!';
+                    modalText.textContent = 'You won a Bonoda membership!';
+                } else {
+                    modalTitle.textContent = 'You Won a Gift!';
+                    modalText.textContent = '33487';
+                }
+                modal.classList.remove('hidden');
+                setTimeout(() => modalContent.classList.add('scale-100'), 10);
+            }
+
+            function closeModal() {
+                modalContent.classList.remove('scale-100');
+                setTimeout(() => modal.classList.add('hidden'), 300);
+            }
+            
+            function closeQrModal() {
+                qrModal.classList.add('hidden');
+            }
+
+            spinBtn.addEventListener('click', spin);
+            payBtn.addEventListener('click', handlePayment);
+            wheelCanvas.addEventListener('transitionend', onSpinEnd);
+            closeModalBtn.addEventListener('click', closeModal);
+            closeQrModalBtn.addEventListener('click', closeQrModal);
+            window.addEventListener('resize', setupCanvas);
+
+            // Initial setup and draw of the wheel
+            setupCanvas();
+        });
+    </script>
 </body>
 </html>
