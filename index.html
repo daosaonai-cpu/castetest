@@ -14,7 +14,8 @@
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
   body {
-    margin: 0; padding: 24px;
+    margin: 0; 
+    padding: 16px; /* Adjusted for mobile */
     background: linear-gradient(to bottom, #b83274, #5a1a3f, #000);
     font-family: 'Share Tech Mono', monospace;
     color: #ff99cc;
@@ -24,6 +25,13 @@
     flex-direction: column;
     align-items: center;
     overflow-x: hidden;
+  }
+  
+  /* Larger padding for larger screens */
+  @media (min-width: 640px) {
+    body {
+      padding: 24px;
+    }
   }
 
   .title-container {
@@ -230,7 +238,7 @@
     display: none;
     justify-content: center;
     align-items: center;
-    padding: 24px;
+    padding: 16px;
     z-index: 100;
   }
   .modal.active {
@@ -240,9 +248,9 @@
     background: #1a001a;
     border: 2px solid #ff3399;
     border-radius: 24px;
-    padding: 32px 28px;
+    padding: 32px 24px;
     width: 100%;
-    max-width: 420px; /* Increased max-width for the wheel */
+    max-width: 420px;
     box-shadow: 0 0 30px #ff3399;
     text-align: center;
     color: #ff99cc;
@@ -338,7 +346,7 @@
       word-wrap: break-word;
   }
   
-  /* --- NEW: Lucky Wheel Styles (inside modal) --- */
+  /* --- Lucky Wheel Styles (inside modal) --- */
   #giftModal .modal-content {
       font-family: 'Poppins', sans-serif;
       background: #111827; /* bg-gray-900 */
@@ -347,6 +355,11 @@
   }
   #wheel-container {
       position: relative;
+      /* Responsive wheel size */
+      width: 70vw;
+      height: 70vw;
+      max-width: 300px;
+      max-height: 300px;
   }
   #wheel-container::before {
       content: '';
@@ -356,9 +369,9 @@
       transform: translateX(-50%);
       width: 0;
       height: 0;
-      border-left: 20px solid transparent;
-      border-right: 20px solid transparent;
-      border-top: 30px solid #facc15; /* yellow-400 */
+      border-left: 15px solid transparent; /* smaller pointer */
+      border-right: 15px solid transparent;
+      border-top: 25px solid #facc15; /* yellow-400 */
       z-index: 10;
   }
   #wheel {
@@ -409,19 +422,19 @@
     <!-- Lucky Wheel HTML is injected here -->
     <div class="w-full max-w-md flex flex-col items-center text-white">
         <div class="text-center mb-4">
-            <h1 class="text-xl md:text-2xl font-bold text-yellow-400 tracking-wider">FACEBOOK PAGE :Bonoda Official</h1>
-            <p class="text-gray-400 mt-2">UPI ID: bonoproduction3@okaxis</p>
+            <h1 class="text-lg md:text-xl font-bold text-yellow-400 tracking-wider">FACEBOOK PAGE :Bonoda Official</h1>
+            <p class="text-gray-400 mt-1 text-sm">UPI ID: bonoproduction3@okaxis</p>
         </div>
 
-        <div id="wheel-container" class="relative w-[250px] h-[250px] sm:w-[300px] sm:h-[300px] mb-6">
+        <div id="wheel-container" class="relative mb-6">
             <canvas id="wheel" class="w-full h-full"></canvas>
         </div>
 
         <div class="flex flex-col sm:flex-row items-center gap-4">
-            <button id="pay-btn" class="bg-green-600 text-white font-bold py-3 px-10 rounded-full text-xl shadow-lg hover:bg-green-700 active:scale-95 transition-all duration-200">
+            <button id="pay-btn" class="bg-green-600 text-white font-bold py-3 px-8 text-lg rounded-full shadow-lg hover:bg-green-700 active:scale-95 transition-all duration-200">
                 Pay ₹10
             </button>
-            <button id="spin-btn" class="bg-red-600 text-white font-bold py-3 px-10 rounded-full text-xl shadow-lg hover:bg-red-700 active:scale-95 transition-all duration-200 disabled:bg-gray-600 disabled:text-gray-400 disabled:cursor-not-allowed">
+            <button id="spin-btn" class="bg-red-600 text-white font-bold py-3 px-8 text-lg rounded-full shadow-lg hover:bg-red-700 active:scale-95 transition-all duration-200 disabled:bg-gray-600 disabled:text-gray-400 disabled:cursor-not-allowed">
                 SPIN
             </button>
         </div>
@@ -429,9 +442,9 @@
     
     <!-- Nested Modal for displaying the prize result -->
     <div id="prizeModal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-[110] p-4">
-        <div class="bg-gray-800 border-2 border-yellow-400 p-8 rounded-2xl shadow-2xl text-center max-w-sm w-full transform scale-95 transition-transform duration-300">
-            <h2 id="prizeModal-title" class="text-3xl font-bold mb-4">Congratulations!</h2>
-            <p id="prizeModal-text" class="text-xl text-gray-300 mb-6">You've won a prize!</p>
+        <div class="bg-gray-800 border-2 border-yellow-400 p-6 rounded-2xl shadow-2xl text-center max-w-sm w-full transform scale-95 transition-transform duration-300">
+            <h2 id="prizeModal-title" class="text-2xl font-bold mb-4">Congratulations!</h2>
+            <p id="prizeModal-text" class="text-lg text-gray-300 mb-6">You've won a prize!</p>
             <button id="close-prizeModal-btn" class="bg-yellow-400 text-gray-900 font-bold py-2 px-8 rounded-full hover:bg-yellow-500 transition-colors">
                 Awesome!
             </button>
@@ -440,11 +453,11 @@
     
     <!-- Nested Modal for displaying the QR Code -->
     <div id="qrModal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-[110] p-4">
-        <div class="bg-gray-800 border-2 border-yellow-400 p-8 rounded-2xl shadow-2xl text-center max-w-sm w-full relative">
+        <div class="bg-gray-800 border-2 border-yellow-400 p-6 rounded-2xl shadow-2xl text-center max-w-sm w-full relative">
             <button id="close-qrModal-btn" class="absolute top-2 right-4 text-gray-400 hover:text-white text-3xl font-bold">&times;</button>
-            <h2 class="text-2xl font-bold mb-4 text-yellow-400">Pay with UPI</h2>
-            <p class="text-gray-300 mb-4">Scan the QR code with your UPI app to pay ₹10.</p>
-            <div id="qrcode" class="bg-white p-4 rounded-lg inline-block"></div>
+            <h2 class="text-xl font-bold mb-4 text-yellow-400">Pay with UPI</h2>
+            <p class="text-gray-300 mb-4">Scan the QR code to pay ₹10.</p>
+            <div id="qrcode" class="bg-white p-3 rounded-lg inline-block"></div>
             <p class="text-gray-400 mt-4 text-sm">Or use UPI ID: bonoproduction3@okaxis</p>
         </div>
     </div>
@@ -628,11 +641,15 @@
     let wheelInitialized = false;
 
     function initializeWheelGame() {
-        if (wheelInitialized) return; // Prevent re-initialization
+        if (wheelInitialized) {
+            // If already initialized, just redraw the canvas in case size changed
+            setupCanvas();
+            return; 
+        }
         wheelInitialized = true;
 
         const wheelCanvas = document.getElementById('wheel');
-        if (!wheelCanvas) return; // Exit if wheel isn't on the page
+        if (!wheelCanvas) return;
 
         const spinBtn = document.getElementById('spin-btn');
         const prizeModal = document.getElementById('prizeModal');
@@ -672,13 +689,13 @@
             wheelCanvas.width = canvasSize * dpr;
             wheelCanvas.height = canvasSize * dpr;
             ctx.scale(dpr, dpr);
-            radius = canvasSize / 2 - 10;
+            radius = canvasSize / 2 - 5; // a little padding
             drawWheel();
         }
         
         function drawWheel() {
             ctx.clearRect(0, 0, wheelCanvas.width, wheelCanvas.height);
-            ctx.font = `bold ${radius * 0.08}px Poppins`;
+            ctx.font = `bold ${radius * 0.09}px Poppins`; // Adjusted font size
             ctx.textBaseline = 'middle';
             
             segments.forEach((segment, i) => {
@@ -691,15 +708,22 @@
                 ctx.fillStyle = segment.color;
                 ctx.fill();
                 ctx.strokeStyle = '#374151';
-                ctx.lineWidth = 4;
+                ctx.lineWidth = 2;
                 ctx.stroke();
                 ctx.save();
                 ctx.fillStyle = 'white';
                 ctx.translate(canvasSize / 2, canvasSize / 2);
                 ctx.rotate(startAngle + anglePerSegment / 2);
                 ctx.textAlign = 'right';
-                ctx.fillText(segment.text, radius * 0.9, 0);
+                // Wrap text if needed (simple check)
+                const text = segment.text;
+                const textWidth = ctx.measureText(text).width;
+                if (textWidth > radius * 0.8) {
+                    ctx.font = `bold ${radius * 0.07}px Poppins`;
+                }
+                ctx.fillText(text, radius * 0.85, 0);
                 ctx.restore();
+                ctx.font = `bold ${radius * 0.09}px Poppins`; // Reset font
             });
         }
         
@@ -735,7 +759,7 @@
         function handlePayment() {
             qrCodeContainer.innerHTML = '';
             const qrImg = document.createElement('img');
-            qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(wheelUpiLink)}`;
+            qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(wheelUpiLink)}`;
             qrImg.alt = "UPI QR Code";
             qrImg.onerror = () => { qrCodeContainer.innerHTML = '<p class="text-red-500">Could not load QR Code.</p>'; };
             qrCodeContainer.appendChild(qrImg);
@@ -784,7 +808,9 @@
         wheelCanvas.addEventListener('transitionend', onSpinEnd);
         closePrizeModalBtn.addEventListener('click', closePrizeModal);
         closeQrModalBtn.addEventListener('click', closeQrModal);
-        window.addEventListener('resize', setupCanvas);
+        
+        // Use ResizeObserver for better performance on resize
+        new ResizeObserver(setupCanvas).observe(document.getElementById('wheel-container'));
 
         setupCanvas();
     }
@@ -793,5 +819,3 @@
 
 </body>
 </html>
-
-
