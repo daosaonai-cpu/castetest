@@ -1,278 +1,797 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Lucky Draw Wheel</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            overflow-x: hidden; /* Prevent horizontal scroll */
-        }
-        /* The pointer that indicates the winning segment */
-        #wheel-container::before {
-            content: '';
-            position: absolute;
-            top: -10px;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 0;
-            height: 0;
-            border-left: 20px solid transparent;
-            border-right: 20px solid transparent;
-            border-top: 30px solid #facc15; /* yellow-400 */
-            z-index: 10;
-        }
-        /* The wheel itself, with a smooth transition for spinning */
-        #wheel {
-            transition: transform 6s cubic-bezier(0.25, 0.1, 0.25, 1);
-        }
-    </style>
-</head>
-<body class="bg-gray-900 text-white min-h-screen flex flex-col items-center justify-center p-4">
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Bonoda Official — Premium</title>
+<!-- Added for Lucky Wheel -->
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+<!-- End of additions -->
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
+  body {
+    margin: 0; padding: 24px;
+    background: linear-gradient(to bottom, #b83274, #5a1a3f, #000);
+    font-family: 'Share Tech Mono', monospace;
+    color: #ff99cc;
+    letter-spacing: 0.12em;
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    overflow-x: hidden;
+  }
 
-    <div class="w-full max-w-md flex flex-col items-center">
-        <div class="text-center mb-8">
-            <h1 class="text-2xl md:text-4xl font-bold text-yellow-400 tracking-wider">FACEBOOK PAGE :Bonoda Official</h1>
+  .title-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin-bottom: 32px;
+    text-align: center;
+  }
+
+  .subtitle {
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    color: #ff99cc;
+    text-shadow: 0 0 4px #ff4db8;
+    margin-bottom: 8px;
+    letter-spacing: 0.2em;
+  }
+
+  /* --- PUNK TITLE STYLE --- */
+  h1 {
+    position: relative;
+    font-weight: 900;
+    font-size: clamp(2.5rem, 8vw, 3.2rem); /* Responsive font size */
+    text-transform: uppercase;
+    margin: 0 0 24px 0;
+    color: #ff99cc;
+    text-shadow: 0 0 2px #ff4db8;
+    animation: glitch-skew 1s infinite linear alternate-reverse;
+  }
+
+  h1::before,
+  h1::after {
+    content: attr(data-text);
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: transparent;
+  }
+
+  h1::before {
+    left: 2px;
+    text-shadow: -2px 0 #ff3399;
+    clip: rect(44px, 450px, 56px, 0);
+    animation: glitch-anim 5s infinite linear alternate-reverse;
+  }
+
+  h1::after {
+    left: -2px;
+    text-shadow: -2px 0 #4db8ff, 2px 2px #ff3399;
+    clip: rect(85px, 450px, 90px, 0);
+    animation: glitch-anim-2 5s infinite linear alternate-reverse;
+  }
+
+  @keyframes glitch-anim {
+    0% { clip: rect(42px, 9999px, 44px, 0); transform: skew(0.3deg); } 5% { clip: rect(17px, 9999px, 94px, 0); } 10% { clip: rect(40px, 9999px, 62px, 0); } 15% { clip: rect(27px, 9999px, 81px, 0); } 20% { clip: rect(74px, 9999px, 53px, 0); } 25% { clip: rect(54px, 9999px, 14px, 0); } 30% { clip: rect(87px, 9999px, 75px, 0); } 35% { clip: rect(38px, 9999px, 13px, 0); } 40% { clip: rect(41px, 9999px, 42px, 0); } 45% { clip: rect(21px, 9999px, 75px, 0); } 50% { clip: rect(13px, 9999px, 57px, 0); } 55% { clip: rect(13px, 9999px, 6px, 0); } 60% { clip: rect(18px, 9999px, 98px, 0); } 65% { clip: rect(89px, 9999px, 43px, 0); } 70% { clip: rect(18px, 9999px, 95px, 0); } 75% { clip: rect(53px, 9999px, 2px, 0); } 80% { clip: rect(45px, 9999px, 48px, 0); transform: skew(0.8deg); } 85% { clip: rect(79px, 9999px, 55px, 0); } 90% { clip: rect(41px, 9999px, 73px, 0); } 95% { clip: rect(29px, 9999px, 78px, 0); } 100% { clip: rect(29px, 9999px, 31px, 0); transform: skew(-0.2deg); }
+  }
+
+  @keyframes glitch-anim-2 {
+    0% { clip: rect(69px, 9999px, 92px, 0); transform: skew(0.5deg); } 5% { clip: rect(8px, 9999px, 33px, 0); } 10% { clip: rect(83px, 9999px, 40px, 0); } 15% { clip: rect(20px, 9999px, 2px, 0); } 20% { clip: rect(18px, 9999px, 79px, 0); } 25% { clip: rect(7px, 9999px, 60px, 0); } 30% { clip: rect(25px, 9999px, 10px, 0); } 35% { clip: rect(2px, 9999px, 5px, 0); } 40% { clip: rect(85px, 9999px, 51px, 0); } 45% { clip: rect(43px, 9999px, 9px, 0); } 50% { clip: rect(2px, 9999px, 78px, 0); } 55% { clip: rect(74px, 9999px, 93px, 0); } 60% { clip: rect(10px, 9999px, 45px, 0); } 65% { clip: rect(63px, 9999px, 3px, 0); } 70% { clip: rect(49px, 9999px, 96px, 0); } 75% { clip: rect(12px, 9999px, 8px, 0); } 80% { clip: rect(51px, 9999px, 80px, 0); transform: skew(-0.6deg); } 85% { clip: rect(11px, 9999px, 59px, 0); } 90% { clip: rect(41px, 9999px, 4px, 0); } 95% { clip: rect(1px, 9999px, 14px, 0); } 100% { clip: rect(8px, 9999px, 99px, 0); transform: skew(0.1deg); }
+  }
+
+  @keyframes glitch-skew {
+    0% { transform: skew(2deg); } 10% { transform: skew(-1deg); } 20% { transform: skew(0.5deg); } 30% { transform: skew(0deg); } 40% { transform: skew(1.5deg); } 50% { transform: skew(0deg); } 60% { transform: skew(-2deg); } 70% { transform: skew(0deg); } 80% { transform: skew(1deg); } 90% { transform: skew(0deg); } 100% { transform: skew(-0.5deg); }
+  }
+  /* --- END PUNK TITLE STYLE --- */
+
+  /* --- GIFT BUTTON STYLE --- */
+  .gift-btn {
+    padding: 12px 28px;
+    font-family: 'Share Tech Mono', monospace;
+    font-size: 1.1rem;
+    font-weight: 900;
+    text-transform: uppercase;
+    color: #fff;
+    background: #ff3399;
+    border: 2px solid #ff99cc;
+    border-radius: 9999px;
+    cursor: pointer;
+    box-shadow: 0 0 15px #ff3399, 0 0 25px #ff3399;
+    transition: all 0.3s ease;
+    animation: pulse-glow 2s infinite alternate;
+  }
+
+  .gift-btn:hover {
+    transform: scale(1.05);
+    box-shadow: 0 0 20px #ff3399, 0 0 35px #ff3399;
+  }
+
+  @keyframes pulse-glow {
+    from {
+      box-shadow: 0 0 15px #ff3399, 0 0 25px #ff3399;
+    }
+    to {
+      box-shadow: 0 0 25px #ff80bf, 0 0 40px #ff80bf;
+    }
+  }
+  /* --- END GIFT BUTTON STYLE --- */
+
+  .grid {
+    display: grid;
+    gap: 20px;
+    grid-template-columns: repeat(auto-fit,minmax(280px,1fr));
+    width: 100%;
+    max-width: 1024px;
+  }
+  .card {
+    background: rgba(0,0,0,0.65);
+    border: 2px solid #ff4db8cc;
+    border-radius: 24px;
+    box-shadow: 0 0 20px #ff4db8aa;
+    overflow: hidden;
+    transition: transform 0.3s ease;
+  }
+  .card:hover {
+    transform: scale(1.05);
+  }
+  .thumb-container {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    overflow: hidden;
+  }
+  .thumb {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    filter: blur(3px) saturate(1.5);
+    transition: filter 0.3s ease;
+  }
+  .locked-overlay {
+    position: absolute;
+    inset: 0;
+    background: rgba(0,0,0,0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    gap: 12px;
+    color: #ff99cc;
+    font-weight: 700;
+    text-shadow: 0 0 8px #ff3399;
+  }
+  .price-tag {
+    background: #8b1c54cc;
+    padding: 6px 18px;
+    border-radius: 9999px;
+    border: 1px solid #ff3399;
+    font-size: 1.25rem;
+    box-shadow: 0 0 10px #ff3399;
+  }
+  .unlock-btn {
+    padding: 10px 24px;
+    border-radius: 24px;
+    background: #d95ea8cc;
+    border: 2px solid #ff3399;
+    font-weight: 900;
+    text-transform: uppercase;
+    color: #fff;
+    box-shadow: 0 0 10px #ff3399;
+    transition: background 0.3s ease;
+    cursor: pointer;
+  }
+  .unlock-btn:hover {
+    background: #ff3399;
+  }
+  .title {
+    font-weight: 900;
+    font-size: 1.25rem;
+    margin: 16px 20px 8px;
+    text-shadow: 0 0 8px #ff4db8;
+  }
+  .price-info {
+    font-size: 0.8rem;
+    opacity: 0.7;
+    margin-left: 20px;
+    margin-bottom: 16px;
+  }
+  .unlocked-link {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    color: #ff99cc;
+    font-weight: 900;
+    font-size: 1.1rem;
+    background: rgba(20, 0, 20, 0.7);
+    text-decoration: none;
+    transition: color 0.3s ease, transform 0.3s ease;
+  }
+  .unlocked-link:hover {
+    color: #fff0ff;
+    transform: scale(1.05);
+  }
+
+  /* Modal Styles */
+  .modal {
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.85);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    padding: 24px;
+    z-index: 100;
+  }
+  .modal.active {
+    display: flex;
+  }
+  .modal-content {
+    background: #1a001a;
+    border: 2px solid #ff3399;
+    border-radius: 24px;
+    padding: 32px 28px;
+    width: 100%;
+    max-width: 420px; /* Increased max-width for the wheel */
+    box-shadow: 0 0 30px #ff3399;
+    text-align: center;
+    color: #ff99cc;
+    position: relative;
+  }
+  .modal-content h2 {
+    margin: 0 0 12px;
+    font-weight: 900;
+    font-size: 1.5rem;
+    text-shadow: 0 0 6px #ff3399;
+  }
+  .modal-content p {
+    font-size: 0.9rem;
+    opacity: 0.8;
+    margin-bottom: 20px;
+    line-height: 1.5;
+  }
+  .modal-content input[type="text"] {
+    width: 100%;
+    padding: 14px;
+    font-size: 1.3rem;
+    font-family: 'Share Tech Mono', monospace;
+    background: #2d002d;
+    border: 2px solid #ff3399;
+    border-radius: 16px;
+    color: #ff99cc;
+    text-align: center;
+    outline: none;
+    box-sizing: border-box;
+  }
+  .modal-content input[type="text"]::placeholder {
+    color: #ff66bb88;
+  }
+  .modal-content input[type="text"]:focus {
+    border-color: #ff4db8;
+    box-shadow: 0 0 10px #ff3399;
+  }
+  .error-msg {
+    margin-top: 8px;
+    color: #ff4d6b;
+    font-weight: 700;
+    font-size: 0.9rem;
+    min-height: 1.2em;
+  }
+  .modal-button {
+    margin-top: 28px;
+    padding: 14px 0;
+    width: 100%;
+    border-radius: 20px;
+    border: 2px solid #ff3399;
+    background: #d95ea8c9;
+    color: white;
+    font-weight: 900;
+    font-size: 1.1rem;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    text-transform: uppercase;
+  }
+  .modal-button:hover {
+    background: #ff3399;
+  }
+  .modal-close-btn {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      background: none;
+      border: none;
+      color: #ff99cc;
+      font-size: 1.8rem;
+      cursor: pointer;
+      opacity: 0.7;
+      z-index: 120; /* Ensure it's above wheel content */
+  }
+  .modal-close-btn:hover {
+      opacity: 1;
+  }
+  
+  /* Payment Modal Specifics */
+  #paymentModal .qr-code {
+      background: white;
+      padding: 10px;
+      border-radius: 12px;
+      margin: 0 auto 20px;
+      width: 180px;
+      height: 180px;
+  }
+  #paymentModal .upi-id {
+      font-weight: bold;
+      background: #2d002d;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ff3399;
+      word-wrap: break-word;
+  }
+  
+  /* --- NEW: Lucky Wheel Styles (inside modal) --- */
+  #giftModal .modal-content {
+      font-family: 'Poppins', sans-serif;
+      background: #111827; /* bg-gray-900 */
+      border-color: #facc15; /* yellow-400 */
+      padding: 16px;
+  }
+  #wheel-container {
+      position: relative;
+  }
+  #wheel-container::before {
+      content: '';
+      position: absolute;
+      top: -10px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 0;
+      border-left: 20px solid transparent;
+      border-right: 20px solid transparent;
+      border-top: 30px solid #facc15; /* yellow-400 */
+      z-index: 10;
+  }
+  #wheel {
+      transition: transform 6s cubic-bezier(0.25, 0.1, 0.25, 1);
+  }
+
+</style>
+</head>
+<body>
+
+<div class="title-container">
+  <h1 data-text="Bonoda Official — Premium">Bonoda Official — Premium</h1>
+  <button id="giftBtn" class="gift-btn">✨ Claim Free Gift ✨</button>
+</div>
+
+<div class="grid" id="videoGrid"></div>
+
+<!-- Modal for entering the unlock code -->
+<div id="codeEntryModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="codeEntryModalTitle">
+  <div class="modal-content">
+    <button class="modal-close-btn" data-close>&times;</button>
+    <h2 id="codeEntryModalTitle">Unlock Premium</h2>
+    <p>Enter the 6-digit code to watch this video.</p>
+    <input type="text" id="codeInput" maxlength="6" placeholder="••••••" autocomplete="off" />
+    <div class="error-msg" id="errorMsg"></div>
+    <button id="submitCodeBtn" class="modal-button">Unlock</button>
+  </div>
+</div>
+
+<!-- Modal for showing payment instructions -->
+<div id="paymentModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="paymentModalTitle">
+    <div class="modal-content">
+      <button class="modal-close-btn" data-close>&times;</button>
+      <h2 id="paymentModalTitle">Complete Payment</h2>
+      <p>Scan the QR code with your UPI app or use the UPI ID below to pay <strong>$1</strong>.</p>
+      <img id="qrCodeImg" class="qr-code" src="" alt="UPI QR Code" />
+      <p class="upi-id" id="upiIdDisplay"></p>
+      <p style="margin-top: 20px;">After paying, click the button below to enter your unlock code.</p>
+      <button id="paidBtn" class="modal-button">I Have Paid</button>
+    </div>
+</div>
+
+<!-- MODIFIED: Modal for the free gift now contains the lucky wheel -->
+<div id="giftModal" class="modal" role="dialog" aria-modal="true">
+  <div class="modal-content">
+    <button class="modal-close-btn" data-close>&times;</button>
+    
+    <!-- Lucky Wheel HTML is injected here -->
+    <div class="w-full max-w-md flex flex-col items-center text-white">
+        <div class="text-center mb-4">
+            <h1 class="text-xl md:text-2xl font-bold text-yellow-400 tracking-wider">FACEBOOK PAGE :Bonoda Official</h1>
             <p class="text-gray-400 mt-2">UPI ID: bonoproduction3@okaxis</p>
         </div>
 
-        <!-- Container for the wheel and pointer. Its size will control the canvas size. -->
-        <div id="wheel-container" class="relative w-[300px] h-[300px] sm:w-[400px] sm:h-[400px] mb-8">
-            <!-- Canvas width and height will be set by JavaScript for sharpness -->
+        <div id="wheel-container" class="relative w-[250px] h-[250px] sm:w-[300px] sm:h-[300px] mb-6">
             <canvas id="wheel" class="w-full h-full"></canvas>
         </div>
 
-        <!-- Buttons Container -->
         <div class="flex flex-col sm:flex-row items-center gap-4">
-             <!-- Payment Button - Now a button, not a link -->
             <button id="pay-btn" class="bg-green-600 text-white font-bold py-3 px-10 rounded-full text-xl shadow-lg hover:bg-green-700 active:scale-95 transition-all duration-200">
                 Pay ₹10
             </button>
-            <!-- Spin Button -->
             <button id="spin-btn" class="bg-red-600 text-white font-bold py-3 px-10 rounded-full text-xl shadow-lg hover:bg-red-700 active:scale-95 transition-all duration-200 disabled:bg-gray-600 disabled:text-gray-400 disabled:cursor-not-allowed">
                 SPIN
             </button>
         </div>
     </div>
-
-
-    <!-- Modal for displaying the prize result -->
-    <div id="modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+    
+    <!-- Nested Modal for displaying the prize result -->
+    <div id="prizeModal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-[110] p-4">
         <div class="bg-gray-800 border-2 border-yellow-400 p-8 rounded-2xl shadow-2xl text-center max-w-sm w-full transform scale-95 transition-transform duration-300">
-            <h2 id="modal-title" class="text-3xl font-bold mb-4">Congratulations!</h2>
-            <p id="modal-text" class="text-xl text-gray-300 mb-6">You've won a prize!</p>
-            <button id="close-modal-btn" class="bg-yellow-400 text-gray-900 font-bold py-2 px-8 rounded-full hover:bg-yellow-500 transition-colors">
+            <h2 id="prizeModal-title" class="text-3xl font-bold mb-4">Congratulations!</h2>
+            <p id="prizeModal-text" class="text-xl text-gray-300 mb-6">You've won a prize!</p>
+            <button id="close-prizeModal-btn" class="bg-yellow-400 text-gray-900 font-bold py-2 px-8 rounded-full hover:bg-yellow-500 transition-colors">
                 Awesome!
             </button>
         </div>
     </div>
     
-    <!-- Modal for displaying the QR Code -->
-    <div id="qr-modal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-50 p-4">
+    <!-- Nested Modal for displaying the QR Code -->
+    <div id="qrModal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-[110] p-4">
         <div class="bg-gray-800 border-2 border-yellow-400 p-8 rounded-2xl shadow-2xl text-center max-w-sm w-full relative">
-            <button id="close-qr-modal-btn" class="absolute top-2 right-4 text-gray-400 hover:text-white text-3xl font-bold">&times;</button>
+            <button id="close-qrModal-btn" class="absolute top-2 right-4 text-gray-400 hover:text-white text-3xl font-bold">&times;</button>
             <h2 class="text-2xl font-bold mb-4 text-yellow-400">Pay with UPI</h2>
             <p class="text-gray-300 mb-4">Scan the QR code with your UPI app to pay ₹10.</p>
-            <div id="qrcode" class="bg-white p-4 rounded-lg inline-block">
-                <!-- QR Code image will be generated here by JavaScript -->
-            </div>
+            <div id="qrcode" class="bg-white p-4 rounded-lg inline-block"></div>
             <p class="text-gray-400 mt-4 text-sm">Or use UPI ID: bonoproduction3@okaxis</p>
         </div>
     </div>
+  </div>
+</div>
 
 
-    <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            // --- DOM Elements ---
-            const wheelCanvas = document.getElementById('wheel');
-            const spinBtn = document.getElementById('spin-btn');
-            const modal = document.getElementById('modal');
-            const modalContent = modal.querySelector('div');
-            const modalTitle = document.getElementById('modal-title');
-            const modalText = document.getElementById('modal-text');
-            const closeModalBtn = document.getElementById('close-modal-btn');
-            const ctx = wheelCanvas.getContext('2d');
-            
-            // --- Payment Elements ---
-            const payBtn = document.getElementById('pay-btn');
-            const qrModal = document.getElementById('qr-modal');
-            const closeQrModalBtn = document.getElementById('close-qr-modal-btn');
-            const qrCodeContainer = document.getElementById('qrcode');
+<script>
+  (function() {
+    // --- ORIGINAL PAGE LOGIC ---
+    const UNLOCK_CODE = "845376";
+    const PRICE_LABEL = "$1";
+    const UPI_ID = "bonoproduction3@okaxis";
+    const PAYEE_NAME = "Bonoda Official";
+    const UPI_AMOUNT_INR = "83.00"; 
 
+    const videos = [
+      { id: "b1", title: "Exclusive: Bonoda Studio Tour", ytUrl: "https://youtu.be/qQGThidylRc?si=CKyE3hI37NSxuYgK", thumb: "https://img.youtube.com/vi/qQGThidylRc/hqdefault.jpg" },
+      { id: "b2", title: "Behind The Track: Emo Punk Mix Tips", ytUrl: "https://youtu.be/Kbyj8D44ThQ?si=i8r7hYqwInwCxMPG", thumb: "https://img.youtube.com/vi/Kbyj8D44ThQ/hqdefault.jpg" },
+      { id: "b3", title: "Live Set: Pink Night (Full)", ytUrl: "https://youtu.be/fb_oi1IUFdU?si=gRAd2kiil6rZ26ey", thumb: "https://img.youtube.com/vi/fb_oi1IUFdU/hqdefault.jpg" },
+    ];
 
-            // --- Sound Synthesis Setup (Tone.js) ---
-            const tickSynth = new Tone.Synth({
-                oscillator: { type: 'sine' },
-                envelope: { attack: 0.005, decay: 0.1, sustain: 0, release: 0.1 }
-            }).toDestination();
+    let unlocked = JSON.parse(localStorage.getItem('bonodaUnlocked') || "[]");
+    let currentUnlockId = null;
 
-            const winSynth = new Tone.Synth({
-                oscillator: { type: 'triangle' },
-                envelope: { attack: 0.01, decay: 0.2, sustain: 0.1, release: 0.4 }
-            }).toDestination();
-            
-            let tickInterval = null;
+    const videoGrid = document.getElementById('videoGrid');
+    const codeEntryModal = document.getElementById('codeEntryModal');
+    const paymentModal = document.getElementById('paymentModal');
+    const giftModal = document.getElementById('giftModal');
+    
+    const codeInput = document.getElementById('codeInput');
+    const errorMsg = document.getElementById('errorMsg');
+    const submitCodeBtn = document.getElementById('submitCodeBtn');
+    const paidBtn = document.getElementById('paidBtn');
+    const giftBtn = document.getElementById('giftBtn');
 
-            // --- Configuration ---
-            const segments = [
-                { text: 'Bonoda membership', color: '#16a34a' },
-                { text: 'GIFT', color: '#4c1d95' },
-                { text: 'Bonoda membership', color: '#16a34a' },
-                { text: 'GIFT', color: '#6d28d9' },
-                { text: 'Bonoda membership', color: '#16a34a' },
-                { text: 'LUCKY DRAW', color: '#f59e0b' },
-                { text: 'Bonoda membership', color: '#16a34a' },
-                { text: 'GIFT', color: '#4c1d95' },
-                { text: 'Bonoda membership', color: '#16a34a' },
-                { text: 'Bonoda membership', color: '#16a34a' },
-            ];
+    function saveUnlocked() {
+      localStorage.setItem('bonodaUnlocked', JSON.stringify(unlocked));
+    }
+    
+    function openModal(modal) {
+        if(modal) modal.classList.add('active');
+    }
 
-            // --- Dynamic Sizing & State Variables ---
-            const numSegments = segments.length;
-            const anglePerSegment = (2 * Math.PI) / numSegments;
-            let canvasSize = 0;
-            let radius = 0;
-            let currentRotation = 0;
-            let isSpinning = false;
-            let winningSegment = null;
+    function closeModal(modal) {
+        if(modal) modal.classList.remove('active');
+    }
 
-            // --- Drawing Functions ---
+    function buildGrid() {
+      videoGrid.innerHTML = '';
+      videos.forEach(video => {
+        const isUnlocked = unlocked.includes(video.id);
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.dataset.videoId = video.id;
 
-            function setupCanvas() {
-                const container = document.getElementById('wheel-container');
-                const dpr = window.devicePixelRatio || 1;
-                const rect = container.getBoundingClientRect();
-                canvasSize = rect.width;
-                wheelCanvas.width = canvasSize * dpr;
-                wheelCanvas.height = canvasSize * dpr;
-                ctx.scale(dpr, dpr);
-                radius = canvasSize / 2 - 10;
-                drawWheel();
-            }
-            
-            function drawWheel() {
-                ctx.clearRect(0, 0, wheelCanvas.width, wheelCanvas.height);
-                ctx.font = `bold ${radius * 0.08}px Poppins`;
-                ctx.textBaseline = 'middle';
-                
-                segments.forEach((segment, i) => {
-                    const startAngle = i * anglePerSegment;
-                    const endAngle = startAngle + anglePerSegment;
-                    ctx.beginPath();
-                    ctx.moveTo(canvasSize / 2, canvasSize / 2);
-                    ctx.arc(canvasSize / 2, canvasSize / 2, radius, startAngle, endAngle);
-                    ctx.closePath();
-                    ctx.fillStyle = segment.color;
-                    ctx.fill();
-                    ctx.strokeStyle = '#374151';
-                    ctx.lineWidth = 4;
-                    ctx.stroke();
-                    ctx.save();
-                    ctx.fillStyle = 'white';
-                    ctx.translate(canvasSize / 2, canvasSize / 2);
-                    ctx.rotate(startAngle + anglePerSegment / 2);
-                    ctx.textAlign = 'right';
-                    ctx.fillText(segment.text, radius * 0.9, 0);
-                    ctx.restore();
-                });
-            }
-            
-            // --- Spin Logic ---
-            function spin() {
-                if (isSpinning) return;
-                Tone.start();
-                isSpinning = true;
-                spinBtn.disabled = true;
-                winningSegment = null;
-                tickInterval = setInterval(() => {
-                    tickSynth.triggerAttackRelease("G5", "32n");
-                }, 120);
-                const rand = Math.random();
-                let outcome;
-                if (rand < 0.1) { outcome = 'LUCKY DRAW'; }
-                else if (rand < 0.7) { outcome = 'Bonoda membership'; }
-                else { outcome = 'GIFT'; }
-                const possibleIndices = segments.map((seg, i) => seg.text === outcome ? i : -1).filter(i => i !== -1);
-                const targetIndex = possibleIndices[Math.floor(Math.random() * possibleIndices.length)];
-                winningSegment = segments[targetIndex];
-                const degreesPerSegment = 360 / numSegments;
-                const pointerAngle = 270; 
-                const targetSegmentCenterAngle = (targetIndex * degreesPerSegment) + (degreesPerSegment / 2);
-                const rotationToTarget = pointerAngle - targetSegmentCenterAngle;
-                const randomExtraSpins = Math.floor(Math.random() * 4) + 5;
-                const finalAngle = currentRotation + (randomExtraSpins * 360) + rotationToTarget;
-                wheelCanvas.style.transform = `rotate(${finalAngle}deg)`;
-            }
+        const thumbContainer = document.createElement('div');
+        thumbContainer.className = 'thumb-container';
 
-            // --- Payment Logic ---
-            const upiLink = "upi://pay?pa=bonoproduction3@okaxis&pn=Bonoda%20Official&am=10&cu=INR&tn=Lucky%20Draw%20Spin";
+        if (!isUnlocked) {
+          const img = document.createElement('img');
+          img.className = 'thumb';
+          img.src = video.thumb;
+          img.alt = video.title;
+          thumbContainer.appendChild(img);
 
-            function handlePayment() {
-                // Always show a QR code in a modal, regardless of device.
-                qrCodeContainer.innerHTML = ''; // Clear previous QR code if any
-                const qrImg = document.createElement('img');
-                // Use a QR code generation API to create the image
-                qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(upiLink)}`;
-                qrImg.alt = "UPI QR Code";
-                qrImg.onerror = () => { 
-                    qrCodeContainer.innerHTML = '<p class="text-red-500">Could not load QR Code.</p>';
-                };
-                qrCodeContainer.appendChild(qrImg);
-                qrModal.classList.remove('hidden');
-            }
+          const overlay = document.createElement('div');
+          overlay.className = 'locked-overlay';
 
-            // --- Event Handlers ---
-            function onSpinEnd() {
-                const transformMatrix = window.getComputedStyle(wheelCanvas).transform;
-                if (transformMatrix !== 'none') {
-                    const values = transformMatrix.split('(')[1].split(')')[0].split(',');
-                    currentRotation = Math.round(Math.atan2(values[1], values[0]) * (180 / Math.PI));
-                }
-                isSpinning = false;
-                spinBtn.disabled = false;
-                clearInterval(tickInterval);
-                if (!winningSegment) return;
-                winSynth.triggerAttackRelease("C5", "0.5s", Tone.now());
-                winSynth.triggerAttackRelease("G5", "0.5s", Tone.now() + 0.2);
-                if (winningSegment.text === 'LUCKY DRAW') {
-                    modalTitle.textContent = '🎉 LUCKY DRAW! 🎉';
-                    modalText.textContent = '69780';
-                } else if (winningSegment.text === 'Bonoda membership') {
-                    modalTitle.textContent = 'Fantastic!';
-                    modalText.textContent = 'You won a Bonoda membership!';
-                } else {
-                    modalTitle.textContent = 'You Won a Gift!';
-                    modalText.textContent = '33487';
-                }
-                modal.classList.remove('hidden');
-                setTimeout(() => modalContent.classList.add('scale-100'), 10);
-            }
+          const priceTag = document.createElement('span');
+          priceTag.className = 'price-tag';
+          priceTag.textContent = PRICE_LABEL;
 
-            function closeModal() {
-                modalContent.classList.remove('scale-100');
-                setTimeout(() => modal.classList.add('hidden'), 300);
-            }
-            
-            function closeQrModal() {
-                qrModal.classList.add('hidden');
-            }
+          const btn = document.createElement('button');
+          btn.className = 'unlock-btn';
+          btn.textContent = 'Pay & Unlock';
+          
+          overlay.appendChild(priceTag);
+          overlay.appendChild(btn);
+          thumbContainer.appendChild(overlay);
+        } else {
+          const link = document.createElement('a');
+          link.href = video.ytUrl;
+          link.target = '_blank';
+          link.rel = 'noopener noreferrer';
+          link.className = 'unlocked-link';
+          link.textContent = '▶ Watch on YouTube';
+          thumbContainer.appendChild(link);
+        }
 
-            spinBtn.addEventListener('click', spin);
-            payBtn.addEventListener('click', handlePayment);
-            wheelCanvas.addEventListener('transitionend', onSpinEnd);
-            closeModalBtn.addEventListener('click', closeModal);
-            closeQrModalBtn.addEventListener('click', closeQrModal);
-            window.addEventListener('resize', setupCanvas);
+        card.appendChild(thumbContainer);
 
-            // Initial setup and draw of the wheel
-            setupCanvas();
+        const titleEl = document.createElement('h3');
+        titleEl.className = 'title';
+        titleEl.textContent = video.title;
+        card.appendChild(titleEl);
+
+        const priceInfo = document.createElement('p');
+        priceInfo.className = 'price-info';
+        priceInfo.textContent = `Price: ${PRICE_LABEL} • ${isUnlocked ? "Unlocked" : "Locked"}`;
+        card.appendChild(priceInfo);
+
+        videoGrid.appendChild(card);
+      });
+    }
+
+    document.querySelectorAll('[data-close]').forEach(btn => {
+        btn.addEventListener('click', () => {
+            closeModal(btn.closest('.modal'));
         });
-    </script>
+    });
+
+    giftBtn.addEventListener('click', () => {
+        openModal(giftModal);
+        initializeWheelGame(); // Initialize the wheel game when modal is opened
+    });
+
+    paidBtn.addEventListener('click', () => {
+        localStorage.setItem('bonodaPaid', 'true');
+        closeModal(paymentModal);
+        errorMsg.textContent = '';
+        codeInput.value = '';
+        openModal(codeEntryModal);
+        codeInput.focus();
+    });
+    
+    function attemptUnlock() {
+        const val = codeInput.value.trim();
+        if (val.length !== 6) {
+            errorMsg.textContent = 'Code must be 6 digits.';
+            return;
+        }
+
+        if (val === UNLOCK_CODE) {
+            const videoToOpen = videos.find(v => v.id === currentUnlockId);
+            videos.forEach(v => {
+                if (!unlocked.includes(v.id)) unlocked.push(v.id);
+            });
+            saveUnlocked();
+            closeModal(codeEntryModal);
+            buildGrid();
+            if (videoToOpen) window.open(videoToOpen.ytUrl, '_blank');
+        } else {
+          errorMsg.textContent = 'Wrong code. Try again.';
+        }
+    }
+
+    submitCodeBtn.addEventListener('click', attemptUnlock);
+    codeInput.addEventListener('keyup', (e) => {
+        if (e.key === 'Enter') attemptUnlock();
+        if (codeInput.value.length < 6) errorMsg.textContent = '';
+    });
+
+    const upiUrl = `upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(PAYEE_NAME)}&am=${UPI_AMOUNT_INR}&cu=INR&tn=BonodaPremiumUnlock`;
+    function setupPaymentModal() {
+        const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(upiUrl)}`;
+        document.getElementById('qrCodeImg').src = qrApiUrl;
+        document.getElementById('upiIdDisplay').textContent = UPI_ID;
+    }
+
+    videoGrid.addEventListener('click', (e) => {
+        if (e.target.classList.contains('unlock-btn')) {
+            currentUnlockId = e.target.closest('.card').dataset.videoId;
+            const hasPaid = localStorage.getItem('bonodaPaid') === 'true';
+            if (hasPaid) {
+                errorMsg.textContent = '';
+                codeInput.value = '';
+                openModal(codeEntryModal);
+                codeInput.focus();
+            } else {
+                openModal(paymentModal);
+            }
+        }
+    });
+
+    // --- Initial setup for original page ---
+    setupPaymentModal();
+    buildGrid();
+
+    // --- NEW: LUCKY WHEEL GAME LOGIC ---
+    let wheelInitialized = false;
+
+    function initializeWheelGame() {
+        if (wheelInitialized) return; // Prevent re-initialization
+        wheelInitialized = true;
+
+        const wheelCanvas = document.getElementById('wheel');
+        if (!wheelCanvas) return; // Exit if wheel isn't on the page
+
+        const spinBtn = document.getElementById('spin-btn');
+        const prizeModal = document.getElementById('prizeModal');
+        const prizeModalContent = prizeModal.querySelector('div');
+        const prizeModalTitle = document.getElementById('prizeModal-title');
+        const prizeModalText = document.getElementById('prizeModal-text');
+        const closePrizeModalBtn = document.getElementById('close-prizeModal-btn');
+        const ctx = wheelCanvas.getContext('2d');
+        
+        const payBtn = document.getElementById('pay-btn');
+        const qrModal = document.getElementById('qrModal');
+        const closeQrModalBtn = document.getElementById('close-qrModal-btn');
+        const qrCodeContainer = document.getElementById('qrcode');
+
+        const tickSynth = new Tone.Synth({ oscillator: { type: 'sine' }, envelope: { attack: 0.005, decay: 0.1, sustain: 0, release: 0.1 } }).toDestination();
+        const winSynth = new Tone.Synth({ oscillator: { type: 'triangle' }, envelope: { attack: 0.01, decay: 0.2, sustain: 0.1, release: 0.4 } }).toDestination();
+        let tickInterval = null;
+
+        const segments = [
+            { text: 'Bonoda membership', color: '#16a34a' }, { text: 'GIFT', color: '#4c1d95' },
+            { text: 'Bonoda membership', color: '#16a34a' }, { text: 'GIFT', color: '#6d28d9' },
+            { text: 'Bonoda membership', color: '#16a34a' }, { text: 'LUCKY DRAW', color: '#f59e0b' },
+            { text: 'Bonoda membership', color: '#16a34a' }, { text: 'GIFT', color: '#4c1d95' },
+            { text: 'Bonoda membership', color: '#16a34a' }, { text: 'Bonoda membership', color: '#16a34a' },
+        ];
+
+        const numSegments = segments.length;
+        const anglePerSegment = (2 * Math.PI) / numSegments;
+        let canvasSize = 0, radius = 0, currentRotation = 0, isSpinning = false, winningSegment = null;
+
+        function setupCanvas() {
+            const container = document.getElementById('wheel-container');
+            if (!container) return;
+            const dpr = window.devicePixelRatio || 1;
+            const rect = container.getBoundingClientRect();
+            canvasSize = rect.width;
+            wheelCanvas.width = canvasSize * dpr;
+            wheelCanvas.height = canvasSize * dpr;
+            ctx.scale(dpr, dpr);
+            radius = canvasSize / 2 - 10;
+            drawWheel();
+        }
+        
+        function drawWheel() {
+            ctx.clearRect(0, 0, wheelCanvas.width, wheelCanvas.height);
+            ctx.font = `bold ${radius * 0.08}px Poppins`;
+            ctx.textBaseline = 'middle';
+            
+            segments.forEach((segment, i) => {
+                const startAngle = i * anglePerSegment;
+                const endAngle = startAngle + anglePerSegment;
+                ctx.beginPath();
+                ctx.moveTo(canvasSize / 2, canvasSize / 2);
+                ctx.arc(canvasSize / 2, canvasSize / 2, radius, startAngle, endAngle);
+                ctx.closePath();
+                ctx.fillStyle = segment.color;
+                ctx.fill();
+                ctx.strokeStyle = '#374151';
+                ctx.lineWidth = 4;
+                ctx.stroke();
+                ctx.save();
+                ctx.fillStyle = 'white';
+                ctx.translate(canvasSize / 2, canvasSize / 2);
+                ctx.rotate(startAngle + anglePerSegment / 2);
+                ctx.textAlign = 'right';
+                ctx.fillText(segment.text, radius * 0.9, 0);
+                ctx.restore();
+            });
+        }
+        
+        function spin() {
+            if (isSpinning) return;
+            Tone.start();
+            isSpinning = true;
+            spinBtn.disabled = true;
+            winningSegment = null;
+            tickInterval = setInterval(() => tickSynth.triggerAttackRelease("G5", "32n"), 120);
+            
+            const rand = Math.random();
+            let outcome;
+            if (rand < 0.1) { outcome = 'LUCKY DRAW'; }
+            else if (rand < 0.7) { outcome = 'Bonoda membership'; }
+            else { outcome = 'GIFT'; }
+            
+            const possibleIndices = segments.map((seg, i) => seg.text === outcome ? i : -1).filter(i => i !== -1);
+            const targetIndex = possibleIndices[Math.floor(Math.random() * possibleIndices.length)];
+            winningSegment = segments[targetIndex];
+            
+            const degreesPerSegment = 360 / numSegments;
+            const pointerAngle = 270; 
+            const targetSegmentCenterAngle = (targetIndex * degreesPerSegment) + (degreesPerSegment / 2);
+            const rotationToTarget = pointerAngle - targetSegmentCenterAngle;
+            const randomExtraSpins = Math.floor(Math.random() * 4) + 5;
+            const finalAngle = currentRotation + (randomExtraSpins * 360) + rotationToTarget;
+            wheelCanvas.style.transform = `rotate(${finalAngle}deg)`;
+        }
+
+        const wheelUpiLink = "upi://pay?pa=bonoproduction3@okaxis&pn=Bonoda%20Official&am=10&cu=INR&tn=Lucky%20Draw%20Spin";
+
+        function handlePayment() {
+            qrCodeContainer.innerHTML = '';
+            const qrImg = document.createElement('img');
+            qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(wheelUpiLink)}`;
+            qrImg.alt = "UPI QR Code";
+            qrImg.onerror = () => { qrCodeContainer.innerHTML = '<p class="text-red-500">Could not load QR Code.</p>'; };
+            qrCodeContainer.appendChild(qrImg);
+            qrModal.classList.remove('hidden');
+        }
+
+        function onSpinEnd() {
+            const transformMatrix = window.getComputedStyle(wheelCanvas).transform;
+            if (transformMatrix !== 'none') {
+                const values = transformMatrix.split('(')[1].split(')')[0].split(',');
+                currentRotation = Math.round(Math.atan2(values[1], values[0]) * (180 / Math.PI));
+            }
+            isSpinning = false;
+            spinBtn.disabled = false;
+            clearInterval(tickInterval);
+            if (!winningSegment) return;
+            
+            winSynth.triggerAttackRelease("C5", "0.5s", Tone.now());
+            winSynth.triggerAttackRelease("G5", "0.5s", Tone.now() + 0.2);
+            
+            if (winningSegment.text === 'LUCKY DRAW') {
+                prizeModalTitle.textContent = '🎉 LUCKY DRAW! 🎉';
+                prizeModalText.textContent = '69780';
+            } else if (winningSegment.text === 'Bonoda membership') {
+                prizeModalTitle.textContent = 'Fantastic!';
+                prizeModalText.textContent = 'You won a Bonoda membership!';
+            } else {
+                prizeModalTitle.textContent = 'You Won a Gift!';
+                prizeModalText.textContent = '33487';
+            }
+            prizeModal.classList.remove('hidden');
+            setTimeout(() => prizeModalContent.classList.add('scale-100'), 10);
+        }
+
+        function closePrizeModal() {
+            prizeModalContent.classList.remove('scale-100');
+            setTimeout(() => prizeModal.classList.add('hidden'), 300);
+        }
+        
+        function closeQrModal() {
+            qrModal.classList.add('hidden');
+        }
+
+        spinBtn.addEventListener('click', spin);
+        payBtn.addEventListener('click', handlePayment);
+        wheelCanvas.addEventListener('transitionend', onSpinEnd);
+        closePrizeModalBtn.addEventListener('click', closePrizeModal);
+        closeQrModalBtn.addEventListener('click', closeQrModal);
+        window.addEventListener('resize', setupCanvas);
+
+        setupCanvas();
+    }
+  })();
+</script>
+
 </body>
 </html>
+
+
