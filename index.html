@@ -1,4 +1,5 @@
-<!DOCTYPE html>
+
+   <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
@@ -101,37 +102,48 @@
   }
   /* --- END PUNK TITLE STYLE --- */
 
-  /* --- GIFT BUTTON STYLE --- */
-  .gift-btn {
+  /* --- ACTION BUTTONS CONTAINER --- */
+  .action-buttons {
+    display: flex;
+    flex-wrap: wrap; /* Allows buttons to stack on small screens */
+    justify-content: center;
+    gap: 16px;
+  }
+
+  /* --- BUTTON BASE STYLE --- */
+  .action-btn {
     padding: 12px 28px;
     font-family: 'Share Tech Mono', monospace;
     font-size: 1.1rem;
     font-weight: 900;
     text-transform: uppercase;
     color: #fff;
-    background: #ff3399;
-    border: 2px solid #ff99cc;
     border-radius: 9999px;
     cursor: pointer;
-    box-shadow: 0 0 15px #ff3399, 0 0 25px #ff3399;
     transition: all 0.3s ease;
-    animation: pulse-glow 2s infinite alternate;
+    text-decoration: none; /* For the anchor tag */
+    display: inline-block;
+    border: none; /* Reset border */
+  }
+  .action-btn:hover {
+    transform: scale(1.05);
   }
 
-  .gift-btn:hover {
-    transform: scale(1.05);
+  /* --- PINK BUTTON STYLE --- */
+  .pink-btn {
+    background: #ff3399;
+    border: 2px solid #ff99cc;
+    box-shadow: 0 0 15px #ff3399, 0 0 25px #ff3399;
+    animation: pulse-glow-pink 2s infinite alternate;
+  }
+  .pink-btn:hover {
     box-shadow: 0 0 20px #ff3399, 0 0 35px #ff3399;
   }
-
-  @keyframes pulse-glow {
-    from {
-      box-shadow: 0 0 15px #ff3399, 0 0 25px #ff3399;
-    }
-    to {
-      box-shadow: 0 0 25px #ff80bf, 0 0 40px #ff80bf;
-    }
+  @keyframes pulse-glow-pink {
+    from { box-shadow: 0 0 15px #ff3399, 0 0 25px #ff3399; }
+    to { box-shadow: 0 0 25px #ff80bf, 0 0 40px #ff80bf; }
   }
-  /* --- END GIFT BUTTON STYLE --- */
+
 
   .grid {
     display: grid;
@@ -378,13 +390,61 @@
       transition: transform 6s cubic-bezier(0.25, 0.1, 0.25, 1);
   }
 
+  /* --- Clothing Modal Styles --- */
+  #clothingModal .modal-content {
+    border-color: #ff3399; /* Changed to pink */
+    box-shadow: 0 0 30px #ff3399; /* Changed to pink */
+    max-width: 500px; /* Wider modal for catalog */
+  }
+  .clothing-catalog {
+    display: flex;
+    flex-direction: column;
+    gap: 24px;
+  }
+  @media (min-width: 480px) {
+    .clothing-catalog {
+      flex-direction: row;
+    }
+  }
+  .product-card {
+    flex: 1;
+  }
+  .product-image {
+    width: 100%;
+    border-radius: 16px;
+    margin-bottom: 12px;
+    object-fit: cover;
+  }
+  .product-price {
+    font-size: 1.5rem;
+    font-weight: 900;
+    color: #ff99cc; /* Changed to pink */
+    text-shadow: 0 0 8px #ff3399; /* Changed to pink */
+    margin-bottom: 12px;
+  }
+  .buy-clothing-btn {
+    background: #d95ea8c9; /* Changed to pink */
+    border-color: #ff3399; /* Changed to pink */
+    width: 100%;
+    padding: 12px;
+    font-size: 1rem;
+    margin-top: 0;
+  }
+  .buy-clothing-btn:hover {
+    background: #ff3399; /* Changed to pink */
+  }
+
+
 </style>
 </head>
 <body>
 
 <div class="title-container">
   <h1 data-text="Bonoda Official — Premium">Bonoda Official — Premium</h1>
-  <button id="giftBtn" class="gift-btn">✨ Claim Free Gift ✨</button>
+  <div class="action-buttons">
+    <button id="giftBtn" class="action-btn pink-btn">✨ Claim Free Gift ✨</button>
+    <button id="clothingBtn" class="action-btn pink-btn">👕 Bonoda Clothing</button>
+  </div>
 </div>
 
 <div class="grid" id="videoGrid"></div>
@@ -406,7 +466,7 @@
     <div class="modal-content">
       <button class="modal-close-btn" data-close>&times;</button>
       <h2 id="paymentModalTitle">Complete Payment</h2>
-      <p>Scan the QR code with your UPI app or use the UPI ID below to pay <strong>$1</strong>.</p>
+      <p id="paymentDetailText">Scan the QR code with your UPI app or use the UPI ID below to pay.</p>
       <img id="qrCodeImg" class="qr-code" src="" alt="UPI QR Code" />
       <p class="upi-id" id="upiIdDisplay"></p>
       <p style="margin-top: 20px;">After paying, click the button below to enter your unlock code.</p>
@@ -464,15 +524,41 @@
   </div>
 </div>
 
+<!-- NEW: Modal for Bonoda Clothing Catalog -->
+<div id="clothingModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="clothingModalTitle">
+  <div class="modal-content">
+    <button class="modal-close-btn" data-close>&times;</button>
+    <h2 id="clothingModalTitle">Bonoda Clothing</h2>
+    <div class="clothing-catalog">
+      <!-- Product 1 -->
+      <div class="product-card">
+        <img src="https://i.postimg.cc/G2Q7MYVT/Screenshot-2024-12-28-095714.png" alt="Bonoda T-Shirt" class="product-image">
+        <p class="product-price">$12</p>
+        <button class="modal-button buy-clothing-btn" data-price-usd="$12" data-price-inr="999.00" data-item-name="BonodaTShirt">Buy Now</button>
+      </div>
+      <!-- Product 2 -->
+      <div class="product-card">
+        <img src="https://i.postimg.cc/02dY7Pgr/bonoda-set.jpg" alt="Bonoda Set" class="product-image">
+        <p class="product-price">$22</p>
+        <button class="modal-button buy-clothing-btn" data-price-usd="$22" data-price-inr="1825.00" data-item-name="BonodaSet">Buy Now</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 
 <script>
   (function() {
-    // --- ORIGINAL PAGE LOGIC ---
-    const UNLOCK_CODE = "845376";
-    const PRICE_LABEL = "$1";
+    // --- CONFIGURATION ---
     const UPI_ID = "bonoproduction3@okaxis";
     const PAYEE_NAME = "Bonoda Official";
-    const UPI_AMOUNT_INR = "83.00"; 
+
+    const PREMIUM_UNLOCK = {
+        CODE: "845376",
+        PRICE_USD: "$1",
+        PRICE_INR: "83.00",
+        ITEM_NAME: "BonodaPremiumUnlock"
+    };
 
     const videos = [
       { id: "b1", title: "Exclusive: Bonoda Studio Tour", ytUrl: "https://youtu.be/qQGThidylRc?si=CKyE3hI37NSxuYgK", thumb: "https://img.youtube.com/vi/qQGThidylRc/hqdefault.jpg" },
@@ -483,27 +569,48 @@
     let unlocked = JSON.parse(localStorage.getItem('bonodaUnlocked') || "[]");
     let currentUnlockId = null;
 
+    // --- ELEMENT SELECTORS ---
     const videoGrid = document.getElementById('videoGrid');
     const codeEntryModal = document.getElementById('codeEntryModal');
     const paymentModal = document.getElementById('paymentModal');
     const giftModal = document.getElementById('giftModal');
+    const clothingModal = document.getElementById('clothingModal');
     
     const codeInput = document.getElementById('codeInput');
     const errorMsg = document.getElementById('errorMsg');
     const submitCodeBtn = document.getElementById('submitCodeBtn');
     const paidBtn = document.getElementById('paidBtn');
     const giftBtn = document.getElementById('giftBtn');
+    const clothingBtn = document.getElementById('clothingBtn');
 
-    function saveUnlocked() {
-      localStorage.setItem('bonodaUnlocked', JSON.stringify(unlocked));
-    }
-    
+    // --- MODAL FUNCTIONS ---
     function openModal(modal) {
         if(modal) modal.classList.add('active');
     }
 
     function closeModal(modal) {
         if(modal) modal.classList.remove('active');
+    }
+
+    // --- DYNAMIC PAYMENT MODAL ---
+    function updatePaymentModal(priceUSD, priceINR, itemName) {
+        const paymentText = document.getElementById('paymentDetailText');
+        const qrCodeImg = document.getElementById('qrCodeImg');
+        const upiIdDisplay = document.getElementById('upiIdDisplay');
+
+        paymentText.innerHTML = `Scan the QR code with your UPI app or use the UPI ID below to pay <strong>${priceUSD}</strong>.`;
+        
+        const upiUrl = `upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(PAYEE_NAME)}&am=${priceINR}&cu=INR&tn=${itemName}`;
+        const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(upiUrl)}`;
+        
+        qrCodeImg.src = qrApiUrl;
+        upiIdDisplay.textContent = UPI_ID;
+    }
+
+
+    // --- UNLOCK & GRID LOGIC ---
+    function saveUnlocked() {
+      localStorage.setItem('bonodaUnlocked', JSON.stringify(unlocked));
     }
 
     function buildGrid() {
@@ -529,7 +636,7 @@
 
           const priceTag = document.createElement('span');
           priceTag.className = 'price-tag';
-          priceTag.textContent = PRICE_LABEL;
+          priceTag.textContent = PREMIUM_UNLOCK.PRICE_USD;
 
           const btn = document.createElement('button');
           btn.className = 'unlock-btn';
@@ -557,13 +664,14 @@
 
         const priceInfo = document.createElement('p');
         priceInfo.className = 'price-info';
-        priceInfo.textContent = `Price: ${PRICE_LABEL} • ${isUnlocked ? "Unlocked" : "Locked"}`;
+        priceInfo.textContent = `Price: ${PREMIUM_UNLOCK.PRICE_USD} • ${isUnlocked ? "Unlocked" : "Locked"}`;
         card.appendChild(priceInfo);
 
         videoGrid.appendChild(card);
       });
     }
 
+    // --- EVENT LISTENERS ---
     document.querySelectorAll('[data-close]').forEach(btn => {
         btn.addEventListener('click', () => {
             closeModal(btn.closest('.modal'));
@@ -572,8 +680,26 @@
 
     giftBtn.addEventListener('click', () => {
         openModal(giftModal);
-        initializeWheelGame(); // Initialize the wheel game when modal is opened
+        initializeWheelGame();
     });
+
+    clothingBtn.addEventListener('click', () => {
+        openModal(clothingModal);
+    });
+
+    clothingModal.addEventListener('click', (e) => {
+        if (e.target.classList.contains('buy-clothing-btn')) {
+            const button = e.target;
+            const priceUSD = button.dataset.priceUsd;
+            const priceINR = button.dataset.priceInr;
+            const itemName = button.dataset.itemName;
+            
+            closeModal(clothingModal);
+            updatePaymentModal(priceUSD, priceINR, itemName);
+            openModal(paymentModal);
+        }
+    });
+
 
     paidBtn.addEventListener('click', () => {
         localStorage.setItem('bonodaPaid', 'true');
@@ -591,7 +717,7 @@
             return;
         }
 
-        if (val === UNLOCK_CODE) {
+        if (val === PREMIUM_UNLOCK.CODE) {
             const videoToOpen = videos.find(v => v.id === currentUnlockId);
             videos.forEach(v => {
                 if (!unlocked.includes(v.id)) unlocked.push(v.id);
@@ -611,38 +737,22 @@
         if (codeInput.value.length < 6) errorMsg.textContent = '';
     });
 
-    const upiUrl = `upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(PAYEE_NAME)}&am=${UPI_AMOUNT_INR}&cu=INR&tn=BonodaPremiumUnlock`;
-    function setupPaymentModal() {
-        const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(upiUrl)}`;
-        document.getElementById('qrCodeImg').src = qrApiUrl;
-        document.getElementById('upiIdDisplay').textContent = UPI_ID;
-    }
-
     videoGrid.addEventListener('click', (e) => {
         if (e.target.classList.contains('unlock-btn')) {
             currentUnlockId = e.target.closest('.card').dataset.videoId;
-            const hasPaid = localStorage.getItem('bonodaPaid') === 'true';
-            if (hasPaid) {
-                errorMsg.textContent = '';
-                codeInput.value = '';
-                openModal(codeEntryModal);
-                codeInput.focus();
-            } else {
-                openModal(paymentModal);
-            }
+            updatePaymentModal(PREMIUM_UNLOCK.PRICE_USD, PREMIUM_UNLOCK.PRICE_INR, PREMIUM_UNLOCK.ITEM_NAME);
+            openModal(paymentModal);
         }
     });
 
     // --- Initial setup for original page ---
-    setupPaymentModal();
     buildGrid();
 
-    // --- NEW: LUCKY WHEEL GAME LOGIC ---
+    // --- LUCKY WHEEL GAME LOGIC ---
     let wheelInitialized = false;
 
     function initializeWheelGame() {
         if (wheelInitialized) {
-            // If already initialized, just redraw the canvas in case size changed
             setupCanvas();
             return; 
         }
@@ -689,13 +799,13 @@
             wheelCanvas.width = canvasSize * dpr;
             wheelCanvas.height = canvasSize * dpr;
             ctx.scale(dpr, dpr);
-            radius = canvasSize / 2 - 5; // a little padding
+            radius = canvasSize / 2 - 5;
             drawWheel();
         }
         
         function drawWheel() {
             ctx.clearRect(0, 0, wheelCanvas.width, wheelCanvas.height);
-            ctx.font = `bold ${radius * 0.09}px Poppins`; // Adjusted font size
+            ctx.font = `bold ${radius * 0.09}px Poppins`;
             ctx.textBaseline = 'middle';
             
             segments.forEach((segment, i) => {
@@ -715,7 +825,6 @@
                 ctx.translate(canvasSize / 2, canvasSize / 2);
                 ctx.rotate(startAngle + anglePerSegment / 2);
                 ctx.textAlign = 'right';
-                // Wrap text if needed (simple check)
                 const text = segment.text;
                 const textWidth = ctx.measureText(text).width;
                 if (textWidth > radius * 0.8) {
@@ -723,7 +832,7 @@
                 }
                 ctx.fillText(text, radius * 0.85, 0);
                 ctx.restore();
-                ctx.font = `bold ${radius * 0.09}px Poppins`; // Reset font
+                ctx.font = `bold ${radius * 0.09}px Poppins`;
             });
         }
         
@@ -809,7 +918,6 @@
         closePrizeModalBtn.addEventListener('click', closePrizeModal);
         closeQrModalBtn.addEventListener('click', closeQrModal);
         
-        // Use ResizeObserver for better performance on resize
         new ResizeObserver(setupCanvas).observe(document.getElementById('wheel-container'));
 
         setupCanvas();
@@ -819,3 +927,5 @@
 
 </body>
 </html>
+ 
+  
