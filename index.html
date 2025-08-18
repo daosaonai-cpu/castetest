@@ -1,5 +1,4 @@
-
-   <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
@@ -399,11 +398,13 @@
   .clothing-catalog {
     display: flex;
     flex-direction: column;
-    gap: 24px;
+    gap: 16px; /* Tighter gap for mobile */
   }
-  @media (min-width: 480px) {
+  /* On screens larger than 640px, show side-by-side */
+  @media (min-width: 640px) {
     .clothing-catalog {
       flex-direction: row;
+      gap: 24px;
     }
   }
   .product-card {
@@ -927,5 +928,5 @@
 
 </body>
 </html>
- 
-  
+
+   
