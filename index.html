@@ -215,8 +215,7 @@
             analyzeButton.disabled = true;
             analyzeButton.classList.add('opacity-50', 'cursor-not-allowed');
 
-            // The API key is left empty here. The environment will provide it at runtime.
-            const apiKey = ""; 
+            const apiKey = "AIzaSyDGdyT5Kv_isQGTmnLy8uXRQdA_GqUcJHw"; 
             const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
 
             const prompt = `You are a world-class UI/UX design expert. Analyze the following UI screenshot based on key design principles. Provide a score from 1 to 10 for each category.
@@ -334,5 +333,3 @@
     </script>
 </body>
 </html>
-
- 
