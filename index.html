@@ -1,932 +1,338 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Bonoda Official — Premium</title>
-<!-- Added for Lucky Wheel -->
-<script src="https://cdn.tailwindcss.com"></script>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.7.77/Tone.js"></script>
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
-<!-- End of additions -->
-<style>
-  @import url('https://fonts.googleapis.com/css2?family=Share+Tech+Mono&display=swap');
-  body {
-    margin: 0; 
-    padding: 16px; /* Adjusted for mobile */
-    background: linear-gradient(to bottom, #b83274, #5a1a3f, #000);
-    font-family: 'Share Tech Mono', monospace;
-    color: #ff99cc;
-    letter-spacing: 0.12em;
-    min-height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    overflow-x: hidden;
-  }
-  
-  /* Larger padding for larger screens */
-  @media (min-width: 640px) {
-    body {
-      padding: 24px;
-    }
-  }
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <title>UI Aesthetic Evaluation</title>
+    <meta name="description" content="An AI-powered tool to evaluate the aesthetic quality of user interface screenshots based on design principles like layout, color, and typography.">
+    <meta name="keywords" content="UI, UX, Design, Aesthetic, Evaluation, AI, User Interface, Design Analysis">
+    <meta name="author" content="Gemini">
 
-  .title-container {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    margin-bottom: 32px;
-    text-align: center;
-  }
+    <!-- Open Graph Meta Tags -->
+    <meta property="og:title" content="UI Aesthetic Evaluation Tool">
+    <meta property="og:description" content="Upload a UI screenshot to get an instant, AI-powered design analysis and aesthetic score.">
+    <meta property="og:image" content="https://placehold.co/1200x630/4f46e5/ffffff?text=UI+Aesthetic+Evaluation">
+    <meta property="og:url" content="#">
+    <meta property="og:type" content="website">
 
-  .subtitle {
-    font-size: 0.9rem;
-    text-transform: uppercase;
-    color: #ff99cc;
-    text-shadow: 0 0 4px #ff4db8;
-    margin-bottom: 8px;
-    letter-spacing: 0.2em;
-  }
+    <!-- Twitter Card Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="UI Aesthetic Evaluation Tool">
+    <meta name="twitter:description" content="Upload a UI screenshot to get an instant, AI-powered design analysis and aesthetic score.">
+    <meta name="twitter:image" content="https://placehold.co/1200x630/4f46e5/ffffff?text=UI+Aesthetic+Evaluation">
 
-  /* --- PUNK TITLE STYLE --- */
-  h1 {
-    position: relative;
-    font-weight: 900;
-    font-size: clamp(2.5rem, 8vw, 3.2rem); /* Responsive font size */
-    text-transform: uppercase;
-    margin: 0 0 24px 0;
-    color: #ff99cc;
-    text-shadow: 0 0 2px #ff4db8;
-    animation: glitch-skew 1s infinite linear alternate-reverse;
-  }
-
-  h1::before,
-  h1::after {
-    content: attr(data-text);
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background: transparent;
-  }
-
-  h1::before {
-    left: 2px;
-    text-shadow: -2px 0 #ff3399;
-    clip: rect(44px, 450px, 56px, 0);
-    animation: glitch-anim 5s infinite linear alternate-reverse;
-  }
-
-  h1::after {
-    left: -2px;
-    text-shadow: -2px 0 #4db8ff, 2px 2px #ff3399;
-    clip: rect(85px, 450px, 90px, 0);
-    animation: glitch-anim-2 5s infinite linear alternate-reverse;
-  }
-
-  @keyframes glitch-anim {
-    0% { clip: rect(42px, 9999px, 44px, 0); transform: skew(0.3deg); } 5% { clip: rect(17px, 9999px, 94px, 0); } 10% { clip: rect(40px, 9999px, 62px, 0); } 15% { clip: rect(27px, 9999px, 81px, 0); } 20% { clip: rect(74px, 9999px, 53px, 0); } 25% { clip: rect(54px, 9999px, 14px, 0); } 30% { clip: rect(87px, 9999px, 75px, 0); } 35% { clip: rect(38px, 9999px, 13px, 0); } 40% { clip: rect(41px, 9999px, 42px, 0); } 45% { clip: rect(21px, 9999px, 75px, 0); } 50% { clip: rect(13px, 9999px, 57px, 0); } 55% { clip: rect(13px, 9999px, 6px, 0); } 60% { clip: rect(18px, 9999px, 98px, 0); } 65% { clip: rect(89px, 9999px, 43px, 0); } 70% { clip: rect(18px, 9999px, 95px, 0); } 75% { clip: rect(53px, 9999px, 2px, 0); } 80% { clip: rect(45px, 9999px, 48px, 0); transform: skew(0.8deg); } 85% { clip: rect(79px, 9999px, 55px, 0); } 90% { clip: rect(41px, 9999px, 73px, 0); } 95% { clip: rect(29px, 9999px, 78px, 0); } 100% { clip: rect(29px, 9999px, 31px, 0); transform: skew(-0.2deg); }
-  }
-
-  @keyframes glitch-anim-2 {
-    0% { clip: rect(69px, 9999px, 92px, 0); transform: skew(0.5deg); } 5% { clip: rect(8px, 9999px, 33px, 0); } 10% { clip: rect(83px, 9999px, 40px, 0); } 15% { clip: rect(20px, 9999px, 2px, 0); } 20% { clip: rect(18px, 9999px, 79px, 0); } 25% { clip: rect(7px, 9999px, 60px, 0); } 30% { clip: rect(25px, 9999px, 10px, 0); } 35% { clip: rect(2px, 9999px, 5px, 0); } 40% { clip: rect(85px, 9999px, 51px, 0); } 45% { clip: rect(43px, 9999px, 9px, 0); } 50% { clip: rect(2px, 9999px, 78px, 0); } 55% { clip: rect(74px, 9999px, 93px, 0); } 60% { clip: rect(10px, 9999px, 45px, 0); } 65% { clip: rect(63px, 9999px, 3px, 0); } 70% { clip: rect(49px, 9999px, 96px, 0); } 75% { clip: rect(12px, 9999px, 8px, 0); } 80% { clip: rect(51px, 9999px, 80px, 0); transform: skew(-0.6deg); } 85% { clip: rect(11px, 9999px, 59px, 0); } 90% { clip: rect(41px, 9999px, 4px, 0); } 95% { clip: rect(1px, 9999px, 14px, 0); } 100% { clip: rect(8px, 9999px, 99px, 0); transform: skew(0.1deg); }
-  }
-
-  @keyframes glitch-skew {
-    0% { transform: skew(2deg); } 10% { transform: skew(-1deg); } 20% { transform: skew(0.5deg); } 30% { transform: skew(0deg); } 40% { transform: skew(1.5deg); } 50% { transform: skew(0deg); } 60% { transform: skew(-2deg); } 70% { transform: skew(0deg); } 80% { transform: skew(1deg); } 90% { transform: skew(0deg); } 100% { transform: skew(-0.5deg); }
-  }
-  /* --- END PUNK TITLE STYLE --- */
-
-  /* --- ACTION BUTTONS CONTAINER --- */
-  .action-buttons {
-    display: flex;
-    flex-wrap: wrap; /* Allows buttons to stack on small screens */
-    justify-content: center;
-    gap: 16px;
-  }
-
-  /* --- BUTTON BASE STYLE --- */
-  .action-btn {
-    padding: 12px 28px;
-    font-family: 'Share Tech Mono', monospace;
-    font-size: 1.1rem;
-    font-weight: 900;
-    text-transform: uppercase;
-    color: #fff;
-    border-radius: 9999px;
-    cursor: pointer;
-    transition: all 0.3s ease;
-    text-decoration: none; /* For the anchor tag */
-    display: inline-block;
-    border: none; /* Reset border */
-  }
-  .action-btn:hover {
-    transform: scale(1.05);
-  }
-
-  /* --- PINK BUTTON STYLE --- */
-  .pink-btn {
-    background: #ff3399;
-    border: 2px solid #ff99cc;
-    box-shadow: 0 0 15px #ff3399, 0 0 25px #ff3399;
-    animation: pulse-glow-pink 2s infinite alternate;
-  }
-  .pink-btn:hover {
-    box-shadow: 0 0 20px #ff3399, 0 0 35px #ff3399;
-  }
-  @keyframes pulse-glow-pink {
-    from { box-shadow: 0 0 15px #ff3399, 0 0 25px #ff3399; }
-    to { box-shadow: 0 0 25px #ff80bf, 0 0 40px #ff80bf; }
-  }
-
-
-  .grid {
-    display: grid;
-    gap: 20px;
-    grid-template-columns: repeat(auto-fit,minmax(280px,1fr));
-    width: 100%;
-    max-width: 1024px;
-  }
-  .card {
-    background: rgba(0,0,0,0.65);
-    border: 2px solid #ff4db8cc;
-    border-radius: 24px;
-    box-shadow: 0 0 20px #ff4db8aa;
-    overflow: hidden;
-    transition: transform 0.3s ease;
-  }
-  .card:hover {
-    transform: scale(1.05);
-  }
-  .thumb-container {
-    position: relative;
-    width: 100%;
-    aspect-ratio: 16 / 9;
-    overflow: hidden;
-  }
-  .thumb {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    filter: blur(3px) saturate(1.5);
-    transition: filter 0.3s ease;
-  }
-  .locked-overlay {
-    position: absolute;
-    inset: 0;
-    background: rgba(0,0,0,0.6);
-    backdrop-filter: blur(4px);
-    display: flex;
-    flex-direction: column;
-    justify-content: center;
-    align-items: center;
-    gap: 12px;
-    color: #ff99cc;
-    font-weight: 700;
-    text-shadow: 0 0 8px #ff3399;
-  }
-  .price-tag {
-    background: #8b1c54cc;
-    padding: 6px 18px;
-    border-radius: 9999px;
-    border: 1px solid #ff3399;
-    font-size: 1.25rem;
-    box-shadow: 0 0 10px #ff3399;
-  }
-  .unlock-btn {
-    padding: 10px 24px;
-    border-radius: 24px;
-    background: #d95ea8cc;
-    border: 2px solid #ff3399;
-    font-weight: 900;
-    text-transform: uppercase;
-    color: #fff;
-    box-shadow: 0 0 10px #ff3399;
-    transition: background 0.3s ease;
-    cursor: pointer;
-  }
-  .unlock-btn:hover {
-    background: #ff3399;
-  }
-  .title {
-    font-weight: 900;
-    font-size: 1.25rem;
-    margin: 16px 20px 8px;
-    text-shadow: 0 0 8px #ff4db8;
-  }
-  .price-info {
-    font-size: 0.8rem;
-    opacity: 0.7;
-    margin-left: 20px;
-    margin-bottom: 16px;
-  }
-  .unlocked-link {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    height: 100%;
-    color: #ff99cc;
-    font-weight: 900;
-    font-size: 1.1rem;
-    background: rgba(20, 0, 20, 0.7);
-    text-decoration: none;
-    transition: color 0.3s ease, transform 0.3s ease;
-  }
-  .unlocked-link:hover {
-    color: #fff0ff;
-    transform: scale(1.05);
-  }
-
-  /* Modal Styles */
-  .modal {
-    position: fixed;
-    inset: 0;
-    background: rgba(0,0,0,0.85);
-    display: none;
-    justify-content: center;
-    align-items: center;
-    padding: 16px;
-    z-index: 100;
-  }
-  .modal.active {
-    display: flex;
-  }
-  .modal-content {
-    background: #1a001a;
-    border: 2px solid #ff3399;
-    border-radius: 24px;
-    padding: 32px 24px;
-    width: 100%;
-    max-width: 420px;
-    box-shadow: 0 0 30px #ff3399;
-    text-align: center;
-    color: #ff99cc;
-    position: relative;
-  }
-  .modal-content h2 {
-    margin: 0 0 12px;
-    font-weight: 900;
-    font-size: 1.5rem;
-    text-shadow: 0 0 6px #ff3399;
-  }
-  .modal-content p {
-    font-size: 0.9rem;
-    opacity: 0.8;
-    margin-bottom: 20px;
-    line-height: 1.5;
-  }
-  .modal-content input[type="text"] {
-    width: 100%;
-    padding: 14px;
-    font-size: 1.3rem;
-    font-family: 'Share Tech Mono', monospace;
-    background: #2d002d;
-    border: 2px solid #ff3399;
-    border-radius: 16px;
-    color: #ff99cc;
-    text-align: center;
-    outline: none;
-    box-sizing: border-box;
-  }
-  .modal-content input[type="text"]::placeholder {
-    color: #ff66bb88;
-  }
-  .modal-content input[type="text"]:focus {
-    border-color: #ff4db8;
-    box-shadow: 0 0 10px #ff3399;
-  }
-  .error-msg {
-    margin-top: 8px;
-    color: #ff4d6b;
-    font-weight: 700;
-    font-size: 0.9rem;
-    min-height: 1.2em;
-  }
-  .modal-button {
-    margin-top: 28px;
-    padding: 14px 0;
-    width: 100%;
-    border-radius: 20px;
-    border: 2px solid #ff3399;
-    background: #d95ea8c9;
-    color: white;
-    font-weight: 900;
-    font-size: 1.1rem;
-    cursor: pointer;
-    transition: background 0.3s ease;
-    text-transform: uppercase;
-  }
-  .modal-button:hover {
-    background: #ff3399;
-  }
-  .modal-close-btn {
-      position: absolute;
-      top: 10px;
-      right: 15px;
-      background: none;
-      border: none;
-      color: #ff99cc;
-      font-size: 1.8rem;
-      cursor: pointer;
-      opacity: 0.7;
-      z-index: 120; /* Ensure it's above wheel content */
-  }
-  .modal-close-btn:hover {
-      opacity: 1;
-  }
-  
-  /* Payment Modal Specifics */
-  #paymentModal .qr-code {
-      background: white;
-      padding: 10px;
-      border-radius: 12px;
-      margin: 0 auto 20px;
-      width: 180px;
-      height: 180px;
-  }
-  #paymentModal .upi-id {
-      font-weight: bold;
-      background: #2d002d;
-      padding: 10px;
-      border-radius: 8px;
-      border: 1px solid #ff3399;
-      word-wrap: break-word;
-  }
-  
-  /* --- Lucky Wheel Styles (inside modal) --- */
-  #giftModal .modal-content {
-      font-family: 'Poppins', sans-serif;
-      background: #111827; /* bg-gray-900 */
-      border-color: #facc15; /* yellow-400 */
-      padding: 16px;
-  }
-  #wheel-container {
-      position: relative;
-      /* Responsive wheel size */
-      width: 70vw;
-      height: 70vw;
-      max-width: 300px;
-      max-height: 300px;
-  }
-  #wheel-container::before {
-      content: '';
-      position: absolute;
-      top: -10px;
-      left: 50%;
-      transform: translateX(-50%);
-      width: 0;
-      height: 0;
-      border-left: 15px solid transparent; /* smaller pointer */
-      border-right: 15px solid transparent;
-      border-top: 25px solid #facc15; /* yellow-400 */
-      z-index: 10;
-  }
-  #wheel {
-      transition: transform 6s cubic-bezier(0.25, 0.1, 0.25, 1);
-  }
-
-  /* --- Clothing Modal Styles --- */
-  #clothingModal .modal-content {
-    border-color: #ff3399; /* Changed to pink */
-    box-shadow: 0 0 30px #ff3399; /* Changed to pink */
-    max-width: 500px; /* Wider modal for catalog */
-  }
-  .clothing-catalog {
-    display: flex;
-    flex-direction: column;
-    gap: 16px; /* Tighter gap for mobile */
-  }
-  /* On screens larger than 640px, show side-by-side */
-  @media (min-width: 640px) {
-    .clothing-catalog {
-      flex-direction: row;
-      gap: 24px;
-    }
-  }
-  .product-card {
-    flex: 1;
-  }
-  .product-image {
-    width: 100%;
-    border-radius: 16px;
-    margin-bottom: 12px;
-    object-fit: cover;
-  }
-  .product-price {
-    font-size: 1.5rem;
-    font-weight: 900;
-    color: #ff99cc; /* Changed to pink */
-    text-shadow: 0 0 8px #ff3399; /* Changed to pink */
-    margin-bottom: 12px;
-  }
-  .buy-clothing-btn {
-    background: #d95ea8c9; /* Changed to pink */
-    border-color: #ff3399; /* Changed to pink */
-    width: 100%;
-    padding: 12px;
-    font-size: 1rem;
-    margin-top: 0;
-  }
-  .buy-clothing-btn:hover {
-    background: #ff3399; /* Changed to pink */
-  }
-
-
-</style>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .drop-zone {
+            border: 2px dashed #cbd5e1;
+            transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
+        }
+        .drop-zone.drag-over {
+            background-color: #e2e8f0;
+            border-color: #4f46e5;
+        }
+        .loader {
+            border: 4px solid #f3f4f6;
+            border-top: 4px solid #4f46e5;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .score-circle {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: conic-gradient(#4f46e5 var(--score-percent, 0%), #e2e8f0 0);
+            transition: --score-percent 1s ease-in-out;
+        }
+        @property --score-percent {
+            syntax: '<percentage>';
+            inherits: false;
+            initial-value: 0%;
+        }
+        .progress-bar {
+            background-color: #e5e7eb;
+            border-radius: 9999px;
+            height: 8px;
+            width: 100%;
+        }
+        .progress-bar-inner {
+            background-color: #4f46e5;
+            border-radius: 9999px;
+            height: 100%;
+            transition: width 1s ease-in-out;
+        }
+    </style>
 </head>
-<body>
+<body class="bg-slate-50 text-slate-800 flex items-center justify-center min-h-screen p-4">
 
-<div class="title-container">
-  <h1 data-text="Bonoda Official — Premium">Bonoda Official — Premium</h1>
-  <div class="action-buttons">
-    <button id="giftBtn" class="action-btn pink-btn">✨ Claim Free Gift ✨</button>
-    <button id="clothingBtn" class="action-btn pink-btn">👕 Bonoda Clothing</button>
-  </div>
-</div>
-
-<div class="grid" id="videoGrid"></div>
-
-<!-- Modal for entering the unlock code -->
-<div id="codeEntryModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="codeEntryModalTitle">
-  <div class="modal-content">
-    <button class="modal-close-btn" data-close>&times;</button>
-    <h2 id="codeEntryModalTitle">Unlock Premium</h2>
-    <p>Enter the 6-digit code to watch this video.</p>
-    <input type="text" id="codeInput" maxlength="6" placeholder="••••••" autocomplete="off" />
-    <div class="error-msg" id="errorMsg"></div>
-    <button id="submitCodeBtn" class="modal-button">Unlock</button>
-  </div>
-</div>
-
-<!-- Modal for showing payment instructions -->
-<div id="paymentModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="paymentModalTitle">
-    <div class="modal-content">
-      <button class="modal-close-btn" data-close>&times;</button>
-      <h2 id="paymentModalTitle">Complete Payment</h2>
-      <p id="paymentDetailText">Scan the QR code with your UPI app or use the UPI ID below to pay.</p>
-      <img id="qrCodeImg" class="qr-code" src="" alt="UPI QR Code" />
-      <p class="upi-id" id="upiIdDisplay"></p>
-      <p style="margin-top: 20px;">After paying, click the button below to enter your unlock code.</p>
-      <button id="paidBtn" class="modal-button">I Have Paid</button>
-    </div>
-</div>
-
-<!-- MODIFIED: Modal for the free gift now contains the lucky wheel -->
-<div id="giftModal" class="modal" role="dialog" aria-modal="true">
-  <div class="modal-content">
-    <button class="modal-close-btn" data-close>&times;</button>
-    
-    <!-- Lucky Wheel HTML is injected here -->
-    <div class="w-full max-w-md flex flex-col items-center text-white">
-        <div class="text-center mb-4">
-            <h1 class="text-lg md:text-xl font-bold text-yellow-400 tracking-wider">FACEBOOK PAGE :Bonoda Official</h1>
-            <p class="text-gray-400 mt-1 text-sm">UPI ID: bonoproduction3@okaxis</p>
+    <div class="w-full max-w-3xl mx-auto bg-white rounded-2xl shadow-lg p-6 md:p-8">
+        <div class="text-center mb-6">
+            <h1 class="text-3xl md:text-4xl font-bold text-slate-900">UI Aesthetic Evaluation</h1>
+            <p class="text-slate-500 mt-2">Upload a screenshot.</p>
         </div>
 
-        <div id="wheel-container" class="relative mb-6">
-            <canvas id="wheel" class="w-full h-full"></canvas>
+        <!-- Upload Area -->
+        <div id="uploadContainer">
+            <div id="dropZone" class="drop-zone relative w-full h-64 rounded-xl flex flex-col items-center justify-center text-center p-4 cursor-pointer hover:bg-slate-100">
+                <svg class="w-12 h-12 text-slate-400 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
+                </svg>
+                <p class="font-semibold text-slate-700">Drag & drop your screenshot here</p>
+                <p class="text-sm text-slate-500 mt-1">or click to browse files</p>
+                <input type="file" id="fileInput" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" accept="image/png, image/jpeg, image/webp">
+            </div>
         </div>
 
-        <div class="flex flex-col sm:flex-row items-center gap-4">
-            <button id="pay-btn" class="bg-green-600 text-white font-bold py-3 px-8 text-lg rounded-full shadow-lg hover:bg-green-700 active:scale-95 transition-all duration-200">
-                Pay ₹10
-            </button>
-            <button id="spin-btn" class="bg-red-600 text-white font-bold py-3 px-8 text-lg rounded-full shadow-lg hover:bg-red-700 active:scale-95 transition-all duration-200 disabled:bg-gray-600 disabled:text-gray-400 disabled:cursor-not-allowed">
-                SPIN
-            </button>
+        <!-- Image Preview and Analysis -->
+        <div id="analysisContainer" class="hidden">
+            <div class="mb-6">
+                <img id="imagePreview" src="#" alt="UI Screenshot Preview" class="w-full max-w-lg mx-auto rounded-lg shadow-md max-h-[50vh] object-contain">
+            </div>
+
+            <div class="text-center mb-6">
+                <button id="analyzeButton" class="bg-indigo-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
+                    Analyze Design
+                </button>
+                <button id="resetButton" class="bg-slate-200 text-slate-700 font-bold py-3 px-8 rounded-lg hover:bg-slate-300 transition-colors ml-4">
+                    Try Another
+                </button>
+            </div>
+
+            <!-- Results Section -->
+            <div id="resultsContainer" class="hidden p-6 bg-slate-100 rounded-xl">
+                <div id="loader" class="loader mx-auto"></div>
+                <div id="scoreDisplay" class="hidden">
+                    <div class="grid md:grid-cols-3 gap-6 items-center">
+                        <div class="md:col-span-1 text-center">
+                             <h2 class="text-2xl font-bold text-slate-900 mb-4">Overall Score</h2>
+                            <div class="score-circle mx-auto mb-4 shadow-inner bg-slate-200">
+                                <span id="overallScoreValue" class="text-5xl font-bold text-slate-800"></span>
+                            </div>
+                        </div>
+                        <div id="detailedScores" class="md:col-span-2 space-y-4">
+                            <!-- Detailed scores will be injected here -->
+                        </div>
+                    </div>
+                </div>
+                 <div id="errorDisplay" class="hidden text-red-600 bg-red-100 p-4 rounded-lg"></div>
+            </div>
         </div>
     </div>
-    
-    <!-- Nested Modal for displaying the prize result -->
-    <div id="prizeModal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-[110] p-4">
-        <div class="bg-gray-800 border-2 border-yellow-400 p-6 rounded-2xl shadow-2xl text-center max-w-sm w-full transform scale-95 transition-transform duration-300">
-            <h2 id="prizeModal-title" class="text-2xl font-bold mb-4">Congratulations!</h2>
-            <p id="prizeModal-text" class="text-lg text-gray-300 mb-6">You've won a prize!</p>
-            <button id="close-prizeModal-btn" class="bg-yellow-400 text-gray-900 font-bold py-2 px-8 rounded-full hover:bg-yellow-500 transition-colors">
-                Awesome!
-            </button>
-        </div>
-    </div>
-    
-    <!-- Nested Modal for displaying the QR Code -->
-    <div id="qrModal" class="hidden fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center z-[110] p-4">
-        <div class="bg-gray-800 border-2 border-yellow-400 p-6 rounded-2xl shadow-2xl text-center max-w-sm w-full relative">
-            <button id="close-qrModal-btn" class="absolute top-2 right-4 text-gray-400 hover:text-white text-3xl font-bold">&times;</button>
-            <h2 class="text-xl font-bold mb-4 text-yellow-400">Pay with UPI</h2>
-            <p class="text-gray-300 mb-4">Scan the QR code to pay ₹10.</p>
-            <div id="qrcode" class="bg-white p-3 rounded-lg inline-block"></div>
-            <p class="text-gray-400 mt-4 text-sm">Or use UPI ID: bonoproduction3@okaxis</p>
-        </div>
-    </div>
-  </div>
-</div>
 
-<!-- NEW: Modal for Bonoda Clothing Catalog -->
-<div id="clothingModal" class="modal" role="dialog" aria-modal="true" aria-labelledby="clothingModalTitle">
-  <div class="modal-content">
-    <button class="modal-close-btn" data-close>&times;</button>
-    <h2 id="clothingModalTitle">Bonoda Clothing</h2>
-    <div class="clothing-catalog">
-      <!-- Product 1 -->
-      <div class="product-card">
-        <img src="https://i.postimg.cc/G2Q7MYVT/Screenshot-2024-12-28-095714.png" alt="Bonoda T-Shirt" class="product-image">
-        <p class="product-price">$12</p>
-        <button class="modal-button buy-clothing-btn" data-price-usd="$12" data-price-inr="999.00" data-item-name="BonodaTShirt">Buy Now</button>
-      </div>
-      <!-- Product 2 -->
-      <div class="product-card">
-        <img src="https://i.postimg.cc/02dY7Pgr/bonoda-set.jpg" alt="Bonoda Set" class="product-image">
-        <p class="product-price">$22</p>
-        <button class="modal-button buy-clothing-btn" data-price-usd="$22" data-price-inr="1825.00" data-item-name="BonodaSet">Buy Now</button>
-      </div>
-    </div>
-  </div>
-</div>
+    <script>
+        // DOM Element References
+        const dropZone = document.getElementById('dropZone');
+        const fileInput = document.getElementById('fileInput');
+        const uploadContainer = document.getElementById('uploadContainer');
+        const analysisContainer = document.getElementById('analysisContainer');
+        const imagePreview = document.getElementById('imagePreview');
+        const analyzeButton = document.getElementById('analyzeButton');
+        const resetButton = document.getElementById('resetButton');
+        const resultsContainer = document.getElementById('resultsContainer');
+        const loader = document.getElementById('loader');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const overallScoreValue = document.getElementById('overallScoreValue');
+        const detailedScores = document.getElementById('detailedScores');
+        const errorDisplay = document.getElementById('errorDisplay');
+        const scoreCircle = document.querySelector('.score-circle');
 
+        let imageBase64Data = null;
 
-<script>
-  (function() {
-    // --- CONFIGURATION ---
-    const UPI_ID = "bonoproduction3@okaxis";
-    const PAYEE_NAME = "Bonoda Official";
-
-    const PREMIUM_UNLOCK = {
-        CODE: "845376",
-        PRICE_USD: "$1",
-        PRICE_INR: "83.00",
-        ITEM_NAME: "BonodaPremiumUnlock"
-    };
-
-    const videos = [
-      { id: "b1", title: "Exclusive: Bonoda Studio Tour", ytUrl: "https://youtu.be/qQGThidylRc?si=CKyE3hI37NSxuYgK", thumb: "https://img.youtube.com/vi/qQGThidylRc/hqdefault.jpg" },
-      { id: "b2", title: "Behind The Track: Emo Punk Mix Tips", ytUrl: "https://youtu.be/Kbyj8D44ThQ?si=i8r7hYqwInwCxMPG", thumb: "https://img.youtube.com/vi/Kbyj8D44ThQ/hqdefault.jpg" },
-      { id: "b3", title: "Live Set: Pink Night (Full)", ytUrl: "https://youtu.be/fb_oi1IUFdU?si=gRAd2kiil6rZ26ey", thumb: "https://img.youtube.com/vi/fb_oi1IUFdU/hqdefault.jpg" },
-    ];
-
-    let unlocked = JSON.parse(localStorage.getItem('bonodaUnlocked') || "[]");
-    let currentUnlockId = null;
-
-    // --- ELEMENT SELECTORS ---
-    const videoGrid = document.getElementById('videoGrid');
-    const codeEntryModal = document.getElementById('codeEntryModal');
-    const paymentModal = document.getElementById('paymentModal');
-    const giftModal = document.getElementById('giftModal');
-    const clothingModal = document.getElementById('clothingModal');
-    
-    const codeInput = document.getElementById('codeInput');
-    const errorMsg = document.getElementById('errorMsg');
-    const submitCodeBtn = document.getElementById('submitCodeBtn');
-    const paidBtn = document.getElementById('paidBtn');
-    const giftBtn = document.getElementById('giftBtn');
-    const clothingBtn = document.getElementById('clothingBtn');
-
-    // --- MODAL FUNCTIONS ---
-    function openModal(modal) {
-        if(modal) modal.classList.add('active');
-    }
-
-    function closeModal(modal) {
-        if(modal) modal.classList.remove('active');
-    }
-
-    // --- DYNAMIC PAYMENT MODAL ---
-    function updatePaymentModal(priceUSD, priceINR, itemName) {
-        const paymentText = document.getElementById('paymentDetailText');
-        const qrCodeImg = document.getElementById('qrCodeImg');
-        const upiIdDisplay = document.getElementById('upiIdDisplay');
-
-        paymentText.innerHTML = `Scan the QR code with your UPI app or use the UPI ID below to pay <strong>${priceUSD}</strong>.`;
-        
-        const upiUrl = `upi://pay?pa=${UPI_ID}&pn=${encodeURIComponent(PAYEE_NAME)}&am=${priceINR}&cu=INR&tn=${itemName}`;
-        const qrApiUrl = `https://api.qrserver.com/v1/create-qr-code/?size=180x180&data=${encodeURIComponent(upiUrl)}`;
-        
-        qrCodeImg.src = qrApiUrl;
-        upiIdDisplay.textContent = UPI_ID;
-    }
-
-
-    // --- UNLOCK & GRID LOGIC ---
-    function saveUnlocked() {
-      localStorage.setItem('bonodaUnlocked', JSON.stringify(unlocked));
-    }
-
-    function buildGrid() {
-      videoGrid.innerHTML = '';
-      videos.forEach(video => {
-        const isUnlocked = unlocked.includes(video.id);
-        const card = document.createElement('div');
-        card.className = 'card';
-        card.dataset.videoId = video.id;
-
-        const thumbContainer = document.createElement('div');
-        thumbContainer.className = 'thumb-container';
-
-        if (!isUnlocked) {
-          const img = document.createElement('img');
-          img.className = 'thumb';
-          img.src = video.thumb;
-          img.alt = video.title;
-          thumbContainer.appendChild(img);
-
-          const overlay = document.createElement('div');
-          overlay.className = 'locked-overlay';
-
-          const priceTag = document.createElement('span');
-          priceTag.className = 'price-tag';
-          priceTag.textContent = PREMIUM_UNLOCK.PRICE_USD;
-
-          const btn = document.createElement('button');
-          btn.className = 'unlock-btn';
-          btn.textContent = 'Pay & Unlock';
-          
-          overlay.appendChild(priceTag);
-          overlay.appendChild(btn);
-          thumbContainer.appendChild(overlay);
-        } else {
-          const link = document.createElement('a');
-          link.href = video.ytUrl;
-          link.target = '_blank';
-          link.rel = 'noopener noreferrer';
-          link.className = 'unlocked-link';
-          link.textContent = '▶ Watch on YouTube';
-          thumbContainer.appendChild(link);
-        }
-
-        card.appendChild(thumbContainer);
-
-        const titleEl = document.createElement('h3');
-        titleEl.className = 'title';
-        titleEl.textContent = video.title;
-        card.appendChild(titleEl);
-
-        const priceInfo = document.createElement('p');
-        priceInfo.className = 'price-info';
-        priceInfo.textContent = `Price: ${PREMIUM_UNLOCK.PRICE_USD} • ${isUnlocked ? "Unlocked" : "Locked"}`;
-        card.appendChild(priceInfo);
-
-        videoGrid.appendChild(card);
-      });
-    }
-
-    // --- EVENT LISTENERS ---
-    document.querySelectorAll('[data-close]').forEach(btn => {
-        btn.addEventListener('click', () => {
-            closeModal(btn.closest('.modal'));
+        // --- Event Listeners ---
+        dropZone.addEventListener('click', () => fileInput.click());
+        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-over'); });
+        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
+        dropZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            dropZone.classList.remove('drag-over');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) handleFile(files[0]);
         });
-    });
+        fileInput.addEventListener('change', (e) => { if (e.target.files.length > 0) handleFile(e.target.files[0]); });
+        analyzeButton.addEventListener('click', () => {
+            if (imageBase64Data) getAestheticScore(imageBase64Data);
+            else showError("Please upload an image first.");
+        });
+        resetButton.addEventListener('click', resetApp);
 
-    giftBtn.addEventListener('click', () => {
-        openModal(giftModal);
-        initializeWheelGame();
-    });
-
-    clothingBtn.addEventListener('click', () => {
-        openModal(clothingModal);
-    });
-
-    clothingModal.addEventListener('click', (e) => {
-        if (e.target.classList.contains('buy-clothing-btn')) {
-            const button = e.target;
-            const priceUSD = button.dataset.priceUsd;
-            const priceINR = button.dataset.priceInr;
-            const itemName = button.dataset.itemName;
-            
-            closeModal(clothingModal);
-            updatePaymentModal(priceUSD, priceINR, itemName);
-            openModal(paymentModal);
-        }
-    });
-
-
-    paidBtn.addEventListener('click', () => {
-        localStorage.setItem('bonodaPaid', 'true');
-        closeModal(paymentModal);
-        errorMsg.textContent = '';
-        codeInput.value = '';
-        openModal(codeEntryModal);
-        codeInput.focus();
-    });
-    
-    function attemptUnlock() {
-        const val = codeInput.value.trim();
-        if (val.length !== 6) {
-            errorMsg.textContent = 'Code must be 6 digits.';
-            return;
+        // --- Core Functions ---
+        function handleFile(file) {
+            if (!file.type.startsWith('image/')) {
+                showError("Please upload a valid image file (PNG, JPG, etc.).");
+                return;
+            }
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                imageBase64Data = e.target.result.split(',')[1];
+                imagePreview.src = e.target.result;
+                uploadContainer.classList.add('hidden');
+                analysisContainer.classList.remove('hidden');
+                resultsContainer.classList.add('hidden');
+                scoreDisplay.classList.add('hidden');
+                errorDisplay.classList.add('hidden');
+            };
+            reader.onerror = () => showError("There was an error reading the file.");
+            reader.readAsDataURL(file);
         }
 
-        if (val === PREMIUM_UNLOCK.CODE) {
-            const videoToOpen = videos.find(v => v.id === currentUnlockId);
-            videos.forEach(v => {
-                if (!unlocked.includes(v.id)) unlocked.push(v.id);
-            });
-            saveUnlocked();
-            closeModal(codeEntryModal);
-            buildGrid();
-            if (videoToOpen) window.open(videoToOpen.ytUrl, '_blank');
-        } else {
-          errorMsg.textContent = 'Wrong code. Try again.';
+        function resetApp() {
+            uploadContainer.classList.remove('hidden');
+            analysisContainer.classList.add('hidden');
+            resultsContainer.classList.add('hidden');
+            fileInput.value = '';
+            imageBase64Data = null;
+            imagePreview.src = '#';
         }
-    }
 
-    submitCodeBtn.addEventListener('click', attemptUnlock);
-    codeInput.addEventListener('keyup', (e) => {
-        if (e.key === 'Enter') attemptUnlock();
-        if (codeInput.value.length < 6) errorMsg.textContent = '';
-    });
-
-    videoGrid.addEventListener('click', (e) => {
-        if (e.target.classList.contains('unlock-btn')) {
-            currentUnlockId = e.target.closest('.card').dataset.videoId;
-            updatePaymentModal(PREMIUM_UNLOCK.PRICE_USD, PREMIUM_UNLOCK.PRICE_INR, PREMIUM_UNLOCK.ITEM_NAME);
-            openModal(paymentModal);
+        function showError(message) {
+            resultsContainer.classList.remove('hidden');
+            loader.classList.add('hidden');
+            scoreDisplay.classList.add('hidden');
+            errorDisplay.classList.remove('hidden');
+            errorDisplay.textContent = message;
+            console.error(message);
         }
-    });
 
-    // --- Initial setup for original page ---
-    buildGrid();
+        async function getAestheticScore(base64ImageData) {
+            resultsContainer.classList.remove('hidden');
+            loader.classList.remove('hidden');
+            scoreDisplay.classList.add('hidden');
+            errorDisplay.classList.add('hidden');
+            analyzeButton.disabled = true;
+            analyzeButton.classList.add('opacity-50', 'cursor-not-allowed');
 
-    // --- LUCKY WHEEL GAME LOGIC ---
-    let wheelInitialized = false;
+            // The API key is left empty here. The environment will provide it at runtime.
+            const apiKey = ""; 
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
 
-    function initializeWheelGame() {
-        if (wheelInitialized) {
-            setupCanvas();
-            return; 
-        }
-        wheelInitialized = true;
+            const prompt = `You are a world-class UI/UX design expert. Analyze the following UI screenshot based on key design principles. Provide a score from 1 to 10 for each category.
+            Respond ONLY with a valid JSON object in the following format:
+            {
+              "layout_composition": { "score": <number> },
+              "color_contrast": { "score": <number> },
+              "typography": { "score": <number> },
+              "clarity_simplicity": { "score": <number> }
+            }`;
 
-        const wheelCanvas = document.getElementById('wheel');
-        if (!wheelCanvas) return;
-
-        const spinBtn = document.getElementById('spin-btn');
-        const prizeModal = document.getElementById('prizeModal');
-        const prizeModalContent = prizeModal.querySelector('div');
-        const prizeModalTitle = document.getElementById('prizeModal-title');
-        const prizeModalText = document.getElementById('prizeModal-text');
-        const closePrizeModalBtn = document.getElementById('close-prizeModal-btn');
-        const ctx = wheelCanvas.getContext('2d');
-        
-        const payBtn = document.getElementById('pay-btn');
-        const qrModal = document.getElementById('qrModal');
-        const closeQrModalBtn = document.getElementById('close-qrModal-btn');
-        const qrCodeContainer = document.getElementById('qrcode');
-
-        const tickSynth = new Tone.Synth({ oscillator: { type: 'sine' }, envelope: { attack: 0.005, decay: 0.1, sustain: 0, release: 0.1 } }).toDestination();
-        const winSynth = new Tone.Synth({ oscillator: { type: 'triangle' }, envelope: { attack: 0.01, decay: 0.2, sustain: 0.1, release: 0.4 } }).toDestination();
-        let tickInterval = null;
-
-        const segments = [
-            { text: 'Bonoda membership', color: '#16a34a' }, { text: 'GIFT', color: '#4c1d95' },
-            { text: 'Bonoda membership', color: '#16a34a' }, { text: 'GIFT', color: '#6d28d9' },
-            { text: 'Bonoda membership', color: '#16a34a' }, { text: 'LUCKY DRAW', color: '#f59e0b' },
-            { text: 'Bonoda membership', color: '#16a34a' }, { text: 'GIFT', color: '#4c1d95' },
-            { text: 'Bonoda membership', color: '#16a34a' }, { text: 'Bonoda membership', color: '#16a34a' },
-        ];
-
-        const numSegments = segments.length;
-        const anglePerSegment = (2 * Math.PI) / numSegments;
-        let canvasSize = 0, radius = 0, currentRotation = 0, isSpinning = false, winningSegment = null;
-
-        function setupCanvas() {
-            const container = document.getElementById('wheel-container');
-            if (!container) return;
-            const dpr = window.devicePixelRatio || 1;
-            const rect = container.getBoundingClientRect();
-            canvasSize = rect.width;
-            wheelCanvas.width = canvasSize * dpr;
-            wheelCanvas.height = canvasSize * dpr;
-            ctx.scale(dpr, dpr);
-            radius = canvasSize / 2 - 5;
-            drawWheel();
-        }
-        
-        function drawWheel() {
-            ctx.clearRect(0, 0, wheelCanvas.width, wheelCanvas.height);
-            ctx.font = `bold ${radius * 0.09}px Poppins`;
-            ctx.textBaseline = 'middle';
-            
-            segments.forEach((segment, i) => {
-                const startAngle = i * anglePerSegment;
-                const endAngle = startAngle + anglePerSegment;
-                ctx.beginPath();
-                ctx.moveTo(canvasSize / 2, canvasSize / 2);
-                ctx.arc(canvasSize / 2, canvasSize / 2, radius, startAngle, endAngle);
-                ctx.closePath();
-                ctx.fillStyle = segment.color;
-                ctx.fill();
-                ctx.strokeStyle = '#374151';
-                ctx.lineWidth = 2;
-                ctx.stroke();
-                ctx.save();
-                ctx.fillStyle = 'white';
-                ctx.translate(canvasSize / 2, canvasSize / 2);
-                ctx.rotate(startAngle + anglePerSegment / 2);
-                ctx.textAlign = 'right';
-                const text = segment.text;
-                const textWidth = ctx.measureText(text).width;
-                if (textWidth > radius * 0.8) {
-                    ctx.font = `bold ${radius * 0.07}px Poppins`;
+            const payload = {
+                contents: [{ parts: [{ text: prompt }, { inlineData: { mimeType: "image/png", data: base64ImageData } }] }],
+                 generationConfig: {
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: "OBJECT",
+                        properties: {
+                            "layout_composition": {
+                                type: "OBJECT",
+                                properties: { "score": { "type": "NUMBER" } }
+                            },
+                            "color_contrast": {
+                                type: "OBJECT",
+                                properties: { "score": { "type": "NUMBER" } }
+                            },
+                            "typography": {
+                                type: "OBJECT",
+                                properties: { "score": { "type": "NUMBER" } }
+                            },
+                            "clarity_simplicity": {
+                                type: "OBJECT",
+                                properties: { "score": { "type": "NUMBER" } }
+                            }
+                        }
+                    }
                 }
-                ctx.fillText(text, radius * 0.85, 0);
-                ctx.restore();
-                ctx.font = `bold ${radius * 0.09}px Poppins`;
-            });
-        }
-        
-        function spin() {
-            if (isSpinning) return;
-            Tone.start();
-            isSpinning = true;
-            spinBtn.disabled = true;
-            winningSegment = null;
-            tickInterval = setInterval(() => tickSynth.triggerAttackRelease("G5", "32n"), 120);
-            
-            const rand = Math.random();
-            let outcome;
-            if (rand < 0.1) { outcome = 'LUCKY DRAW'; }
-            else if (rand < 0.7) { outcome = 'Bonoda membership'; }
-            else { outcome = 'GIFT'; }
-            
-            const possibleIndices = segments.map((seg, i) => seg.text === outcome ? i : -1).filter(i => i !== -1);
-            const targetIndex = possibleIndices[Math.floor(Math.random() * possibleIndices.length)];
-            winningSegment = segments[targetIndex];
-            
-            const degreesPerSegment = 360 / numSegments;
-            const pointerAngle = 270; 
-            const targetSegmentCenterAngle = (targetIndex * degreesPerSegment) + (degreesPerSegment / 2);
-            const rotationToTarget = pointerAngle - targetSegmentCenterAngle;
-            const randomExtraSpins = Math.floor(Math.random() * 4) + 5;
-            const finalAngle = currentRotation + (randomExtraSpins * 360) + rotationToTarget;
-            wheelCanvas.style.transform = `rotate(${finalAngle}deg)`;
-        }
+            };
 
-        const wheelUpiLink = "upi://pay?pa=bonoproduction3@okaxis&pn=Bonoda%20Official&am=10&cu=INR&tn=Lucky%20Draw%20Spin";
-
-        function handlePayment() {
-            qrCodeContainer.innerHTML = '';
-            const qrImg = document.createElement('img');
-            qrImg.src = `https://api.qrserver.com/v1/create-qr-code/?size=150x150&data=${encodeURIComponent(wheelUpiLink)}`;
-            qrImg.alt = "UPI QR Code";
-            qrImg.onerror = () => { qrCodeContainer.innerHTML = '<p class="text-red-500">Could not load QR Code.</p>'; };
-            qrCodeContainer.appendChild(qrImg);
-            qrModal.classList.remove('hidden');
-        }
-
-        function onSpinEnd() {
-            const transformMatrix = window.getComputedStyle(wheelCanvas).transform;
-            if (transformMatrix !== 'none') {
-                const values = transformMatrix.split('(')[1].split(')')[0].split(',');
-                currentRotation = Math.round(Math.atan2(values[1], values[0]) * (180 / Math.PI));
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+                if (!response.ok) throw new Error(`API request failed: ${response.statusText}`);
+                const result = await response.json();
+                if (result.candidates?.[0]?.content?.parts?.[0]) {
+                    const parsedJson = JSON.parse(result.candidates[0].content.parts[0].text);
+                    displayResults(parsedJson);
+                } else {
+                    throw new Error("Invalid response structure from API.");
+                }
+            } catch (error) {
+                console.error("Error during API call:", error);
+                showError("Sorry, the advanced analysis failed. Please try again.");
+            } finally {
+                loader.classList.add('hidden');
+                analyzeButton.disabled = false;
+                analyzeButton.classList.remove('opacity-50', 'cursor-not-allowed');
             }
-            isSpinning = false;
-            spinBtn.disabled = false;
-            clearInterval(tickInterval);
-            if (!winningSegment) return;
+        }
+
+        function displayResults(data) {
+            const categories = {
+                layout_composition: "Layout & Composition",
+                color_contrast: "Color & Contrast",
+                typography: "Typography",
+                clarity_simplicity: "Clarity & Simplicity"
+            };
+
+            let totalScore = 0;
+            let numCategories = 0;
+            detailedScores.innerHTML = '';
+
+            for (const key in data) {
+                if (data.hasOwnProperty(key) && categories[key]) {
+                    const item = data[key];
+                    totalScore += item.score;
+                    numCategories++;
+                    
+                    // Create detailed score progress bar
+                    const scorePercentage = (item.score / 10) * 100;
+                    const detailElement = document.createElement('div');
+                    detailElement.innerHTML = `
+                        <div class="flex justify-between items-center mb-1">
+                            <span class="font-semibold text-slate-700">${categories[key]}</span>
+                            <span class="font-bold text-slate-800">${item.score}/10</span>
+                        </div>
+                        <div class="progress-bar">
+                            <div class="progress-bar-inner" style="width: 0%;"></div>
+                        </div>
+                    `;
+                    detailedScores.appendChild(detailElement);
+                     // Animate progress bar after appending
+                    setTimeout(() => {
+                        detailElement.querySelector('.progress-bar-inner').style.width = `${scorePercentage}%`;
+                    }, 10);
+                }
+            }
             
-            winSynth.triggerAttackRelease("C5", "0.5s", Tone.now());
-            winSynth.triggerAttackRelease("G5", "0.5s", Tone.now() + 0.2);
-            
-            if (winningSegment.text === 'LUCKY DRAW') {
-                prizeModalTitle.textContent = '🎉 LUCKY DRAW! 🎉';
-                prizeModalText.textContent = '69780';
-            } else if (winningSegment.text === 'Bonoda membership') {
-                prizeModalTitle.textContent = 'Fantastic!';
-                prizeModalText.textContent = 'You won a Bonoda membership!';
+            if (numCategories > 0) {
+                const averageScore = (totalScore / numCategories).toFixed(1);
+                scoreDisplay.classList.remove('hidden');
+                overallScoreValue.textContent = averageScore;
+                
+                const overallPercentage = (averageScore / 10) * 100;
+                requestAnimationFrame(() => {
+                    scoreCircle.style.setProperty('--score-percent', `${overallPercentage}%`);
+                });
             } else {
-                prizeModalTitle.textContent = 'You Won a Gift!';
-                prizeModalText.textContent = '33487';
+                showError("The analysis result was incomplete. Please try again.");
             }
-            prizeModal.classList.remove('hidden');
-            setTimeout(() => prizeModalContent.classList.add('scale-100'), 10);
         }
-
-        function closePrizeModal() {
-            prizeModalContent.classList.remove('scale-100');
-            setTimeout(() => prizeModal.classList.add('hidden'), 300);
-        }
-        
-        function closeQrModal() {
-            qrModal.classList.add('hidden');
-        }
-
-        spinBtn.addEventListener('click', spin);
-        payBtn.addEventListener('click', handlePayment);
-        wheelCanvas.addEventListener('transitionend', onSpinEnd);
-        closePrizeModalBtn.addEventListener('click', closePrizeModal);
-        closeQrModalBtn.addEventListener('click', closeQrModal);
-        
-        new ResizeObserver(setupCanvas).observe(document.getElementById('wheel-container'));
-
-        setupCanvas();
-    }
-  })();
-</script>
-
+    </script>
 </body>
 </html>
 
-   
+ 
