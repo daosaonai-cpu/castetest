@@ -3,333 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    
-    <title>UI Aesthetic Evaluation</title>
-    <meta name="description" content="An AI-powered tool to evaluate the aesthetic quality of user interface screenshots based on design principles like layout, color, and typography.">
-    <meta name="keywords" content="UI, UX, Design, Aesthetic, Evaluation, AI, User Interface, Design Analysis">
-    <meta name="author" content="Gemini">
-
-    <!-- Open Graph Meta Tags -->
-    <meta property="og:title" content="UI Aesthetic Evaluation Tool">
-    <meta property="og:description" content="Upload a UI screenshot to get an instant, AI-powered design analysis and aesthetic score.">
-    <meta property="og:image" content="https://placehold.co/1200x630/4f46e5/ffffff?text=UI+Aesthetic+Evaluation">
-    <meta property="og:url" content="#">
-    <meta property="og:type" content="website">
-
-    <!-- Twitter Card Meta Tags -->
-    <meta name="twitter:card" content="summary_large_image">
-    <meta name="twitter:title" content="UI Aesthetic Evaluation Tool">
-    <meta name="twitter:description" content="Upload a UI screenshot to get an instant, AI-powered design analysis and aesthetic score.">
-    <meta name="twitter:image" content="https://placehold.co/1200x630/4f46e5/ffffff?text=UI+Aesthetic+Evaluation">
-
+    <title>A Guide to Environmental Sustainability</title>
+    <!-- Tailwind CSS for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
+        /* Using Inter as the default font */
         body {
             font-family: 'Inter', sans-serif;
         }
-        .drop-zone {
-            border: 2px dashed #cbd5e1;
-            transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
-        }
-        .drop-zone.drag-over {
-            background-color: #e2e8f0;
-            border-color: #4f46e5;
-        }
-        .loader {
-            border: 4px solid #f3f4f6;
-            border-top: 4px solid #4f46e5;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .score-circle {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: conic-gradient(#4f46e5 var(--score-percent, 0%), #e2e8f0 0);
-            transition: --score-percent 1s ease-in-out;
-        }
-        @property --score-percent {
-            syntax: '<percentage>';
-            inherits: false;
-            initial-value: 0%;
-        }
-        .progress-bar {
-            background-color: #e5e7eb;
-            border-radius: 9999px;
-            height: 8px;
-            width: 100%;
-        }
-        .progress-bar-inner {
-            background-color: #4f46e5;
-            border-radius: 9999px;
-            height: 100%;
-            transition: width 1s ease-in-out;
-        }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 flex items-center justify-center min-h-screen p-4">
+<body class="bg-slate-50 text-slate-800">
 
-    <div class="w-full max-w-3xl mx-auto bg-white rounded-2xl shadow-lg p-6 md:p-8">
-        <div class="text-center mb-6">
-            <h1 class="text-3xl md:text-4xl font-bold text-slate-900">UI Aesthetic Evaluation</h1>
-            <p class="text-slate-500 mt-2">Upload a screenshot.</p>
-        </div>
+    <!-- Main container with vertical padding -->
+    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
 
-        <!-- Upload Area -->
-        <div id="uploadContainer">
-            <div id="dropZone" class="drop-zone relative w-full h-64 rounded-xl flex flex-col items-center justify-center text-center p-4 cursor-pointer hover:bg-slate-100">
-                <svg class="w-12 h-12 text-slate-400 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
-                </svg>
-                <p class="font-semibold text-slate-700">Drag & drop your screenshot here</p>
-                <p class="text-sm text-slate-500 mt-1">or click to browse files</p>
-                <input type="file" id="fileInput" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" accept="image/png, image/jpeg, image/webp">
-            </div>
-        </div>
+        <!-- Main content card with shadow and rounded corners -->
+        <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg overflow-hidden">
+            <div class="p-8 sm:p-10 lg:p-12">
 
-        <!-- Image Preview and Analysis -->
-        <div id="analysisContainer" class="hidden">
-            <div class="mb-6">
-                <img id="imagePreview" src="#" alt="UI Screenshot Preview" class="w-full max-w-lg mx-auto rounded-lg shadow-md max-h-[50vh] object-contain">
-            </div>
-
-            <div class="text-center mb-6">
-                <button id="analyzeButton" class="bg-indigo-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                    Analyze Design
-                </button>
-                <button id="resetButton" class="bg-slate-200 text-slate-700 font-bold py-3 px-8 rounded-lg hover:bg-slate-300 transition-colors ml-4">
-                    Try Another
-                </button>
-            </div>
-
-            <!-- Results Section -->
-            <div id="resultsContainer" class="hidden p-6 bg-slate-100 rounded-xl">
-                <div id="loader" class="loader mx-auto"></div>
-                <div id="scoreDisplay" class="hidden">
-                    <div class="grid md:grid-cols-3 gap-6 items-center">
-                        <div class="md:col-span-1 text-center">
-                             <h2 class="text-2xl font-bold text-slate-900 mb-4">Overall Score</h2>
-                            <div class="score-circle mx-auto mb-4 shadow-inner bg-slate-200">
-                                <span id="overallScoreValue" class="text-5xl font-bold text-slate-800"></span>
-                            </div>
-                        </div>
-                        <div id="detailedScores" class="md:col-span-2 space-y-4">
-                            <!-- Detailed scores will be injected here -->
-                        </div>
-                    </div>
-                </div>
-                 <div id="errorDisplay" class="hidden text-red-600 bg-red-100 p-4 rounded-lg"></div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // DOM Element References
-        const dropZone = document.getElementById('dropZone');
-        const fileInput = document.getElementById('fileInput');
-        const uploadContainer = document.getElementById('uploadContainer');
-        const analysisContainer = document.getElementById('analysisContainer');
-        const imagePreview = document.getElementById('imagePreview');
-        const analyzeButton = document.getElementById('analyzeButton');
-        const resetButton = document.getElementById('resetButton');
-        const resultsContainer = document.getElementById('resultsContainer');
-        const loader = document.getElementById('loader');
-        const scoreDisplay = document.getElementById('scoreDisplay');
-        const overallScoreValue = document.getElementById('overallScoreValue');
-        const detailedScores = document.getElementById('detailedScores');
-        const errorDisplay = document.getElementById('errorDisplay');
-        const scoreCircle = document.querySelector('.score-circle');
-
-        let imageBase64Data = null;
-
-        // --- Event Listeners ---
-        dropZone.addEventListener('click', () => fileInput.click());
-        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-over'); });
-        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
-        dropZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            dropZone.classList.remove('drag-over');
-            const files = e.dataTransfer.files;
-            if (files.length > 0) handleFile(files[0]);
-        });
-        fileInput.addEventListener('change', (e) => { if (e.target.files.length > 0) handleFile(e.target.files[0]); });
-        analyzeButton.addEventListener('click', () => {
-            if (imageBase64Data) getAestheticScore(imageBase64Data);
-            else showError("Please upload an image first.");
-        });
-        resetButton.addEventListener('click', resetApp);
-
-        // --- Core Functions ---
-        function handleFile(file) {
-            if (!file.type.startsWith('image/')) {
-                showError("Please upload a valid image file (PNG, JPG, etc.).");
-                return;
-            }
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                imageBase64Data = e.target.result.split(',')[1];
-                imagePreview.src = e.target.result;
-                uploadContainer.classList.add('hidden');
-                analysisContainer.classList.remove('hidden');
-                resultsContainer.classList.add('hidden');
-                scoreDisplay.classList.add('hidden');
-                errorDisplay.classList.add('hidden');
-            };
-            reader.onerror = () => showError("There was an error reading the file.");
-            reader.readAsDataURL(file);
-        }
-
-        function resetApp() {
-            uploadContainer.classList.remove('hidden');
-            analysisContainer.classList.add('hidden');
-            resultsContainer.classList.add('hidden');
-            fileInput.value = '';
-            imageBase64Data = null;
-            imagePreview.src = '#';
-        }
-
-        function showError(message) {
-            resultsContainer.classList.remove('hidden');
-            loader.classList.add('hidden');
-            scoreDisplay.classList.add('hidden');
-            errorDisplay.classList.remove('hidden');
-            errorDisplay.textContent = message;
-            console.error(message);
-        }
-
-        async function getAestheticScore(base64ImageData) {
-            resultsContainer.classList.remove('hidden');
-            loader.classList.remove('hidden');
-            scoreDisplay.classList.add('hidden');
-            errorDisplay.classList.add('hidden');
-            analyzeButton.disabled = true;
-            analyzeButton.classList.add('opacity-50', 'cursor-not-allowed');
-
-            const apiKey = "AIzaSyDGdyT5Kv_isQGTmnLy8uXRQdA_GqUcJHw"; 
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-
-            const prompt = `You are a world-class UI/UX design expert. Analyze the following UI screenshot based on key design principles. Provide a score from 1 to 10 for each category.
-            Respond ONLY with a valid JSON object in the following format:
-            {
-              "layout_composition": { "score": <number> },
-              "color_contrast": { "score": <number> },
-              "typography": { "score": <number> },
-              "clarity_simplicity": { "score": <number> }
-            }`;
-
-            const payload = {
-                contents: [{ parts: [{ text: prompt }, { inlineData: { mimeType: "image/png", data: base64ImageData } }] }],
-                 generationConfig: {
-                    responseMimeType: "application/json",
-                    responseSchema: {
-                        type: "OBJECT",
-                        properties: {
-                            "layout_composition": {
-                                type: "OBJECT",
-                                properties: { "score": { "type": "NUMBER" } }
-                            },
-                            "color_contrast": {
-                                type: "OBJECT",
-                                properties: { "score": { "type": "NUMBER" } }
-                            },
-                            "typography": {
-                                type: "OBJECT",
-                                properties: { "score": { "type": "NUMBER" } }
-                            },
-                            "clarity_simplicity": {
-                                type: "OBJECT",
-                                properties: { "score": { "type": "NUMBER" } }
-                            }
-                        }
-                    }
-                }
-            };
-
-            try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
-                });
-                if (!response.ok) throw new Error(`API request failed: ${response.statusText}`);
-                const result = await response.json();
-                if (result.candidates?.[0]?.content?.parts?.[0]) {
-                    const parsedJson = JSON.parse(result.candidates[0].content.parts[0].text);
-                    displayResults(parsedJson);
-                } else {
-                    throw new Error("Invalid response structure from API.");
-                }
-            } catch (error) {
-                console.error("Error during API call:", error);
-                showError("Sorry, the advanced analysis failed. Please try again.");
-            } finally {
-                loader.classList.add('hidden');
-                analyzeButton.disabled = false;
-                analyzeButton.classList.remove('opacity-50', 'cursor-not-allowed');
-            }
-        }
-
-        function displayResults(data) {
-            const categories = {
-                layout_composition: "Layout & Composition",
-                color_contrast: "Color & Contrast",
-                typography: "Typography",
-                clarity_simplicity: "Clarity & Simplicity"
-            };
-
-            let totalScore = 0;
-            let numCategories = 0;
-            detailedScores.innerHTML = '';
-
-            for (const key in data) {
-                if (data.hasOwnProperty(key) && categories[key]) {
-                    const item = data[key];
-                    totalScore += item.score;
-                    numCategories++;
-                    
-                    // Create detailed score progress bar
-                    const scorePercentage = (item.score / 10) * 100;
-                    const detailElement = document.createElement('div');
-                    detailElement.innerHTML = `
-                        <div class="flex justify-between items-center mb-1">
-                            <span class="font-semibold text-slate-700">${categories[key]}</span>
-                            <span class="font-bold text-slate-800">${item.score}/10</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-bar-inner" style="width: 0%;"></div>
-                        </div>
-                    `;
-                    detailedScores.appendChild(detailElement);
-                     // Animate progress bar after appending
-                    setTimeout(() => {
-                        detailElement.querySelector('.progress-bar-inner').style.width = `${scorePercentage}%`;
-                    }, 10);
-                }
-            }
-            
-            if (numCategories > 0) {
-                const averageScore = (totalScore / numCategories).toFixed(1);
-                scoreDisplay.classList.remove('hidden');
-                overallScoreValue.textContent = averageScore;
+                <!-- Header Section -->
+                <header class="text-center mb-10">
+                    <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 tracking-tight">
+                        A Guide to Environmental Sustainability
+                    </h1>
+                    <p class="mt-4 text-lg text-slate-600">
+                        Understanding our planet's resources and the path to a sustainable future.
+                    </p>
+                </header>
                 
-                const overallPercentage = (averageScore / 10) * 100;
-                requestAnimationFrame(() => {
-                    scoreCircle.style.setProperty('--score-percent', `${overallPercentage}%`);
-                });
-            } else {
-                showError("The analysis result was incomplete. Please try again.");
-            }
-        }
-    </script>
+                <!-- Separator -->
+                <hr class="mb-10 border-slate-200">
+
+                <!-- Section 1: Defining Our World -->
+                <section class="mb-8">
+                    <h2 class="text-2xl font-semibold text-slate-800 mb-4">Defining Our World and Its Components</h2>
+                    <p class="text-base sm:text-lg leading-relaxed text-slate-600 text-justify">
+                        To appreciate the delicate balance of our planet, we must first understand the fundamental stage upon which all life plays out: the environment. This term refers not to a distant, abstract concept, but to the immediate surroundings where all living things exist. This intricate web of life is composed of two distinct but inseparable types of components. On one hand, we have the biotic factors, which encompass all living organisms, from the smallest microbes to the largest animals. On the other, we have the abiotic factors—the non-living elements such as water, soil, and the sunlight that provides the energy for almost all life on Earth. The continuous and dynamic interaction between these living and non-living elements is the foundational process that supports and sustains entire ecosystems, creating the conditions necessary for life to thrive.
+                    </p>
+                </section>
+
+                <!-- Section 2: Natural Resources -->
+                <section class="mb-8">
+                    <h2 class="text-2xl font-semibold text-slate-800 mb-4">The Treasure Chest of Nature: Understanding Natural Resources</h2>
+                    <p class="text-base sm:text-lg leading-relaxed text-slate-600 text-justify">
+                        Within these ecosystems lies a wealth of natural resources—materials provided by the Earth that we depend on for survival and development. These resources can be broadly categorized by their availability. Some, like the fossil fuels coal and petroleum, are non-renewable; they were formed over millions of years and exist in finite quantities that we are depleting rapidly. Others are renewable, capable of regenerating over time if managed wisely. A particularly promising category is continuous resources, which are perpetually available to us. Prime examples include the boundless power of solar and tidal energy, offering a clean and inexhaustible alternative to fossil fuels. The value of these natural gifts extends far beyond mere economic utility; they also provide critical ecosystem services, such as the natural purification of air and water, climate regulation, and pollination, which are essential for our collective well-being.
+                    </p>
+                </section>
+
+                <!-- Section 3: Mismanagement Consequences -->
+                <section class="mb-8">
+                    <h2 class="text-2xl font-semibold text-slate-800 mb-4">A Planet in Peril: The Consequences of Mismanagement</h2>
+                    <p class="text-base sm:text-lg leading-relaxed text-slate-600 text-justify">
+                        Unfortunately, humanity's relationship with these resources has often been one of shortsightedness, leading to severe environmental degradation. One of the most pressing issues is overexploitation, a term that describes the harvesting of resources at an unsustainable rate. This is starkly evident in practices like industrial overfishing, which has decimated marine populations, and rampant over-mining, which scars landscapes and depletes finite mineral reserves. Another critical issue is deforestation. This is far more than simply clearing trees; it is the wholesale destruction of complex forest ecosystems, a process that directly results in catastrophic habitat loss and a profound reduction in global biodiversity, pushing countless species toward extinction.
+                    </p>
+                </section>
+
+                <!-- Section 4: Sustainability -->
+                <section class="mb-8">
+                    <h2 class="text-2xl font-semibold text-slate-800 mb-4">The Path Forward: The Principle of Sustainability</h2>
+                    <p class="text-base sm:text-lg leading-relaxed text-slate-600 text-justify">
+                        In response to these escalating crises, the global community has rallied around a guiding principle for the future: sustainability. At its heart, this concept is about fulfilling the needs of the present by using our resources responsibly, thereby ensuring their availability for future generations. It is crucial to understand its foundational structure. While technological advancements are undoubtedly powerful tools in achieving our environmental goals, the framework of sustainability itself is balanced upon its three core and interconnected pillars: the Environmental, the Social, and the Economic. This holistic approach is enshrined in global commitments like the landmark Paris Agreement, which established the urgent goal to limit global warming to well below 2°C compared to pre-industrial levels. This mission is further detailed in the comprehensive roadmap provided by the seventeen UN Sustainable Development Goals (SDGs), which outline a blueprint for a more equitable and sustainable world.
+                    </p>
+                </section>
+
+                <!-- Section 5: Practice and Action -->
+                <section class="mb-8">
+                    <h2 class="text-2xl font-semibold text-slate-800 mb-4">Putting Sustainability into Practice: From Global to Personal Action</h2>
+                    <p class="text-base sm:text-lg leading-relaxed text-slate-600 text-justify">
+                        Translating the principle of sustainability into tangible outcomes requires a multi-layered approach. In resource management, this means adopting smarter practices across the board. For instance, effective water conservation is being achieved through proven methods like rainwater harvesting and high-efficiency drip irrigation. In our consumption cycles, the memorable mantra of waste management—Reduce, Reuse, and Recycle—provides a simple yet powerful guide for minimizing our impact. Our food systems are also transforming through sustainable agriculture, which champions techniques like organic farming and crop rotation to build healthy soil and reduce reliance on chemical inputs.
+                    </p>
+                     <p class="mt-4 text-base sm:text-lg leading-relaxed text-slate-600 text-justify">
+                        Technology acts as a critical enabler in this transition. Modern 'smart farming', for example, utilizes sophisticated sensors and AI to optimize water and fertilizer use with incredible precision. In our cities, the concept of 'green buildings' is taking hold, where the defining characteristic is not their appearance but their fundamentally energy-efficient design. Ultimately, this global effort is powered by individual actions. The journey begins with personal lifestyle choices, such as a conscious effort to save energy and reduce plastic use. However, for systemic change, the most potent action an individual can take is to become an engaged citizen and provide active policy support for governments to enact and enforce stronger environmental protections. This collective effort is vital because, as we are increasingly reminded, our planet's resources are finite, and their use must be carefully balanced to ensure a prosperous and healthy home for all.
+                    </p>
+                </section>
+                
+            </div>
+        </div>
+
+    </main>
+    
+    <!-- Footer -->
+    <footer class="text-center py-6">
+        <p class="text-slate-500 text-sm">&copy; 2024 Environmental Insights. All rights reserved.</p>
+    </footer>
+
 </body>
 </html>
+
+
