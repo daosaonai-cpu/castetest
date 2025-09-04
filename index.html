@@ -1,5 +1,4 @@
-
-               <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -135,15 +134,19 @@
                 if (userAnswers[index] === option) {
                     button.classList.add('selected');
                 }
-                button.onclick = () => selectOption(index, option);
+                button.onclick = (event) => selectOption(index, option, event.currentTarget);
                 optionsContainer.appendChild(button);
             });
             updateNavigation();
         }
 
-        function selectOption(index, option) {
+        function selectOption(index, option, selectedButtonEl) {
             userAnswers[index] = option;
-            loadQuestion(index); // Reload to show selection
+            const optionButtons = optionsContainer.querySelectorAll('.quiz-option');
+            optionButtons.forEach(btn => {
+                btn.classList.remove('selected');
+            });
+            selectedButtonEl.classList.add('selected');
         }
 
         function updateNavigation() {
@@ -184,7 +187,12 @@
                 
                 const reviewItem = document.createElement('div');
                 reviewItem.className = 'p-3 mb-3 rounded-lg border';
-                reviewItem.classList.add(isCorrect ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200');
+                
+                if (isCorrect) {
+                    reviewItem.classList.add('bg-green-50', 'border-green-200');
+                } else {
+                    reviewItem.classList.add('bg-red-50', 'border-red-200');
+                }
                 
                 reviewItem.innerHTML = `
                     <p class="font-semibold text-gray-800">${index + 1}. ${question.question}</p>
@@ -240,3 +248,6 @@
     </script>
 </body>
 </html>
+
+
+           
