@@ -1,98 +1,242 @@
-<!DOCTYPE html>
+
+               <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>A Guide to Environmental Sustainability</title>
-    <!-- Tailwind CSS for styling -->
+    <title>NIELIT O Level Web Designing MCQ</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts: Inter -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Using Inter as the default font */
         body {
             font-family: 'Inter', sans-serif;
         }
+        .quiz-option {
+            transition: all 0.2s ease-in-out;
+        }
+        .quiz-option:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .quiz-option.selected {
+            background-color: #3b82f6; /* bg-blue-500 */
+            color: white;
+            border-color: #3b82f6; /* border-blue-500 */
+        }
+        .correct {
+            background-color: #22c55e !important; /* bg-green-500 */
+            color: white !important;
+            border-color: #16a34a !important; /* border-green-600 */
+        }
+        .incorrect {
+            background-color: #ef4444 !important; /* bg-red-500 */
+            color: white !important;
+            border-color: #dc2626 !important; /* border-red-600 */
+        }
+        .disabled-button {
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800">
+<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
 
-    <!-- Main container with vertical padding -->
-    <main class="container mx-auto px-4 sm:px-6 lg:px-8 py-12 sm:py-16">
+    <div id="quiz-container" class="w-full max-w-2xl bg-white rounded-xl shadow-lg p-6 md:p-8">
+        
+        <!-- Quiz Header -->
+        <div class="mb-6 text-center">
+            <h1 class="text-2xl md:text-3xl font-bold text-gray-800">NIELIT O' Level Web Designing Quiz</h1>
+            <p class="text-gray-500 mt-2">Test your knowledge with these 20 MCQs</p>
+        </div>
 
-        <!-- Main content card with shadow and rounded corners -->
-        <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-lg overflow-hidden">
-            <div class="p-8 sm:p-10 lg:p-12">
+        <!-- Quiz Body -->
+        <div id="quiz-body">
+            <div id="question-area" class="mb-6">
+                <p class="text-lg font-semibold text-gray-700 mb-2"><span id="question-number">1</span>. <span id="question-text"></span></p>
+                <div id="options-container" class="space-y-3">
+                    <!-- Options will be dynamically inserted here -->
+                </div>
+            </div>
 
-                <!-- Header Section -->
-                <header class="text-center mb-10">
-                    <h1 class="text-3xl sm:text-4xl md:text-5xl font-bold text-slate-900 tracking-tight">
-                        A Guide to Environmental Sustainability
-                    </h1>
-                    <p class="mt-4 text-lg text-slate-600">
-                        Understanding our planet's resources and the path to a sustainable future.
-                    </p>
-                </header>
-                
-                <!-- Separator -->
-                <hr class="mb-10 border-slate-200">
-
-                <!-- Section 1: Defining Our World -->
-                <section class="mb-8">
-                    <h2 class="text-2xl font-semibold text-slate-800 mb-4">Defining Our World and Its Components</h2>
-                    <p class="text-base sm:text-lg leading-relaxed text-slate-600 text-justify">
-                        To appreciate the delicate balance of our planet, we must first understand the fundamental stage upon which all life plays out: the environment. This term refers not to a distant, abstract concept, but to the immediate surroundings where all living things exist. This intricate web of life is composed of two distinct but inseparable types of components. On one hand, we have the biotic factors, which encompass all living organisms, from the smallest microbes to the largest animals. On the other, we have the abiotic factors—the non-living elements such as water, soil, and the sunlight that provides the energy for almost all life on Earth. The continuous and dynamic interaction between these living and non-living elements is the foundational process that supports and sustains entire ecosystems, creating the conditions necessary for life to thrive.
-                    </p>
-                </section>
-
-                <!-- Section 2: Natural Resources -->
-                <section class="mb-8">
-                    <h2 class="text-2xl font-semibold text-slate-800 mb-4">The Treasure Chest of Nature: Understanding Natural Resources</h2>
-                    <p class="text-base sm:text-lg leading-relaxed text-slate-600 text-justify">
-                        Within these ecosystems lies a wealth of natural resources—materials provided by the Earth that we depend on for survival and development. These resources can be broadly categorized by their availability. Some, like the fossil fuels coal and petroleum, are non-renewable; they were formed over millions of years and exist in finite quantities that we are depleting rapidly. Others are renewable, capable of regenerating over time if managed wisely. A particularly promising category is continuous resources, which are perpetually available to us. Prime examples include the boundless power of solar and tidal energy, offering a clean and inexhaustible alternative to fossil fuels. The value of these natural gifts extends far beyond mere economic utility; they also provide critical ecosystem services, such as the natural purification of air and water, climate regulation, and pollination, which are essential for our collective well-being.
-                    </p>
-                </section>
-
-                <!-- Section 3: Mismanagement Consequences -->
-                <section class="mb-8">
-                    <h2 class="text-2xl font-semibold text-slate-800 mb-4">A Planet in Peril: The Consequences of Mismanagement</h2>
-                    <p class="text-base sm:text-lg leading-relaxed text-slate-600 text-justify">
-                        Unfortunately, humanity's relationship with these resources has often been one of shortsightedness, leading to severe environmental degradation. One of the most pressing issues is overexploitation, a term that describes the harvesting of resources at an unsustainable rate. This is starkly evident in practices like industrial overfishing, which has decimated marine populations, and rampant over-mining, which scars landscapes and depletes finite mineral reserves. Another critical issue is deforestation. This is far more than simply clearing trees; it is the wholesale destruction of complex forest ecosystems, a process that directly results in catastrophic habitat loss and a profound reduction in global biodiversity, pushing countless species toward extinction.
-                    </p>
-                </section>
-
-                <!-- Section 4: Sustainability -->
-                <section class="mb-8">
-                    <h2 class="text-2xl font-semibold text-slate-800 mb-4">The Path Forward: The Principle of Sustainability</h2>
-                    <p class="text-base sm:text-lg leading-relaxed text-slate-600 text-justify">
-                        In response to these escalating crises, the global community has rallied around a guiding principle for the future: sustainability. At its heart, this concept is about fulfilling the needs of the present by using our resources responsibly, thereby ensuring their availability for future generations. It is crucial to understand its foundational structure. While technological advancements are undoubtedly powerful tools in achieving our environmental goals, the framework of sustainability itself is balanced upon its three core and interconnected pillars: the Environmental, the Social, and the Economic. This holistic approach is enshrined in global commitments like the landmark Paris Agreement, which established the urgent goal to limit global warming to well below 2°C compared to pre-industrial levels. This mission is further detailed in the comprehensive roadmap provided by the seventeen UN Sustainable Development Goals (SDGs), which outline a blueprint for a more equitable and sustainable world.
-                    </p>
-                </section>
-
-                <!-- Section 5: Practice and Action -->
-                <section class="mb-8">
-                    <h2 class="text-2xl font-semibold text-slate-800 mb-4">Putting Sustainability into Practice: From Global to Personal Action</h2>
-                    <p class="text-base sm:text-lg leading-relaxed text-slate-600 text-justify">
-                        Translating the principle of sustainability into tangible outcomes requires a multi-layered approach. In resource management, this means adopting smarter practices across the board. For instance, effective water conservation is being achieved through proven methods like rainwater harvesting and high-efficiency drip irrigation. In our consumption cycles, the memorable mantra of waste management—Reduce, Reuse, and Recycle—provides a simple yet powerful guide for minimizing our impact. Our food systems are also transforming through sustainable agriculture, which champions techniques like organic farming and crop rotation to build healthy soil and reduce reliance on chemical inputs.
-                    </p>
-                     <p class="mt-4 text-base sm:text-lg leading-relaxed text-slate-600 text-justify">
-                        Technology acts as a critical enabler in this transition. Modern 'smart farming', for example, utilizes sophisticated sensors and AI to optimize water and fertilizer use with incredible precision. In our cities, the concept of 'green buildings' is taking hold, where the defining characteristic is not their appearance but their fundamentally energy-efficient design. Ultimately, this global effort is powered by individual actions. The journey begins with personal lifestyle choices, such as a conscious effort to save energy and reduce plastic use. However, for systemic change, the most potent action an individual can take is to become an engaged citizen and provide active policy support for governments to enact and enforce stronger environmental protections. This collective effort is vital because, as we are increasingly reminded, our planet's resources are finite, and their use must be carefully balanced to ensure a prosperous and healthy home for all.
-                    </p>
-                </section>
-                
+            <!-- Navigation -->
+            <div class="flex justify-between items-center border-t pt-4 mt-6">
+                <button id="prev-btn" class="px-4 py-2 bg-gray-300 text-gray-700 font-semibold rounded-lg shadow-sm hover:bg-gray-400 transition-colors disabled-button" disabled>Previous</button>
+                <p class="text-sm font-medium text-gray-600" id="progress-text">Question 1 of 20</p>
+                <button id="next-btn" class="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-sm hover:bg-blue-600 transition-colors">Next</button>
+                <button id="submit-btn" class="hidden px-4 py-2 bg-green-500 text-white font-semibold rounded-lg shadow-sm hover:bg-green-600 transition-colors">Submit Quiz</button>
             </div>
         </div>
 
-    </main>
-    
-    <!-- Footer -->
-    <footer class="text-center py-6">
-        <p class="text-slate-500 text-sm">&copy; 2024 Environmental Insights. All rights reserved.</p>
-    </footer>
+        <!-- Results Screen -->
+        <div id="results-screen" class="hidden text-center">
+            <h2 class="text-2xl font-bold text-gray-800 mb-2">Quiz Completed!</h2>
+            <p class="text-gray-600 mb-4">Here's your score:</p>
+            <div class="bg-blue-100 border-2 border-blue-300 rounded-full w-40 h-40 mx-auto flex flex-col items-center justify-center mb-6">
+                <p class="text-4xl font-bold text-blue-600" id="score-text">0/20</p>
+                <p class="text-lg font-medium text-blue-500" id="score-percentage">0%</p>
+            </div>
+            <p class="text-gray-700 font-medium mb-6" id="result-message"></p>
+            <div id="review-container" class="text-left max-h-60 overflow-y-auto border rounded-lg p-4 mb-6">
+                <!-- Review answers will be populated here -->
+            </div>
+            <button id="restart-btn" class="w-full px-4 py-3 bg-blue-500 text-white font-bold rounded-lg shadow-sm hover:bg-blue-600 transition-colors">Restart Quiz</button>
+        </div>
 
+    </div>
+
+    <script>
+        const quizData = [
+            { question: "What does HTML stand for?", options: ["Hyper Text Markup Language", "Home Tool Markup Language", "Hyperlinks and Text Markup Language", "Hyper Tooling Markup Language"], answer: "Hyper Text Markup Language" },
+            { question: "Which tag is used to create a hyperlink in HTML?", options: ["<link>", "<a>", "<hyperlink>", "<href>"], answer: "<a>" },
+            { question: "What does CSS stand for?", options: ["Creative Style Sheets", "Computer Style Sheets", "Cascading Style Sheets", "Colorful Style Sheets"], answer: "Cascading Style Sheets" },
+            { question: "Which CSS property is used to change the background color of an element?", options: ["bgcolor", "color", "background-color", "background"], answer: "background-color" },
+            { question: "Inside which HTML element do we put the JavaScript?", options: ["<js>", "<scripting>", "<javascript>", "<script>"], answer: "<script>" },
+            { question: "Which character is used to indicate an end tag in HTML?", options: ["/", "*", "<", "^"], answer: "/" },
+            { question: "How can you make a numbered list?", options: ["<ul>", "<ol>", "<dl>", "<list>"], answer: "<ol>" },
+            { question: "How do you select an element with id 'header' in CSS?", options: [".header", "header", "#header", "*header"], answer: "#header" },
+            { question: "What is the correct way to write a JavaScript array?", options: ["var colors = (1:'red', 2:'green')", "var colors = ['red', 'green']", "var colors = 'red', 'green'", "var colors = 1 = ('red')"], answer: "var colors = ['red', 'green']" },
+            { question: "Which protocol is primarily used for browsing web pages?", options: ["FTP", "TCP", "HTTP", "SMTP"], answer: "HTTP" },
+            { question: "What is the default port for HTTP?", options: ["21", "25", "80", "443"], answer: "80" },
+            { question: "The attribute used to specify the URL of an image is:", options: ["href", "src", "link", "url"], answer: "src" },
+            { question: "Which of the following is NOT a web browser?", options: ["Chrome", "Apache", "Firefox", "Edge"], answer: "Apache" },
+            { question: "Which organization defines the Web Standards?", options: ["Microsoft", "Google", "The World Wide Web Consortium (W3C)", "Mozilla"], answer: "The World Wide Web Consortium (W3C)" },
+            { question: "How do you add a comment in a CSS file?", options: ["// this is a comment", "<!-- this is a comment -->", "/* this is a comment */", "' this is a comment"], answer: "/* this is a comment */" },
+            { question: "What does 'IP' stand for in IP Address?", options: ["Internet Provider", "Internet Protocol", "Internal Protocol", "Internet Page"], answer: "Internet Protocol" },
+            { question: "Which input type defines a slider control?", options: ["<input type='slider'>", "<input type='range'>", "<input type='controls'>", "<input type='drag'>"], answer: "<input type='range'>" },
+            { question: "In JavaScript, what is used to declare a variable?", options: ["var", "let", "const", "All of the above"], answer: "All of the above" },
+            { question: "Which property is used to change the font of an element in CSS?", options: ["font-style", "text-style", "font-family", "font-weight"], answer: "font-family" },
+            { question: "Which tag is used to define the document's body?", options: ["<head>", "<main>", "<body>", "<content>"], answer: "<body>" }
+        ];
+
+        let currentQuestionIndex = 0;
+        const userAnswers = new Array(quizData.length).fill(null);
+
+        const quizBody = document.getElementById('quiz-body');
+        const resultsScreen = document.getElementById('results-screen');
+        const questionNumberEl = document.getElementById('question-number');
+        const questionTextEl = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const submitBtn = document.getElementById('submit-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const progressText = document.getElementById('progress-text');
+
+        function loadQuestion(index) {
+            const question = quizData[index];
+            questionNumberEl.textContent = index + 1;
+            questionTextEl.textContent = question.question;
+            optionsContainer.innerHTML = '';
+
+            question.options.forEach(option => {
+                const button = document.createElement('button');
+                button.textContent = option;
+                button.className = 'w-full text-left p-4 border-2 border-gray-300 rounded-lg quiz-option hover:bg-gray-100 hover:border-blue-400';
+                if (userAnswers[index] === option) {
+                    button.classList.add('selected');
+                }
+                button.onclick = () => selectOption(index, option);
+                optionsContainer.appendChild(button);
+            });
+            updateNavigation();
+        }
+
+        function selectOption(index, option) {
+            userAnswers[index] = option;
+            loadQuestion(index); // Reload to show selection
+        }
+
+        function updateNavigation() {
+            progressText.textContent = `Question ${currentQuestionIndex + 1} of ${quizData.length}`;
+            
+            // Previous Button
+            if (currentQuestionIndex === 0) {
+                prevBtn.disabled = true;
+                prevBtn.classList.add('disabled-button');
+            } else {
+                prevBtn.disabled = false;
+                prevBtn.classList.remove('disabled-button');
+            }
+            
+            // Next/Submit Button
+            if (currentQuestionIndex === quizData.length - 1) {
+                nextBtn.classList.add('hidden');
+                submitBtn.classList.remove('hidden');
+            } else {
+                nextBtn.classList.remove('hidden');
+                submitBtn.classList.add('hidden');
+            }
+        }
+
+        function showResults() {
+            quizBody.classList.add('hidden');
+            resultsScreen.classList.remove('hidden');
+            
+            let score = 0;
+            const reviewContainer = document.getElementById('review-container');
+            reviewContainer.innerHTML = '<h3 class="text-xl font-bold mb-4 text-gray-700">Review Your Answers</h3>';
+            
+            quizData.forEach((question, index) => {
+                const isCorrect = userAnswers[index] === question.answer;
+                if(isCorrect) {
+                    score++;
+                }
+                
+                const reviewItem = document.createElement('div');
+                reviewItem.className = 'p-3 mb-3 rounded-lg border';
+                reviewItem.classList.add(isCorrect ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200');
+                
+                reviewItem.innerHTML = `
+                    <p class="font-semibold text-gray-800">${index + 1}. ${question.question}</p>
+                    <p class="text-sm mt-2 ${isCorrect ? 'text-green-700' : 'text-red-700'}">Your answer: ${userAnswers[index] || 'Not answered'}</p>
+                    ${!isCorrect ? `<p class="text-sm mt-1 text-green-800 font-medium">Correct answer: ${question.answer}</p>` : ''}
+                `;
+                reviewContainer.appendChild(reviewItem);
+            });
+            
+            const percentage = Math.round((score / quizData.length) * 100);
+            document.getElementById('score-text').textContent = `${score}/${quizData.length}`;
+            document.getElementById('score-percentage').textContent = `${percentage}%`;
+
+            const resultMessage = document.getElementById('result-message');
+            if (percentage >= 75) {
+                resultMessage.textContent = "Excellent Work! You have a strong knowledge of web design.";
+                resultMessage.className = "text-green-600 font-medium mb-6";
+            } else if (percentage >= 50) {
+                resultMessage.textContent = "Good Job! A little more practice and you'll be an expert.";
+                resultMessage.className = "text-yellow-600 font-medium mb-6";
+            } else {
+                resultMessage.textContent = "Keep trying! Review the concepts to improve your score.";
+                resultMessage.className = "text-red-600 font-medium mb-6";
+            }
+        }
+
+        prevBtn.addEventListener('click', () => {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                loadQuestion(currentQuestionIndex);
+            }
+        });
+
+        nextBtn.addEventListener('click', () => {
+            if (currentQuestionIndex < quizData.length - 1) {
+                currentQuestionIndex++;
+                loadQuestion(currentQuestionIndex);
+            }
+        });
+
+        submitBtn.addEventListener('click', showResults);
+
+        restartBtn.addEventListener('click', () => {
+            currentQuestionIndex = 0;
+            userAnswers.fill(null);
+            resultsScreen.classList.add('hidden');
+            quizBody.classList.remove('hidden');
+            loadQuestion(currentQuestionIndex);
+        });
+
+        // Initial load
+        loadQuestion(currentQuestionIndex);
+    </script>
 </body>
 </html>
-
-
