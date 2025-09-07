@@ -3,251 +3,297 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NIELIT O Level Web Designing MCQ</title>
+    <title>NIELIT 'O' Level Python MCQ Quiz</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
         }
-        .quiz-option {
-            transition: all 0.2s ease-in-out;
-        }
-        .quiz-option:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-        }
         .quiz-option.selected {
-            background-color: #3b82f6; /* bg-blue-500 */
+            background-color: #3b82f6; /* blue-500 */
             color: white;
-            border-color: #3b82f6; /* border-blue-500 */
+            border-color: #2563eb; /* blue-600 */
         }
-        .correct {
-            background-color: #22c55e !important; /* bg-green-500 */
-            color: white !important;
-            border-color: #16a34a !important; /* border-green-600 */
+        .quiz-option.correct {
+            background-color: #22c55e; /* green-500 */
+            color: white;
+            border-color: #16a34a; /* green-600 */
         }
-        .incorrect {
-            background-color: #ef4444 !important; /* bg-red-500 */
-            color: white !important;
-            border-color: #dc2626 !important; /* border-red-600 */
-        }
-        .disabled-button {
-            cursor: not-allowed;
-            opacity: 0.6;
+        .quiz-option.incorrect {
+            background-color: #ef4444; /* red-500 */
+            color: white;
+            border-color: #dc2626; /* red-600 */
         }
     </style>
 </head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen p-4">
+<body class="bg-slate-100 text-slate-800 flex items-center justify-center min-h-screen p-4">
 
-    <div id="quiz-container" class="w-full max-w-2xl bg-white rounded-xl shadow-lg p-6 md:p-8">
+    <div id="page-lock-modal" class="fixed inset-0 bg-slate-900 bg-opacity-95 flex items-center justify-center p-4 z-50">
+        <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-sm text-center">
+            <h3 class="text-xl font-bold mb-2">Access Restricted</h3>
+            <p class="text-sm text-slate-500 mb-4">Please enter the password to view the quiz.</p>
+            <input type="password" id="page-password-input" class="w-full border border-slate-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter password...">
+            <p id="page-password-error" class="text-red-500 text-sm mt-2 hidden">Incorrect password. Please try again.</p>
+            <div class="mt-6">
+                <button id="page-password-submit-btn" class="w-full bg-blue-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-blue-700">Unlock</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="quiz-container" class="w-full max-w-2xl bg-white p-6 sm:p-8 rounded-xl shadow-lg hidden">
+        <div class="text-center mb-6">
+            <h1 class="text-2xl sm:text-3xl font-bold text-slate-900">Python Programming MCQ Quiz</h1>
+            <p class="text-slate-500 mt-2">NIELIT 'O' Level (M3-R5) - 20 Marks</p>
+        </div>
         
-        <!-- Quiz Header -->
-        <div class="mb-6 text-center">
-            <h1 class="text-2xl md:text-3xl font-bold text-gray-800">NIELIT O' Level Web Designing Quiz</h1>
-            <p class="text-gray-500 mt-2">Test your knowledge with these 20 MCQs</p>
+        <div id="questions-wrapper" class="space-y-6">
+            <!-- Questions will be injected here by JavaScript -->
         </div>
 
-        <!-- Quiz Body -->
-        <div id="quiz-body">
-            <div id="question-area" class="mb-6">
-                <p class="text-lg font-semibold text-gray-700 mb-2"><span id="question-number">1</span>. <span id="question-text"></span></p>
-                <div id="options-container" class="space-y-3">
-                    <!-- Options will be dynamically inserted here -->
-                </div>
-            </div>
+        <div class="mt-8 text-center">
+            <button id="submit-btn" class="bg-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 transition-all duration-300 transform hover:scale-105">
+                Submit Answers
+            </button>
+        </div>
+    </div>
 
-            <!-- Navigation -->
-            <div class="flex justify-between items-center border-t pt-4 mt-6">
-                <button id="prev-btn" class="px-4 py-2 bg-gray-300 text-gray-700 font-semibold rounded-lg shadow-sm hover:bg-gray-400 transition-colors disabled-button" disabled>Previous</button>
-                <p class="text-sm font-medium text-gray-600" id="progress-text">Question 1 of 20</p>
-                <button id="next-btn" class="px-4 py-2 bg-blue-500 text-white font-semibold rounded-lg shadow-sm hover:bg-blue-600 transition-colors">Next</button>
-                <button id="submit-btn" class="hidden px-4 py-2 bg-green-500 text-white font-semibold rounded-lg shadow-sm hover:bg-green-600 transition-colors">Submit Quiz</button>
+    <div id="result-container" class="w-full max-w-2xl bg-white p-8 rounded-xl shadow-lg text-center hidden">
+        <h2 class="text-2xl sm:text-3xl font-bold text-slate-900">Quiz Results</h2>
+        <div class="my-6">
+            <p class="text-lg">You scored</p>
+            <p id="score" class="text-5xl font-extrabold text-blue-600 my-2">0 / 20</p>
+            <p id="feedback" class="text-lg font-medium text-slate-600"></p>
+        </div>
+        <button id="retry-btn" class="bg-slate-700 text-white font-bold py-3 px-8 rounded-lg hover:bg-slate-800 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-slate-500 transition-all duration-300">
+            Try Again
+        </button>
+        <button id="review-btn" class="ml-4 bg-green-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 transition-all duration-300">
+            Review Answers
+        </button>
+    </div>
+
+    <div id="password-modal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+        <div class="bg-white p-6 rounded-lg shadow-xl w-full max-w-sm">
+            <h3 class="text-lg font-bold mb-4">Enter Code to Review</h3>
+            <p class="text-sm text-slate-500 mb-4">Please enter the access code to review your answers.</p>
+            <input type="password" id="password-input" class="w-full border border-slate-300 rounded-md p-2 focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Enter code...">
+            <p id="password-error" class="text-red-500 text-sm mt-2 hidden">Incorrect code. Please try again.</p>
+            <div class="mt-6 flex justify-end space-x-3">
+                <button id="password-cancel-btn" class="bg-slate-200 text-slate-800 font-bold py-2 px-4 rounded-lg hover:bg-slate-300">Cancel</button>
+                <button id="password-submit-btn" class="bg-green-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-green-700">Submit</button>
             </div>
         </div>
-
-        <!-- Results Screen -->
-        <div id="results-screen" class="hidden text-center">
-            <h2 class="text-2xl font-bold text-gray-800 mb-2">Quiz Completed!</h2>
-            <p class="text-gray-600 mb-4">Here's your score:</p>
-            <div class="bg-blue-100 border-2 border-blue-300 rounded-full w-40 h-40 mx-auto flex flex-col items-center justify-center mb-6">
-                <p class="text-4xl font-bold text-blue-600" id="score-text">0/20</p>
-                <p class="text-lg font-medium text-blue-500" id="score-percentage">0%</p>
-            </div>
-            <p class="text-gray-700 font-medium mb-6" id="result-message"></p>
-            <div id="review-container" class="text-left max-h-60 overflow-y-auto border rounded-lg p-4 mb-6">
-                <!-- Review answers will be populated here -->
-            </div>
-            <button id="restart-btn" class="w-full px-4 py-3 bg-blue-500 text-white font-bold rounded-lg shadow-sm hover:bg-blue-600 transition-colors">Restart Quiz</button>
-        </div>
-
     </div>
 
     <script>
+        const questionsWrapper = document.getElementById('questions-wrapper');
+        const submitBtn = document.getElementById('submit-btn');
+        const quizContainer = document.getElementById('quiz-container');
+        const resultContainer = document.getElementById('result-container');
+        const scoreElement = document.getElementById('score');
+        const feedbackElement = document.getElementById('feedback');
+        const retryBtn = document.getElementById('retry-btn');
+        const reviewBtn = document.getElementById('review-btn');
+        const passwordModal = document.getElementById('password-modal');
+        const passwordInput = document.getElementById('password-input');
+        const passwordSubmitBtn = document.getElementById('password-submit-btn');
+        const passwordCancelBtn = document.getElementById('password-cancel-btn');
+        const passwordError = document.getElementById('password-error');
+
+        // New elements for page lock
+        const pageLockModal = document.getElementById('page-lock-modal');
+        const pagePasswordInput = document.getElementById('page-password-input');
+        const pagePasswordSubmitBtn = document.getElementById('page-password-submit-btn');
+        const pagePasswordError = document.getElementById('page-password-error');
+
         const quizData = [
-            { question: "What does HTML stand for?", options: ["Hyper Text Markup Language", "Home Tool Markup Language", "Hyperlinks and Text Markup Language", "Hyper Tooling Markup Language"], answer: "Hyper Text Markup Language" },
-            { question: "Which tag is used to create a hyperlink in HTML?", options: ["<link>", "<a>", "<hyperlink>", "<href>"], answer: "<a>" },
-            { question: "What does CSS stand for?", options: ["Creative Style Sheets", "Computer Style Sheets", "Cascading Style Sheets", "Colorful Style Sheets"], answer: "Cascading Style Sheets" },
-            { question: "Which CSS property is used to change the background color of an element?", options: ["bgcolor", "color", "background-color", "background"], answer: "background-color" },
-            { question: "Inside which HTML element do we put the JavaScript?", options: ["<js>", "<scripting>", "<javascript>", "<script>"], answer: "<script>" },
-            { question: "Which character is used to indicate an end tag in HTML?", options: ["/", "*", "<", "^"], answer: "/" },
-            { question: "How can you make a numbered list?", options: ["<ul>", "<ol>", "<dl>", "<list>"], answer: "<ol>" },
-            { question: "How do you select an element with id 'header' in CSS?", options: [".header", "header", "#header", "*header"], answer: "#header" },
-            { question: "What is the correct way to write a JavaScript array?", options: ["var colors = (1:'red', 2:'green')", "var colors = ['red', 'green']", "var colors = 'red', 'green'", "var colors = 1 = ('red')"], answer: "var colors = ['red', 'green']" },
-            { question: "Which protocol is primarily used for browsing web pages?", options: ["FTP", "TCP", "HTTP", "SMTP"], answer: "HTTP" },
-            { question: "What is the default port for HTTP?", options: ["21", "25", "80", "443"], answer: "80" },
-            { question: "The attribute used to specify the URL of an image is:", options: ["href", "src", "link", "url"], answer: "src" },
-            { question: "Which of the following is NOT a web browser?", options: ["Chrome", "Apache", "Firefox", "Edge"], answer: "Apache" },
-            { question: "Which organization defines the Web Standards?", options: ["Microsoft", "Google", "The World Wide Web Consortium (W3C)", "Mozilla"], answer: "The World Wide Web Consortium (W3C)" },
-            { question: "How do you add a comment in a CSS file?", options: ["// this is a comment", "<!-- this is a comment -->", "/* this is a comment */", "' this is a comment"], answer: "/* this is a comment */" },
-            { question: "What does 'IP' stand for in IP Address?", options: ["Internet Provider", "Internet Protocol", "Internal Protocol", "Internet Page"], answer: "Internet Protocol" },
-            { question: "Which input type defines a slider control?", options: ["<input type='slider'>", "<input type='range'>", "<input type='controls'>", "<input type='drag'>"], answer: "<input type='range'>" },
-            { question: "In JavaScript, what is used to declare a variable?", options: ["var", "let", "const", "All of the above"], answer: "All of the above" },
-            { question: "Which property is used to change the font of an element in CSS?", options: ["font-style", "text-style", "font-family", "font-weight"], answer: "font-family" },
-            { question: "Which tag is used to define the document's body?", options: ["<head>", "<main>", "<body>", "<content>"], answer: "<body>" }
+            { question: "Who developed the Python language?", options: ["Zim Den", "Guido van Rossum", "Niene Stom", "Wick van Rossum"], answer: "Guido van Rossum", description: "Guido van Rossum is the creator of Python, first releasing it in 1991." },
+            { question: "Which keyword is used for function definition in Python?", options: ["fun", "function", "def", "define"], answer: "def", description: "The `def` keyword is used to define a function in Python." },
+            { question: "What is the output of `print(2 ** 3)`?", options: ["6", "8", "9", "12"], answer: "8", description: "The `**` operator is for exponentiation. `2 ** 3` means 2 to the power of 3, which is 8." },
+            { question: "Which of the following data types is immutable?", options: ["List", "Dictionary", "Set", "Tuple"], answer: "Tuple", description: "Tuples are ordered and unchangeable (immutable). Lists, Dictionaries, and Sets are mutable." },
+            { question: "What does the `len()` function do?", options: ["Returns the length of an object", "Returns the largest value", "Returns a random number", "Converts to lowercase"], answer: "Returns the length of an object", description: "The `len()` function returns the number of items in an object like a list, tuple, or string." },
+            { question: "How do you start a single-line comment in Python?", options: ["//", "/*", "#", "<!--"], answer: "#", description: "In Python, the `#` symbol is used to start a single-line comment." },
+            { question: "Which method is used to add an item to the end of a list?", options: [".add()", ".push()", ".insert()", ".append()"], answer: ".append()", description: "The `.append()` method adds a single item to the very end of a list." },
+            { question: "What will be the output of `print('Hello'[1])`?", options: ["H", "e", "l", "o"], answer: "e", description: "String indexing starts at 0. 'H' is at index 0, so 'e' is at index 1." },
+            { question: "Which operator is used for logical AND?", options: ["&", "&&", "and", "||"], answer: "and", description: "Python uses the keyword `and` for logical AND operations." },
+            { question: "What is the correct file extension for Python files?", options: [".pyt", ".pt", ".pyth", ".py"], answer: ".py", description: "Python source files are conventionally saved with the `.py` extension." },
+            { question: "Which function is used to get user input?", options: ["get()", "input()", "read()", "prompt()"], answer: "input()", description: "The `input()` function pauses execution to allow the user to type in a line of text." },
+            { question: "What is the full form of NumPy?", options: ["Number Python", "Numerical Python", "Numbers in Python", "Numeric Python"], answer: "Numerical Python", description: "NumPy stands for Numerical Python and is a fundamental package for scientific computing." },
+            { question: "Which statement is used to handle exceptions?", options: ["if-else", "switch-case", "try-except", "do-while"], answer: "try-except", description: "The `try-except` block is Python's way of handling errors and exceptions gracefully." },
+            { question: "How do you create a dictionary in Python?", options: ["[]", "()", "{}", "<>"], answer: "{}", description: "Curly braces `{}` are used to create dictionaries, which store data in key-value pairs." },
+            { question: "What is the output of `bool(0)`?", options: ["True", "False", "Error", "None"], answer: "False", description: "In a boolean context, the integer `0`, empty strings, and empty collections evaluate to `False`." },
+            { question: "Which mode is used to open a file for writing, and will create the file if it does not exist?", options: ["r", "w", "a", "x"], answer: "w", description: "The 'w' mode opens a file for writing. It overwrites the file if it exists, and creates it if it doesn't." },
+            { question: "The `pandas` library is primarily used for:", options: ["Web Development", "Data manipulation and analysis", "Machine Learning", "Game Development"], answer: "Data manipulation and analysis", description: "Pandas provides high-performance, easy-to-use data structures and data analysis tools." },
+            { question: "What is the output of `3 * 'ab'`?", options: ["ababab", "9ab", "Error", "ab ab ab"], answer: "ababab", description: "The `*` operator, when used with a string, performs repetition. It repeats 'ab' 3 times." },
+            { question: "Which of these is NOT a core data type?", options: ["List", "Dictionary", "Class", "Tuple"], answer: "Class", description: "'Class' is a blueprint for creating objects, not a built-in core data type like List, Tuple, or Dictionary." },
+            { question: "What does the `range(3)` function generate?", options: ["[0, 1, 2]", "[1, 2, 3]", "[0, 1, 2, 3]", "[1, 2]"], answer: "[0, 1, 2]", description: "`range(n)` generates numbers from 0 up to (but not including) n. So `range(3)` produces 0, 1, and 2." }
         ];
 
-        let currentQuestionIndex = 0;
-        const userAnswers = new Array(quizData.length).fill(null);
+        let selectedAnswers = new Array(quizData.length).fill(null);
 
-        const quizBody = document.getElementById('quiz-body');
-        const resultsScreen = document.getElementById('results-screen');
-        const questionNumberEl = document.getElementById('question-number');
-        const questionTextEl = document.getElementById('question-text');
-        const optionsContainer = document.getElementById('options-container');
-        const prevBtn = document.getElementById('prev-btn');
-        const nextBtn = document.getElementById('next-btn');
-        const submitBtn = document.getElementById('submit-btn');
-        const restartBtn = document.getElementById('restart-btn');
-        const progressText = document.getElementById('progress-text');
+        function loadQuiz() {
+            questionsWrapper.innerHTML = '';
+            quizData.forEach((quizItem, index) => {
+                const questionElement = document.createElement('div');
+                questionElement.className = 'question-block';
+                questionElement.innerHTML = `
+                    <p class="font-semibold text-lg mb-3">${index + 1}. ${quizItem.question}</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3" data-question-index="${index}">
+                        ${quizItem.options.map(option => `
+                            <button class="quiz-option w-full text-left p-3 border-2 border-slate-200 rounded-lg hover:bg-slate-100 hover:border-blue-400 transition-colors duration-200">
+                                ${option}
+                            </button>
+                        `).join('')}
+                    </div>
+                `;
+                questionsWrapper.appendChild(questionElement);
+            });
 
-        function loadQuestion(index) {
-            const question = quizData[index];
-            questionNumberEl.textContent = index + 1;
-            questionTextEl.textContent = question.question;
-            optionsContainer.innerHTML = '';
+            addOptionListeners();
+        }
 
-            question.options.forEach(option => {
-                const button = document.createElement('button');
-                button.textContent = option;
-                button.className = 'w-full text-left p-4 border-2 border-gray-300 rounded-lg quiz-option hover:bg-gray-100 hover:border-blue-400';
-                if (userAnswers[index] === option) {
+        function addOptionListeners() {
+            questionsWrapper.querySelectorAll('.quiz-option').forEach(button => {
+                button.addEventListener('click', () => {
+                    const questionBlock = button.parentElement;
+                    const questionIndex = parseInt(questionBlock.dataset.questionIndex);
+                    
+                    // Deselect previous selection in the same question
+                    questionBlock.querySelectorAll('.quiz-option').forEach(btn => btn.classList.remove('selected'));
+                    
+                    // Select the new one
                     button.classList.add('selected');
-                }
-                button.onclick = (event) => selectOption(index, option, event.currentTarget);
-                optionsContainer.appendChild(button);
+                    selectedAnswers[questionIndex] = button.textContent.trim();
+                });
             });
-            updateNavigation();
         }
-
-        function selectOption(index, option, selectedButtonEl) {
-            userAnswers[index] = option;
-            const optionButtons = optionsContainer.querySelectorAll('.quiz-option');
-            optionButtons.forEach(btn => {
-                btn.classList.remove('selected');
-            });
-            selectedButtonEl.classList.add('selected');
-        }
-
-        function updateNavigation() {
-            progressText.textContent = `Question ${currentQuestionIndex + 1} of ${quizData.length}`;
-            
-            // Previous Button
-            if (currentQuestionIndex === 0) {
-                prevBtn.disabled = true;
-                prevBtn.classList.add('disabled-button');
-            } else {
-                prevBtn.disabled = false;
-                prevBtn.classList.remove('disabled-button');
-            }
-            
-            // Next/Submit Button
-            if (currentQuestionIndex === quizData.length - 1) {
-                nextBtn.classList.add('hidden');
-                submitBtn.classList.remove('hidden');
-            } else {
-                nextBtn.classList.remove('hidden');
-                submitBtn.classList.add('hidden');
-            }
-        }
-
-        function showResults() {
-            quizBody.classList.add('hidden');
-            resultsScreen.classList.remove('hidden');
-            
+        
+        submitBtn.addEventListener('click', () => {
             let score = 0;
-            const reviewContainer = document.getElementById('review-container');
-            reviewContainer.innerHTML = '<h3 class="text-xl font-bold mb-4 text-gray-700">Review Your Answers</h3>';
-            
-            quizData.forEach((question, index) => {
-                const isCorrect = userAnswers[index] === question.answer;
-                if(isCorrect) {
+            quizData.forEach((quizItem, index) => {
+                if (selectedAnswers[index] === quizItem.answer) {
                     score++;
                 }
-                
-                const reviewItem = document.createElement('div');
-                reviewItem.className = 'p-3 mb-3 rounded-lg border';
-                
-                if (isCorrect) {
-                    reviewItem.classList.add('bg-green-50', 'border-green-200');
-                } else {
-                    reviewItem.classList.add('bg-red-50', 'border-red-200');
-                }
-                
-                reviewItem.innerHTML = `
-                    <p class="font-semibold text-gray-800">${index + 1}. ${question.question}</p>
-                    <p class="text-sm mt-2 ${isCorrect ? 'text-green-700' : 'text-red-700'}">Your answer: ${userAnswers[index] || 'Not answered'}</p>
-                    ${!isCorrect ? `<p class="text-sm mt-1 text-green-800 font-medium">Correct answer: ${question.answer}</p>` : ''}
-                `;
-                reviewContainer.appendChild(reviewItem);
             });
-            
-            const percentage = Math.round((score / quizData.length) * 100);
-            document.getElementById('score-text').textContent = `${score}/${quizData.length}`;
-            document.getElementById('score-percentage').textContent = `${percentage}%`;
 
-            const resultMessage = document.getElementById('result-message');
-            if (percentage >= 75) {
-                resultMessage.textContent = "Excellent Work! You have a strong knowledge of web design.";
-                resultMessage.className = "text-green-600 font-medium mb-6";
-            } else if (percentage >= 50) {
-                resultMessage.textContent = "Good Job! A little more practice and you'll be an expert.";
-                resultMessage.className = "text-yellow-600 font-medium mb-6";
+            scoreElement.textContent = `${score} / ${quizData.length}`;
+
+            if (score > 15) {
+                feedbackElement.textContent = "Excellent Work!";
+                feedbackElement.className = "text-lg font-medium text-green-600";
+            } else if (score > 10) {
+                feedbackElement.textContent = "Good Job, keep practicing!";
+                feedbackElement.className = "text-lg font-medium text-yellow-600";
             } else {
-                resultMessage.textContent = "Keep trying! Review the concepts to improve your score.";
-                resultMessage.className = "text-red-600 font-medium mb-6";
+                feedbackElement.textContent = "You can do better. Review your answers.";
+                 feedbackElement.className = "text-lg font-medium text-red-600";
+            }
+
+            quizContainer.classList.add('hidden');
+            resultContainer.classList.remove('hidden');
+        });
+
+        function showReview() {
+            quizData.forEach((quizItem, index) => {
+                const questionBlock = questionsWrapper.children[index];
+                const options = questionBlock.querySelectorAll('.quiz-option');
+
+                // Check if description is already added to prevent duplicates
+                if (questionBlock.querySelector('.answer-description')) {
+                    return;
+                }
+
+                options.forEach(optionButton => {
+                    optionButton.disabled = true; // Disable all buttons
+                    const optionText = optionButton.textContent.trim();
+                    
+                    // Remove selection style
+                    optionButton.classList.remove('selected');
+
+                    if (optionText === quizItem.answer) {
+                        optionButton.classList.add('correct');
+                    } else if (optionText === selectedAnswers[index]) {
+                         optionButton.classList.add('incorrect');
+                    }
+                });
+
+                const descriptionElement = document.createElement('div');
+                descriptionElement.className = 'answer-description mt-3 p-3 bg-blue-50 border border-blue-200 text-blue-800 rounded-lg text-sm';
+                descriptionElement.innerHTML = `<span class="font-bold">Explanation:</span> ${quizItem.description}`;
+                questionBlock.appendChild(descriptionElement);
+            });
+
+            resultContainer.classList.add('hidden');
+            quizContainer.classList.remove('hidden');
+            submitBtn.classList.add('hidden'); // Hide submit after review
+        }
+
+        reviewBtn.addEventListener('click', () => {
+            // Show the password modal instead of directly showing the review
+            passwordModal.classList.remove('hidden');
+            passwordInput.value = '';
+            passwordError.classList.add('hidden');
+            passwordInput.focus();
+        });
+
+        passwordCancelBtn.addEventListener('click', () => {
+            passwordModal.classList.add('hidden');
+        });
+
+        passwordSubmitBtn.addEventListener('click', () => {
+            const enteredCode = passwordInput.value;
+            if (enteredCode === 'Nielit123') {
+                passwordModal.classList.add('hidden');
+                showReview(); // Call the function with the review logic
+            } else {
+                passwordError.classList.remove('hidden');
+            }
+        });
+
+        retryBtn.addEventListener('click', () => {
+            selectedAnswers.fill(null);
+            resultContainer.classList.add('hidden');
+            quizContainer.classList.remove('hidden');
+            submitBtn.classList.remove('hidden');
+            loadQuiz();
+        });
+
+        // --- Page Lock Logic ---
+        function unlockPage() {
+            const enteredPassword = pagePasswordInput.value;
+            if (enteredPassword === 'Nielit@123') {
+                pageLockModal.classList.add('hidden');
+                quizContainer.classList.remove('hidden');
+                loadQuiz(); // Load the quiz only after successful login
+            } else {
+                pagePasswordError.classList.remove('hidden');
+                pagePasswordInput.value = '';
+                pagePasswordInput.focus();
             }
         }
 
-        prevBtn.addEventListener('click', () => {
-            if (currentQuestionIndex > 0) {
-                currentQuestionIndex--;
-                loadQuestion(currentQuestionIndex);
+        pagePasswordSubmitBtn.addEventListener('click', unlockPage);
+
+        // Also allow pressing Enter to submit the page password
+        pagePasswordInput.addEventListener('keyup', function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                unlockPage();
             }
         });
 
-        nextBtn.addEventListener('click', () => {
-            if (currentQuestionIndex < quizData.length - 1) {
-                currentQuestionIndex++;
-                loadQuestion(currentQuestionIndex);
-            }
-        });
+        // Focus on the password input on page load
+        window.onload = () => {
+            pagePasswordInput.focus();
+        };
 
-        submitBtn.addEventListener('click', showResults);
-
-        restartBtn.addEventListener('click', () => {
-            currentQuestionIndex = 0;
-            userAnswers.fill(null);
-            resultsScreen.classList.add('hidden');
-            quizBody.classList.remove('hidden');
-            loadQuestion(currentQuestionIndex);
-        });
-
-        // Initial load
-        loadQuestion(currentQuestionIndex);
     </script>
 </body>
 </html>
 
 
+
+
            
+
