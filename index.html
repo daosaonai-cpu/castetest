@@ -1,239 +1,184 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NIELIT 'O' Level Python Quiz</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        .prose {
-            line-height: 1.7;
-        }
-        .prose h3 {
-            font-size: 1.25rem;
-            font-weight: 600;
-            margin-top: 1.5em;
-            margin-bottom: 0.5em;
-        }
-        .prose code {
-            background-color: #f3f4f6;
-            padding: 0.2em 0.4em;
-            margin: 0;
-            font-size: 85%;
-            border-radius: 3px;
-            font-family: monospace;
-        }
-    </style>
-</head>
-<body class="bg-gray-100 flex items-center justify-center min-h-screen py-8">
+int num;
+printf("Enter a number: ");
+scanf("%d", &num); // %d is a format specifier for int
+printf("You entered: %d", num);
+                </pre></code>
 
-    <!-- Password Overlay -->
-    <div id="password-overlay" class="fixed inset-0 bg-gray-800 bg-opacity-95 flex items-center justify-center z-50">
-        <div class="bg-white p-8 rounded-xl shadow-2xl text-center w-11/12 max-w-sm">
-            <h2 class="text-2xl font-bold mb-2 text-gray-800">Authentication Required</h2>
-            <p class="text-gray-500 mb-6">Please enter the password to access the quiz.</p>
-            <form id="password-form">
-                <input type="password" id="password-input" class="w-full p-3 border border-gray-300 rounded-lg mb-4 text-center focus:ring-2 focus:ring-blue-500" placeholder="Password">
-                <button type="submit" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg shadow-md transition-transform transform hover:scale-105">
-                    Unlock
-                </button>
-                <p id="password-error" class="text-red-500 text-sm mt-3 hidden">Incorrect Password. Please try again.</p>
-            </form>
+                <h3>7. Control Flow</h3>
+                <ul>
+                    <li><strong>if-else:</strong> Executes code based on a condition.
+                        <code><pre>if (age >= 18) { ... } else { ... }</pre></code></li>
+                    <li><strong>switch:</strong> A multi-way branch statement.
+                        <code><pre>switch(choice) { case 1: ...; break; default: ...; }</pre></code></li>
+                    <li><strong>for loop:</strong> Repeats a block of code a known number of times.
+                        <code><pre>for (int i = 0; i < 5; i++) { ... }</pre></code></li>
+                    <li><strong>while loop:</strong> Repeats as long as a condition is true.
+                        <code><pre>while (condition) { ... }</pre></code></li>
+                </ul>
+
+                <h3>8. Functions</h3>
+                <p>A function is a block of code that performs a specific task. It helps in code reusability.</p>
+                <code><pre>
+int add(int a, int b) { // Function definition
+    return a + b;
+}
+int main() {
+    int sum = add(5, 3); // Function call
+    return 0;
+}
+                </pre></code>
+
+                <h3>9. Arrays & Strings</h3>
+                <p>An <strong>array</strong> is a collection of items of the same data type stored at contiguous memory locations. Example: <code>int numbers[5] = {10, 20, 30, 40, 50};</code>.
+                A <strong>string</strong> in C is an array of characters ending with the null character <code>'\0'</code>. Example: <code>char name[] = "John";</code></p>
+
+                <h3>10. Pointers</h3>
+                <p>A pointer is a variable that stores the memory address of another variable. The <code>&</code> operator gives the address, and the <code>*</code> operator dereferences (gets the value at an address).</p>
+                <code><pre>
+int var = 10;
+int *p;      // Pointer declaration
+p = &var;    // Store address of var in p
+printf("Value: %d", *p); // Access value using pointer
+                </pre></code>
+            </div>
         </div>
-    </div>
 
-    <!-- Main Content Wrapper -->
-    <div id="main-content" class="container mx-auto p-4 md:p-8 max-w-3xl hidden">
-        <!-- Study Material Container -->
-        <div id="study-container" class="bg-white rounded-xl shadow-lg p-6 md:p-8">
-            <div class="text-center mb-6">
-                <h1 class="text-3xl font-bold text-gray-800">Comprehensive Guide to Python Basics</h1>
-                <p class="text-gray-500 mt-2">Read this guide carefully to prepare for the quiz.</p>
-                <div class="mt-4 p-3 bg-blue-50 border border-blue-200 rounded-lg">
-                    <p class="text-lg font-bold text-blue-700">Quiz starts in: <span id="study-timer-display">15:00</span></p>
+        <!-- Quiz Section -->
+        <div id="quizSection" class="bg-white p-8 rounded-xl shadow-lg hidden">
+            <div class="flex justify-between items-center mb-4">
+                <h2 class="text-2xl font-bold">C Quiz</h2>
+                <div class="text-2xl font-bold text-red-600" id="quizTimer">45:00</div>
+            </div>
+            <div class="w-full bg-gray-200 rounded-full h-2.5 mb-6">
+                <div id="progressBar" class="bg-indigo-600 h-2.5 rounded-full timer-bar" style="width: 0%"></div>
+            </div>
+
+            <div id="questionContainer">
+                <h3 class="text-xl font-semibold mb-1" id="questionNumber"></h3>
+                <p class="text-lg mb-6" id="questionText"></p>
+                <div id="answerOptions" class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                    <!-- Options will be injected here -->
                 </div>
             </div>
-            <div class="prose max-w-none text-gray-700 space-y-4">
-                <h3>Chapter 1: Introduction to Python</h3>
-                <p>
-                    Welcome to the world of Python! Python is a powerful and versatile <strong>interpreted</strong>, <strong>high-level</strong>, <strong>general-purpose programming language</strong>. Created by <strong>Guido van Rossum</strong> and first released in 1991, its design philosophy emphasizes code readability and simplicity. As an "interpreted" language, Python code is executed line-by-line by an interpreter, which makes it easier to debug than compiled languages. Its "high-level" nature means it handles complex tasks like memory management automatically, allowing you to focus on the logic of your code.
-                </p>
-                 <h3>Chapter 2: Variables and Data Types</h3>
-                <p>
-                    To store information, we use <strong>variables</strong>, which act as named <strong>containers</strong> or labels for <strong>data values</strong> in memory. You can create one easily with an assignment, like <code>my_age = 25</code> or <code>greeting = "Hello"</code>. Python is dynamically-typed, meaning you don't have to declare the variable's type; the interpreter figures it out automatically. Python supports various built-in <strong>data types</strong>. The most common are: <strong>integers</strong> (whole numbers like <code>10</code>), <strong>floats</strong> (decimal numbers like <code>3.14</code>), <strong>strings</strong> (text enclosed in quotes, like <code>"Hello, World!"</code>), and <strong>Booleans</strong> which represent either <code>True</code> or <code>False</code>.
-                </p>
-                <h3>Chapter 3: Data Structures and Functions</h3>
-                <p>
-                    To group multiple values, Python provides collection data types. The two most common are lists and tuples. A <strong>list</strong>, created with <strong>square brackets</strong> (e.g., <code>[1, "apple", 3]</code>), is <strong>mutable</strong>. This means you can change, add, or remove items after it's created. A <strong>tuple</strong>, created with <strong>parentheses</strong> (e.g., <code>(1, "apple", 3)</code>), is <strong>immutable</strong>, so it cannot be modified once defined, making it safer for data that should not change. For writing reusable and organized code, we use <strong>functions</strong>. A function is a named <strong>block of code</strong> that performs a specific task and only <strong>runs when it is called</strong>. You define a function using the <code><strong>def</strong></code> keyword, and it can take inputs (parameters) and produce an output (return value).
-                </p>
-                 <h3>Chapter 4: Keywords and Control Flow</h3>
-                <p>
-                    Python has a set of <strong>reserved words</strong>, known as <strong>keywords</strong> (e.g., <code>if</code>, <code>for</code>, <code>while</code>, <code>def</code>, <code>class</code>), which have <strong>special meanings</strong> and cannot be used as variable names. The structure of Python code is unique because it uses <strong>indentation</strong> (whitespace at the beginning of a line) to define <strong>code blocks</strong>, rather than using braces like other languages. This is crucial for control flow. For decision-making, Python uses the <code><strong>if-else</strong></code> statement, a <strong>conditional</strong> that executes one block of code if a condition is <strong>true</strong>, and another if it's <strong>false</strong>. You can also add more conditions using <code>elif</code> (else if).
-                </p>
-                 <h3>Chapter 5: Loops and Comments</h3>
-                <p>
-                    To repeat a block of code multiple times, we use <strong>loops</strong>. Python has two primary loop types: the <code><strong>for</strong></code> loop, which is used to iterate over a sequence (like a list, tuple, or string), and the <code><strong>while</strong></code> loop, which repeats its code block as long as a certain condition remains true. Finally, to make your code easier to understand for yourself and others, you can add notes called comments. A single-line <strong>comment</strong> in Python starts with a <strong>hash</strong> (<code>#</code>) symbol. For multi-line comments or documentation strings (docstrings), you can use triple quotes (<code>"""..."""</code>). Anything written as a comment is ignored by the interpreter.
-                </p>
-            </div>
-            <div class="mt-8 text-center">
-                <button id="start-quiz-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg shadow-md transition-transform transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-300">
-                    Start Quiz Now
-                </button>
+
+            <div class="flex justify-between items-center mt-8">
+                <button id="prevBtn" class="px-6 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition">Previous</button>
+                <span id="questionCounter" class="text-gray-600 font-medium"></span>
+                <button id="nextBtn" class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">Next</button>
+                <button id="submitBtn" class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition hidden">Submit</button>
             </div>
         </div>
 
-        <!-- Quiz Container -->
-        <div id="quiz-container" class="hidden bg-white rounded-xl shadow-lg">
-            <!-- Sticky Timer Header -->
-            <div class="sticky top-0 bg-white bg-opacity-95 backdrop-blur-sm p-4 border-b z-10 rounded-t-xl">
-                 <div class="text-center text-2xl font-bold text-red-600">Time Left: <span id="quiz-timer-display">45:00</span></div>
+        <!-- Results Section -->
+        <div id="resultsSection" class="bg-white p-8 rounded-xl shadow-lg hidden">
+            <h2 class="text-3xl font-bold text-center mb-2">Quiz Completed!</h2>
+            <p class="text-center text-gray-600 mb-6">Here are your results.</p>
+            <div class="bg-indigo-100 text-indigo-800 p-6 rounded-lg text-center mb-8">
+                <p class="text-lg">You Scored</p>
+                <p class="text-5xl font-bold my-2" id="scoreText"></p>
+                <p class="text-2xl" id="percentageText"></p>
             </div>
-            <div class="p-6 md:p-8">
-                <!-- Header -->
-                <div class="text-center mb-8">
-                    <h1 class="text-3xl font-bold text-gray-800">NIELIT 'O' Level Python Quiz</h1>
-                    <p class="text-gray-500 mt-2">Answer the following 10 questions in your own words. Each question is worth 2 marks.</p>
-                </div>
-
-                <!-- Questions Form -->
-                <form id="quiz-form">
-                    <div id="questions-wrapper" class="space-y-6">
-                        <!-- Questions will be dynamically inserted here -->
-                    </div>
-                    <div class="mt-8 text-center">
-                        <button type="submit" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg shadow-md transition-transform transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-300">
-                            Submit Answers
-                        </button>
-                    </div>
-                </form>
+            <div id="reviewContainer" class="space-y-6 max-h-[50vh] overflow-y-auto pr-2">
+                <!-- Review content will be injected here -->
             </div>
-        </div>
-
-        <!-- Results Container -->
-        <div id="results-container" class="hidden bg-white rounded-xl shadow-lg p-6 md:p-8">
-            <div class="text-center mb-6">
-                <h2 class="text-3xl font-bold text-gray-800">Your Results</h2>
-                <p id="score" class="text-5xl font-bold text-blue-600 my-4"></p>
-                <p id="feedback-message" class="text-gray-600 text-lg"></p>
-            </div>
-
-            <div id="detailed-results" class="space-y-4 border-t pt-6">
-                <!-- Detailed feedback will be inserted here -->
-            </div>
-
-            <div class="mt-8 text-center">
-                <button id="try-again-btn" class="bg-gray-700 hover:bg-gray-800 text-white font-bold py-3 px-8 rounded-lg shadow-md transition-transform transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-gray-300">
+             <div class="text-center mt-8">
+                <button id="restartBtn" class="px-8 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-transform transform hover:scale-105">
                     Try Again
                 </button>
             </div>
         </div>
+
     </div>
 
     <script>
-        const quizData = [
-            {
-                question: "1. What is Python and who developed it?",
-                keywords: ["interpreted", "high-level", "programming", "language", "guido", "rossum", "van rossum", "general-purpose", "creator"],
-                minKeywords: 3,
-                hint: "Try to mention that it's an interpreted, high-level language and name its creator, Guido van Rossum."
-            },
-            {
-                question: "2. What are variables in Python? Give an example.",
-                keywords: ["container", "store", "data", "value", "memory", "location", "name", "=", "reference", "label", "x = 5", "assign"],
-                minKeywords: 3,
-                hint: "Think of variables as named containers for storing data. An example would be 'name = \"John\"'."
-            },
-            {
-                question: "3. Explain the difference between a list and a tuple.",
-                keywords: ["mutable", "immutable", "changeable", "unchangeable", "square", "brackets", "parentheses", "round", "modified", "alter"],
-                minKeywords: 3,
-                hint: "The key difference is mutability. One can be changed (mutable), and the other cannot (immutable). Remember which uses [] and which uses ()."
-            },
-            {
-                question: "4. What is a function in Python? Provide an example of defining one.",
-                keywords: ["block", "code", "runs", "called", "reusable", "def", "return", "perform a task", "organized", "arguments", "parameters"],
-                minKeywords: 3,
-                hint: "A function is a reusable block of code. Remember to use the 'def' keyword to define one."
-            },
-            {
-                question: "5. What are keywords in Python? Give an example.",
-                keywords: ["reserved", "words", "special", "meaning", "if", "else", "for", "while", "def", "class", "import", "built-in"],
-                minKeywords: 2,
-                hint: "These are reserved words with special meanings, like 'if', 'for', and 'while'. You cannot use them as variable names."
-            },
-            {
-                question: "6. What is the purpose of indentation in Python?",
-                keywords: ["indentation", "code", "block", "readability", "syntax", "group", "statements", "whitespace", "space", "structure"],
-                minKeywords: 2,
-                hint: "Indentation is not just for style; it's how Python groups statements together to define code blocks (like in loops or functions)."
-            },
-            {
-                question: "7. How do you add a single-line comment in Python?",
-                keywords: ["comment", "hash", "#", "symbol", "ignore", "interpreter", "pound sign"],
-                minKeywords: 2,
-                hint: "Use the hash (#) symbol. Anything after it on the same line is ignored."
-            },
-            {
-                question: "8. Name two different data types in Python.",
-                keywords: ["integer", "float", "string", "boolean", "list", "tuple", "dictionary", "int", "str", "bool", "set"],
-                minKeywords: 2,
-                hint: "Think about different kinds of data you can store, like whole numbers (int), text (str), or true/false values (bool)."
-            },
-            {
-                question: "9. What does the 'if-else' statement do?",
-                keywords: ["conditional", "statement", "condition", "true", "false", "block", "execute", "decision", "making", "branching", "control flow"],
-                minKeywords: 3,
-                hint: "This is used for decision-making. It runs one block of code if a condition is true, and another if it is false."
-            },
-            {
-                question: "10. What is a loop? Name one type of loop in Python.",
-                keywords: ["loop", "iterate", "sequence", "repeat", "execute", "for", "while", "over and over", "repetition"],
-                minKeywords: 3,
-                hint: "A loop executes a block of code repeatedly. The two main types are 'for' and 'while' loops."
-            }
+        const guideSection = document.getElementById('guideSection');
+        const quizSection = document.getElementById('quizSection');
+        const resultsSection = document.getElementById('resultsSection');
+
+        const guideTimerEl = document.getElementById('guideTimer');
+        const quizTimerEl = document.getElementById('quizTimer');
+
+        const questionNumberEl = document.getElementById('questionNumber');
+        const questionTextEl = document.getElementById('questionText');
+        const answerOptionsEl = document.getElementById('answerOptions');
+        const questionCounterEl = document.getElementById('questionCounter');
+
+        const progressBar = document.getElementById('progressBar');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const submitBtn = document.getElementById('submitBtn');
+        const restartBtn = document.getElementById('restartBtn');
+
+        const scoreTextEl = document.getElementById('scoreText');
+        const percentageTextEl = document.getElementById('percentageText');
+        const reviewContainerEl = document.getElementById('reviewContainer');
+
+        const questions = [
+            { question: "Who is the father of C language?", options: ["Steve Jobs", "James Gosling", "Dennis Ritchie", "Rasmus Lerdorf"], answer: 2 },
+            { question: "Which of the following is not a valid C variable name?", options: ["int number;", "float rate;", "int variable_count;", "int $main;"], answer: 3 },
+            { question: "All keywords in C are in ____________", options: ["LowerCase letters", "UpperCase letters", "CamelCase letters", "None of the mentioned"], answer: 0 },
+            { question: "Which is valid C expression?", options: ["int my_num = 100,000;", "int my_num = 100000;", "int my num = 10000;", "int $my_num = 10000;"], answer: 1 },
+            { question: "What is an example of iteration in C?", options: ["for", "if", "switch", "goto"], answer: 0 },
+            { question: "What is the size of an `int` data type?", options: ["4 Bytes", "8 Bytes", "Depends on the system/compiler", "2 Bytes"], answer: 2 },
+            { question: "Which of the following is not a keyword in C?", options: ["auto", "case", "volatile", "string"], answer: 3 },
+            { question: "What does the `&` operator do?", options: ["Dereferencing", "Returns the address of a variable", "Bitwise AND", "Logical AND"], answer: 1 },
+            { question: "The format identifier ‘%i’ is also used for _____ data type.", options: ["char", "int", "float", "double"], answer: 1 },
+            { question: "What is the result of `10 % 3`?", options: ["3", "1", "0", "Compiler Error"], answer: 1 },
+            { question: "Which operator has the highest precedence in C?", options: ["()", "=", "*", "+"], answer: 0 },
+            { question: "What will be the output: `printf(\"%d\", 5 + 3 * 2);`?", options: ["16", "11", "13", "Error"], answer: 1 },
+            { question: "How do you declare a constant in C?", options: ["`const int PI = 3.14;`", "`#define PI 3.14`", "Both A and B", "Neither A nor B"], answer: 2 },
+            { question: "What is the purpose of the `scanf()` function?", options: ["To print output", "To read formatted input from the user", "To get a character", "To clear the screen"], answer: 1 },
+            { question: "Which header file is required for `printf()` and `scanf()`?", options: ["<stdlib.h>", "<conio.h>", "<stdio.h>", "<string.h>"], answer: 2 },
+            { question: "What will this code print? `int x = 5; if (x > 5) printf(\"A\"); else printf(\"B\");`", options: ["A", "B", "AB", "No output"], answer: 1 },
+            { question: "A `do-while` loop is guaranteed to execute at least how many times?", options: ["0", "1", "Depends on the condition", "Infinite"], answer: 1 },
+            { question: "The `break` statement is used to exit from a:", options: ["if statement", "for loop", "switch statement", "Both B and C"], answer: 3 },
+            { question: "What keyword is used to skip the current iteration and continue with the next one?", options: ["break", "return", "continue", "exit"], answer: 2 },
+            { question: "What is a function in C?", options: ["A block of code that performs a specific task", "A keyword", "A data type", "A variable"], answer: 0 },
+            { question: "What does `void` mean in a function declaration like `void myFunction()`?", options: ["The function is empty", "The function returns nothing", "The function takes no arguments", "The function is invalid"], answer: 1 },
+            { question: "How do you define an array of 5 integers?", options: ["`int arr[5];`", "`int arr = {1,2,3,4,5};`", "`array int[5];`", "`int[5] arr;`"], answer: 0 },
+            { question: "What is the index of the last element in an array `char arr[10];`?", options: ["10", "9", "0", "arr.length - 1"], answer: 1 },
+            { question: "Strings in C are terminated by which character?", options: ["'\\n'", "'\\t'", "'\\0'", "'. '"], answer: 2 },
+            { question: "What does a pointer variable store?", options: ["The value of a variable", "A character", "The memory address of a variable", "A floating-point number"], answer: 2 },
+            { question: "How do you get the value stored at the address pointed to by a pointer `p`?", options: ["`*p`", "`&p`", "`p`", "`val(p)`"], answer: 0 },
+            { question: "What is a `NULL` pointer?", options: ["A pointer that points to address 0", "A pointer that is uninitialized", "A pointer that causes an error", "A pointer to a void type"], answer: 0 },
+            { question: "Which of the following is the correct way to declare a structure?", options: ["`structure car { ... };`", "`struct car { ... };`", "`typedef struct { ... };`", "`object car { ... };`"], answer: 1 },
+            { question: "How to access a member `speed` of a structure variable `car1`?", options: ["`car1->speed`", "`car1.speed`", "`car1(speed)`", "`car1[speed]`"], answer: 1 },
+            { question: "What will be the output: `int x = 10; printf(\"%d\", x++);`?", options: ["11", "10", "12", "Error"], answer: 1 },
+            { question: "Which loop is faster in C, `for` or `while`?", options: ["for", "while", "Both are equally fast", "Depends on the situation"], answer: 2 },
+            { question: "What is the purpose of the `return 0;` statement in `main()`?", options: ["Indicates program ended with errors", "Does nothing", "Indicates successful program execution", "Returns a value to the OS"], answer: 2 },
+            { question: "A C variable cannot start with a ___________", options: ["Number", "Alphabet", "Underscore (_)", "Both A and C"], answer: 0 },
+            { question: "Which is the correct syntax for a for loop?", options: ["`for(initialization, condition, increment)`", "`for(initialization; condition; increment)`", "`for(condition; initialization; increment)`", "`for(initialization; increment; condition)`"], answer: 1 },
+            { question: "What is the default value of a static variable?", options: ["0", "1", "Garbage value", "NULL"], answer: 0 },
+            { question: "The `sizeof()` operator returns the size of a variable in ____.", options: ["bits", "bytes", "kilobytes", "megabytes"], answer: 1 },
+            { question: "What is the full form of `stdio.h`?", options: ["Standard Input Output Header", "String Input Output Header", "Standard Integer Operations Header", "None of the above"], answer: 0 },
+            { question: "What does `++a` (pre-increment) mean?", options: ["Increment `a` then use its value", "Use `a`'s value then increment", "Both are same", "It's invalid syntax"], answer: 0 },
+            { question: "Which data type is best for storing a phone number?", options: ["int", "long int", "char array (string)", "float"], answer: 2 },
+            { question: "How do you comment a single line in C?", options: ["`// comment`", "`/* comment */`", "`<!-- comment -->`", "`# comment`"], answer: 0 },
+            { question: "What is recursion?", options: ["A loop", "A function calling another function", "A function calling itself", "A data structure"], answer: 2 },
+            { question: "What does the `strcmp()` function do?", options: ["Copies a string", "Compares two strings", "Concatenates two strings", "Finds the length of a string"], answer: 1 },
+            { question: "If you pass an array to a function, what is actually passed?", options: ["The first element's value", "A copy of the whole array", "The base address of the array", "The size of the array"], answer: 2 },
+            { question: "What is `malloc()` used for?", options: ["To free allocated memory", "To allocate memory dynamically", "To create a new variable", "To make a function call"], answer: 1 },
+            { question: "The `typedef` keyword is used to...", options: ["Define a new data type", "Give an existing data type a new name", "Define a variable", "Define a macro"], answer: 1 },
+            { question: "What will `printf(\"%c\", 65);` print?", options: ["65", "Error", "'A'", "Garbage value"], answer: 2 },
+            { question: "Which operator is used to access members of a structure using a pointer?", options: [". (dot)", "& (ampersand)", "* (asterisk)", "-> (arrow)"], answer: 3 },
+            { question: "What is the associativity of the assignment operator `=`?", options: ["Left to Right", "Right to Left", "No associativity", "Depends on the compiler"], answer: 1 },
+            { question: "What is the correct way to initialize a string?", options: ["`char s[] = \"hello\";`", "`char s[5] = \"hello\";`", "`char s[6] = {'h','e','l','l','o','\\0'};`", "All of the above"], answer: 3 },
+            { question: "Which of the following is an exit-controlled loop?", options: ["for", "while", "do-while", "if-else"], answer: 2 },
         ];
-        
-        // --- All DOM Element Selections ---
-        const passwordOverlay = document.getElementById('password-overlay');
-        const passwordForm = document.getElementById('password-form');
-        const passwordInput = document.getElementById('password-input');
-        const passwordError = document.getElementById('password-error');
-        const mainContent = document.getElementById('main-content');
 
-        const studyContainer = document.getElementById('study-container');
-        const studyTimerDisplay = document.getElementById('study-timer-display');
-        const startQuizBtn = document.getElementById('start-quiz-btn');
-        const questionsWrapper = document.getElementById('questions-wrapper');
-        const quizForm = document.getElementById('quiz-form');
-        const quizContainer = document.getElementById('quiz-container');
-        const quizTimerDisplay = document.getElementById('quiz-timer-display');
-        const resultsContainer = document.getElementById('results-container');
-        const scoreElement = document.getElementById('score');
-        const feedbackMessage = document.getElementById('feedback-message');
-        const detailedResults = document.getElementById('detailed-results');
-        const tryAgainBtn = document.getElementById('try-again-btn');
+        let currentQuestionIndex = 0;
+        let userAnswers = new Array(questions.length).fill(null);
+        let guideTimerInterval, quizTimerInterval;
 
-        // --- Timer Logic Variables ---
-        let studyTimerInterval, quizTimerInterval;
-
-        // --- Helper function to format time ---
-        function formatTime(seconds) {
-            const minutes = Math.floor(seconds / 60);
-            const remainingSeconds = seconds % 60;
-            return `${minutes.toString().padStart(2, '0')}:${remainingSeconds.toString().padStart(2, '0')}`;
-        }
-
-        // --- Timer Functions ---
-        function startStudyTimer() {
+        function startGuideTimer() {
             let duration = 15 * 60; // 15 minutes
-            studyTimerInterval = setInterval(() => {
+            guideTimerInterval = setInterval(() => {
                 duration--;
-                studyTimerDisplay.textContent = formatTime(duration);
+                let minutes = Math.floor(duration / 60);
+                let seconds = duration % 60;
+                guideTimerEl.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
                 if (duration <= 0) {
+                    clearInterval(guideTimerInterval);
                     startQuiz();
                 }
             }, 1000);
@@ -243,172 +188,146 @@
             let duration = 45 * 60; // 45 minutes
             quizTimerInterval = setInterval(() => {
                 duration--;
-                quizTimerDisplay.textContent = formatTime(duration);
+                let minutes = Math.floor(duration / 60);
+                let seconds = duration % 60;
+                quizTimerEl.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
                 if (duration <= 0) {
                     clearInterval(quizTimerInterval);
-                    quizForm.dispatchEvent(new Event('submit', { cancelable: true }));
+                    showResults();
                 }
             }, 1000);
         }
 
         function startQuiz() {
-            clearInterval(studyTimerInterval);
-            studyContainer.classList.add('hidden');
-            quizContainer.classList.remove('hidden');
-            window.scrollTo(0, 0);
+            guideSection.classList.add('hidden');
+            quizSection.classList.remove('hidden');
             startQuizTimer();
+            displayQuestion();
         }
 
+        function displayQuestion() {
+            const question = questions[currentQuestionIndex];
+            questionNumberEl.textContent = `Question ${currentQuestionIndex + 1}`;
+            questionTextEl.textContent = question.question;
+            answerOptionsEl.innerHTML = '';
 
-        // --- Password Logic ---
-        passwordForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            if (passwordInput.value === 'Nielit@nielit') {
-                passwordOverlay.classList.add('hidden');
-                mainContent.classList.remove('hidden');
-                startStudyTimer();
+            question.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.innerHTML = `<code>${option.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</code>`;
+                button.classList.add('answer-option', 'w-full', 'text-left', 'p-4', 'border-2', 'rounded-lg', 'hover:bg-indigo-100', 'transition', 'duration-200');
+                if (userAnswers[currentQuestionIndex] === index) {
+                    button.classList.add('selected');
+                }
+                button.onclick = () => selectAnswer(index);
+                answerOptionsEl.appendChild(button);
+            });
+            
+            updateNavigation();
+        }
+
+        function selectAnswer(index) {
+            userAnswers[currentQuestionIndex] = index;
+            const options = answerOptionsEl.querySelectorAll('.answer-option');
+            options.forEach((btn, i) => {
+                btn.classList.remove('selected');
+                if (i === index) {
+                    btn.classList.add('selected');
+                }
+            });
+            setTimeout(() => {
+                if (currentQuestionIndex < questions.length - 1) {
+                    currentQuestionIndex++;
+                    displayQuestion();
+                } else {
+                    // Auto-move to submit button focus
+                    nextBtn.classList.add('hidden');
+                    submitBtn.classList.remove('hidden');
+                }
+            }, 300); // Small delay for feedback
+        }
+
+        function updateNavigation() {
+            progressBar.style.width = `${((currentQuestionIndex + 1) / questions.length) * 100}%`;
+            questionCounterEl.textContent = `${currentQuestionIndex + 1} / ${questions.length}`;
+            
+            prevBtn.disabled = currentQuestionIndex === 0;
+            prevBtn.classList.toggle('opacity-50', currentQuestionIndex === 0);
+
+            if (currentQuestionIndex === questions.length - 1) {
+                nextBtn.classList.add('hidden');
+                submitBtn.classList.remove('hidden');
             } else {
-                passwordError.classList.remove('hidden');
-                passwordInput.value = '';
-                passwordInput.focus();
+                nextBtn.classList.remove('hidden');
+                submitBtn.classList.add('hidden');
+            }
+        }
+        
+        function showResults() {
+            clearInterval(quizTimerInterval);
+            quizSection.classList.add('hidden');
+            resultsSection.classList.remove('hidden');
+
+            let score = 0;
+            userAnswers.forEach((answer, index) => {
+                if (answer === questions[index].answer) {
+                    score++;
+                }
+            });
+
+            const percentage = ((score / questions.length) * 100).toFixed(1);
+            scoreTextEl.textContent = `${score} / ${questions.length}`;
+            percentageTextEl.textContent = `${percentage}%`;
+
+            reviewContainerEl.innerHTML = '';
+            questions.forEach((q, index) => {
+                const resultCard = document.createElement('div');
+                resultCard.classList.add('p-4', 'rounded-lg', 'border');
+                
+                const userAnswer = userAnswers[index];
+                const isCorrect = userAnswer === q.answer;
+
+                resultCard.classList.add(isCorrect ? 'bg-green-50 border-green-200' : 'bg-red-50 border-red-200');
+
+                let content = `<h4 class="font-semibold text-gray-800">Q${index + 1}: ${q.question}</h4><div class="mt-3 space-y-2">`;
+                q.options.forEach((option, optIndex) => {
+                    let optionClass = 'answer-option';
+                    if (optIndex === q.answer) {
+                        optionClass += ' correct';
+                    } else if (optIndex === userAnswer && !isCorrect) {
+                         optionClass += ' incorrect';
+                    }
+
+                    content += `<div class="${optionClass} p-3 border rounded-md"><code>${option.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</code></div>`;
+                });
+                content += '</div>';
+
+                resultCard.innerHTML = content;
+                reviewContainerEl.appendChild(resultCard);
+            });
+        }
+        
+        nextBtn.addEventListener('click', () => {
+            if (currentQuestionIndex < questions.length - 1) {
+                currentQuestionIndex++;
+                displayQuestion();
             }
         });
 
-        // --- Quiz Logic ---
-
-        // Function to render questions
-        function renderQuestions() {
-            questionsWrapper.innerHTML = '';
-            quizData.forEach((q, index) => {
-                const questionElement = document.createElement('div');
-                questionElement.classList.add('p-4', 'border', 'rounded-lg', 'bg-gray-50');
-                questionElement.innerHTML = `
-                    <label for="answer-${index}" class="block text-md font-semibold text-gray-700 mb-2">${q.question}</label>
-                    <textarea id="answer-${index}" name="answer-${index}" rows="3" class="w-full p-2 border border-gray-300 rounded-md focus:ring-2 focus:ring-blue-500 focus:border-blue-500 transition" placeholder="Type your answer here..."></textarea>
-                `;
-                questionsWrapper.appendChild(questionElement);
-            });
-        }
-
-        // Function to evaluate answers and show results
-        quizForm.addEventListener('submit', (e) => {
-            e.preventDefault();
-            clearInterval(quizTimerInterval); // Stop the timer on manual submit
-            let score = 0;
-            detailedResults.innerHTML = '';
-
-            quizData.forEach((q, index) => {
-                const userAnswer = document.getElementById(`answer-${index}`).value.toLowerCase();
-                let keywordsFound = 0;
-                
-                if (userAnswer.trim() !== '') {
-                   q.keywords.forEach(keyword => {
-                        if (userAnswer.includes(keyword)) {
-                            keywordsFound++;
-                        }
-                    });
-                }
-
-                const isCorrect = keywordsFound >= q.minKeywords;
-                const isPartial = keywordsFound > 0 && !isCorrect;
-
-                let points = 0;
-                let statusColorClass = 'red';
-                let resultText = '✖ Incorrect (0 Marks)';
-                
-                if (isCorrect) {
-                    points = 2;
-                    statusColorClass = 'green';
-                    resultText = '✔ Correct (+2 Marks)';
-                } else if (isPartial) {
-                    points = 1;
-                    statusColorClass = 'yellow';
-                    resultText = '● Partially Correct (+1 Mark)';
-                }
-                score += points;
-                
-                const resultEntry = document.createElement('div');
-                resultEntry.classList.add('p-3', 'rounded-lg', 'border');
-
-                if (isCorrect) {
-                    resultEntry.classList.add('border-green-200', 'bg-green-50');
-                } else if (isPartial) {
-                     resultEntry.classList.add('border-yellow-200', 'bg-yellow-50');
-                } else {
-                    resultEntry.classList.add('border-red-200', 'bg-red-50');
-                }
-
-                let hintHTML = '';
-                if (!isCorrect) {
-                    hintHTML = `<div class="mt-2 p-2 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-800 text-sm rounded-r-md">
-                        <strong>Hint:</strong> ${q.hint}
-                    </div>`;
-                }
-                
-                const userAnswerText = document.getElementById(`answer-${index}`).value;
-                const sanitizedAnswer = userAnswerText ? userAnswerText.replace(/</g, "&lt;").replace(/>/g, "&gt;") : '<i>No answer provided</i>';
-
-                resultEntry.innerHTML = `
-                    <p class="font-semibold text-gray-800">${q.question}</p>
-                    <p class="text-sm text-gray-600 mt-2 pl-2 border-l-4 border-${statusColorClass}-500">Your answer: ${sanitizedAnswer}</p>
-                    <p class="font-semibold mt-2 text-sm text-${statusColorClass}-600">
-                        ${resultText}
-                    </p>
-                    ${hintHTML}
-                `;
-                detailedResults.appendChild(resultEntry);
-            });
-
-            scoreElement.textContent = `${score} / 20`;
-            if (score >= 12) {
-                feedbackMessage.textContent = "Excellent work! You have a good grasp of the basics.";
-                scoreElement.classList.remove('text-red-600', 'text-yellow-600');
-                scoreElement.classList.add('text-green-600');
-            } else if (score >= 6) {
-                feedbackMessage.textContent = "Good effort! A little more practice will make you perfect.";
-                scoreElement.classList.remove('text-red-600', 'text-green-600');
-                scoreElement.classList.add('text-yellow-600');
-            } else {
-                feedbackMessage.textContent = "Keep trying! Review the basics and you'll improve.";
-                scoreElement.classList.remove('text-yellow-600', 'text-green-600');
-                scoreElement.classList.add('text-red-600');
+        prevBtn.addEventListener('click', () => {
+            if (currentQuestionIndex > 0) {
+                currentQuestionIndex--;
+                displayQuestion();
             }
-
-            quizContainer.classList.add('hidden');
-            resultsContainer.classList.remove('hidden');
-            window.scrollTo(0, 0);
         });
         
-        // Try again button functionality
-        tryAgainBtn.addEventListener('click', () => {
-            clearInterval(studyTimerInterval);
-            clearInterval(quizTimerInterval);
-            resultsContainer.classList.add('hidden');
-            studyContainer.classList.remove('hidden'); 
-            quizForm.reset(); 
-            studyTimerDisplay.textContent = '15:00'; // Reset display
-            quizTimerDisplay.textContent = '45:00'; // Reset display
-            startStudyTimer(); // Start the study timer again
-            window.scrollTo(0, 0); 
-        });
+        submitBtn.addEventListener('click', showResults);
+        restartBtn.addEventListener('click', () => window.location.reload());
 
-        // Start Quiz button functionality
-        startQuizBtn.addEventListener('click', startQuiz);
+        window.onload = () => {
+            startGuideTimer();
+        };
 
-
-        // Initial render
-        renderQuestions();
     </script>
 </body>
 </html>
-
-
-
-
-
-
-
-           
-
-
 
