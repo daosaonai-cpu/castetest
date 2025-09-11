@@ -10,295 +10,236 @@
         body {
             font-family: 'Inter', sans-serif;
         }
-        .timer-bar {
-            transition: width 1s linear;
+        .quiz-container {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 2rem;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            background-color: #ffffff;
         }
-        .answer-option.selected {
-            background-color: #3b82f6;
-            color: white;
-            border-color: #2563eb;
+        .question-block {
+            transition: background-color 0.3s ease;
         }
-        .answer-option.correct {
-            background-color: #22c55e;
-            color: white;
-            border-color: #16a34a;
+        .correct-answer {
+            background-color: #d1fae5; /* Light green */
+            border-left: 4px solid #10b981; /* Green */
         }
-        .answer-option.incorrect {
-            background-color: #ef4444;
-            color: white;
-            border-color: #dc2626;
+        .incorrect-answer {
+            background-color: #fee2e2; /* Light red */
+            border-left: 4px solid #ef4444; /* Red */
+        }
+        .timer {
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
     </style>
 </head>
-<body class="bg-gray-100 text-gray-800 flex items-center justify-center min-h-screen p-4">
-    <div class="w-full max-w-4xl mx-auto">
-        <!-- Quiz Section -->
-        <div id="quizSection" class="bg-white p-8 rounded-xl shadow-lg">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-2xl font-bold">C Programming Quiz</h2>
-                <div class="text-2xl font-bold text-red-600" id="quizTimer">45:00</div>
-            </div>
-            <div class="w-full bg-gray-200 rounded-full h-2.5 mb-6">
-                <div id="progressBar" class="bg-indigo-600 h-2.5 rounded-full timer-bar" style="width: 0%"></div>
+<body class="bg-gray-100 text-gray-800">
+
+    <div id="quizApp" class="container mx-auto p-4">
+
+        <div class="quiz-container">
+            <div class="text-center mb-8">
+                <h1 class="text-4xl font-bold text-gray-900">C Programming Quiz</h1>
+                <p class="text-gray-600 mt-2">10 Questions | 2 Marks Each | 45 Minutes</p>
             </div>
 
-            <div id="questionContainer">
-                <h3 class="text-xl font-semibold mb-1" id="questionNumber"></h3>
-                <p class="text-lg mb-6" id="questionText"></p>
-                <div id="answerOptions" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                    <!-- Options will be injected here -->
+            <!-- Timer -->
+            <div id="timer-container" class="w-full bg-gray-200 rounded-full p-2 mb-8 text-center shadow-inner timer">
+                <div class="bg-blue-600 text-lg font-semibold text-white py-2 rounded-full">
+                    Time Remaining: <span id="time" class="font-mono">45:00</span>
                 </div>
             </div>
 
-            <div class="flex justify-between items-center mt-8">
-                <button id="prevBtn" class="px-6 py-2 bg-gray-300 text-gray-800 rounded-lg hover:bg-gray-400 transition">Previous</button>
-                <span id="questionCounter" class="text-gray-600 font-medium"></span>
-                <button id="nextBtn" class="px-6 py-2 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition">Next</button>
-                <button id="submitBtn" class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition hidden">Submit</button>
-            </div>
-        </div>
+            <!-- Quiz Form -->
+            <form id="quizForm">
+                <div id="questions-container" class="space-y-6">
+                    <!-- Questions will be dynamically inserted here -->
+                </div>
+                <div class="mt-10 text-center">
+                    <button type="submit" id="submitBtn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition-transform transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-300">
+                        Submit Quiz
+                    </button>
+                </div>
+            </form>
 
-        <!-- Results Section -->
-        <div id="resultsSection" class="bg-white p-8 rounded-xl shadow-lg hidden">
-            <h2 class="text-3xl font-bold text-center mb-2">Quiz Completed!</h2>
-            <p class="text-center text-gray-600 mb-6">Here are your results.</p>
-            <div class="bg-indigo-100 text-indigo-800 p-6 rounded-lg text-center mb-8">
-                <p class="text-lg">You Scored</p>
-                <p class="text-5xl font-bold my-2" id="scoreText"></p>
-                <p class="text-2xl" id="percentageText"></p>
+            <!-- Results Section -->
+            <div id="results-container" class="hidden mt-10">
+                <div class="text-center p-6 bg-gray-50 rounded-lg shadow-md">
+                    <h2 class="text-3xl font-bold text-gray-900">Quiz Complete!</h2>
+                    <p class="text-xl mt-2">Your Final Score:</p>
+                    <p class="text-5xl font-extrabold text-blue-600 my-4" id="score"></p>
+                </div>
+                <h3 class="text-2xl font-semibold mt-8 mb-4">Review Your Answers:</h3>
+                <div id="results-details" class="space-y-4">
+                    <!-- Detailed results and hints will be shown here -->
+                </div>
+                 <div class="mt-10 text-center">
+                    <button id="retryBtn" class="bg-gray-600 hover:bg-gray-700 text-white font-bold py-3 px-8 rounded-lg shadow-lg transition-transform transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-gray-300">
+                        Try Again
+                    </button>
+                </div>
             </div>
-            <div id="reviewContainer" class="space-y-6 max-h-[50vh] overflow-y-auto pr-2">
-                <!-- Review content will be injected here -->
-            </div>
-             <div class="text-center mt-8">
-                <button id="restartBtn" class="px-8 py-3 bg-indigo-600 text-white rounded-lg hover:bg-indigo-700 transition-transform transform hover:scale-105">
-                    Try Again
-                </button>
-            </div>
-        </div>
 
+        </div>
     </div>
 
     <script>
-        const quizSection = document.getElementById('quizSection');
-        const resultsSection = document.getElementById('resultsSection');
-
-        const quizTimerEl = document.getElementById('quizTimer');
-
-        const questionNumberEl = document.getElementById('questionNumber');
-        const questionTextEl = document.getElementById('questionText');
-        const answerOptionsEl = document.getElementById('answerOptions');
-        const questionCounterEl = document.getElementById('questionCounter');
-
-        const progressBar = document.getElementById('progressBar');
-        const prevBtn = document.getElementById('prevBtn');
-        const nextBtn = document.getElementById('nextBtn');
-        const submitBtn = document.getElementById('submitBtn');
-        const restartBtn = document.getElementById('restartBtn');
-
-        const scoreTextEl = document.getElementById('scoreText');
-        const percentageTextEl = document.getElementById('percentageText');
-        const reviewContainerEl = document.getElementById('reviewContainer');
-
-        const questions = [
-            { question: "Who is the father of C language?", options: ["Steve Jobs", "James Gosling", "Dennis Ritchie", "Rasmus Lerdorf"], answer: 2 },
-            { question: "Which of the following is not a valid C variable name?", options: ["int number;", "float rate;", "int variable_count;", "int $main;"], answer: 3 },
-            { question: "All keywords in C are in ____________", options: ["LowerCase letters", "UpperCase letters", "CamelCase letters", "None of the mentioned"], answer: 0 },
-            { question: "Which is valid C expression?", options: ["int my_num = 100,000;", "int my_num = 100000;", "int my num = 10000;", "int $my_num = 10000;"], answer: 1 },
-            { question: "What is an example of iteration in C?", options: ["for", "if", "switch", "goto"], answer: 0 },
-            { question: "What is the size of an `int` data type?", options: ["4 Bytes", "8 Bytes", "Depends on the system/compiler", "2 Bytes"], answer: 2 },
-            { question: "Which of the following is not a keyword in C?", options: ["auto", "case", "volatile", "string"], answer: 3 },
-            { question: "What does the `&` operator do?", options: ["Dereferencing", "Returns the address of a variable", "Bitwise AND", "Logical AND"], answer: 1 },
-            { question: "The format identifier ‘%i’ is also used for _____ data type.", options: ["char", "int", "float", "double"], answer: 1 },
-            { question: "What is the result of `10 % 3`?", options: ["3", "1", "0", "Compiler Error"], answer: 1 },
-            { question: "Which operator has the highest precedence in C?", options: ["()", "=", "*", "+"], answer: 0 },
-            { question: "What will be the output: `printf(\"%d\", 5 + 3 * 2);`?", options: ["16", "11", "13", "Error"], answer: 1 },
-            { question: "How do you declare a constant in C?", options: ["`const int PI = 3.14;`", "`#define PI 3.14`", "Both A and B", "Neither A nor B"], answer: 2 },
-            { question: "What is the purpose of the `scanf()` function?", options: ["To print output", "To read formatted input from the user", "To get a character", "To clear the screen"], answer: 1 },
-            { question: "Which header file is required for `printf()` and `scanf()`?", options: ["<stdlib.h>", "<conio.h>", "<stdio.h>", "<string.h>"], answer: 2 },
-            { question: "What will this code print? `int x = 5; if (x > 5) printf(\"A\"); else printf(\"B\");`", options: ["A", "B", "AB", "No output"], answer: 1 },
-            { question: "A `do-while` loop is guaranteed to execute at least how many times?", options: ["0", "1", "Depends on the condition", "Infinite"], answer: 1 },
-            { question: "The `break` statement is used to exit from a:", options: ["if statement", "for loop", "switch statement", "Both B and C"], answer: 3 },
-            { question: "What keyword is used to skip the current iteration and continue with the next one?", options: ["break", "return", "continue", "exit"], answer: 2 },
-            { question: "What is a function in C?", options: ["A block of code that performs a specific task", "A keyword", "A data type", "A variable"], answer: 0 },
-            { question: "What does `void` mean in a function declaration like `void myFunction()`?", options: ["The function is empty", "The function returns nothing", "The function takes no arguments", "The function is invalid"], answer: 1 },
-            { question: "How do you define an array of 5 integers?", options: ["`int arr[5];`", "`int arr = {1,2,3,4,5};`", "`array int[5];`", "`int[5] arr;`"], answer: 0 },
-            { question: "What is the index of the last element in an array `char arr[10];`?", options: ["10", "9", "0", "arr.length - 1"], answer: 1 },
-            { question: "Strings in C are terminated by which character?", options: ["'\\n'", "'\\t'", "'\\0'", "'. '"], answer: 2 },
-            { question: "What does a pointer variable store?", options: ["The value of a variable", "A character", "The memory address of a variable", "A floating-point number"], answer: 2 },
-            { question: "How do you get the value stored at the address pointed to by a pointer `p`?", options: ["`*p`", "`&p`", "`p`", "`val(p)`"], answer: 0 },
-            { question: "What is a `NULL` pointer?", options: ["A pointer that points to address 0", "A pointer that is uninitialized", "A pointer that causes an error", "A pointer to a void type"], answer: 0 },
-            { question: "Which of the following is the correct way to declare a structure?", options: ["`structure car { ... };`", "`struct car { ... };`", "`typedef struct { ... };`", "`object car { ... };`"], answer: 1 },
-            { question: "How to access a member `speed` of a structure variable `car1`?", options: ["`car1->speed`", "`car1.speed`", "`car1(speed)`", "`car1[speed]`"], answer: 1 },
-            { question: "What will be the output: `int x = 10; printf(\"%d\", x++);`?", options: ["11", "10", "12", "Error"], answer: 1 },
-            { question: "Which loop is faster in C, `for` or `while`?", options: ["for", "while", "Both are equally fast", "Depends on the situation"], answer: 2 },
-            { question: "What is the purpose of the `return 0;` statement in `main()`?", options: ["Indicates program ended with errors", "Does nothing", "Indicates successful program execution", "Returns a value to the OS"], answer: 2 },
-            { question: "A C variable cannot start with a ___________", options: ["Number", "Alphabet", "Underscore (_)", "Both A and C"], answer: 0 },
-            { question: "Which is the correct syntax for a for loop?", options: ["`for(initialization, condition, increment)`", "`for(initialization; condition; increment)`", "`for(condition; initialization; increment)`", "`for(initialization; increment; condition)`"], answer: 1 },
-            { question: "What is the default value of a static variable?", options: ["0", "1", "Garbage value", "NULL"], answer: 0 },
-            { question: "The `sizeof()` operator returns the size of a variable in ____.", options: ["bits", "bytes", "kilobytes", "megabytes"], answer: 1 },
-            { question: "What is the full form of `stdio.h`?", options: ["Standard Input Output Header", "String Input Output Header", "Standard Integer Operations Header", "None of the above"], answer: 0 },
-            { question: "What does `++a` (pre-increment) mean?", options: ["Increment `a` then use its value", "Use `a`'s value then increment", "Both are same", "It's invalid syntax"], answer: 0 },
-            { question: "Which data type is best for storing a phone number?", options: ["int", "long int", "char array (string)", "float"], answer: 2 },
-            { question: "How do you comment a single line in C?", options: ["`// comment`", "`/* comment */`", "`<!-- comment -->`", "`# comment`"], answer: 0 },
-            { question: "What is recursion?", options: ["A loop", "A function calling another function", "A function calling itself", "A data structure"], answer: 2 },
-            { question: "What does the `strcmp()` function do?", options: ["Copies a string", "Compares two strings", "Concatenates two strings", "Finds the length of a string"], answer: 1 },
-            { question: "If you pass an array to a function, what is actually passed?", options: ["The first element's value", "A copy of the whole array", "The base address of the array", "The size of the array"], answer: 2 },
-            { question: "What is `malloc()` used for?", options: ["To free allocated memory", "To allocate memory dynamically", "To create a new variable", "To make a function call"], answer: 1 },
-            { question: "The `typedef` keyword is used to...", options: ["Define a new data type", "Give an existing data type a new name", "Define a variable", "Define a macro"], answer: 1 },
-            { question: "What will `printf(\"%c\", 65);` print?", options: ["65", "Error", "'A'", "Garbage value"], answer: 2 },
-            { question: "Which operator is used to access members of a structure using a pointer?", options: [". (dot)", "& (ampersand)", "* (asterisk)", "-> (arrow)"], answer: 3 },
-            { question: "What is the associativity of the assignment operator `=`?", options: ["Left to Right", "Right to Left", "No associativity", "Depends on the compiler"], answer: 1 },
-            { question: "What is the correct way to initialize a string?", options: ["`char s[] = \"hello\";`", "`char s[5] = \"hello\";`", "`char s[6] = {'h','e','l','l','o','\\0'};`", "All of the above"], answer: 3 },
-            { question: "Which of the following is an exit-controlled loop?", options: ["for", "while", "do-while", "if-else"], answer: 2 },
+        const quizData = [
+            {
+                question: "1. C is a high-level, procedural programming language. True or False?",
+                answerPatterns: [/true/i],
+                hint: "C provides strong abstraction from the hardware, a key feature of high-level languages."
+            },
+            {
+                question: "2. Who is credited with creating the C programming language?",
+                answerPatterns: [/dennis\s*ritchie/i],
+                hint: "He was an American computer scientist who developed C at Bell Labs in the early 1970s."
+            },
+            {
+                question: "3. Why is C often referred to as a 'middle-level' language?",
+                answerPatterns: [/low level.*high level/i, /high level.*low level/i, /both/i, /system programming/i, /memory access/i],
+                hint: "It bridges the gap between machine-level languages and high-level languages."
+            },
+            {
+                question: "4. What is the primary function of a compiler?",
+                answerPatterns: [/translate/i, /convert/i, /source.*machine/i, /source.*object/i, /human.*computer/i],
+                hint: "It translates the source code you write into a language the computer's processor can execute."
+            },
+            {
+                question: "5. What are 'keywords' in C?",
+                answerPatterns: [/reserved\s*word/i, /predefined/i, /special\s*meaning/i],
+                hint: "These are words with a special meaning to the compiler, like `int`, `return`, or `if`."
+            },
+            {
+                question: "6. What is the format specifier for a single character?",
+                answerPatterns: [/%c/i],
+                hint: "It starts with a '%' and is followed by the first letter of 'character'."
+            },
+            {
+                question: "7. Which header file is required to use dynamic memory allocation functions like `malloc`?",
+                answerPatterns: [/stdlib\.h/i, /standard library/i],
+                hint: "This standard library header contains functions for memory allocation, process control, and conversions."
+            },
+            {
+                question: "8. What keyword is used to exit from a loop or switch statement prematurely?",
+                answerPatterns: [/break/i],
+                hint: "You use this to 'break' out of the current loop or switch block."
+            },
+            {
+                question: "9. How do you write a single-line comment in C?",
+                answerPatterns: [/\/\//, /double forward slash/i],
+                hint: "It involves two identical punctuation marks at the start of the comment."
+            },
+            {
+                question: "10. What data type would you use to store a whole number like 42?",
+                answerPatterns: [/int/i, /integer/i],
+                hint: "It's the most common data type for whole numbers."
+            }
         ];
 
-        let currentQuestionIndex = 0;
-        let userAnswers = new Array(questions.length).fill(null);
-        let quizTimerInterval;
+        const questionsContainer = document.getElementById('questions-container');
+        const quizForm = document.getElementById('quizForm');
+        const resultsContainer = document.getElementById('results-container');
+        const scoreElement = document.getElementById('score');
+        const resultsDetails = document.getElementById('results-details');
+        const timeElement = document.getElementById('time');
+        const submitBtn = document.getElementById('submitBtn');
+        const retryBtn = document.getElementById('retryBtn');
 
-        function startQuizTimer() {
-            let duration = 45 * 60; // 45 minutes
-            quizTimerInterval = setInterval(() => {
-                duration--;
-                let minutes = Math.floor(duration / 60);
-                let seconds = duration % 60;
-                quizTimerEl.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-                if (duration <= 0) {
-                    clearInterval(quizTimerInterval);
-                    showResults();
+        let timer;
+        let timeLeft = 45 * 60; // 45 minutes in seconds
+
+        function startTimer() {
+            timer = setInterval(() => {
+                timeLeft--;
+                const minutes = Math.floor(timeLeft / 60);
+                const seconds = timeLeft % 60;
+                timeElement.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
+                if (timeLeft <= 0) {
+                    clearInterval(timer);
+                    submitQuiz();
                 }
             }, 1000);
         }
-
-        function startQuiz() {
-            startQuizTimer();
-            displayQuestion();
-        }
-
-        function displayQuestion() {
-            const question = questions[currentQuestionIndex];
-            questionNumberEl.textContent = `Question ${currentQuestionIndex + 1}`;
-            questionTextEl.textContent = question.question;
-            answerOptionsEl.innerHTML = '';
-
-            question.options.forEach((option, index) => {
-                const button = document.createElement('button');
-                button.innerHTML = `<code>${option.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</code>`;
-                button.classList.add('answer-option', 'w-full', 'text-left', 'p-4', 'border-2', 'rounded-lg', 'hover:bg-indigo-100', 'transition', 'duration-200');
-                if (userAnswers[currentQuestionIndex] === index) {
-                    button.classList.add('selected');
-                }
-                button.onclick = () => selectAnswer(index);
-                answerOptionsEl.appendChild(button);
-            });
-            
-            updateNavigation();
-        }
-
-        function selectAnswer(index) {
-            userAnswers[currentQuestionIndex] = index;
-            const options = answerOptionsEl.querySelectorAll('.answer-option');
-            options.forEach((btn, i) => {
-                btn.classList.remove('selected');
-                if (i === index) {
-                    btn.classList.add('selected');
-                }
-            });
-            setTimeout(() => {
-                if (currentQuestionIndex < questions.length - 1) {
-                    currentQuestionIndex++;
-                    displayQuestion();
-                } else {
-                    nextBtn.classList.add('hidden');
-                    submitBtn.classList.remove('hidden');
-                }
-            }, 300);
-        }
-
-        function updateNavigation() {
-            progressBar.style.width = `${((currentQuestionIndex + 1) / questions.length) * 100}%`;
-            questionCounterEl.textContent = `${currentQuestionIndex + 1} / ${questions.length}`;
-            
-            prevBtn.disabled = currentQuestionIndex === 0;
-            prevBtn.classList.toggle('opacity-50', currentQuestionIndex === 0);
-
-            if (currentQuestionIndex === questions.length - 1) {
-                nextBtn.classList.add('hidden');
-                submitBtn.classList.remove('hidden');
-            } else {
-                nextBtn.classList.remove('hidden');
-                submitBtn.classList.add('hidden');
-            }
-        }
         
-        function showResults() {
-            clearInterval(quizTimerInterval);
-            quizSection.classList.add('hidden');
-            resultsSection.classList.remove('hidden');
+        function loadQuestions() {
+            questionsContainer.innerHTML = '';
+            quizData.forEach((q, index) => {
+                const questionElement = document.createElement('div');
+                questionElement.className = 'p-4 bg-white rounded-lg shadow';
+                questionElement.innerHTML = `
+                    <p class="font-semibold text-lg mb-3">${q.question}</p>
+                    <input type="text" id="answer-${index}" class="w-full px-4 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="Type your answer here...">
+                `;
+                questionsContainer.appendChild(questionElement);
+            });
+        }
+
+        function submitQuiz(event) {
+            if(event) event.preventDefault();
+            clearInterval(timer);
 
             let score = 0;
-            userAnswers.forEach((answer, index) => {
-                if (answer === questions[index].answer) {
-                    score++;
+            resultsDetails.innerHTML = ''; 
+
+            quizData.forEach((q, index) => {
+                const userAnswer = document.getElementById(`answer-${index}`).value.trim();
+                let isCorrect = q.answerPatterns.some(pattern => pattern.test(userAnswer));
+
+                if (isCorrect) {
+                    score += 2;
                 }
-            });
-
-            const percentage = ((score / questions.length) * 100).toFixed(1);
-            scoreTextEl.textContent = `${score} / ${questions.length}`;
-            percentageTextEl.textContent = `${percentage}%`;
-
-            reviewContainerEl.innerHTML = '';
-            questions.forEach((q, index) => {
-                const resultCard = document.createElement('div');
-                resultCard.classList.add('p-4', 'rounded-lg', 'border');
                 
-                const userAnswer = userAnswers[index];
-                const isCorrect = userAnswer === q.answer;
+                // Build result details
+                const resultBlock = document.createElement('div');
+                resultBlock.className = `p-4 rounded-lg question-block ${isCorrect ? 'correct-answer' : 'incorrect-answer'}`;
+                
+                let detailHTML = `
+                    <p class="font-semibold">${q.question}</p>
+                    <p class="mt-1"><strong>Your Answer:</strong> ${userAnswer || "<em>No answer provided</em>"}</p>
+                `;
 
-                resultCard.classList.add(isCorrect ? 'bg-green-50' : 'bg-red-50');
-                resultCard.classList.add(isCorrect ? 'border-green-200' : 'border-red-200');
-
-                let content = `<h4 class="font-semibold text-gray-800">Q${index + 1}: ${q.question}</h4><div class="mt-3 space-y-2">`;
-                q.options.forEach((option, optIndex) => {
-                    let optionClass = 'answer-option p-3 border rounded-md';
-                    if (optIndex === q.answer) {
-                        optionClass += ' correct';
-                    } else if (optIndex === userAnswer && !isCorrect) {
-                         optionClass += ' incorrect';
-                    }
-                    content += `<div class="${optionClass}"><code>${option.replace(/</g, "&lt;").replace(/>/g, "&gt;")}</code></div>`;
-                });
-                content += '</div>';
-
-                resultCard.innerHTML = content;
-                reviewContainerEl.appendChild(resultCard);
+                if (!isCorrect) {
+                    detailHTML += `<p class="mt-2 text-sm text-red-700"><strong>Hint:</strong> ${q.hint}</p>`;
+                } else {
+                     detailHTML += `<p class="mt-2 text-sm text-green-700"><strong>Status:</strong> Correct</p>`;
+                }
+                
+                resultBlock.innerHTML = detailHTML;
+                resultsDetails.appendChild(resultBlock);
             });
+
+            scoreElement.textContent = `${score} / ${quizData.length * 2}`;
+            quizForm.classList.add('hidden');
+            document.getElementById('timer-container').classList.add('hidden');
+            resultsContainer.classList.remove('hidden');
         }
-        
-        nextBtn.addEventListener('click', () => {
-            if (currentQuestionIndex < questions.length - 1) {
-                currentQuestionIndex++;
-                displayQuestion();
-            }
-        });
 
-        prevBtn.addEventListener('click', () => {
-            if (currentQuestionIndex > 0) {
-                currentQuestionIndex--;
-                displayQuestion();
-            }
-        });
-        
-        submitBtn.addEventListener('click', showResults);
-        restartBtn.addEventListener('click', () => window.location.reload());
+        function resetQuiz() {
+            timeLeft = 45 * 60;
+            clearInterval(timer);
+            startTimer();
+            loadQuestions();
+            quizForm.reset();
+            resultsContainer.classList.add('hidden');
+            quizForm.classList.remove('hidden');
+            document.getElementById('timer-container').classList.remove('hidden');
+        }
 
-        window.onload = startQuiz;
+        // Event Listeners
+        quizForm.addEventListener('submit', submitQuiz);
+        retryBtn.addEventListener('click', resetQuiz);
+
+        // Initial Load
+        window.onload = () => {
+            loadQuestions();
+            startTimer();
+        };
 
     </script>
 </body>
 </html>
-
-
-
 
