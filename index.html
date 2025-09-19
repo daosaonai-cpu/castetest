@@ -3,103 +3,364 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BCA 1st Semester Portal</title>
+    <title>Interactive C Loops Tutorial</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* Tailwind gray-50 */
+        }
+        .tab-active {
+            background-color: #1e40af; /* Tailwind blue-800 */
+            color: white;
+            border-color: #1e40af;
+        }
+        .code-block {
+            background-color: #1e293b; /* Tailwind slate-800 */
+            color: #e2e8f0; /* Tailwind slate-200 */
+            border-radius: 0.5rem;
+            padding: 1rem;
+            position: relative;
+            overflow-x: auto;
+            user-select: none; /* Prevents text selection */
         }
     </style>
 </head>
-<body class="bg-gray-100 dark:bg-gray-900">
-    <div class="min-h-screen flex items-center justify-center p-4">
-        <div class="max-w-md w-full bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 text-center">
-            
-            <!-- Header Section -->
-            <div class="mb-8">
-                <h1 class="text-3xl font-bold text-gray-800 dark:text-white">Welcome, BCA Aspirant!</h1>
-                <p class="text-gray-500 dark:text-gray-400 mt-2">Your journey for the 1st Semester starts here.</p>
-            </div>
+<body class="antialiased text-slate-800">
 
-            <!-- Main Content: Quiz Card -->
-            <div class="bg-gray-50 dark:bg-gray-700 p-6 rounded-xl border border-gray-200 dark:border-gray-600">
-                <h2 class="text-xl font-semibold text-gray-700 dark:text-white mb-2">Fundamental of IT Quiz</h2>
-                <p class="text-gray-600 dark:text-gray-300 mb-6">You will have 10 minutes to complete the quiz. The timer will start once you click the button.</p>
+    <div class="container mx-auto p-4 sm:p-6 lg:p-8">
+        
+        <!-- Header -->
+        <header class="text-center mb-8">
+            <h1 class="text-4xl md:text-5xl font-bold text-blue-800">Interactive C Loops Tutorial</h1>
+            <p class="mt-2 text-lg text-slate-600">Master `for`, `while`, and `do-while` loops in C with hands-on examples.</p>
+        </header>
+
+        <!-- Tabs for loop selection -->
+        <div class="mb-8 flex justify-center border-b border-slate-300">
+            <button id="for-tab" class="tab-btn px-4 py-2 sm:px-6 sm:py-3 font-semibold border-b-2 tab-active" onclick="showLoop('for')">For Loop</button>
+            <button id="while-tab" class="tab-btn px-4 py-2 sm:px-6 sm:py-3 font-semibold border-b-2 border-transparent text-slate-500 hover:text-blue-700 hover:border-blue-700" onclick="showLoop('while')">While Loop</button>
+            <button id="do-while-tab" class="tab-btn px-4 py-2 sm:px-6 sm:py-3 font-semibold border-b-2 border-transparent text-slate-500 hover:text-blue-700 hover:border-blue-700" onclick="showLoop('do-while')">Do-While Loop</button>
+        </div>
+
+        <!-- Main Content Area -->
+        <main id="content-area">
+
+            <!-- For Loop Section -->
+            <section id="for-content" class="loop-section space-y-8">
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h2 class="text-3xl font-bold text-blue-700 mb-4">The `for` Loop</h2>
+                    <p class="text-slate-700 leading-relaxed">The `for` loop is ideal when you know in advance how many times you want to execute a block of code. It combines initialization, condition checking, and an increment/decrement operation in a single line, making the code compact and readable.</p>
+                    <div class="mt-4">
+                        <h3 class="font-semibold text-lg mb-2">Syntax:</h3>
+                        <div class="code-block">
+<pre><code>for (initialization; condition; update) {
+    // code to be executed
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Example 1: Print numbers 1 to 5 -->
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-2xl font-semibold mb-3">Example 1: Print Numbers 1 to 5</h3>
+                    <p class="text-slate-600 mb-4">A classic example that prints numbers from 1 to 5, demonstrating the basic structure.</p>
+                    <div class="code-block">
+<pre><code>#include &lt;stdio.h&gt;
+
+int main() {
+    for (int i = 1; i <= 5; i++) {
+        printf("%d ", i);
+    }
+    printf("\n");
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
                 
-                <!-- Timer Display -->
-                <div id="timer-display" class="text-4xl font-bold text-gray-800 dark:text-white my-4 hidden">10:00</div>
+                <!-- Example 2: Multiplication Table -->
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-2xl font-semibold mb-3">Example 2: Print Multiplication Table of 7</h3>
+                    <p class="text-slate-600 mb-4">This code generates the multiplication table for a given number (7 in this case) up to 10.</p>
+                    <div class="code-block">
+<pre><code>#include &lt;stdio.h&gt;
 
-                <!-- The Quiz Button -->
-                <a href="https://forms.gle/gPiKbuMTqtoyNuUt6" target="_blank" id="quiz-button" class="block w-full bg-pink-500 text-white font-bold py-3 px-6 rounded-lg hover:bg-pink-600 focus:outline-none focus:ring-4 focus:ring-pink-300 dark:focus:ring-pink-800 transition-transform transform hover:scale-105">
-                    Take Quiz
-                </a>
-            </div>
+int main() {
+    int num = 7;
+    for (int i = 1; i <= 10; i++) {
+        printf("%d * %d = %d\n", num, i, num * i);
+    }
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <!-- Example 3: Calculate Factorial -->
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-2xl font-semibold mb-3">Example 3: Calculate Factorial of a Number</h3>
+                    <p class="text-slate-600 mb-4">This example calculates the factorial of 5 (5! = 5 * 4 * 3 * 2 * 1) using a loop that counts down.</p>
+                    <div class="code-block">
+<pre><code>#include &lt;stdio.h&gt;
+
+int main() {
+    int num = 7;
+    for (int i = 1; i <= 10; i++) {
+        printf("%d * %d = %d\n", num, i, num * i);
+    }
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <!-- Example 3: Calculate Factorial -->
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-2xl font-semibold mb-3">Example 3: Calculate Factorial of a Number</h3>
+                    <p class="text-slate-600 mb-4">This example calculates the factorial of 5 (5! = 5 * 4 * 3 * 2 * 1) using a loop that counts down.</p>
+                    <div class="code-block">
+                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre><code>#include &lt;stdio.h&gt;
+
+int main() {
+    int n = 5;
+    long long factorial = 1;
+    for (int i = n; i >= 1; i--) {
+        factorial *= i;
+    }
+    printf("Factorial of %d = %lld\n", n, factorial);
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+            </section>
+
+            <!-- While Loop Section -->
+            <section id="while-content" class="loop-section space-y-8 hidden">
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h2 class="text-3xl font-bold text-blue-700 mb-4">The `while` Loop</h2>
+                    <p class="text-slate-700 leading-relaxed">The `while` loop, an entry-controlled loop, repeatedly executes a block of code as long as a given condition is true. The condition is checked *before* the loop body is executed. It's used when the number of iterations is not known beforehand.</p>
+                     <div class="mt-4">
+                        <h3 class="font-semibold text-lg mb-2">Syntax:</h3>
+                        <div class="code-block">
+<pre><code>while (condition) {
+    // code to be executed
+    // update statement
+}</code></pre>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Example 1: Sum of first 10 natural numbers -->
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-2xl font-semibold mb-3">Example 1: Sum of First 10 Natural Numbers</h3>
+                    <p class="text-slate-600 mb-4">This program calculates the sum of numbers from 1 to 10 using a `while` loop.</p>
+                    <div class="code-block">
+<pre><code>#include &lt;stdio.h&gt;
+
+int main() {
+    int i = 1, sum = 0;
+    while (i <= 10) {
+        sum += i;
+        i++;
+    }
+    printf("Sum = %d\n", sum);
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+                
+                <!-- Example 2: Reverse a number -->
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-2xl font-semibold mb-3">Example 2: Reverse a Number</h3>
+                    <p class="text-slate-600 mb-4">This code reverses the digits of an integer. The loop continues as long as the number is not zero.</p>
+                    <div class="code-block">
+<pre><code>#include &lt;stdio.h&gt;
+
+int main() {
+    int n = 12345, reversedN = 0, remainder;
+    while (n != 0) {
+        remainder = n % 10;
+        reversedN = reversedN * 10 + remainder;
+        n /= 10;
+    }
+    printf("Reversed Number = %d\n", reversedN);
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <!-- Example 3: Count digits in a number -->
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-2xl font-semibold mb-3">Example 3: Count Digits in an Integer</h3>
+                    <p class="text-slate-600 mb-4">This example counts the total number of digits in a given integer by repeatedly dividing it by 10.</p>
+                    <div class="code-block">
+<pre><code>#include &lt;stdio.h&gt;
+
+int main() {
+    long long n = 9876543210;
+    int count = 0;
+    while (n != 0) {
+        n /= 10; // n = n / 10
+        ++count;
+    }
+    printf("Number of digits: %d\n", count);
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+            </section>
             
-            <!-- Footer Information -->
-            <div class="mt-8">
-                 <p class="text-sm text-gray-400 dark:text-gray-500">Good luck with your studies!</p>
-            </div>
+            <!-- Do-While Loop Section -->
+            <section id="do-while-content" class="loop-section space-y-8 hidden">
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h2 class="text-3xl font-bold text-blue-700 mb-4">The `do-while` Loop</h2>
+                    <p class="text-slate-700 leading-relaxed">The `do-while` loop is an exit-controlled loop. It is similar to a `while` loop, but the loop body is executed at least once, regardless of whether the condition is true or false. The condition is checked *after* the loop body is executed.</p>
+                     <div class="mt-4">
+                        <h3 class="font-semibold text-lg mb-2">Syntax:</h3>
+                        <div class="code-block">
+<pre><code>do {
+    // code to be executed
+    // update statement
+} while (condition);</code></pre>
+                        </div>
+                    </div>
+                </div>
 
-        </div>
-    </div>
+                <!-- Example 1: Print numbers 1 to 5 -->
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-2xl font-semibold mb-3">Example 1: Print Numbers 1 to 5</h3>
+                    <p class="text-slate-600 mb-4">Even if the condition was `i <= 0`, this loop would run once and print '1'.</p>
+                    <div class="code-block">
+<pre><code>#include &lt;stdio.h&gt;
 
-    <!-- Time's Up Modal -->
-    <div id="time-up-modal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 hidden">
-        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-8 text-center max-w-sm w-full">
-            <h2 class="text-2xl font-bold text-red-500 mb-4">Time's Up!</h2>
-            <p class="text-gray-600 dark:text-gray-300 mb-6">Your 10 minutes are over. Please submit your quiz now.</p>
-            <button id="close-modal-button" class="w-full bg-pink-500 text-white font-bold py-2 px-4 rounded-lg hover:bg-pink-600">
-                OK
-            </button>
-        </div>
+int main() {
+    int i = 1;
+    do {
+        printf("%d ", i);
+        i++;
+    } while (i <= 5);
+    printf("\n");
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+                
+                <!-- Example 2: Keep taking input until positive -->
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-2xl font-semibold mb-3">Example 2: Read Input Until a Positive Number is Entered</h3>
+                    <p class="text-slate-600 mb-4">This is a perfect use case for `do-while`. The program must ask for input at least once. This simulation enters -2, then 5.</p>
+                    <div class="code-block">
+<pre><code>#include &lt;stdio.h&gt;
+
+int main() {
+    int number;
+    do {
+        printf("Enter a positive integer: ");
+        scanf("%d", &number);
+    } while (number <= 0);
+
+    printf("You entered: %d\n", number);
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+
+                <!-- Example 3: Simple menu -->
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h3 class="text-2xl font-semibold mb-3">Example 3: A Simple Menu System</h3>
+                    <p class="text-slate-600 mb-4">A `do-while` loop ensures the menu is displayed at least once. The loop continues until the user chooses to exit (by entering 0).</p>
+                    <div class="code-block">
+<pre><code>#include &lt;stdio.h&gt;
+
+int main() {
+    int choice;
+    do {
+        printf("\n--- MENU ---\n");
+        printf("1. Option 1\n");
+        printf("2. Option 2\n");
+        printf("0. Exit\n");
+        printf("Enter your choice: ");
+        scanf("%d", &choice);
+
+        // This is where you would handle the choice
+        printf("You chose: %d\n", choice);
+
+    } while (choice != 0);
+
+    printf("Exiting program.\n");
+    return 0;
+}</code></pre>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- Footer -->
+        <footer class="text-center mt-12 py-4 border-t border-slate-300">
+            <p class="text-slate-500">Created to make C programming easier.</p>
+        </footer>
     </div>
 
     <script>
-        const quizButton = document.getElementById('quiz-button');
-        const timerDisplay = document.getElementById('timer-display');
-        const timeUpModal = document.getElementById('time-up-modal');
-        const closeModalButton = document.getElementById('close-modal-button');
+        // Store references to elements
+        const contentSections = {
+            for: document.getElementById('for-content'),
+            while: document.getElementById('while-content'),
+            'do-while': document.getElementById('do-while-content')
+        };
 
-        let timerInterval;
-        let timeInSeconds = 600; // 10 minutes
+        const tabs = {
+            for: document.getElementById('for-tab'),
+            while: document.getElementById('while-tab'),
+            'do-while': document.getElementById('do-while-tab')
+        };
+        
+        // Function to switch between loop sections
+        function showLoop(loopType) {
+            // Hide all sections and remove active class from all tabs
+            for (const key in contentSections) {
+                contentSections[key].classList.add('hidden');
+                tabs[key].classList.remove('tab-active', 'text-slate-500', 'hover:text-blue-700', 'hover:border-blue-700');
+                tabs[key].classList.add('text-slate-500', 'hover:text-blue-700', 'hover:border-blue-700');
+            }
 
-        quizButton.addEventListener('click', startTimer);
+            // Show the selected section and add active class to its tab
+            contentSections[loopType].classList.remove('hidden');
+            tabs[loopType].classList.add('tab-active');
+            tabs[loopType].classList.remove('text-slate-500', 'hover:text-blue-700', 'hover:border-blue-700');
+        }
 
-        function startTimer() {
-            // Prevent starting multiple timers
-            quizButton.removeEventListener('click', startTimer);
-            quizButton.classList.add('opacity-50', 'cursor-not-allowed');
-            quizButton.textContent = 'Quiz in Progress...';
+        // Function to copy code to clipboard
+        function copyCode(button) {
+            const codeBlock = button.nextElementSibling;
+            const code = codeBlock.textContent;
             
-            timerDisplay.classList.remove('hidden');
+            // Using execCommand for broader compatibility within iFrames
+            const textarea = document.createElement('textarea');
+            textarea.value = code;
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                button.textContent = 'Copied!';
+            } catch (err) {
+                button.textContent = 'Failed!';
+                console.error('Failed to copy text: ', err);
+            }
+            document.body.removeChild(textarea);
 
-            timerInterval = setInterval(() => {
-                timeInSeconds--;
-                updateTimerDisplay();
-
-                if (timeInSeconds <= 0) {
-                    clearInterval(timerInterval);
-                    timerDisplay.textContent = "00:00";
-                    timerDisplay.classList.add('text-red-500');
-                    timeUpModal.classList.remove('hidden');
-                }
-            }, 1000);
+            setTimeout(() => {
+                button.textContent = 'Copy';
+            }, 2000);
         }
-
-        function updateTimerDisplay() {
-            const minutes = Math.floor(timeInSeconds / 60);
-            const seconds = timeInSeconds % 60;
-            timerDisplay.textContent = `${String(minutes).padStart(2, '0')}:${String(seconds).padStart(2, '0')}`;
-        }
-
-        closeModalButton.addEventListener('click', () => {
-            timeUpModal.classList.add('hidden');
-        });
+        
     </script>
 
 </body>
 </html>
+
+
 
 
 
