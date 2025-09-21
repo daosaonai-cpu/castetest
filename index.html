@@ -3,362 +3,305 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Interactive C Loops Tutorial</title>
+    <title>Air Draw - Full Screen</title>
+    <!-- Tailwind CSS for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- MediaPipe libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
     <style>
+        /* Custom styles for the loader and overall layout */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+        
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f8fafc; /* Tailwind gray-50 */
+            overflow: hidden; /* Prevent scrollbars */
         }
-        .tab-active {
-            background-color: #1e40af; /* Tailwind blue-800 */
-            color: white;
-            border-color: #1e40af;
+        .loader {
+            border: 8px solid #f3f3f3; /* Light grey */
+            border-top: 8px solid #3498db; /* Blue */
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
         }
-        .code-block {
-            background-color: #1e293b; /* Tailwind slate-800 */
-            color: #e2e8f0; /* Tailwind slate-200 */
-            border-radius: 0.5rem;
-            padding: 1rem;
-            position: relative;
-            overflow-x: auto;
-            user-select: none; /* Prevents text selection */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .input_video {
+            display: none;
+        }
+        #output_canvas {
+            width: 100vw;
+            height: 100vh;
+            object-fit: cover;
+            transform: scaleX(-1); /* Mirror effect */
+        }
+        .color-circle {
+            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        }
+        .color-circle.selected {
+            transform: scale(1.2);
+            box-shadow: 0 0 15px 5px rgba(255, 255, 255, 0.7);
         }
     </style>
 </head>
-<body class="antialiased text-slate-800">
+<body class="bg-gray-900 text-white">
 
-    <div class="container mx-auto p-4 sm:p-6 lg:p-8">
+    <!-- Main container for the video feed and UI elements -->
+    <div id="container" class="relative w-screen h-screen">
+        <canvas id="output_canvas" class="absolute top-0 left-0"></canvas>
+        <video class="input_video" id="input_video" autoplay playsinline></video>
         
-        <!-- Header -->
-        <header class="text-center mb-8">
-            <h1 class="text-4xl md:text-5xl font-bold text-blue-800">Interactive C Loops Tutorial</h1>
-            <p class="mt-2 text-lg text-slate-600">Master `for`, `while`, and `do-while` loops in C with hands-on examples.</p>
-        </header>
-
-        <!-- Tabs for loop selection -->
-        <div class="mb-8 flex justify-center border-b border-slate-300">
-            <button id="for-tab" class="tab-btn px-4 py-2 sm:px-6 sm:py-3 font-semibold border-b-2 tab-active" onclick="showLoop('for')">For Loop</button>
-            <button id="while-tab" class="tab-btn px-4 py-2 sm:px-6 sm:py-3 font-semibold border-b-2 border-transparent text-slate-500 hover:text-blue-700 hover:border-blue-700" onclick="showLoop('while')">While Loop</button>
-            <button id="do-while-tab" class="tab-btn px-4 py-2 sm:px-6 sm:py-3 font-semibold border-b-2 border-transparent text-slate-500 hover:text-blue-700 hover:border-blue-700" onclick="showLoop('do-while')">Do-While Loop</button>
+        <!-- Loading Indicator -->
+        <div id="loading-indicator" class="absolute inset-0 flex flex-col items-center justify-center bg-gray-900 bg-opacity-80 z-30">
+            <div class="loader"></div>
+            <p class="mt-4 text-lg">Initializing Camera...</p>
         </div>
 
-        <!-- Main Content Area -->
-        <main id="content-area">
+        <!-- Header Information -->
+        <div class="absolute top-5 left-1/2 -translate-x-1/2 text-center z-20">
+             <h1 class="text-3xl md:text-4xl font-bold text-white drop-shadow-lg">Air Draw</h1>
+             <p class="text-gray-300 drop-shadow-lg">BANAJIT BORO</p>
+        </div>
 
-            <!-- For Loop Section -->
-            <section id="for-content" class="loop-section space-y-8">
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h2 class="text-3xl font-bold text-blue-700 mb-4">The `for` Loop</h2>
-                    <p class="text-slate-700 leading-relaxed">The `for` loop is ideal when you know in advance how many times you want to execute a block of code. It combines initialization, condition checking, and an increment/decrement operation in a single line, making the code compact and readable.</p>
-                    <div class="mt-4">
-                        <h3 class="font-semibold text-lg mb-2">Syntax:</h3>
-                        <div class="code-block">
-<pre><code>for (initialization; condition; update) {
-    // code to be executed
-}</code></pre>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Example 1: Print numbers 1 to 5 -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-2xl font-semibold mb-3">Example 1: Print Numbers 1 to 5</h3>
-                    <p class="text-slate-600 mb-4">A classic example that prints numbers from 1 to 5, demonstrating the basic structure.</p>
-                    <div class="code-block">
-<pre><code>#include &lt;stdio.h&gt;
-
-int main() {
-    for (int i = 1; i <= 5; i++) {
-        printf("%d ", i);
-    }
-    printf("\n");
-    return 0;
-}</code></pre>
-                    </div>
-                </div>
-                
-                <!-- Example 2: Multiplication Table -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-2xl font-semibold mb-3">Example 2: Print Multiplication Table of 7</h3>
-                    <p class="text-slate-600 mb-4">This code generates the multiplication table for a given number (7 in this case) up to 10.</p>
-                    <div class="code-block">
-<pre><code>#include &lt;stdio.h&gt;
-
-int main() {
-    int num = 7;
-    for (int i = 1; i <= 10; i++) {
-        printf("%d * %d = %d\n", num, i, num * i);
-    }
-    return 0;
-}</code></pre>
-                    </div>
-                </div>
-
-                <!-- Example 3: Calculate Factorial -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-2xl font-semibold mb-3">Example 3: Calculate Factorial of a Number</h3>
-                    <p class="text-slate-600 mb-4">This example calculates the factorial of 5 (5! = 5 * 4 * 3 * 2 * 1) using a loop that counts down.</p>
-                    <div class="code-block">
-<pre><code>#include &lt;stdio.h&gt;
-
-int main() {
-    int num = 7;
-    for (int i = 1; i <= 10; i++) {
-        printf("%d * %d = %d\n", num, i, num * i);
-    }
-    return 0;
-}</code></pre>
-                    </div>
-                </div>
-
-                <!-- Example 3: Calculate Factorial -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-2xl font-semibold mb-3">Example 3: Calculate Factorial of a Number</h3>
-                    <p class="text-slate-600 mb-4">This example calculates the factorial of 5 (5! = 5 * 4 * 3 * 2 * 1) using a loop that counts down.</p>
-                    <div class="code-block">
-                        <button class="copy-btn" onclick="copyCode(this)">Copy</button>
-<pre><code>#include &lt;stdio.h&gt;
-
-int main() {
-    int n = 5;
-    long long factorial = 1;
-    for (int i = n; i >= 1; i--) {
-        factorial *= i;
-    }
-    printf("Factorial of %d = %lld\n", n, factorial);
-    return 0;
-}</code></pre>
-                    </div>
-                </div>
-
-            </section>
-
-            <!-- While Loop Section -->
-            <section id="while-content" class="loop-section space-y-8 hidden">
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h2 class="text-3xl font-bold text-blue-700 mb-4">The `while` Loop</h2>
-                    <p class="text-slate-700 leading-relaxed">The `while` loop, an entry-controlled loop, repeatedly executes a block of code as long as a given condition is true. The condition is checked *before* the loop body is executed. It's used when the number of iterations is not known beforehand.</p>
-                     <div class="mt-4">
-                        <h3 class="font-semibold text-lg mb-2">Syntax:</h3>
-                        <div class="code-block">
-<pre><code>while (condition) {
-    // code to be executed
-    // update statement
-}</code></pre>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Example 1: Sum of first 10 natural numbers -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-2xl font-semibold mb-3">Example 1: Sum of First 10 Natural Numbers</h3>
-                    <p class="text-slate-600 mb-4">This program calculates the sum of numbers from 1 to 10 using a `while` loop.</p>
-                    <div class="code-block">
-<pre><code>#include &lt;stdio.h&gt;
-
-int main() {
-    int i = 1, sum = 0;
-    while (i <= 10) {
-        sum += i;
-        i++;
-    }
-    printf("Sum = %d\n", sum);
-    return 0;
-}</code></pre>
-                    </div>
-                </div>
-                
-                <!-- Example 2: Reverse a number -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-2xl font-semibold mb-3">Example 2: Reverse a Number</h3>
-                    <p class="text-slate-600 mb-4">This code reverses the digits of an integer. The loop continues as long as the number is not zero.</p>
-                    <div class="code-block">
-<pre><code>#include &lt;stdio.h&gt;
-
-int main() {
-    int n = 12345, reversedN = 0, remainder;
-    while (n != 0) {
-        remainder = n % 10;
-        reversedN = reversedN * 10 + remainder;
-        n /= 10;
-    }
-    printf("Reversed Number = %d\n", reversedN);
-    return 0;
-}</code></pre>
-                    </div>
-                </div>
-
-                <!-- Example 3: Count digits in a number -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-2xl font-semibold mb-3">Example 3: Count Digits in an Integer</h3>
-                    <p class="text-slate-600 mb-4">This example counts the total number of digits in a given integer by repeatedly dividing it by 10.</p>
-                    <div class="code-block">
-<pre><code>#include &lt;stdio.h&gt;
-
-int main() {
-    long long n = 9876543210;
-    int count = 0;
-    while (n != 0) {
-        n /= 10; // n = n / 10
-        ++count;
-    }
-    printf("Number of digits: %d\n", count);
-    return 0;
-}</code></pre>
-                    </div>
-                </div>
-            </section>
-            
-            <!-- Do-While Loop Section -->
-            <section id="do-while-content" class="loop-section space-y-8 hidden">
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h2 class="text-3xl font-bold text-blue-700 mb-4">The `do-while` Loop</h2>
-                    <p class="text-slate-700 leading-relaxed">The `do-while` loop is an exit-controlled loop. It is similar to a `while` loop, but the loop body is executed at least once, regardless of whether the condition is true or false. The condition is checked *after* the loop body is executed.</p>
-                     <div class="mt-4">
-                        <h3 class="font-semibold text-lg mb-2">Syntax:</h3>
-                        <div class="code-block">
-<pre><code>do {
-    // code to be executed
-    // update statement
-} while (condition);</code></pre>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Example 1: Print numbers 1 to 5 -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-2xl font-semibold mb-3">Example 1: Print Numbers 1 to 5</h3>
-                    <p class="text-slate-600 mb-4">Even if the condition was `i <= 0`, this loop would run once and print '1'.</p>
-                    <div class="code-block">
-<pre><code>#include &lt;stdio.h&gt;
-
-int main() {
-    int i = 1;
-    do {
-        printf("%d ", i);
-        i++;
-    } while (i <= 5);
-    printf("\n");
-    return 0;
-}</code></pre>
-                    </div>
-                </div>
-                
-                <!-- Example 2: Keep taking input until positive -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-2xl font-semibold mb-3">Example 2: Read Input Until a Positive Number is Entered</h3>
-                    <p class="text-slate-600 mb-4">This is a perfect use case for `do-while`. The program must ask for input at least once. This simulation enters -2, then 5.</p>
-                    <div class="code-block">
-<pre><code>#include &lt;stdio.h&gt;
-
-int main() {
-    int number;
-    do {
-        printf("Enter a positive integer: ");
-        scanf("%d", &number);
-    } while (number <= 0);
-
-    printf("You entered: %d\n", number);
-    return 0;
-}</code></pre>
-                    </div>
-                </div>
-
-                <!-- Example 3: Simple menu -->
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h3 class="text-2xl font-semibold mb-3">Example 3: A Simple Menu System</h3>
-                    <p class="text-slate-600 mb-4">A `do-while` loop ensures the menu is displayed at least once. The loop continues until the user chooses to exit (by entering 0).</p>
-                    <div class="code-block">
-<pre><code>#include &lt;stdio.h&gt;
-
-int main() {
-    int choice;
-    do {
-        printf("\n--- MENU ---\n");
-        printf("1. Option 1\n");
-        printf("2. Option 2\n");
-        printf("0. Exit\n");
-        printf("Enter your choice: ");
-        scanf("%d", &choice);
-
-        // This is where you would handle the choice
-        printf("You chose: %d\n", choice);
-
-    } while (choice != 0);
-
-    printf("Exiting program.\n");
-    return 0;
-}</code></pre>
-                    </div>
-                </div>
-            </section>
-        </main>
-
-        <!-- Footer -->
-        <footer class="text-center mt-12 py-4 border-t border-slate-300">
-            <p class="text-slate-500">Created to make C programming easier.</p>
-        </footer>
+        <!-- Color Palette -->
+        <div id="color-palette" class="absolute top-24 left-1/2 -translate-x-1/2 flex gap-4 p-2 bg-black bg-opacity-30 rounded-full z-20">
+            <!-- Color circles will be injected here by JS -->
+        </div>
+        
+        <!-- Controls -->
+        <button id="clear-button" class="absolute bottom-6 right-6 bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-5 rounded-full shadow-lg transition-all z-20">
+             Clear
+        </button>
     </div>
 
-    <script>
-        // Store references to elements
-        const contentSections = {
-            for: document.getElementById('for-content'),
-            while: document.getElementById('while-content'),
-            'do-while': document.getElementById('do-while-content')
-        };
+    <script type="module">
+        // Get references to the HTML elements
+        const videoElement = document.getElementById('input_video');
+        const canvasElement = document.getElementById('output_canvas');
+        const canvasCtx = canvasElement.getContext('2d');
+        const loadingIndicator = document.getElementById('loading-indicator');
+        const clearButton = document.getElementById('clear-button');
+        const colorPalette = document.getElementById('color-palette');
 
-        const tabs = {
-            for: document.getElementById('for-tab'),
-            while: document.getElementById('while-tab'),
-            'do-while': document.getElementById('do-while-tab')
-        };
+        // --- State Variables ---
+        let isDrawing = false;
+        let isErasing = false;
+        let currentPath = [];
+        let allPaths = [];
         
-        // Function to switch between loop sections
-        function showLoop(loopType) {
-            // Hide all sections and remove active class from all tabs
-            for (const key in contentSections) {
-                contentSections[key].classList.add('hidden');
-                tabs[key].classList.remove('tab-active', 'text-slate-500', 'hover:text-blue-700', 'hover:border-blue-700');
-                tabs[key].classList.add('text-slate-500', 'hover:text-blue-700', 'hover:border-blue-700');
+        // --- Configuration ---
+        let drawingColor = '#ec4899'; // Pink color (default)
+        const drawingLineWidth = 8;
+        const eraserColor = 'rgba(239, 68, 68, 0.5)'; // Semi-transparent red
+        const eraserRadius = 40; // in pixels
+        const colors = ['#ec4899', '#ef4444', '#3b82f6', '#22c55e', '#eab308'];
+
+        // --- Initialize UI ---
+        function setupColorPalette() {
+            colors.forEach(color => {
+                const circle = document.createElement('div');
+                circle.className = 'color-circle w-10 h-10 rounded-full cursor-pointer border-2 border-white';
+                circle.style.backgroundColor = color;
+                circle.dataset.color = color;
+                if (color === drawingColor) {
+                    circle.classList.add('selected');
+                }
+                colorPalette.appendChild(circle);
+            });
+        }
+        setupColorPalette();
+
+        // --- Drawing and Erasing Functions ---
+
+        // Draws all the stored lines onto the canvas
+        function drawPaths() {
+            canvasCtx.lineCap = 'round';
+            canvasCtx.lineJoin = 'round';
+
+            // Draw all completed paths
+            for (const path of allPaths) {
+                if (path.points.length < 2) continue;
+                canvasCtx.beginPath();
+                canvasCtx.strokeStyle = path.color;
+                canvasCtx.lineWidth = path.width;
+                canvasCtx.moveTo(path.points[0].x, path.points[0].y);
+                for (let i = 1; i < path.points.length; i++) {
+                    canvasCtx.lineTo(path.points[i].x, path.points[i].y);
+                }
+                canvasCtx.stroke();
             }
 
-            // Show the selected section and add active class to its tab
-            contentSections[loopType].classList.remove('hidden');
-            tabs[loopType].classList.add('tab-active');
-            tabs[loopType].classList.remove('text-slate-500', 'hover:text-blue-700', 'hover:border-blue-700');
+            // Draw the current path being drawn
+            if (currentPath.length > 1) {
+                canvasCtx.beginPath();
+                canvasCtx.strokeStyle = drawingColor;
+                canvasCtx.lineWidth = drawingLineWidth;
+                canvasCtx.moveTo(currentPath[0].x, currentPath[0].y);
+                for (let i = 1; i < currentPath.length; i++) {
+                    canvasCtx.lineTo(currentPath[i].x, currentPath[i].y);
+                }
+                canvasCtx.stroke();
+            }
         }
+        
+        // Main function called on every frame from the camera
+        function onResults(results) {
+            if (loadingIndicator.style.display !== 'none') {
+                loadingIndicator.style.display = 'none';
+            }
 
-        // Function to copy code to clipboard
-        function copyCode(button) {
-            const codeBlock = button.nextElementSibling;
-            const code = codeBlock.textContent;
+            canvasElement.width = window.innerWidth;
+            canvasElement.height = window.innerHeight;
             
-            // Using execCommand for broader compatibility within iFrames
-            const textarea = document.createElement('textarea');
-            textarea.value = code;
-            document.body.appendChild(textarea);
-            textarea.select();
-            try {
-                document.execCommand('copy');
-                button.textContent = 'Copied!';
-            } catch (err) {
-                button.textContent = 'Failed!';
-                console.error('Failed to copy text: ', err);
+            canvasCtx.save();
+            canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+            canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+
+            // Draw the existing lines first
+            drawPaths();
+
+            if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+                const handLandmarks = results.multiHandLandmarks[0]; // Use the first detected hand
+
+                // --- Gesture Detection ---
+                const indexTip = handLandmarks[8];
+                const middleTip = handLandmarks[12];
+                const ringTip = handLandmarks[16];
+                const pinkyTip = handLandmarks[20];
+                
+                const indexPip = handLandmarks[6];
+                const middlePip = handLandmarks[10];
+                const ringPip = handLandmarks[14];
+                const pinkyPip = handLandmarks[18];
+
+                const isFist = (indexTip.y > indexPip.y && middleTip.y > middlePip.y && ringTip.y > ringPip.y && pinkyTip.y > pinkyPip.y);
+                const drawGestureDistance = Math.hypot(indexTip.x - middleTip.x, indexTip.y - middleTip.y);
+                const isDrawingGesture = drawGestureDistance < 0.04;
+
+                const indexTipPos = {
+                    x: indexTip.x * canvasElement.width,
+                    y: indexTip.y * canvasElement.height
+                };
+
+                // --- Color Selection Logic ---
+                if (!isDrawing && !isFist) {
+                    const paletteCircles = document.querySelectorAll('.color-circle');
+                    paletteCircles.forEach(circle => {
+                        const rect = circle.getBoundingClientRect();
+                        const circleCenterX = rect.left + rect.width / 2;
+                        const circleCenterY = rect.top + rect.height / 2;
+                        
+                        // We need to mirror the x-coordinate for selection
+                        const mirroredX = canvasElement.width - indexTipPos.x;
+                        const dist = Math.hypot(mirroredX - circleCenterX, indexTipPos.y - circleCenterY);
+
+                        if (dist < rect.width / 1.5) { // A bit larger radius for easier selection
+                            drawingColor = circle.dataset.color;
+                            document.querySelector('.color-circle.selected').classList.remove('selected');
+                            circle.classList.add('selected');
+                        }
+                    });
+                }
+
+
+                // --- Mode Logic (Erase > Draw > Idle) ---
+                if (isFist) {
+                    isErasing = true;
+                    isDrawing = false;
+                    
+                    const eraserPos = {
+                        x: handLandmarks[9].x * canvasElement.width,
+                        y: handLandmarks[9].y * canvasElement.height
+                    };
+                    
+                    canvasCtx.fillStyle = eraserColor;
+                    canvasCtx.beginPath();
+                    canvasCtx.arc(eraserPos.x, eraserPos.y, eraserRadius, 0, 2 * Math.PI);
+                    canvasCtx.fill();
+                    
+                    allPaths = allPaths.filter(path => {
+                        return !path.points.some(point => {
+                            const dist = Math.hypot(point.x - eraserPos.x, point.y - eraserPos.y);
+                            return dist < eraserRadius;
+                        });
+                    });
+
+                } else if (isDrawingGesture) {
+                    isErasing = false;
+                    if (!isDrawing) {
+                        isDrawing = true;
+                        currentPath = [indexTipPos];
+                    } else {
+                        currentPath.push(indexTipPos);
+                    }
+                } else {
+                    isErasing = false;
+                    if (isDrawing) {
+                        isDrawing = false;
+                        if (currentPath.length > 1) {
+                            allPaths.push({
+                                points: currentPath,
+                                color: drawingColor,
+                                width: drawingLineWidth
+                            });
+                        }
+                        currentPath = [];
+                    }
+                }
+
+                // Draw the hand skeleton on top of everything for debugging/visuals
+                window.drawConnectors(canvasCtx, handLandmarks, window.HAND_CONNECTIONS, { color: '#34d399', lineWidth: 5 });
+                window.drawLandmarks(canvasCtx, handLandmarks, { color: isFist ? '#ef4444' : '#f87171', lineWidth: 2 });
+
+            } else {
+                if(isDrawing) {
+                    isDrawing = false;
+                    if (currentPath.length > 1) {
+                        allPaths.push({ points: currentPath, color: drawingColor, width: drawingLineWidth });
+                    }
+                    currentPath = [];
+                }
             }
-            document.body.removeChild(textarea);
-
-            setTimeout(() => {
-                button.textContent = 'Copy';
-            }, 2000);
+            canvasCtx.restore();
         }
-        
-    </script>
 
+        // --- Initialization ---
+        const hands = new window.Hands({
+            locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
+        });
+
+        hands.setOptions({
+            maxNumHands: 1,
+            modelComplexity: 1,
+            minDetectionConfidence: 0.7,
+            minTrackingConfidence: 0.7
+        });
+
+        hands.onResults(onResults);
+
+        const camera = new window.Camera(videoElement, {
+            onFrame: async () => {
+                await hands.send({ image: videoElement });
+            },
+            width: 1280,
+            height: 720
+        });
+        camera.start();
+
+        clearButton.addEventListener('click', () => {
+            allPaths = [];
+            currentPath = [];
+        });
+    </script>
 </body>
 </html>
+
+
 
 
 
