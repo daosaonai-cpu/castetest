@@ -1,305 +1,251 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Air Draw - Full Screen</title>
-    <!-- Tailwind CSS for styling -->
+    <title>C Programming Loops: A Crash Course</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- MediaPipe libraries -->
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils/camera_utils.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils/control_utils.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils/drawing_utils.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands/hands.js" crossorigin="anonymous"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
     <style>
-        /* Custom styles for the loader and overall layout */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
-        
         body {
             font-family: 'Inter', sans-serif;
-            overflow: hidden; /* Prevent scrollbars */
+            background-color: #111827;
+            color: #d1d5db;
         }
-        .loader {
-            border: 8px solid #f3f3f3; /* Light grey */
-            border-top: 8px solid #3498db; /* Blue */
-            border-radius: 50%;
-            width: 60px;
-            height: 60px;
-            animation: spin 1s linear infinite;
+        .code-block {
+            font-family: 'Fira Code', monospace;
+            background-color: #1f2937;
+            border: 1px solid #374151;
         }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .code-keyword { color: #818cf8; }
+        .code-type { color: #fca5a5; }
+        .code-comment { color: #6b7280; }
+        .code-string { color: #a5f3fc; }
+        .code-number { color: #fde047; }
+        .code-function { color: #6ee7b7; }
+        .content-card {
+            background-color: #1f2937;
+            border: 1px solid #374151;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
         }
-        .input_video {
-            display: none;
+        .content-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2), 0 4px 6px -2px rgba(0, 0, 0, 0.1);
         }
-        #output_canvas {
-            width: 100vw;
-            height: 100vh;
-            object-fit: cover;
-            transform: scaleX(-1); /* Mirror effect */
+        .copy-btn {
+            background-color: #374151;
+            color: #9ca3af;
+            transition: background-color 0.2s ease, color 0.2s ease;
         }
-        .color-circle {
-            transition: transform 0.2s ease-in-out, box-shadow 0.2s ease-in-out;
+        .copy-btn:hover {
+            background-color: #4b5563;
+            color: #e5e7eb;
         }
-        .color-circle.selected {
-            transform: scale(1.2);
-            box-shadow: 0 0 15px 5px rgba(255, 255, 255, 0.7);
+        .copy-success {
+            background-color: #10b981;
+            color: white;
         }
     </style>
 </head>
-<body class="bg-gray-900 text-white">
+<body class="antialiased">
+    <div class="container mx-auto px-4 py-8 md:py-12 max-w-4xl">
+        <!-- Header Section -->
+        <header class="text-center mb-12">
+            <h1 class="text-4xl md:text-5xl font-bold text-white mb-2">
+                C Programming Loops: A Crash Course
+            </h1>
+            <p class="text-lg text-gray-400">Your guide to iteration and control flow in C.</p>
+        </header>
 
-    <!-- Main container for the video feed and UI elements -->
-    <div id="container" class="relative w-screen h-screen">
-        <canvas id="output_canvas" class="absolute top-0 left-0"></canvas>
-        <video class="input_video" id="input_video" autoplay playsinline></video>
+        <main class="space-y-12">
+            <!-- Section: Introduction to Loops -->
+            <section id="intro" class="content-card rounded-lg p-6 md:p-8">
+                <h2 class="text-2xl font-semibold text-white mb-4 border-l-4 border-indigo-400 pl-4">What are Loops?</h2>
+                <p class="text-gray-300 leading-relaxed">
+                    In programming, a loop is a control structure used to repeat a block of code as long as a specified condition is true. Loops are fundamental for automating repetitive tasks, processing collections of data like arrays, and implementing complex algorithms. Without them, you would have to write the same lines of code over and over again. C provides several types of loops to handle different situations.
+                </p>
+            </section>
+
+            <!-- Section: For Loop -->
+            <section id="for-loop" class="content-card rounded-lg p-6 md:p-8">
+                <h2 class="text-2xl font-semibold text-white mb-4 border-l-4 border-indigo-400 pl-4">The `for` Loop</h2>
+                <div class="prose prose-invert max-w-none">
+                    <p>The <code>for</code> loop is ideal when you know in advance how many times you want to execute a statement or a block of statements. It combines initialization, condition checking, and an increment/decrement operation in a single line.</p>
+                    <h3 class="text-xl font-medium text-gray-200 mt-6">Syntax:</h3>
+                    <pre class="code-block rounded-lg p-4 text-sm whitespace-pre-wrap"><code class="language-c"><span class="code-keyword">for</span> (initialization; condition; increment/decrement) {
+   <span class="code-comment">// code to be executed</span>
+}</code></pre>
+                    <h3 class="text-xl font-medium text-gray-200 mt-6">Example:</h3>
+                    <p>This example prints numbers from 1 to 5.</p>
+                    <div class="relative">
+                        <pre class="code-block rounded-lg p-4 text-sm overflow-x-auto"><code class="language-c" id="code1"><span class="code-keyword">#include</span> <span class="code-string">&lt;stdio.h&gt;</span>
+
+<span class="code-type">int</span> <span class="code-function">main</span>() {
+   <span class="code-type">int</span> i;
+   
+   <span class="code-comment">// Loop from 1 to 5</span>
+   <span class="code-keyword">for</span> (i = <span class="code-number">1</span>; i <= <span class="code-number">5</span>; i++) {
+      <span class="code-function">printf</span>(<span class="code-string">"%d\n"</span>, i);
+   }
+   
+   <span class="code-keyword">return</span> <span class="code-number">0</span>;
+}</code></pre>
+                        <button onclick="copyCode('code1', this)" class="copy-btn absolute top-2 right-2 text-xs py-1 px-2 rounded-md">Copy</button>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Section: While Loop -->
+            <section id="while-loop" class="content-card rounded-lg p-6 md:p-8">
+                <h2 class="text-2xl font-semibold text-white mb-4 border-l-4 border-indigo-400 pl-4">The `while` Loop</h2>
+                <div class="prose prose-invert max-w-none">
+                    <p>The <code>while</code> loop is used when the number of iterations is not known beforehand. It repeatedly executes a target statement as long as a given condition is true. The condition is checked *before* the loop body is executed.</p>
+                    <h3 class="text-xl font-medium text-gray-200 mt-6">Syntax:</h3>
+                    <pre class="code-block rounded-lg p-4 text-sm whitespace-pre-wrap"><code class="language-c"><span class="code-keyword">while</span> (condition) {
+   <span class="code-comment">// code to be executed</span>
+}</code></pre>
+                    <h3 class="text-xl font-medium text-gray-200 mt-6">Example:</h3>
+                    <p>This example does the same thing as the `for` loop, but using a `while` loop structure.</p>
+                    <div class="relative">
+                        <pre class="code-block rounded-lg p-4 text-sm overflow-x-auto"><code class="language-c" id="code2"><span class="code-keyword">#include</span> <span class="code-string">&lt;stdio.h&gt;</span>
+
+<span class="code-type">int</span> <span class="code-function">main</span>() {
+   <span class="code-type">int</span> i = <span class="code-number">1</span>; <span class="code-comment">// Initialization</span>
+   
+   <span class="code-keyword">while</span> (i <= <span class="code-number">5</span>) { <span class="code-comment">// Condition</span>
+      <span class="code-function">printf</span>(<span class="code-string">"%d\n"</span>, i);
+      i++; <span class="code-comment">// Increment</span>
+   }
+   
+   <span class="code-keyword">return</span> <span class="code-number">0</span>;
+}</code></pre>
+                        <button onclick="copyCode('code2', this)" class="copy-btn absolute top-2 right-2 text-xs py-1 px-2 rounded-md">Copy</button>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Section: Do...While Loop -->
+            <section id="do-while-loop" class="content-card rounded-lg p-6 md:p-8">
+                <h2 class="text-2xl font-semibold text-white mb-4 border-l-4 border-indigo-400 pl-4">The `do...while` Loop</h2>
+                <div class="prose prose-invert max-w-none">
+                    <p>The <code>do...while</code> loop is similar to a <code>while</code> loop, but with a key difference: the loop body is guaranteed to execute at least once. This is because the condition is checked *after* the body of the loop has been executed.</p>
+                    <h3 class="text-xl font-medium text-gray-200 mt-6">Syntax:</h3>
+                    <pre class="code-block rounded-lg p-4 text-sm whitespace-pre-wrap"><code class="language-c"><span class="code-keyword">do</span> {
+   <span class="code-comment">// code to be executed</span>
+} <span class="code-keyword">while</span> (condition);</code></pre>
+                    <h3 class="text-xl font-medium text-gray-200 mt-6">Example:</h3>
+                    <p>This example asks for user input and continues to do so until the user enters a number greater than 10.</p>
+                     <div class="relative">
+                        <pre class="code-block rounded-lg p-4 text-sm overflow-x-auto"><code class="language-c" id="code3"><span class="code-keyword">#include</span> <span class="code-string">&lt;stdio.h&gt;</span>
+
+<span class="code-type">int</span> <span class="code-function">main</span>() {
+   <span class="code-type">int</span> number;
+   
+   <span class="code-keyword">do</span> {
+      <span class="code-function">printf</span>(<span class="code-string">"Enter a number greater than 10: "</span>);
+      <span class="code-function">scanf</span>(<span class="code-string">"%d"</span>, &number);
+   } <span class="code-keyword">while</span> (number <= <span class="code-number">10</span>);
+   
+   <span class="code-function">printf</span>(<span class="code-string">"Correct! You entered %d\n"</span>, number);
+   
+   <span class="code-keyword">return</span> <span class="code-number">0</span>;
+}</code></pre>
+                        <button onclick="copyCode('code3', this)" class="copy-btn absolute top-2 right-2 text-xs py-1 px-2 rounded-md">Copy</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Section: Break Statement -->
+            <section id="break" class="content-card rounded-lg p-6 md:p-8">
+                <h2 class="text-2xl font-semibold text-white mb-4 border-l-4 border-indigo-400 pl-4">The `break` Statement</h2>
+                <div class="prose prose-invert max-w-none">
+                    <p>The <code>break</code> statement is used to exit a loop (<code>for</code>, <code>while</code>, or <code>do...while</code>) or a <code>switch</code> statement prematurely. When a <code>break</code> statement is encountered inside a loop, the loop is immediately terminated, and program control resumes at the next statement following the loop.</p>
+                    <h3 class="text-xl font-medium text-gray-200 mt-6">Example:</h3>
+                    <p>This loop intends to run 10 times, but it stops when <code>i</code> becomes 5.</p>
+                    <div class="relative">
+                        <pre class="code-block rounded-lg p-4 text-sm overflow-x-auto"><code class="language-c" id="code4"><span class="code-keyword">#include</span> <span class="code-string">&lt;stdio.h&gt;</span>
+
+<span class="code-type">int</span> <span class="code-function">main</span>() {
+   <span class="code-type">int</span> i;
+   
+   <span class="code-keyword">for</span> (i = <span class="code-number">1</span>; i <= <span class="code-number">10</span>; i++) {
+      <span class="code-keyword">if</span> (i == <span class="code-number">5</span>) {
+         <span class="code-function">printf</span>(<span class="code-string">"Breaking the loop at i = 5\n"</span>);
+         <span class="code-keyword">break</span>; <span class="code-comment">// Exit the loop</span>
+      }
+      <span class="code-function">printf</span>(<span class="code-string">"%d\n"</span>, i);
+   }
+   
+   <span class="code-keyword">return</span> <span class="code-number">0</span>;
+}</code></pre>
+                        <button onclick="copyCode('code4', this)" class="copy-btn absolute top-2 right-2 text-xs py-1 px-2 rounded-md">Copy</button>
+                    </div>
+                </div>
+            </section>
+            
+            <!-- Section: Continue Statement -->
+            <section id="continue" class="content-card rounded-lg p-6 md:p-8">
+                <h2 class="text-2xl font-semibold text-white mb-4 border-l-4 border-indigo-400 pl-4">The `continue` Statement</h2>
+                <div class="prose prose-invert max-w-none">
+                    <p>The <code>continue</code> statement is used to skip the rest of the current iteration of a loop and move to the next iteration. Unlike <code>break</code>, it doesn't terminate the loop entirely. It just bypasses the remaining code inside the loop for the current iteration.</p>
+                    <h3 class="text-xl font-medium text-gray-200 mt-6">Example:</h3>
+                    <p>This example prints numbers from 1 to 10 but skips printing the number 5.</p>
+                    <div class="relative">
+                        <pre class="code-block rounded-lg p-4 text-sm overflow-x-auto"><code class="language-c" id="code5"><span class="code-keyword">#include</span> <span class="code-string">&lt;stdio.h&gt;</span>
+
+<span class="code-type">int</span> <span class="code-function">main</span>() {
+   <span class="code-type">int</span> i;
+   
+   <span class="code-keyword">for</span> (i = <span class="code-number">1</span>; i <= <span class="code-number">10</span>; i++) {
+      <span class="code-keyword">if</span> (i == <span class="code-number">5</span>) {
+         <span class="code-function">printf</span>(<span class="code-string">"(Skipping 5...)\n"</span>);
+         <span class="code-keyword">continue</span>; <span class="code-comment">// Skip this iteration</span>
+      }
+      <span class="code-function">printf</span>(<span class="code-string">"%d\n"</span>, i);
+   }
+   
+   <span class="code-keyword">return</span> <span class="code-number">0</span>;
+}</code></pre>
+                         <button onclick="copyCode('code5', this)" class="copy-btn absolute top-2 right-2 text-xs py-1 px-2 rounded-md">Copy</button>
+                    </div>
+                </div>
+            </section>
+        </main>
         
-        <!-- Loading Indicator -->
-        <div id="loading-indicator" class="absolute inset-0 flex flex-col items-center justify-center bg-gray-900 bg-opacity-80 z-30">
-            <div class="loader"></div>
-            <p class="mt-4 text-lg">Initializing Camera...</p>
-        </div>
-
-        <!-- Header Information -->
-        <div class="absolute top-5 left-1/2 -translate-x-1/2 text-center z-20">
-             <h1 class="text-3xl md:text-4xl font-bold text-white drop-shadow-lg">Air Draw</h1>
-             <p class="text-gray-300 drop-shadow-lg">BANAJIT BORO</p>
-        </div>
-
-        <!-- Color Palette -->
-        <div id="color-palette" class="absolute top-24 left-1/2 -translate-x-1/2 flex gap-4 p-2 bg-black bg-opacity-30 rounded-full z-20">
-            <!-- Color circles will be injected here by JS -->
-        </div>
-        
-        <!-- Controls -->
-        <button id="clear-button" class="absolute bottom-6 right-6 bg-red-600 hover:bg-red-700 text-white font-bold py-3 px-5 rounded-full shadow-lg transition-all z-20">
-             Clear
-        </button>
+        <!-- Footer -->
+        <footer class="text-center mt-12 py-4 border-t border-gray-700">
+            <p class="text-gray-500">Created for educational purposes.</p>
+        </footer>
     </div>
 
-    <script type="module">
-        // Get references to the HTML elements
-        const videoElement = document.getElementById('input_video');
-        const canvasElement = document.getElementById('output_canvas');
-        const canvasCtx = canvasElement.getContext('2d');
-        const loadingIndicator = document.getElementById('loading-indicator');
-        const clearButton = document.getElementById('clear-button');
-        const colorPalette = document.getElementById('color-palette');
-
-        // --- State Variables ---
-        let isDrawing = false;
-        let isErasing = false;
-        let currentPath = [];
-        let allPaths = [];
-        
-        // --- Configuration ---
-        let drawingColor = '#ec4899'; // Pink color (default)
-        const drawingLineWidth = 8;
-        const eraserColor = 'rgba(239, 68, 68, 0.5)'; // Semi-transparent red
-        const eraserRadius = 40; // in pixels
-        const colors = ['#ec4899', '#ef4444', '#3b82f6', '#22c55e', '#eab308'];
-
-        // --- Initialize UI ---
-        function setupColorPalette() {
-            colors.forEach(color => {
-                const circle = document.createElement('div');
-                circle.className = 'color-circle w-10 h-10 rounded-full cursor-pointer border-2 border-white';
-                circle.style.backgroundColor = color;
-                circle.dataset.color = color;
-                if (color === drawingColor) {
-                    circle.classList.add('selected');
-                }
-                colorPalette.appendChild(circle);
-            });
+    <script>
+        function copyCode(elementId, buttonElement) {
+            const codeEl = document.getElementById(elementId);
+            // Use a temporary textarea to preserve formatting
+            const textArea = document.createElement('textarea');
+            textArea.value = codeEl.innerText;
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                // Use execCommand as a fallback
+                document.execCommand('copy');
+                buttonElement.innerText = 'Copied!';
+                buttonElement.classList.add('copy-success');
+                setTimeout(() => {
+                    buttonElement.innerText = 'Copy';
+                    buttonElement.classList.remove('copy-success');
+                }, 2000);
+            } catch (err) {
+                console.error('Fallback: Oops, unable to copy', err);
+                buttonElement.innerText = 'Failed!';
+            }
+            document.body.removeChild(textArea);
         }
-        setupColorPalette();
-
-        // --- Drawing and Erasing Functions ---
-
-        // Draws all the stored lines onto the canvas
-        function drawPaths() {
-            canvasCtx.lineCap = 'round';
-            canvasCtx.lineJoin = 'round';
-
-            // Draw all completed paths
-            for (const path of allPaths) {
-                if (path.points.length < 2) continue;
-                canvasCtx.beginPath();
-                canvasCtx.strokeStyle = path.color;
-                canvasCtx.lineWidth = path.width;
-                canvasCtx.moveTo(path.points[0].x, path.points[0].y);
-                for (let i = 1; i < path.points.length; i++) {
-                    canvasCtx.lineTo(path.points[i].x, path.points[i].y);
-                }
-                canvasCtx.stroke();
-            }
-
-            // Draw the current path being drawn
-            if (currentPath.length > 1) {
-                canvasCtx.beginPath();
-                canvasCtx.strokeStyle = drawingColor;
-                canvasCtx.lineWidth = drawingLineWidth;
-                canvasCtx.moveTo(currentPath[0].x, currentPath[0].y);
-                for (let i = 1; i < currentPath.length; i++) {
-                    canvasCtx.lineTo(currentPath[i].x, currentPath[i].y);
-                }
-                canvasCtx.stroke();
-            }
-        }
-        
-        // Main function called on every frame from the camera
-        function onResults(results) {
-            if (loadingIndicator.style.display !== 'none') {
-                loadingIndicator.style.display = 'none';
-            }
-
-            canvasElement.width = window.innerWidth;
-            canvasElement.height = window.innerHeight;
-            
-            canvasCtx.save();
-            canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-            canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
-
-            // Draw the existing lines first
-            drawPaths();
-
-            if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
-                const handLandmarks = results.multiHandLandmarks[0]; // Use the first detected hand
-
-                // --- Gesture Detection ---
-                const indexTip = handLandmarks[8];
-                const middleTip = handLandmarks[12];
-                const ringTip = handLandmarks[16];
-                const pinkyTip = handLandmarks[20];
-                
-                const indexPip = handLandmarks[6];
-                const middlePip = handLandmarks[10];
-                const ringPip = handLandmarks[14];
-                const pinkyPip = handLandmarks[18];
-
-                const isFist = (indexTip.y > indexPip.y && middleTip.y > middlePip.y && ringTip.y > ringPip.y && pinkyTip.y > pinkyPip.y);
-                const drawGestureDistance = Math.hypot(indexTip.x - middleTip.x, indexTip.y - middleTip.y);
-                const isDrawingGesture = drawGestureDistance < 0.04;
-
-                const indexTipPos = {
-                    x: indexTip.x * canvasElement.width,
-                    y: indexTip.y * canvasElement.height
-                };
-
-                // --- Color Selection Logic ---
-                if (!isDrawing && !isFist) {
-                    const paletteCircles = document.querySelectorAll('.color-circle');
-                    paletteCircles.forEach(circle => {
-                        const rect = circle.getBoundingClientRect();
-                        const circleCenterX = rect.left + rect.width / 2;
-                        const circleCenterY = rect.top + rect.height / 2;
-                        
-                        // We need to mirror the x-coordinate for selection
-                        const mirroredX = canvasElement.width - indexTipPos.x;
-                        const dist = Math.hypot(mirroredX - circleCenterX, indexTipPos.y - circleCenterY);
-
-                        if (dist < rect.width / 1.5) { // A bit larger radius for easier selection
-                            drawingColor = circle.dataset.color;
-                            document.querySelector('.color-circle.selected').classList.remove('selected');
-                            circle.classList.add('selected');
-                        }
-                    });
-                }
-
-
-                // --- Mode Logic (Erase > Draw > Idle) ---
-                if (isFist) {
-                    isErasing = true;
-                    isDrawing = false;
-                    
-                    const eraserPos = {
-                        x: handLandmarks[9].x * canvasElement.width,
-                        y: handLandmarks[9].y * canvasElement.height
-                    };
-                    
-                    canvasCtx.fillStyle = eraserColor;
-                    canvasCtx.beginPath();
-                    canvasCtx.arc(eraserPos.x, eraserPos.y, eraserRadius, 0, 2 * Math.PI);
-                    canvasCtx.fill();
-                    
-                    allPaths = allPaths.filter(path => {
-                        return !path.points.some(point => {
-                            const dist = Math.hypot(point.x - eraserPos.x, point.y - eraserPos.y);
-                            return dist < eraserRadius;
-                        });
-                    });
-
-                } else if (isDrawingGesture) {
-                    isErasing = false;
-                    if (!isDrawing) {
-                        isDrawing = true;
-                        currentPath = [indexTipPos];
-                    } else {
-                        currentPath.push(indexTipPos);
-                    }
-                } else {
-                    isErasing = false;
-                    if (isDrawing) {
-                        isDrawing = false;
-                        if (currentPath.length > 1) {
-                            allPaths.push({
-                                points: currentPath,
-                                color: drawingColor,
-                                width: drawingLineWidth
-                            });
-                        }
-                        currentPath = [];
-                    }
-                }
-
-                // Draw the hand skeleton on top of everything for debugging/visuals
-                window.drawConnectors(canvasCtx, handLandmarks, window.HAND_CONNECTIONS, { color: '#34d399', lineWidth: 5 });
-                window.drawLandmarks(canvasCtx, handLandmarks, { color: isFist ? '#ef4444' : '#f87171', lineWidth: 2 });
-
-            } else {
-                if(isDrawing) {
-                    isDrawing = false;
-                    if (currentPath.length > 1) {
-                        allPaths.push({ points: currentPath, color: drawingColor, width: drawingLineWidth });
-                    }
-                    currentPath = [];
-                }
-            }
-            canvasCtx.restore();
-        }
-
-        // --- Initialization ---
-        const hands = new window.Hands({
-            locateFile: (file) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands/${file}`
-        });
-
-        hands.setOptions({
-            maxNumHands: 1,
-            modelComplexity: 1,
-            minDetectionConfidence: 0.7,
-            minTrackingConfidence: 0.7
-        });
-
-        hands.onResults(onResults);
-
-        const camera = new window.Camera(videoElement, {
-            onFrame: async () => {
-                await hands.send({ image: videoElement });
-            },
-            width: 1280,
-            height: 720
-        });
-        camera.start();
-
-        clearButton.addEventListener('click', () => {
-            allPaths = [];
-            currentPath = [];
-        });
     </script>
 </body>
 </html>
+
+
 
 
 
