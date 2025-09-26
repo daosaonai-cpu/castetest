@@ -3,40 +3,237 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Open Google Form</title>
+    <title>C Programming Loops Guide</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" xintegrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
     <style>
         body {
             font-family: 'Inter', sans-serif;
         }
+        .code-block {
+            background-color: #1E293B; /* slate-800 */
+            color: #E2E8F0; /* slate-200 */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: 'Courier New', Courier, monospace;
+            white-space: pre-wrap;
+            word-wrap: break-word;
+            font-size: 0.9rem;
+            line-height: 1.5;
+        }
+        .code-block .keyword { color: #93C5FD; /* blue-300 */ }
+        .code-block .type { color: #A5B4FC; /* indigo-300 */ }
+        .code-block .comment { color: #64748B; /* slate-500 */ }
+        .code-block .string { color: #A7F3D0; /* emerald-200 */ }
+        .code-block .number { color: #FDBA74; /* orange-300 */ }
+        .code-block .function { color: #F0ABFC; /* fuchsia-300 */ }
+        .card {
+            background-color: white;
+            border-radius: 0.75rem;
+            padding: 2rem;
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            transition: transform 0.2s ease-in-out;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+        }
     </style>
 </head>
-<body class="bg-gray-100 dark:bg-gray-900 flex items-center justify-center min-h-screen">
-    <!-- Main container for the card -->
-    <div class="bg-white dark:bg-gray-800 rounded-xl shadow-lg p-8 max-w-sm w-full text-center">
-        <!-- Card Header -->
-        <h1 class="text-2xl font-bold text-gray-800 dark:text-white mb-3">
-            Google Form Access
-        </h1>
+<body class="bg-slate-100 text-slate-800">
 
-        <!-- Card Description -->
-        <p class="text-gray-600 dark:text-gray-300 mb-6">
-            Click the button below to open the form in a new tab.
-        </p>
+    <div class="container mx-auto p-4 md:p-8">
+        <header class="text-center mb-10">
+            <h1 class="text-4xl md:text-5xl font-bold text-slate-900">C Programming Loops & Control Statements</h1>
+            <p class="text-slate-600 mt-2 text-lg">A simple guide with easy-to-understand examples.</p>
+            <div class="mt-6 flex justify-center items-center space-x-4">
+                <button id="download-page-btn" class="inline-flex items-center bg-slate-700 hover:bg-slate-800 text-white font-bold py-2 px-4 rounded-lg transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                    </svg>
+                    <span>Download HTML</span>
+                </button>
+                <button id="download-pdf-btn" class="inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
+                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <span>Download as PDF</span>
+                </button>
+            </div>
+        </header>
 
-        <!-- The Button/Link to the Form -->
-        <a href="https://forms.gle/mUBJzYuPazsAihKk8"
-           target="_blank"
-           rel="noopener noreferrer"
-           class="inline-block w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg text-lg transition-transform transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-300 dark:focus:ring-blue-800">
-            Open Form
-        </a>
+        <main class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+            <!-- For Loop Card -->
+            <div class="card">
+                <h2 class="text-2xl font-semibold mb-4 text-slate-900">For Loop</h2>
+                <p class="mb-4 text-slate-700">The `for` loop is used to execute a block of code a specific number of times. It's great when you know exactly how many times you want to loop.</p>
+                <div class="code-block">
+<pre>
+<span class="comment">// Prints numbers from 1 to 5</span>
+<span class="keyword">#include</span> <span class="string">&lt;stdio.h&gt;</span>
+
+<span class="type">int</span> <span class="function">main</span>() {
+    <span class="type">int</span> i;
+    <span class="keyword">for</span> (i = <span class="number">1</span>; i <= <span class="number">5</span>; i++) {
+        <span class="function">printf</span>(<span class="string">"%d\n"</span>, i);
+    }
+    <span class="keyword">return</span> <span class="number">0</span>;
+}
+</pre>
+                </div>
+            </div>
+
+            <!-- While Loop Card -->
+            <div class="card">
+                <h2 class="text-2xl font-semibold mb-4 text-slate-900">While Loop</h2>
+                <p class="mb-4 text-slate-700">The `while` loop executes a block of code as long as a specified condition is true. It checks the condition *before* executing the loop's body.</p>
+                <div class="code-block">
+<pre>
+<span class="comment">// Prints numbers from 1 to 5</span>
+<span class="keyword">#include</span> <span class="string">&lt;stdio.h&gt;</span>
+
+<span class="type">int</span> <span class="function">main</span>() {
+    <span class="type">int</span> i = <span class="number">1</span>;
+    <span class="keyword">while</span> (i <= <span class="number">5</span>) {
+        <span class="function">printf</span>(<span class="string">"%d\n"</span>, i);
+        i++;
+    }
+    <span class="keyword">return</span> <span class="number">0</span>;
+}
+</pre>
+                </div>
+            </div>
+
+            <!-- Do-While Loop Card -->
+            <div class="card">
+                <h2 class="text-2xl font-semibold mb-4 text-slate-900">Do-While Loop</h2>
+                <p class="mb-4 text-slate-700">Similar to a `while` loop, but it executes the block of code *at least once* before checking if the condition is true.</p>
+                <div class="code-block">
+<pre>
+<span class="comment">// Prints numbers from 1 to 5</span>
+<span class="keyword">#include</span> <span class="string">&lt;stdio.h&gt;</span>
+
+<span class="type">int</span> <span class="function">main</span>() {
+    <span class="type">int</span> i = <span class="number">1</span>;
+    <span class="keyword">do</span> {
+        <span class="function">printf</span>(<span class="string">"%d\n"</span>, i);
+        i++;
+    } <span class="keyword">while</span> (i <= <span class="number">5</span>);
+    <span class="keyword">return</span> <span class="number">0</span>;
+}
+</pre>
+                </div>
+            </div>
+
+            <!-- Break Statement Card -->
+            <div class="card">
+                <h2 class="text-2xl font-semibold mb-4 text-slate-900">Break Statement</h2>
+                <p class="mb-4 text-slate-700">The `break` statement is used to exit a loop immediately, regardless of the loop's condition. Execution continues at the first statement after the loop.</p>
+                <div class="code-block">
+<pre>
+<span class="comment">// Stops the loop when i is 3</span>
+<span class="keyword">#include</span> <span class="string">&lt;stdio.h&gt;</span>
+
+<span class="type">int</span> <span class="function">main</span>() {
+    <span class="type">int</span> i;
+    <span class="keyword">for</span> (i = <span class="number">1</span>; i <= <span class="number">5</span>; i++) {
+        <span class="keyword">if</span> (i == <span class="number">3</span>) {
+            <span class="keyword">break</span>; <span class="comment">// Exit loop</span>
+        }
+        <span class="function">printf</span>(<span class="string">"%d\n"</span>, i);
+    }
+    <span class="comment">// Output: 1 2</span>
+    <span class="keyword">return</span> <span class="number">0</span>;
+}
+</pre>
+                </div>
+            </div>
+            
+            <!-- Continue Statement Card -->
+            <div class="card">
+                <h2 class="text-2xl font-semibold mb-4 text-slate-900">Continue Statement</h2>
+                <p class="mb-4 text-slate-700">The `continue` statement skips the current iteration of a loop and moves to the next one. The loop's condition is re-evaluated.</p>
+                <div class="code-block">
+<pre>
+<span class="comment">// Skips printing 3</span>
+<span class="keyword">#include</span> <span class="string">&lt;stdio.h&gt;</span>
+
+<span class="type">int</span> <span class="function">main</span>() {
+    <span class="type">int</span> i;
+    <span class="keyword">for</span> (i = <span class="number">1</span>; i <= <span class="number">5</span>; i++) {
+        <span class="keyword">if</span> (i == <span class="number">3</span>) {
+            <span class="keyword">continue</span>; <span class="comment">// Skip this iteration</span>
+        }
+        <span class="function">printf</span>(<span class="string">"%d\n"</span>, i);
+    }
+    <span class="comment">// Output: 1 2 4 5</span>
+    <span class="keyword">return</span> <span class="number">0</span>;
+}
+</pre>
+                </div>
+            </div>
+
+            <!-- Summary Card -->
+            <div class="card md:col-span-2 lg:col-span-1">
+                <h2 class="text-2xl font-semibold mb-4 text-slate-900">Quick Summary</h2>
+                <ul class="list-disc list-inside text-slate-700 space-y-2">
+                    <li><span class="font-semibold">for:</span> Use when you know the number of iterations.</li>
+                    <li><span class="font-semibold">while:</span> Use when the number of iterations is unknown and depends on a condition.</li>
+                    <li><span class="font-semibold">do-while:</span> Use when you need the loop body to execute at least once.</li>
+                    <li><span class="font-semibold">break:</span> To exit a loop early.</li>
+                    <li><span class="font-semibold">continue:</span> To skip the current iteration and proceed to the next.</li>
+                </ul>
+            </div>
+        </main>
+        
+        <footer class="text-center mt-12 text-slate-500">
+            <p>Created to make C loops easier to understand.</p>
+        </footer>
+
     </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const downloadPageButton = document.getElementById('download-page-btn');
+            const downloadPdfButton = document.getElementById('download-pdf-btn');
+    
+            downloadPageButton.addEventListener('click', () => {
+                // We get the entire HTML of the page
+                const pageHTML = document.documentElement.outerHTML;
+                downloadFile('c_loops_guide.html', pageHTML, 'text/html');
+            });
+
+            downloadPdfButton.addEventListener('click', () => {
+                const element = document.querySelector('.container');
+                const opt = {
+                    margin:       0.5,
+                    filename:     'c_loops_guide.pdf',
+                    image:        { type: 'jpeg', quality: 0.98 },
+                    html2canvas:  { scale: 2 },
+                    jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+                };
+                // Use html2pdf library to generate PDF
+                html2pdf().from(element).set(opt).save();
+            });
+    
+            function downloadFile(filename, text, type) {
+                const element = document.createElement('a');
+                element.setAttribute('href', `data:${type};charset=utf-8,` + encodeURIComponent(text));
+                element.setAttribute('download', filename);
+    
+                element.style.display = 'none';
+                document.body.appendChild(element);
+    
+                element.click();
+    
+                document.body.removeChild(element);
+            }
+        });
+    </script>
+
 </body>
 </html>
+
 
 
 
