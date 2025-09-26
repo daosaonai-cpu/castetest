@@ -1,430 +1,514 @@
 <!DOCTYPE html>
-<html lang="en" class="scroll-smooth">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crash Course: Decision Making in Programming</title>
-    <!-- Tailwind CSS for modern styling -->
+    <title>NIELIT KOKRAJHAR EC AI Smart Class Env.</title>
+    <!-- Tailwind CSS for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- html2pdf.js for PDF generation -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" xintegrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
-    <!-- Google Fonts: Inter -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- MediaPipe libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.3/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils@0.6/control_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils@0.3/drawing_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4/hands.js" crossorigin="anonymous"></script>
+    <!-- PDF.js library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <style>
-        /* Applying the Inter font family */
+        /* Custom styles for the loader, layout, and new UI elements */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+        
         body {
-            font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Inter', sans-serif;
         }
-        /* Style for the copy button feedback */
-        .copied-feedback {
-            position: absolute;
-            top: -30px;
-            right: 0;
-            background-color: #2ecc71;
+        .loader {
+            border: 8px solid #f3f3f3; /* Light grey */
+            border-top: 8px solid #3498db; /* Blue */
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .input_video {
+            display: none;
+        }
+        #output_canvas {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            /* transform: scaleX(-1); <-- This is now handled dynamically */
+        }
+        .mirrored {
+            transform: scaleX(-1); /* Mirror effect */
+        }
+        /* Style for disabled buttons */
+        .disabled-button {
+            background-color: #a0aec0; /* gray-500 */
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        /* Style for notifications */
+        #notification-container {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(239, 68, 68, 0.8); /* red-500 with opacity */
             color: white;
-            padding: 4px 8px;
-            border-radius: 4px;
-            font-size: 0.8em;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            z-index: 1000;
             opacity: 0;
-            transition: opacity 0.3s, top 0.3s;
-            pointer-events: none;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        #notification-container.show {
+            opacity: 1;
+            visibility: visible;
         }
     </style>
 </head>
-<body class="bg-slate-100 dark:bg-slate-900 text-slate-700 dark:text-slate-300">
+<body class="bg-gray-900 text-white flex flex-col items-center justify-center min-h-screen p-4">
 
-    <!-- Main Content Container -->
-    <div class="container mx-auto max-w-4xl p-4 sm:p-6 lg:p-8">
-        <div id="content-to-download" class="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl p-6 md:p-10">
+    <div class="w-full max-w-4xl mx-auto">
+        <h1 class="text-3xl md:text-4xl font-bold text-center mb-2 text-blue-400">NIELIT KOKRAJHAR EC AI Smart Class Env.</h1>
+        <p class="text-center text-gray-400 mb-6">BANAJIT BORO</p>
 
-            <!-- Header Section -->
-            <header class="text-center mb-10">
-                <h1 class="text-4xl md:text-5xl font-extrabold bg-clip-text text-transparent bg-gradient-to-r from-blue-500 to-teal-400 mb-2">Crash Course: Decision Making</h1>
-                <p class="text-xl text-slate-500 dark:text-slate-400">How your code can think, choose, and react.</p>
-                <button id="download-pdf-btn" class="mt-6 bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-6 rounded-lg inline-flex items-center transition-transform transform hover:scale-105">
-                    <svg class="w-5 h-5 mr-2" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                        <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
-                    </svg>
-                    <span>Download as PDF</span>
-                </button>
-            </header>
-
-            <p class="text-lg leading-relaxed mb-6">Imagine you're following a recipe. Most steps are sequential: "First, chop the onions. Second, heat the oil." But sometimes, a recipe has choices: "If you want it spicy, add chili flakes." This is <strong>decision-making</strong>. Your code, just like a recipe, needs to react to different situations. Decision-making statements are the tools that allow your program to ask questions and choose a path to follow based on the answers.</p>
-            
-            
-
-[Image of a programming decision flowchart]
-
-            
-            <hr class="my-12 border-slate-200 dark:border-slate-700">
-
-            <!-- Section 1: if Statement -->
-            <section id="if-statement">
-                <h2 class="text-3xl font-bold mb-4 text-slate-900 dark:text-white">1. The <code>if</code> Statement</h2>
-                <p class="text-lg leading-relaxed mb-6">The <strong><code>if</code> statement</strong> is the most basic building block. It's like asking a simple "yes" or "no" question. If the answer is "yes," you perform an action. If the answer is "no," you simply do nothing and move on.</p>
-
-                <div class="analogy bg-sky-100 dark:bg-sky-900/50 border-l-4 border-sky-500 text-sky-800 dark:text-sky-200 p-5 rounded-r-lg my-6">
-                    <strong class="font-semibold text-lg block mb-1">Analogy: The Umbrella Rule ☂️</strong>
-                    <p>Think about leaving your house: "<strong>If</strong> it is raining, <strong>then</strong> I will take an umbrella." If it's not raining (the condition is false), you just ignore that rule and walk out the door.</p>
-                </div>
-
-                <h3 class="text-2xl font-semibold mt-8 mb-3 text-slate-800 dark:text-slate-100">Syntax</h3>
-                <div class="code-block relative">
-                    <pre class="bg-slate-900 text-white p-5 rounded-lg overflow-x-auto"><code class="language-c">if (condition) {
-    // This is the "action block".
-    // It only runs if the 'condition' inside the parentheses is true.
-}</code></pre>
-                </div>
-
-                <h3 class="text-2xl font-semibold mt-8 mb-3 text-slate-800 dark:text-slate-100">Example: Accessing a Restricted Movie</h3>
-                <div class="code-block relative">
-                    <button class="copy-btn absolute top-3 right-3 bg-slate-700 hover:bg-slate-600 text-white text-xs font-semibold py-1 px-2 rounded-md">Copy</button>
-                    <pre class="bg-slate-900 text-white p-5 rounded-lg overflow-x-auto"><code class="language-c">#include &lt;stdio.h&gt;
-
-int main() {
-    int user_age = 15;
-    printf("Checking your age for the movie...\n");
-
-    // The condition 'user_age >= 13' is TRUE because 15 is >= 13.
-    if (user_age >= 13) {
-        // Because the condition was true, this line will be executed.
-        printf("Access granted! Enjoy the movie.\n");
-    }
-
-    printf("Thank you for visiting!\n"); // This line runs no matter what.
-    return 0;
-}</code></pre>
-                </div>
-            </section>
-
-            <hr class="my-12 border-slate-200 dark:border-slate-700">
-
-            <!-- Section 2: if...else Statement -->
-            <section id="if-else-statement">
-                <h2 class="text-3xl font-bold mb-4 text-slate-900 dark:text-white">2. The <code>if...else</code> Statement</h2>
-                <p class="text-lg leading-relaxed mb-6">What if you need a plan for when the condition is false? That's where <strong><code>if...else</code></strong> comes in. It provides an alternative path, a "Plan B." It creates a clear "this or that" choice, guaranteeing that one of the two blocks of code will run.</p>
-
-                <div class="analogy bg-sky-100 dark:bg-sky-900/50 border-l-4 border-sky-500 text-sky-800 dark:text-sky-200 p-5 rounded-r-lg my-6">
-                    <strong class="font-semibold text-lg block mb-1">Analogy: The Ice Cream Plan 🍦</strong>
-                    <p>You decide: "<strong>If</strong> the ice cream truck is here, <strong>then</strong> I'll buy a cone. <strong>Else</strong> (otherwise), I'll eat the cookies at home." You are definitely going to have a snack; the <code class="bg-slate-200 dark:bg-slate-700 px-2 py-1 rounded">if...else</code> structure just determines <em>which</em> snack you have.</p>
-                </div>
-
-                <h3 class="text-2xl font-semibold mt-8 mb-3 text-slate-800 dark:text-slate-100">Syntax</h3>
-                <div class="code-block relative">
-                    <pre class="bg-slate-900 text-white p-5 rounded-lg overflow-x-auto"><code class="language-c">if (condition) {
-    // This block runs if the condition is TRUE.
-} else {
-    // This block runs if the condition is FALSE.
-}</code></pre>
-                </div>
-                
-                <h3 class="text-2xl font-semibold mt-8 mb-3 text-slate-800 dark:text-slate-100">Example: Checking a Password</h3>
-                <div class="code-block relative">
-                    <button class="copy-btn absolute top-3 right-3 bg-slate-700 hover:bg-slate-600 text-white text-xs font-semibold py-1 px-2 rounded-md">Copy</button>
-                    <pre class="bg-slate-900 text-white p-5 rounded-lg overflow-x-auto"><code class="language-c">#include &lt;stdio.h&gt;
-#include &lt;string.h&gt; // Needed for comparing strings
-
-int main() {
-    char correct_password[] = "secret123";
-    char user_input[] = "password";
-
-    // strcmp() returns 0 if the strings are the same.
-    // Since "password" is not "secret123", the condition is FALSE.
-    if (strcmp(user_input, correct_password) == 0) {
-        printf("Login successful! Welcome.\n");
-    } else {
-        // So, the 'else' block runs instead.
-        printf("Incorrect password. Please try again.\n");
-    }
-    return 0;
-}</code></pre>
-                </div>
-            </section>
-            
-            <hr class="my-12 border-slate-200 dark:border-slate-700">
-
-            <!-- Section 3: if...else if...else Ladder -->
-            <section id="if-else-if-ladder">
-                <h2 class="text-3xl font-bold mb-4 text-slate-900 dark:text-white">3. The <code>if...else if...else</code> Ladder</h2>
-                <p class="text-lg leading-relaxed mb-6">Sometimes one question isn't enough. You might need to check a series of related conditions. The <strong><code>if...else if...else</code> ladder</strong> is a clean way to do this. It's like a checklist your program goes through from top to bottom, stopping as soon as it finds a true condition.</p>
-
-                <div class="analogy bg-sky-100 dark:bg-sky-900/50 border-l-4 border-sky-500 text-sky-800 dark:text-sky-200 p-5 rounded-r-lg my-6">
-                    <strong class="font-semibold text-lg block mb-1">Analogy: Grading a Test 📝</strong>
-                    <p>A teacher follows a set of rules: "<strong>If</strong> the score is above 90, the grade is 'A'. <strong>Else if</strong> the score is above 80, the grade is 'B'. <strong>Else if</strong> the score is above 70, the grade is 'C'. <strong>Else</strong>, the grade is 'F'."</p>
-                </div>
-                
-                <h3 class="text-2xl font-semibold mt-8 mb-3 text-slate-800 dark:text-slate-100">Example: The Grading Program</h3>
-                <div class="code-block relative">
-                    <button class="copy-btn absolute top-3 right-3 bg-slate-700 hover:bg-slate-600 text-white text-xs font-semibold py-1 px-2 rounded-md">Copy</button>
-                    <pre class="bg-slate-900 text-white p-5 rounded-lg overflow-x-auto"><code class="language-c">#include &lt;stdio.h&gt;
-
-int main() {
-    int score = 85;
-    char grade;
-
-    if (score >= 90) {
-        grade = 'A';
-    } else if (score >= 80) { // 85 >= 80 is TRUE, so this block runs.
-        grade = 'B';
-    } else if (score >= 70) {
-        grade = 'C';
-    } else {
-        grade = 'F';
-    }
-
-    printf("With a score of %d, your grade is %c.\n", score, grade);
-    return 0;
-}</code></pre>
-                </div>
-            </section>
-
-            <hr class="my-12 border-slate-200 dark:border-slate-700">
-
-            <!-- Section 4: switch...case Statement -->
-            <section id="switch-case">
-                <h2 class="text-3xl font-bold mb-4 text-slate-900 dark:text-white">4. The <code>switch...case</code> Statement</h2>
-                <p class="text-lg leading-relaxed mb-6">The <strong><code>switch...case</code> statement</strong> is a specialized tool for when you have a single variable and you want to perform different actions based on its exact value. It's often cleaner and more efficient than a long <code class="bg-slate-200 dark:bg-slate-700 px-2 py-1 rounded">if...else if</code> ladder for this specific scenario.</p>
-
-                <div class="analogy bg-sky-100 dark:bg-sky-900/50 border-l-4 border-sky-500 text-sky-800 dark:text-sky-200 p-5 rounded-r-lg my-6">
-                    <strong class="font-semibold text-lg block mb-1">Analogy: A Vending Machine 🥤</strong>
-                    <p>A vending machine is like a switch. You provide a single value (the code "B4"). The machine checks your code against its options (<code>case</code>s). If it finds a match (<code>case "B4":</code>), it dispenses a soda. If not (<code>default</code>), it gives an error.</p>
-                </div>
-                
-                <h3 class="text-2xl font-semibold mt-8 mb-3 text-slate-800 dark:text-slate-100">Example: Day of the Week</h3>
-                 <p class="text-lg leading-relaxed mb-6">The <code class="bg-slate-200 dark:bg-slate-700 px-2 py-1 rounded">break;</code> statement is critical. If you forget it, the program will "fall through" and execute the code in the next case as well!</p>
-                <div class="code-block relative">
-                    <button class="copy-btn absolute top-3 right-3 bg-slate-700 hover:bg-slate-600 text-white text-xs font-semibold py-1 px-2 rounded-md">Copy</button>
-                    <pre class="bg-slate-900 text-white p-5 rounded-lg overflow-x-auto"><code class="language-c">#include &lt;stdio.h&gt;
-
-int main() {
-    int day_of_week = 3; // 1=Sun, 2=Mon, 3=Tue
-
-    switch (day_of_week) {
-        case 1: printf("It's Sunday.\n"); break;
-        case 2: printf("It's Monday.\n"); break;
-        case 3: 
-            printf("It's Tuesday.\n"); 
-            break; // Finds a match and breaks out.
-        case 4: printf("It's Wednesday.\n"); break;
-        case 5: printf("It's Thursday.\n"); break;
-        case 6: printf("It's Friday.\n"); break;
-        case 7: printf("It's Saturday.\n"); break;
-        default: printf("Invalid day number.\n");
-    }
-    return 0;
-}</code></pre>
-                </div>
-            </section>
-
-            <hr class="my-12 border-slate-200 dark:border-slate-700">
-
-            <!-- Section 5: Ternary Operator -->
-            <section id="ternary-operator">
-                <h2 class="text-3xl font-bold mb-4 text-slate-900 dark:text-white">5. The Ternary Operator (<code>? :</code>)</h2>
-                <p class="text-lg leading-relaxed mb-6">The <strong>ternary operator</strong> is a compact, inline version of an <code class="bg-slate-200 dark:bg-slate-700 px-2 py-1 rounded">if...else</code> statement. It's used to assign a value to a variable based on a single condition. Its brevity makes it handy but can reduce readability if overused or nested.</p>
-                
-                <h3 class="text-2xl font-semibold mt-8 mb-3 text-slate-800 dark:text-slate-100">Syntax</h3>
-                <div class="code-block relative">
-                    <pre class="bg-slate-900 text-white p-5 rounded-lg overflow-x-auto"><code class="language-c">variable = (condition) ? value_if_true : value_if_false;</code></pre>
-                </div>
-
-                <h3 class="text-2xl font-semibold mt-8 mb-3 text-slate-800 dark:text-slate-100">Example: Pass or Fail</h3>
-                <div class="code-block relative">
-                    <button class="copy-btn absolute top-3 right-3 bg-slate-700 hover:bg-slate-600 text-white text-xs font-semibold py-1 px-2 rounded-md">Copy</button>
-                    <pre class="bg-slate-900 text-white p-5 rounded-lg overflow-x-auto"><code class="language-c">#include &lt;stdio.h&gt;
-#include &lt;string.h&gt;
-
-int main() {
-    int score = 75;
-    char* result;
-
-    // If score is >= 60, result is "Pass". Otherwise, it's "Fail".
-    result = (score >= 60) ? "Pass" : "Fail";
-
-    printf("With a score of %d, the result is: %s\n", score, result);
-    return 0;
-}</code></pre>
-                </div>
-            </section>
-
-            <hr class="my-12 border-slate-200 dark:border-slate-700">
-
-            <!-- Section 6: goto Statement -->
-            <section id="goto-statement">
-                 <h2 class="text-3xl font-bold mb-4 text-slate-900 dark:text-white">6. The <code>goto</code> Statement</h2>
-                 <p class="text-lg leading-relaxed mb-6">The <strong><code>goto</code> statement</strong> provides an unconditional jump from the <code class="bg-slate-200 dark:bg-slate-700 px-2 py-1 rounded">goto</code> to a labeled statement in the same function. It tells the program to stop what it's doing and immediately "teleport" execution to another spot.</p>
-
-                <div class="warning bg-red-100 dark:bg-red-900/50 border-l-4 border-red-500 text-red-800 dark:text-red-200 p-5 rounded-r-lg my-6">
-                    <strong class="font-semibold text-lg block mb-1">⚠️ Strong Word of Caution</strong>
-                    <p>The use of <code class="bg-red-200 dark:bg-red-800 px-2 py-1 rounded">goto</code> is <strong>heavily discouraged</strong> in all modern programming. It creates code that is incredibly difficult to read and debug, often called <strong>"spaghetti code."</strong> For every problem you think <code class="bg-red-200 dark:bg-red-800 px-2 py-1 rounded">goto</code> can solve, there is a better, clearer solution using loops or functions. It is included here for educational completeness only.</p>
-                </div>
-
-                
-
-                <h3 class="text-2xl font-semibold mt-8 mb-3 text-slate-800 dark:text-slate-100">Example: (For Educational Purposes Only)</h3>
-                <div class="code-block relative">
-                     <button class="copy-btn absolute top-3 right-3 bg-slate-700 hover:bg-slate-600 text-white text-xs font-semibold py-1 px-2 rounded-md">Copy</button>
-                    <pre class="bg-slate-900 text-white p-5 rounded-lg overflow-x-auto"><code class="language-c">#include &lt;stdio.h&gt;
-
-int main() {
-    int count = 1;
-
-start_loop: // This is the label we will jump to.
-    printf("Count is: %d\n", count);
-    count++;
-
-    if (count <= 3) {
-        goto start_loop; // Jump back to the top of our "loop".
-    }
-
-    printf("Loop finished.\n");
-    return 0;
-}</code></pre>
-                </div>
-            </section>
-
-            <hr class="my-12 border-slate-200 dark:border-slate-700">
-
-            <!-- Comparison Table -->
-            <section id="comparison">
-                <h2 class="text-3xl font-bold mb-6 text-slate-900 dark:text-white text-center">Quick Comparison</h2>
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
-                        <thead class="bg-slate-100 dark:bg-slate-700">
-                            <tr>
-                                <th class="p-4 text-lg font-semibold text-slate-800 dark:text-slate-100 rounded-tl-lg">Statement</th>
-                                <th class="p-4 text-lg font-semibold text-slate-800 dark:text-slate-100">Best For</th>
-                                <th class="p-4 text-lg font-semibold text-slate-800 dark:text-slate-100 rounded-tr-lg">Key Feature</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <tr class="border-b border-slate-200 dark:border-slate-700">
-                                <td class="p-4 font-mono font-bold">if</td>
-                                <td class="p-4">A single, optional action.</td>
-                                <td class="p-4">Executes code only if a condition is true.</td>
-                            </tr>
-                            <tr class="border-b border-slate-200 dark:border-slate-700">
-                                <td class="p-4 font-mono font-bold">if-else</td>
-                                <td class="p-4">A clear "this or that" choice.</td>
-                                <td class="p-4">Guarantees one of two blocks will run.</td>
-                            </tr>
-                             <tr class="border-b border-slate-200 dark:border-slate-700">
-                                <td class="p-4 font-mono font-bold">if-else if</td>
-                                <td class="p-4">Checking multiple, related conditions in order.</td>
-                                <td class="p-4">A chain of checks; stops at the first true one.</td>
-                            </tr>
-                            <tr class="border-b border-slate-200 dark:border-slate-700">
-                                <td class="p-4 font-mono font-bold">switch</td>
-                                <td class="p-4">Checking a variable against many exact values.</td>
-                                <td class="p-4">Clean and often more efficient than long if-ladders.</td>
-                            </tr>
-                            <tr>
-                                <td class="p-4 font-mono font-bold">ternary ?:</td>
-                                <td class="p-4">Assigning one of two values to a variable.</td>
-                                <td class="p-4">A very compact, inline if-else statement.</td>
-                            </tr>
-                        </tbody>
-                    </table>
-                </div>
-            </section>
-
+        <!-- Main container for the video feed and loader -->
+        <div id="container" class="relative w-full aspect-video rounded-lg shadow-2xl bg-gray-800 flex items-center justify-center overflow-hidden">
+            <canvas id="output_canvas" class="absolute top-0 left-0"></canvas>
+            <video class="input_video" id="input_video" autoplay playsinline></video>
+            <div id="loading-indicator" class="absolute inset-0 flex flex-col items-center justify-center bg-gray-800 bg-opacity-75 rounded-lg z-10">
+                <div class="loader"></div>
+                <p class="mt-4 text-lg">Initializing Camera...</p>
+            </div>
         </div>
-        <!-- Footer -->
-        <footer class="text-center mt-8 text-slate-500 dark:text-slate-400">
-            <p>&copy; 2025 Crash Courses Inc. Happy Coding!</p>
-        </footer>
+        
+        <!-- Controls -->
+        <div class="mt-4 flex justify-center items-center flex-wrap gap-4">
+            <button id="clear-button" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors">
+                Clear All
+            </button>
+            <input type="file" id="file-upload" class="hidden" accept="image/*,application/pdf">
+            <label for="file-upload" class="bg-pink-500 hover:bg-pink-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors cursor-pointer">
+                Upload File
+            </label>
+            <!-- PDF Navigation -->
+            <button id="prev-page-button" class="hidden bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors">Prev</button>
+            <span id="page-indicator" class="hidden text-lg"></span>
+            <button id="next-page-button" class="hidden bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors">Next</button>
+        </div>
     </div>
 
-    <script>
-        // JavaScript for "Copy Code" button functionality and PDF download
-        document.addEventListener('DOMContentLoaded', () => {
-            const allCopyButtons = document.querySelectorAll('.copy-btn');
-            
-            allCopyButtons.forEach(button => {
-                button.addEventListener('click', (event) => {
-                    const codeBlock = event.target.nextElementSibling;
-                    const code = codeBlock.querySelector('code').innerText;
+    <!-- Notification container -->
+    <div id="notification-container"></div>
 
-                    // Create a temporary textarea to hold the text
-                    const textArea = document.createElement('textarea');
-                    textArea.value = code;
-                    document.body.appendChild(textArea);
-                    textArea.select();
-                    
-                    try {
-                        // Use the modern clipboard API if available
-                        document.execCommand('copy');
-                        showFeedback(event.target, 'Copied!');
-                    } catch (err) {
-                        console.error('Failed to copy text: ', err);
-                        showFeedback(event.target, 'Failed!');
-                    }
-                    
-                    document.body.removeChild(textArea);
-                });
-            });
+    <script type="module">
+        // Set the workerSrc for PDF.js
+        window.pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js`;
 
-            // PDF Download Logic
-            const downloadBtn = document.getElementById('download-pdf-btn');
-            const contentToDownload = document.getElementById('content-to-download');
+        // --- Get references to the HTML elements ---
+        const videoElement = document.getElementById('input_video');
+        const canvasElement = document.getElementById('output_canvas');
+        const canvasCtx = canvasElement.getContext('2d');
+        const loadingIndicator = document.getElementById('loading-indicator');
+        const clearButton = document.getElementById('clear-button');
+        const fileUploadInput = document.getElementById('file-upload');
+        const prevPageButton = document.getElementById('prev-page-button');
+        const nextPageButton = document.getElementById('next-page-button');
+        const pageIndicator = document.getElementById('page-indicator');
+        const notificationContainer = document.getElementById('notification-container');
 
-            downloadBtn.addEventListener('click', () => {
-                const originalTitle = document.title;
-                document.title = 'CrashCourse_DecisionMaking'; // Set title for PDF metadata
+        // --- State Variables ---
+        let currentMode = 'idle'; // 'idle', 'drawing', 'erasing'
+        let lastMode = 'idle';
+        let currentPath = [];
+        let allPaths = [];
+        let uploadedImage = null;
+        let pdfDoc = null;
+        let currentPageNum = 1;
+        let totalPages = 0;
+        
+        // --- On-Canvas Button Control State ---
+        let lastButtonPressTime = 0;
+        const BUTTON_PRESS_COOLDOWN = 1000; // 1 second cooldown
 
-                const opt = {
-                    margin:       0.5,
-                    filename:     'CrashCourse_DecisionMaking.pdf',
-                    image:        { type: 'jpeg', quality: 0.98 },
-                    html2canvas:  { scale: 2, useCORS: true, logging: false },
-                    jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
-                };
+        // --- Configuration ---
+        const drawingColor = '#ec4899'; // Pink color
+        const drawingLineWidth = 6;
+        const eraserColor = 'rgba(239, 68, 68, 0.5)'; // Semi-transparent red
+        const eraserRadius = 30;
+        const cursorColor = '#f87171';
+        const cursorRadius = 5;
 
-                // Temporarily hide buttons so they don't appear in the PDF
-                const buttonsToHide = document.querySelectorAll('.copy-btn, #download-pdf-btn');
-                buttonsToHide.forEach(btn => btn.style.visibility = 'hidden');
+        // --- UI Feedback Functions ---
+        function showNotification(message, duration = 3000) {
+            notificationContainer.textContent = message;
+            notificationContainer.classList.add('show');
+            setTimeout(() => {
+                notificationContainer.classList.remove('show');
+            }, duration);
+        }
+        
+        // --- Canvas Drawing Helper Functions ---
+        function drawPaths() {
+            canvasCtx.lineCap = 'round';
+            canvasCtx.lineJoin = 'round';
 
-                html2pdf().from(contentToDownload).set(opt).save().then(() => {
-                    // Show the buttons again after the PDF has been generated and saved
-                    buttonsToHide.forEach(btn => btn.style.visibility = 'visible');
-                    document.title = originalTitle; // Restore original page title
-                }).catch(err => {
-                    console.error("PDF generation failed:", err);
-                    // Ensure buttons are visible even if PDF generation fails
-                    buttonsToHide.forEach(btn => btn.style.visibility = 'visible');
-                    document.title = originalTitle;
-                });
-            });
-
-
-            function showFeedback(button, message) {
-                const feedback = document.createElement('div');
-                feedback.textContent = message;
-                feedback.className = 'copied-feedback';
-                
-                button.parentElement.appendChild(feedback);
-
-                // Trigger animation
-                setTimeout(() => {
-                    feedback.style.opacity = '1';
-                    feedback.style.top = '-35px';
-                }, 10);
-
-                // Remove after 2 seconds
-                setTimeout(() => {
-                    feedback.style.opacity = '0';
-                    feedback.style.top = '-30px';
-                    setTimeout(() => {
-                        feedback.remove();
-                    }, 300);
-                }, 2000);
+            // Draw all completed paths
+            for (const path of allPaths) {
+                if (path.points.length < 2) continue;
+                canvasCtx.beginPath();
+                canvasCtx.strokeStyle = path.color;
+                canvasCtx.lineWidth = path.width;
+                canvasCtx.moveTo(path.points[0].x, path.points[0].y);
+                for (let i = 1; i < path.points.length; i++) {
+                    canvasCtx.lineTo(path.points[i].x, path.points[i].y);
+                }
+                canvasCtx.stroke();
             }
+            // Draw the current path being drawn
+            if (currentPath.length > 1) {
+                canvasCtx.beginPath();
+                canvasCtx.strokeStyle = drawingColor;
+                canvasCtx.lineWidth = drawingLineWidth;
+                canvasCtx.moveTo(currentPath[0].x, currentPath[0].y);
+                for (let i = 1; i < currentPath.length; i++) {
+                    canvasCtx.lineTo(currentPath[i].x, currentPath[i].y);
+                }
+                canvasCtx.stroke();
+            }
+        }
+        
+        // Helper to draw rounded rectangles for on-canvas buttons
+        function drawRoundRect(ctx, x, y, width, height, radius) {
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + width - radius, y);
+            ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+            ctx.lineTo(x + width, y + height - radius);
+            ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+            ctx.lineTo(x + radius, y + height);
+            ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        // --- Main Animation Loop ---
+        function onResults(results) {
+            if (loadingIndicator.style.display !== 'none') {
+                loadingIndicator.style.display = 'none';
+            }
+
+            // Toggle mirror effect based on content type
+            if (uploadedImage) {
+                // Don't mirror for PDF/Image
+                canvasElement.classList.remove('mirrored');
+            } else {
+                // Mirror for the live camera feed
+                canvasElement.classList.add('mirrored');
+            }
+
+            // Set canvas dimensions
+            canvasElement.width = videoElement.videoWidth;
+            canvasElement.height = videoElement.videoHeight;
+
+            canvasCtx.save();
+            canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+
+            // 1. Draw the background (camera feed or uploaded file)
+            if (uploadedImage) {
+                canvasCtx.drawImage(uploadedImage, 0, 0, canvasElement.width, canvasElement.height);
+            } else {
+                canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+            }
+
+            // 2. Draw user-made paths
+            drawPaths();
+            
+            // 3. Handle hand detection and gestures
+            if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+                let handLandmarks = results.multiHandLandmarks[0];
+
+                // If viewing a PDF/image, we need to manually flip the hand coordinates
+                // because the canvas itself is not mirrored, but the camera input is.
+                if (uploadedImage) {
+                    handLandmarks = handLandmarks.map(landmark => {
+                        return { 
+                            ...landmark, 
+                            x: 1 - landmark.x 
+                        };
+                    });
+                }
+
+                handlePdfNavigation(handLandmarks);
+                handleGestures(handLandmarks);
+
+                // Draw hand landmarks for visual feedback
+                window.drawConnectors(canvasCtx, handLandmarks, window.HAND_CONNECTIONS, { color: '#34d399', lineWidth: 5 });
+                const landmarkColor = currentMode === 'erasing' ? '#ef4444' : (currentMode === 'drawing' ? '#ec4899' : '#f87171');
+                window.drawLandmarks(canvasCtx, handLandmarks, { color: landmarkColor, lineWidth: 2 });
+            } else { // Hand not detected
+                if (currentMode === 'drawing') { // Finish any path if hand leaves screen
+                    if (currentPath.length > 1) {
+                        allPaths.push({ points: currentPath, color: drawingColor, width: drawingLineWidth });
+                    }
+                    currentPath = [];
+                }
+                currentMode = 'idle';
+            }
+            
+            canvasCtx.restore();
+        }
+        
+        function handlePdfNavigation(handLandmarks) {
+            if (!pdfDoc) return;
+            
+            const buttonWidth = 120;
+            const buttonHeight = 70;
+            const buttonPadding = 20;
+            const buttonRadius = 15;
+
+            const prevButtonRect = { x: buttonPadding, y: buttonPadding, width: buttonWidth, height: buttonHeight };
+            const nextButtonRect = { x: canvasElement.width - buttonWidth - buttonPadding, y: buttonPadding, width: buttonWidth, height: buttonHeight };
+            
+            const indexTip = handLandmarks[8];
+            const indexTipPos = { x: indexTip.x * canvasElement.width, y: indexTip.y * canvasElement.height };
+            const now = Date.now();
+            let prevButtonHover = false;
+            let nextButtonHover = false;
+
+            // Check for Previous button touch
+            if (now - lastButtonPressTime > BUTTON_PRESS_COOLDOWN &&
+                indexTipPos.x > prevButtonRect.x && indexTipPos.x < prevButtonRect.x + prevButtonRect.width &&
+                indexTipPos.y > prevButtonRect.y && indexTipPos.y < prevButtonRect.y + prevButtonRect.height) {
+                prevButtonHover = true;
+                prevPageButton.click();
+                lastButtonPressTime = now;
+            }
+
+            // Check for Next button touch
+            if (now - lastButtonPressTime > BUTTON_PRESS_COOLDOWN &&
+                indexTipPos.x > nextButtonRect.x && indexTipPos.x < nextButtonRect.x + nextButtonRect.width &&
+                indexTipPos.y > nextButtonRect.y && indexTipPos.y < nextButtonRect.y + nextButtonRect.height) {
+                nextButtonHover = true;
+                nextPageButton.click();
+                lastButtonPressTime = now;
+            }
+            
+            // Draw the buttons
+            canvasCtx.font = 'bold 30px Inter';
+            canvasCtx.textAlign = 'center';
+            canvasCtx.textBaseline = 'middle';
+
+            // Previous Button
+            canvasCtx.fillStyle = prevButtonHover ? 'rgba(96, 165, 250, 0.8)' : 'rgba(96, 165, 250, 0.5)';
+            drawRoundRect(canvasCtx, prevButtonRect.x, prevButtonRect.y, prevButtonRect.width, prevButtonRect.height, buttonRadius);
+            canvasCtx.fillStyle = 'white';
+            canvasCtx.fillText('PREV', prevButtonRect.x + prevButtonRect.width / 2, prevButtonRect.y + prevButtonRect.height / 2);
+            
+            // Next Button
+            canvasCtx.fillStyle = nextButtonHover ? 'rgba(96, 165, 250, 0.8)' : 'rgba(96, 165, 250, 0.5)';
+            drawRoundRect(canvasCtx, nextButtonRect.x, nextButtonRect.y, nextButtonRect.width, nextButtonRect.height, buttonRadius);
+            canvasCtx.fillStyle = 'white';
+            canvasCtx.fillText('NEXT', nextButtonRect.x + nextButtonRect.width / 2, nextButtonRect.y + nextButtonRect.height / 2);
+        }
+
+        function handleGestures(handLandmarks) {
+            const indexTip = handLandmarks[8];
+            const middleTip = handLandmarks[12];
+            const thumbTip = handLandmarks[4];
+            
+            // --- Gesture Recognition Logic ---
+            // Drawing: Index and middle fingertips are very close
+            const drawGestureDistance = Math.hypot(indexTip.x - middleTip.x, indexTip.y - middleTip.y);
+            const isDrawingGesture = drawGestureDistance < 0.04;
+            
+            // Erasing: A closed fist (all fingertips are close to the palm center)
+            const isFist = (
+                Math.hypot(thumbTip.x - handLandmarks[10].x, thumbTip.y - handLandmarks[10].y) < 0.1 &&
+                Math.hypot(indexTip.x - handLandmarks[6].x, indexTip.y - handLandmarks[6].y) < 0.1 &&
+                Math.hypot(handLandmarks[20].x - handLandmarks[14].x, handLandmarks[20].y - handLandmarks[14].y) < 0.1 // Pinky tip to middle knuckle
+            );
+            
+            // --- Action Implementation ---
+            if (isFist) {
+                currentMode = 'erasing';
+                if (currentMode === 'drawing' && currentPath.length > 1) { // Finish path before erasing
+                     allPaths.push({ points: currentPath, color: drawingColor, width: drawingLineWidth });
+                     currentPath = [];
+                }
+
+                const eraserPos = {
+                    x: handLandmarks[9].x * canvasElement.width,
+                    y: handLandmarks[9].y * canvasElement.height
+                };
+                // Draw eraser visual
+                canvasCtx.fillStyle = eraserColor;
+                canvasCtx.beginPath();
+                canvasCtx.arc(eraserPos.x, eraserPos.y, eraserRadius, 0, 2 * Math.PI);
+                canvasCtx.fill();
+                // Filter out points within the eraser radius
+                allPaths = allPaths.filter(path => !path.points.some(point => Math.hypot(point.x - eraserPos.x, point.y - eraserPos.y) < eraserRadius));
+            } else if (isDrawingGesture) {
+                currentMode = 'drawing';
+                const fingerTipPos = { x: indexTip.x * canvasElement.width, y: indexTip.y * canvasElement.height };
+                
+                // Start a new path or add to the current one
+                if (lastMode !== 'drawing') {
+                    currentPath = [fingerTipPos];
+                } else {
+                    currentPath.push(fingerTipPos);
+                }
+            } else { // Idle mode (hand is open, not drawing, not erasing)
+                currentMode = 'idle';
+                // If we were just drawing, finalize the path
+                if (lastMode === 'drawing') {
+                    if (currentPath.length > 1) {
+                        allPaths.push({ points: currentPath, color: drawingColor, width: drawingLineWidth });
+                    }
+                    currentPath = [];
+                }
+                
+                // Draw a cursor at the index fingertip
+                const cursorPosition = { x: indexTip.x * canvasElement.width, y: indexTip.y * canvasElement.height };
+                canvasCtx.fillStyle = cursorColor;
+                canvasCtx.beginPath();
+                canvasCtx.arc(cursorPosition.x, cursorPosition.y, cursorRadius, 0, 2 * Math.PI);
+                canvasCtx.fill();
+            }
+            lastMode = currentMode;
+        }
+
+
+        // --- PDF Rendering ---
+        async function renderPdfPage(num) {
+            if (!pdfDoc || num < 1 || num > totalPages) return;
+            
+            try {
+                const page = await pdfDoc.getPage(num);
+                const viewport = page.getViewport({ scale: 2.0 });
+                const tempCanvas = document.createElement('canvas');
+                const tempCtx = tempCanvas.getContext('2d');
+                tempCanvas.height = viewport.height;
+                tempCanvas.width = viewport.width;
+
+                await page.render({ canvasContext: tempCtx, viewport: viewport }).promise;
+                
+                const img = new Image();
+                img.onload = () => {
+                    uploadedImage = img;
+                    allPaths = []; // Clear drawings for the new page
+                    currentPath = [];
+                };
+                img.src = tempCanvas.toDataURL();
+                pageIndicator.textContent = `Page ${num} of ${totalPages}`;
+                
+                // Update button states
+                prevPageButton.disabled = num <= 1;
+                nextPageButton.disabled = num >= totalPages;
+                prevPageButton.classList.toggle('disabled-button', num <= 1);
+                nextPageButton.classList.toggle('disabled-button', num >= totalPages);
+
+            } catch(error) {
+                console.error("Failed to render PDF page:", error);
+                showNotification("Failed to render PDF page.");
+            }
+        }
+
+        // --- Initialization and Event Listeners ---
+        const hands = new window.Hands({
+            locateFile: (file) => {
+                return `https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4/${file}`;
+            }
+        });
+        hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.7, minTrackingConfidence: 0.7 });
+        hands.onResults(onResults);
+        const camera = new window.Camera(videoElement, { onFrame: async () => { await hands.send({ image: videoElement }); }, width: 1280, height: 720 });
+        camera.start();
+
+        clearButton.addEventListener('click', () => {
+            allPaths = [];
+            currentPath = [];
+            uploadedImage = null; // Also clear the uploaded image background
+            pdfDoc = null;
+            fileUploadInput.value = ''; // Reset file input
+            // Hide PDF controls
+            prevPageButton.classList.add('hidden');
+            nextPageButton.classList.add('hidden');
+            pageIndicator.classList.add('hidden');
+        });
+
+        fileUploadInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            // Reset drawing and PDF state
+            allPaths = [];
+            currentPath = [];
+            pdfDoc = null;
+            uploadedImage = null;
+
+            if (file.type.startsWith('image/')) {
+                // Hide PDF controls
+                prevPageButton.classList.add('hidden');
+                nextPageButton.classList.add('hidden');
+                pageIndicator.classList.add('hidden');
+                
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => { uploadedImage = img; };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            } else if (file.type === 'application/pdf') {
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    try {
+                        const loadingTask = window.pdfjsLib.getDocument({ data: e.target.result });
+                        const pdf = await loadingTask.promise;
+                        pdfDoc = pdf;
+                        totalPages = pdf.numPages;
+                        currentPageNum = 1;
+                        await renderPdfPage(currentPageNum);
+                        // Show PDF controls
+                        prevPageButton.classList.remove('hidden');
+                        nextPageButton.classList.remove('hidden');
+                        pageIndicator.classList.remove('hidden');
+                    } catch (error) {
+                        console.error('Error loading PDF:', error);
+                        showNotification("Could not load the PDF file. It might be corrupted.");
+                    }
+                };
+                reader.readAsArrayBuffer(file);
+            } else {
+                showNotification("Unsupported file type. Please upload an image or PDF.");
+            }
+        });
+
+        nextPageButton.addEventListener('click', () => {
+            if (currentPageNum >= totalPages) return;
+            currentPageNum++;
+            renderPdfPage(currentPageNum);
+        });
+
+        prevPageButton.addEventListener('click', () => {
+            if (currentPageNum <= 1) return;
+            currentPageNum--;
+            renderPdfPage(currentPageNum);
         });
     </script>
 </body>
 </html>
+
+
 
 
 
