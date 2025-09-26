@@ -38,8 +38,7 @@
         #output_canvas {
             width: 100%;
             height: 100%;
-            object-fit: cover;
-            /* transform: scaleX(-1); <-- This is now handled dynamically */
+            object-fit: contain; /* Use contain to see the whole page */
         }
         .mirrored {
             transform: scaleX(-1); /* Mirror effect */
@@ -70,6 +69,17 @@
             opacity: 1;
             visibility: visible;
         }
+        /* Fullscreen style for the container */
+        #container.fullscreen-mode {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            border-radius: 0;
+            z-index: 50;
+            background-color: #111827; /* bg-gray-900 */
+        }
     </style>
 </head>
 <body class="bg-gray-900 text-white flex flex-col items-center justify-center min-h-screen p-4">
@@ -92,6 +102,9 @@
         <div class="mt-4 flex justify-center items-center flex-wrap gap-4">
             <button id="clear-button" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors">
                 Clear All
+            </button>
+            <button id="fullscreen-button" class="hidden bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors">
+                Fullscreen
             </button>
             <input type="file" id="file-upload" class="hidden" accept="image/*,application/pdf">
             <label for="file-upload" class="bg-pink-500 hover:bg-pink-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors cursor-pointer">
@@ -122,6 +135,9 @@
         const nextPageButton = document.getElementById('next-page-button');
         const pageIndicator = document.getElementById('page-indicator');
         const notificationContainer = document.getElementById('notification-container');
+        const fullscreenButton = document.getElementById('fullscreen-button');
+        const container = document.getElementById('container');
+
 
         // --- State Variables ---
         let currentMode = 'idle'; // 'idle', 'drawing', 'erasing'
@@ -132,6 +148,7 @@
         let pdfDoc = null;
         let currentPageNum = 1;
         let totalPages = 0;
+        let isFullscreen = false;
         
         // --- On-Canvas Button Control State ---
         let lastButtonPressTime = 0;
@@ -152,6 +169,35 @@
             setTimeout(() => {
                 notificationContainer.classList.remove('show');
             }, duration);
+        }
+
+        // --- Fullscreen Toggle ---
+        function toggleFullscreen() {
+            isFullscreen = !isFullscreen;
+
+            container.classList.toggle('fullscreen-mode', isFullscreen);
+            
+            // Hide siblings of the container (title, controls, etc.)
+            const siblings = [...container.parentElement.children];
+            siblings.forEach(child => {
+                if (child.id !== 'container') {
+                    child.classList.toggle('hidden', isFullscreen);
+                }
+            });
+
+            if (isFullscreen) {
+                const exitButton = document.createElement('button');
+                exitButton.id = 'exit-fullscreen-btn';
+                exitButton.textContent = 'Exit Fullscreen (Esc)';
+                exitButton.className = 'fixed top-4 right-4 z-[100] bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-md';
+                exitButton.onclick = toggleFullscreen;
+                document.body.appendChild(exitButton);
+            } else {
+                const exitButton = document.getElementById('exit-fullscreen-btn');
+                if (exitButton) {
+                    exitButton.remove();
+                }
+            }
         }
         
         // --- Canvas Drawing Helper Functions ---
@@ -216,8 +262,9 @@
             }
 
             // Set canvas dimensions
-            canvasElement.width = videoElement.videoWidth;
-            canvasElement.height = videoElement.videoHeight;
+            canvasElement.width = isFullscreen ? window.innerWidth : videoElement.videoWidth;
+            canvasElement.height = isFullscreen ? window.innerHeight : videoElement.videoHeight;
+
 
             canvasCtx.save();
             canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
@@ -434,6 +481,10 @@
         camera.start();
 
         clearButton.addEventListener('click', () => {
+            if (isFullscreen) {
+                toggleFullscreen();
+            }
+            fullscreenButton.classList.add('hidden');
             allPaths = [];
             currentPath = [];
             uploadedImage = null; // Also clear the uploaded image background
@@ -448,6 +499,8 @@
         fileUploadInput.addEventListener('change', (event) => {
             const file = event.target.files[0];
             if (!file) return;
+
+            fullscreenButton.classList.remove('hidden');
 
             // Reset drawing and PDF state
             allPaths = [];
@@ -493,6 +546,14 @@
             }
         });
 
+        fullscreenButton.addEventListener('click', toggleFullscreen);
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === "Escape" && isFullscreen) {
+                toggleFullscreen();
+            }
+        });
+
         nextPageButton.addEventListener('click', () => {
             if (currentPageNum >= totalPages) return;
             currentPageNum++;
@@ -507,6 +568,9 @@
     </script>
 </body>
 </html>
+
+
+
 
 
 
