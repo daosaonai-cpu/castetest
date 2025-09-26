@@ -3,236 +3,368 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>C Programming Loops Guide</title>
+    <title>C Programming Crash Course: Input and Output</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" xintegrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
         }
         .code-block {
-            background-color: #1E293B; /* slate-800 */
-            color: #E2E8F0; /* slate-200 */
-            padding: 1rem;
+            background-color: #1e293b;
+            color: #e2e8f0;
             border-radius: 0.5rem;
-            font-family: 'Courier New', Courier, monospace;
+            padding: 1rem;
+            position: relative;
+            overflow-x: auto;
+        }
+        .code-block pre {
             white-space: pre-wrap;
             word-wrap: break-word;
-            font-size: 0.9rem;
-            line-height: 1.5;
         }
-        .code-block .keyword { color: #93C5FD; /* blue-300 */ }
-        .code-block .type { color: #A5B4FC; /* indigo-300 */ }
-        .code-block .comment { color: #64748B; /* slate-500 */ }
-        .code-block .string { color: #A7F3D0; /* emerald-200 */ }
-        .code-block .number { color: #FDBA74; /* orange-300 */ }
-        .code-block .function { color: #F0ABFC; /* fuchsia-300 */ }
-        .card {
-            background-color: white;
-            border-radius: 0.75rem;
-            padding: 2rem;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-            transition: transform 0.2s ease-in-out;
+        .copy-btn {
+            position: absolute;
+            top: 0.5rem;
+            right: 0.5rem;
+            background-color: #334155;
+            color: #94a3b8;
+            border: none;
+            padding: 0.25rem 0.75rem;
+            border-radius: 0.375rem;
+            cursor: pointer;
+            font-size: 0.875rem;
+            transition: background-color 0.2s;
         }
-        .card:hover {
-            transform: translateY(-5px);
+        .copy-btn:hover {
+            background-color: #475569;
+        }
+        .copy-btn-success {
+            background-color: #16a34a;
+            color: white;
+        }
+        .pro-tip {
+            background-color: #e0f2fe;
+            border-left: 4px solid #0ea5e9;
+            padding: 1rem;
+            margin-top: 1rem;
+            border-radius: 0 0.5rem 0.5rem 0;
+        }
+        .warning-tip {
+            background-color: #fef9c3;
+            border-left: 4px solid #facc15;
+            padding: 1rem;
+            margin-top: 1rem;
+            border-radius: 0 0.5rem 0.5rem 0;
         }
     </style>
 </head>
-<body class="bg-slate-100 text-slate-800">
+<body class="bg-slate-50 text-slate-800">
 
-    <div class="container mx-auto p-4 md:p-8">
+    <div class="container mx-auto p-4 md:p-8 max-w-4xl">
+        <!-- Header -->
         <header class="text-center mb-10">
-            <h1 class="text-4xl md:text-5xl font-bold text-slate-900">C Programming Loops & Control Statements</h1>
-            <p class="text-slate-600 mt-2 text-lg">A simple guide with easy-to-understand examples.</p>
-            <div class="mt-6 flex justify-center items-center space-x-4">
-                <button id="download-page-btn" class="inline-flex items-center bg-slate-700 hover:bg-slate-800 text-white font-bold py-2 px-4 rounded-lg transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
-                    </svg>
-                    <span>Download HTML</span>
-                </button>
-                <button id="download-pdf-btn" class="inline-flex items-center bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition-colors">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                    <span>Download as PDF</span>
-                </button>
-            </div>
+            <h1 class="text-4xl md:text-5xl font-bold text-slate-900">C Programming I/O</h1>
+            <p class="text-lg text-slate-600 mt-2">A Crash Course on Managing Input & Output Operators</p>
+            <button id="download-btn" class="mt-6 bg-sky-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50 transition duration-300">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor">
+                  <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                </svg>
+                Download as PDF
+            </button>
         </header>
 
-        <main class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            <!-- For Loop Card -->
-            <div class="card">
-                <h2 class="text-2xl font-semibold mb-4 text-slate-900">For Loop</h2>
-                <p class="mb-4 text-slate-700">The `for` loop is used to execute a block of code a specific number of times. It's great when you know exactly how many times you want to loop.</p>
-                <div class="code-block">
-<pre>
-<span class="comment">// Prints numbers from 1 to 5</span>
-<span class="keyword">#include</span> <span class="string">&lt;stdio.h&gt;</span>
+        <!-- Main Content -->
+        <main class="space-y-12">
 
-<span class="type">int</span> <span class="function">main</span>() {
-    <span class="type">int</span> i;
-    <span class="keyword">for</span> (i = <span class="number">1</span>; i <= <span class="number">5</span>; i++) {
-        <span class="function">printf</span>(<span class="string">"%d\n"</span>, i);
-    }
-    <span class="keyword">return</span> <span class="number">0</span>;
-}
-</pre>
+            <!-- Introduction Section -->
+            <section id="introduction">
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h2 class="text-2xl font-bold text-sky-700 mb-4 border-b pb-2">What is Input/Output in C?</h2>
+                    <p class="mb-4">
+                        In programming, getting data into your program and getting results out are fundamental operations. These are known as Input and Output (I/O). In C, we handle I/O using a set of functions defined in the standard I/O library, which you include in your code with <code class="bg-slate-200 px-2 py-1 rounded-md text-sm font-mono">#include &lt;stdio.h&gt;</code>.
+                    </p>
+                    <ul class="list-disc list-inside space-y-2 text-slate-700">
+                        <li><strong>Input:</strong> Feeding data to your program. This can be from a keyboard, a file, or another device. The standard input stream is called <code class="bg-slate-200 px-2 py-1 rounded-md text-sm font-mono">stdin</code>.</li>
+                        <li><strong>Output:</strong> Displaying data from your program. This can be to the screen, a file, or a printer. The standard output stream is called <code class="bg-slate-200 px-2 py-1 rounded-md text-sm font-mono">stdout</code>.</li>
+                    </ul>
                 </div>
-            </div>
+            </section>
 
-            <!-- While Loop Card -->
-            <div class="card">
-                <h2 class="text-2xl font-semibold mb-4 text-slate-900">While Loop</h2>
-                <p class="mb-4 text-slate-700">The `while` loop executes a block of code as long as a specified condition is true. It checks the condition *before* executing the loop's body.</p>
-                <div class="code-block">
-<pre>
-<span class="comment">// Prints numbers from 1 to 5</span>
-<span class="keyword">#include</span> <span class="string">&lt;stdio.h&gt;</span>
+            <!-- Reading and Writing a Character Section -->
+            <section id="char-io">
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h2 class="text-2xl font-bold text-sky-700 mb-4 border-b pb-2">1. Reading and Writing a Character</h2>
+                    <p class="mb-4">
+                        C provides simple functions specifically for handling single characters. These are great for simple tasks like reading a single menu choice or processing text one character at a time.
+                    </p>
+                    
+                    <h3 class="text-xl font-semibold mt-6 mb-2">Reading a Character: <code class="font-mono">getchar()</code></h3>
+                    <p class="mb-3">
+                        The <code class="bg-slate-200 px-2 py-1 rounded-md text-sm font-mono">getchar()</code> function reads the next available character from the standard input (<code class="font-mono">stdin</code>), which is usually the keyboard. It returns the character read as an integer.
+                    </p>
+                    <div class="code-block">
+<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre><code class="language-c">
+#include &lt;stdio.h&gt;
 
-<span class="type">int</span> <span class="function">main</span>() {
-    <span class="type">int</span> i = <span class="number">1</span>;
-    <span class="keyword">while</span> (i <= <span class="number">5</span>) {
-        <span class="function">printf</span>(<span class="string">"%d\n"</span>, i);
-        i++;
-    }
-    <span class="keyword">return</span> <span class="number">0</span>;
+int main() {
+    int ch; // Use int to hold the return value of getchar()
+
+    printf("Please enter a character: ");
+    
+    // Read a single character from the keyboard
+    ch = getchar(); 
+
+    printf("You entered the character: %c\n", ch);
+
+    return 0;
 }
-</pre>
-                </div>
-            </div>
+</code></pre>
+                    </div>
 
-            <!-- Do-While Loop Card -->
-            <div class="card">
-                <h2 class="text-2xl font-semibold mb-4 text-slate-900">Do-While Loop</h2>
-                <p class="mb-4 text-slate-700">Similar to a `while` loop, but it executes the block of code *at least once* before checking if the condition is true.</p>
-                <div class="code-block">
-<pre>
-<span class="comment">// Prints numbers from 1 to 5</span>
-<span class="keyword">#include</span> <span class="string">&lt;stdio.h&gt;</span>
+                    <h3 class="text-xl font-semibold mt-6 mb-2">Writing a Character: <code class="font-mono">putchar()</code></h3>
+                    <p class="mb-3">
+                        The <code class="bg-slate-200 px-2 py-1 rounded-md text-sm font-mono">putchar()</code> function writes a single character to the standard output (<code class="font-mono">stdout</code>), which is usually the screen.
+                    </p>
+                    <div class="code-block">
+<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre><code class="language-c">
+#include &lt;stdio.h&gt;
 
-<span class="type">int</span> <span class="function">main</span>() {
-    <span class="type">int</span> i = <span class="number">1</span>;
-    <span class="keyword">do</span> {
-        <span class="function">printf</span>(<span class="string">"%d\n"</span>, i);
-        i++;
-    } <span class="keyword">while</span> (i <= <span class="number">5</span>);
-    <span class="keyword">return</span> <span class="number">0</span>;
+int main() {
+    char myChar = 'A';
+
+    printf("The character is: ");
+
+    // Write a single character to the screen
+    putchar(myChar);
+    
+    // putchar can also print a newline
+    putchar('\n'); 
+
+    return 0;
 }
-</pre>
+</code></pre>
+                    </div>
                 </div>
-            </div>
+            </section>
 
-            <!-- Break Statement Card -->
-            <div class="card">
-                <h2 class="text-2xl font-semibold mb-4 text-slate-900">Break Statement</h2>
-                <p class="mb-4 text-slate-700">The `break` statement is used to exit a loop immediately, regardless of the loop's condition. Execution continues at the first statement after the loop.</p>
-                <div class="code-block">
-<pre>
-<span class="comment">// Stops the loop when i is 3</span>
-<span class="keyword">#include</span> <span class="string">&lt;stdio.h&gt;</span>
+            <!-- Formatted Output Section -->
+            <section id="formatted-output">
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h2 class="text-2xl font-bold text-sky-700 mb-4 border-b pb-2">2. Formatted Output: <code class="font-mono">printf()</code></h2>
+                    <p class="mb-4">
+                        While <code class="font-mono">putchar()</code> is good for single characters, you'll usually want to print more complex things like numbers, strings, and formatted text. For this, C gives us the powerful <code class="bg-slate-200 px-2 py-1 rounded-md text-sm font-mono">printf()</code> function.
+                    </p>
+                    <p class="mb-4">
+                        The name <code class="font-mono">printf</code> stands for "print formatted". It allows you to construct a string with placeholders, called <strong class="text-slate-900">format specifiers</strong>, which are replaced by the values of variables you provide.
+                    </p>
+                    
+                    <h3 class="text-xl font-semibold mt-6 mb-2">Syntax</h3>
+                    <p class="mb-3">
+                        <code class="bg-slate-200 px-2 py-1 rounded-md text-sm font-mono">printf("format string", argument1, argument2, ...);</code>
+                    </p>
+                    
+                    <h3 class="text-xl font-semibold mt-6 mb-2">Common Format Specifiers</h3>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse mt-4">
+                            <thead>
+                                <tr class="bg-slate-100">
+                                    <th class="border p-2 font-semibold">Specifier</th>
+                                    <th class="border p-2 font-semibold">Data Type</th>
+                                    <th class="border p-2 font-semibold">Example</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td class="border p-2 font-mono">%d or %i</td>
+                                    <td class="border p-2">Signed Integer</td>
+                                    <td class="border p-2">123, -45</td>
+                                </tr>
+                                <tr>
+                                    <td class="border p-2 font-mono">%f</td>
+                                    <td class="border p-2">Floating-point number (float, double)</td>
+                                    <td class="border p-2">3.14159</td>
+                                </tr>
+                                <tr>
+                                    <td class="border p-2 font-mono">%c</td>
+                                    <td class="border p-2">Single Character</td>
+                                    <td class="border p-2">'a'</td>
+                                </tr>
+                                <tr>
+                                    <td class="border p-2 font-mono">%s</td>
+                                    <td class="border p-2">String (array of characters)</td>
+                                    <td class="border p-2">"Hello World"</td>
+                                </tr>
+                                <tr>
+                                    <td class="border p-2 font-mono">%%</td>
+                                    <td class="border p-2">Literal '%' sign</td>
+                                    <td class="border p-2">Prints a single %</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
 
-<span class="type">int</span> <span class="function">main</span>() {
-    <span class="type">int</span> i;
-    <span class="keyword">for</span> (i = <span class="number">1</span>; i <= <span class="number">5</span>; i++) {
-        <span class="keyword">if</span> (i == <span class="number">3</span>) {
-            <span class="keyword">break</span>; <span class="comment">// Exit loop</span>
-        }
-        <span class="function">printf</span>(<span class="string">"%d\n"</span>, i);
-    }
-    <span class="comment">// Output: 1 2</span>
-    <span class="keyword">return</span> <span class="number">0</span>;
+                    <h3 class="text-xl font-semibold mt-6 mb-2">Example: Using <code class="font-mono">printf()</code></h3>
+                    <div class="code-block">
+<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre><code class="language-c">
+#include &lt;stdio.h&gt;
+
+int main() {
+    int age = 25;
+    float pi = 3.14159;
+    char grade = 'A';
+    char name[] = "Alex";
+
+    // Printing different data types using their format specifiers
+    printf("Hello, my name is %s.\n", name);
+    printf("I am %d years old.\n", age);
+    printf("My favorite letter is %c, and my grade was %c.\n", grade, grade);
+    printf("The value of Pi is approximately %f.\n", pi);
+
+    // You can also format floats to a specific precision
+    printf("Pi to two decimal places is %.2f.\n", pi);
+    
+    printf("I am 100%% sure about this.\n");
+
+    return 0;
 }
-</pre>
+</code></pre>
+                    </div>
                 </div>
-            </div>
+            </section>
             
-            <!-- Continue Statement Card -->
-            <div class="card">
-                <h2 class="text-2xl font-semibold mb-4 text-slate-900">Continue Statement</h2>
-                <p class="mb-4 text-slate-700">The `continue` statement skips the current iteration of a loop and moves to the next one. The loop's condition is re-evaluated.</p>
-                <div class="code-block">
-<pre>
-<span class="comment">// Skips printing 3</span>
-<span class="keyword">#include</span> <span class="string">&lt;stdio.h&gt;</span>
+            <!-- Formatted Input Section -->
+            <section id="formatted-input">
+                <div class="bg-white p-6 rounded-lg shadow-md">
+                    <h2 class="text-2xl font-bold text-sky-700 mb-4 border-b pb-2">3. Formatted Input: <code class="font-mono">scanf()</code></h2>
+                    <p class="mb-4">
+                        Just as <code class="font-mono">printf()</code> handles formatted output, <code class="bg-slate-200 px-2 py-1 rounded-md text-sm font-mono">scanf()</code> handles formatted input. It reads data from the standard input (keyboard) according to the format specifiers you provide and stores the data in variables.
+                    </p>
+                    
+                    <h3 class="text-xl font-semibold mt-6 mb-2">Syntax</h3>
+                    <p class="mb-3">
+                        <code class="bg-slate-200 px-2 py-1 rounded-md text-sm font-mono">scanf("format string", &variable1, &variable2, ...);</code>
+                    </p>
+                    
+                    <div class="warning-tip">
+                        <p class="font-bold mb-2 text-yellow-800">The Ampersand <code class="font-mono text-lg">&</code> is Crucial!</p>
+                        <p class="text-yellow-900">
+                            Notice the <code class="font-mono bg-yellow-200 px-1 rounded">&</code> symbol before each variable name. This is the "address-of" operator. It gives <code class="font-mono">scanf()</code> the memory address of the variable, so it knows <strong class="font-semibold">where</strong> to store the input data. Forgetting the <code class="font-mono">&</code> is one of the most common C programming mistakes and will cause your program to crash! (The only common exception is when reading into a string/character array, as the array name itself points to the first element's address).
+                        </p>
+                    </div>
 
-<span class="type">int</span> <span class="function">main</span>() {
-    <span class="type">int</span> i;
-    <span class="keyword">for</span> (i = <span class="number">1</span>; i <= <span class="number">5</span>; i++) {
-        <span class="keyword">if</span> (i == <span class="number">3</span>) {
-            <span class="keyword">continue</span>; <span class="comment">// Skip this iteration</span>
-        }
-        <span class="function">printf</span>(<span class="string">"%d\n"</span>, i);
-    }
-    <span class="comment">// Output: 1 2 4 5</span>
-    <span class="keyword">return</span> <span class="number">0</span>;
+                    <h3 class="text-xl font-semibold mt-6 mb-2">Example: Using <code class="font-mono">scanf()</code></h3>
+                    <div class="code-block">
+<button class="copy-btn" onclick="copyCode(this)">Copy</button>
+<pre><code class="language-c">
+#include &lt;stdio.h&gt;
+
+int main() {
+    int userAge;
+    float userHeight;
+    char userInitial;
+    char userName[20]; // A character array to store a string
+
+    // Prompt the user for their name and read it
+    printf("Enter your first name: ");
+    scanf("%s", userName); // No '&' needed for character arrays
+
+    // Prompt the user for their age and read it
+    printf("Enter your age: ");
+    scanf("%d", &userAge); // Use '&' to get the address
+
+    // Prompt for height
+    printf("Enter your height in meters (e.g., 1.75): ");
+    scanf("%f", &userHeight);
+
+    // Prompt for initial
+    printf("Enter your middle initial: ");
+    scanf(" %c", &userInitial); // Note the space before %c
+
+    // Display the collected information
+    printf("\n--- User Information ---\n");
+    printf("Name: %s\n", userName);
+    printf("Age: %d\n", userAge);
+    printf("Height: %.2f meters\n", userHeight);
+    printf("Middle Initial: %c\n", userInitial);
+
+    return 0;
 }
-</pre>
+</code></pre>
+                    </div>
+                    
+                    <div class="pro-tip">
+                        <p class="font-bold mb-2 text-sky-800">Pro Tip: The Space Before <code class="font-mono">%c</code></p>
+                        <p class="text-sky-900">
+                            In the example above, we used <code class="font-mono bg-sky-100 px-1 rounded">" %c"</code> (with a leading space) in the <code class="font-mono">scanf</code> for the character. Why? When you type input like "1.75" and press Enter, the newline character (<code class="font-mono">\n</code>) from the Enter key is left in the input buffer. The next <code class="font-mono">scanf("%c", ...)</code> would read that newline character instead of waiting for your input. The leading space in <code class="font-mono">" %c"</code> tells <code class="font-mono">scanf</code> to skip any whitespace (including newlines) before reading the actual character.
+                        </p>
+                    </div>
+
                 </div>
-            </div>
-
-            <!-- Summary Card -->
-            <div class="card md:col-span-2 lg:col-span-1">
-                <h2 class="text-2xl font-semibold mb-4 text-slate-900">Quick Summary</h2>
-                <ul class="list-disc list-inside text-slate-700 space-y-2">
-                    <li><span class="font-semibold">for:</span> Use when you know the number of iterations.</li>
-                    <li><span class="font-semibold">while:</span> Use when the number of iterations is unknown and depends on a condition.</li>
-                    <li><span class="font-semibold">do-while:</span> Use when you need the loop body to execute at least once.</li>
-                    <li><span class="font-semibold">break:</span> To exit a loop early.</li>
-                    <li><span class="font-semibold">continue:</span> To skip the current iteration and proceed to the next.</li>
-                </ul>
-            </div>
+            </section>
         </main>
-        
-        <footer class="text-center mt-12 text-slate-500">
-            <p>Created to make C loops easier to understand.</p>
-        </footer>
 
+        <!-- Footer -->
+        <footer class="text-center mt-12 py-4 border-t">
+            <p class="text-slate-500">Happy Coding!</p>
+        </footer>
     </div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            const downloadPageButton = document.getElementById('download-page-btn');
-            const downloadPdfButton = document.getElementById('download-pdf-btn');
-    
-            downloadPageButton.addEventListener('click', () => {
-                // We get the entire HTML of the page
-                const pageHTML = document.documentElement.outerHTML;
-                downloadFile('c_loops_guide.html', pageHTML, 'text/html');
-            });
-
-            downloadPdfButton.addEventListener('click', () => {
-                const element = document.querySelector('.container');
-                const opt = {
-                    margin:       0.5,
-                    filename:     'c_loops_guide.pdf',
-                    image:        { type: 'jpeg', quality: 0.98 },
-                    html2canvas:  { scale: 2 },
-                    jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
-                };
-                // Use html2pdf library to generate PDF
-                html2pdf().from(element).set(opt).save();
-            });
-    
-            function downloadFile(filename, text, type) {
-                const element = document.createElement('a');
-                element.setAttribute('href', `data:${type};charset=utf-8,` + encodeURIComponent(text));
-                element.setAttribute('download', filename);
-    
-                element.style.display = 'none';
-                document.body.appendChild(element);
-    
-                element.click();
-    
-                document.body.removeChild(element);
+        function copyCode(button) {
+            const codeBlock = button.parentElement;
+            const code = codeBlock.querySelector('code').innerText;
+            
+            // Using document.execCommand as it's more reliable in sandboxed environments
+            const textArea = document.createElement('textarea');
+            textArea.value = code;
+            document.body.appendChild(textArea);
+            textArea.select();
+            try {
+                document.execCommand('copy');
+                button.innerText = 'Copied!';
+                button.classList.add('copy-btn-success');
+                setTimeout(() => {
+                    button.innerText = 'Copy';
+                    button.classList.remove('copy-btn-success');
+                }, 2000);
+            } catch (err) {
+                console.error('Failed to copy text: ', err);
+                button.innerText = 'Error';
             }
-        });
-    </script>
+            document.body.removeChild(textArea);
+        }
 
+        function downloadPDF() {
+            const downloadButton = document.getElementById('download-btn');
+            const content = document.querySelector('.container');
+            
+            // Temporarily hide the button to exclude it from the PDF
+            downloadButton.style.visibility = 'hidden';
+
+            const options = {
+                margin: 0.5,
+                filename: 'C_Programming_IO_Crash_Course.pdf',
+                image: { type: 'jpeg', quality: 0.98 },
+                html2canvas: { scale: 2, useCORS: true },
+                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
+            };
+
+            // Use html2pdf to generate the PDF and then restore the button
+            html2pdf().from(content).set(options).save().then(() => {
+                downloadButton.style.visibility = 'visible';
+            });
+        }
+
+        document.getElementById('download-btn').addEventListener('click', downloadPDF);
+    </script>
 </body>
 </html>
+
+
 
 
 
