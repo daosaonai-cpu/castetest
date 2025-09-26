@@ -1,385 +1,549 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="scroll-smooth">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>C Programming Crash Course: Input and Output</title>
+    <title>Crash Course: Operators & Expressions</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js" xintegrity="sha512-GsLlZN/3F2ErC5ifS5QtgpiJtWd43JWSuIgh7mbzZ8zBps+dvLusV+eNQATqgA/HdeKFVgA5v3S/cIrLF7QnIg==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
         }
-        .code-block {
-            background-color: #1e293b;
-            color: #e2e8f0;
-            border-radius: 0.5rem;
-            padding: 1rem;
-            position: relative;
-            overflow-x: auto;
+        /* Simple scrollbar styling for a more modern look */
+        ::-webkit-scrollbar {
+            width: 8px;
         }
-        .code-block pre {
-            white-space: pre-wrap;
-            word-wrap: break-word;
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #888;
+            border-radius: 10px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #555;
+        }
+        .code-block {
+            position: relative;
         }
         .copy-btn {
             position: absolute;
             top: 0.5rem;
             right: 0.5rem;
-            background-color: #334155;
-            color: #94a3b8;
-            border: none;
-            padding: 0.25rem 0.75rem;
-            border-radius: 0.375rem;
+            background-color: #4a5568;
+            color: white;
+            padding: 0.25rem 0.5rem;
+            border-radius: 0.25rem;
+            font-size: 0.8rem;
             cursor: pointer;
-            font-size: 0.875rem;
-            transition: background-color 0.2s;
+            opacity: 0.8;
+            transition: opacity 0.2s;
         }
         .copy-btn:hover {
-            background-color: #475569;
+            opacity: 1;
         }
-        .copy-btn-success {
-            background-color: #16a34a;
-            color: white;
-        }
-        .pro-tip {
-            background-color: #e0f2fe;
-            border-left: 4px solid #0ea5e9;
-            padding: 1rem;
-            margin-top: 1rem;
-            border-radius: 0 0.5rem 0.5rem 0;
-        }
-        .warning-tip {
-            background-color: #fef9c3;
-            border-left: 4px solid #facc15;
-            padding: 1rem;
-            margin-top: 1rem;
-            border-radius: 0 0.5rem 0.5rem 0;
+        .copy-btn.copied {
+            background-color: #2f855a;
         }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800">
+<body class="bg-gray-50 text-gray-800">
 
-    <div class="container mx-auto p-4 md:p-8 max-w-4xl">
-        <!-- Header -->
-        <header class="text-center mb-10">
-            <h1 class="text-4xl md:text-5xl font-bold text-slate-900">C Programming I/O</h1>
-            <p class="text-lg text-slate-600 mt-2">A Crash Course on Managing Input & Output Operators</p>
-            <button id="download-btn" class="mt-6 bg-sky-600 text-white font-bold py-2 px-4 rounded-lg hover:bg-sky-700 focus:outline-none focus:ring-2 focus:ring-sky-500 focus:ring-opacity-50 transition duration-300">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 inline-block mr-2" viewBox="0 0 20 20" fill="currentColor">
-                  <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
-                </svg>
-                Download as PDF
-            </button>
-        </header>
+    <div class="flex flex-col md:flex-row">
+        <!-- Sidebar Navigation -->
+        <aside class="w-full md:w-64 bg-gray-800 text-white p-4 md:h-screen md:sticky top-0">
+            <h2 class="text-xl font-bold mb-4">Topics</h2>
+            <div class="mb-4">
+                <button id="download-pdf" class="w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors duration-200 flex items-center justify-center space-x-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd" d="M3 17a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm3.293-7.707a1 1 0 011.414 0L9 10.586V3a1 1 0 112 0v7.586l1.293-1.293a1 1 0 111.414 1.414l-3 3a1 1 0 01-1.414 0l-3-3a1 1 0 010-1.414z" clip-rule="evenodd" />
+                    </svg>
+                    <span>Download PDF</span>
+                </button>
+            </div>
+            <nav>
+                <ul class="space-y-2">
+                    <li><a href="#intro" class="block py-2 px-3 rounded hover:bg-gray-700">Introduction</a></li>
+                    <li><a href="#arithmetic" class="block py-2 px-3 rounded hover:bg-gray-700">Arithmetic Operators</a></li>
+                    <li><a href="#relational" class="block py-2 px-3 rounded hover:bg-gray-700">Relational Operators</a></li>
+                    <li><a href="#logical" class="block py-2 px-3 rounded hover:bg-gray-700">Logical Operators</a></li>
+                    <li><a href="#assignment" class="block py-2 px-3 rounded hover:bg-gray-700">Assignment Operators</a></li>
+                    <li><a href="#increment-decrement" class="block py-2 px-3 rounded hover:bg-gray-700">Increment/Decrement</a></li>
+                    <li><a href="#conditional" class="block py-2 px-3 rounded hover:bg-gray-700">Conditional Operator</a></li>
+                    <li><a href="#bitwise" class="block py-2 px-3 rounded hover:bg-gray-700">Bitwise Operators</a></li>
+                    <li><a href="#special" class="block py-2 px-3 rounded hover:bg-gray-700">Special Operators</a></li>
+                    <li><a href="#precedence" class="block py-2 px-3 rounded hover:bg-gray-700">Precedence & Associativity</a></li>
+                </ul>
+            </nav>
+        </aside>
 
         <!-- Main Content -->
-        <main class="space-y-12">
+        <main class="flex-1 p-6 md:p-10">
+            <header class="mb-10">
+                <h1 class="text-4xl font-bold text-gray-900">Crash Course: Operators and Expressions</h1>
+                <p class="mt-2 text-lg text-gray-600">Your complete guide to understanding operators in programming (using C-like syntax).</p>
+            </header>
+            
+            <!-- Sections will be injected here -->
+            <div class="space-y-12">
+                
+                <!-- Introduction -->
+                <section id="intro" class="bg-white p-6 rounded-lg shadow-md">
+                    <h2 class="text-2xl font-semibold mb-4 border-l-4 border-blue-500 pl-4">Introduction to Operators & Expressions</h2>
+                    <p class="mb-4">In programming, an <strong>operator</strong> is a symbol that tells the compiler to perform a specific mathematical or logical manipulation. Think of them as the action words of programming.</p>
+                    <p>An <strong>expression</strong> is a combination of variables, constants, and operators that represents a single value. For example, <code>5 + 10</code> is an expression whose value is 15.</p>
+                </section>
 
-            <!-- Introduction Section -->
-            <section id="introduction">
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h2 class="text-2xl font-bold text-sky-700 mb-4 border-b pb-2">What is Input/Output in C?</h2>
-                    <p class="mb-4">
-                        In programming, getting data into your program and getting results out are fundamental operations. These are known as Input and Output (I/O). In C, we handle I/O using a set of functions defined in the standard I/O library, which you include in your code with <code class="bg-slate-200 px-2 py-1 rounded-md text-sm font-mono">#include &lt;stdio.h&gt;</code>.
-                    </p>
-                    <ul class="list-disc list-inside space-y-2 text-slate-700">
-                        <li><strong>Input:</strong> Feeding data to your program. This can be from a keyboard, a file, or another device. The standard input stream is called <code class="bg-slate-200 px-2 py-1 rounded-md text-sm font-mono">stdin</code>.</li>
-                        <li><strong>Output:</strong> Displaying data from your program. This can be to the screen, a file, or a printer. The standard output stream is called <code class="bg-slate-200 px-2 py-1 rounded-md text-sm font-mono">stdout</code>.</li>
-                    </ul>
-                </div>
-            </section>
-
-            <!-- Reading and Writing a Character Section -->
-            <section id="char-io">
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h2 class="text-2xl font-bold text-sky-700 mb-4 border-b pb-2">1. Reading and Writing a Character</h2>
-                    <p class="mb-4">
-                        C provides simple functions specifically for handling single characters. These are great for simple tasks like reading a single menu choice or processing text one character at a time.
-                    </p>
-                    
-                    <h3 class="text-xl font-semibold mt-6 mb-2">Reading a Character: <code class="font-mono">getchar()</code></h3>
-                    <p class="mb-3">
-                        The <code class="bg-slate-200 px-2 py-1 rounded-md text-sm font-mono">getchar()</code> function reads the next available character from the standard input (<code class="font-mono">stdin</code>), which is usually the keyboard. It returns the character read as an integer.
-                    </p>
-                    <div class="code-block">
-<button class="copy-btn" onclick="copyCode(this)">Copy</button>
-<pre><code class="language-c">
-#include &lt;stdio.h&gt;
-
-int main() {
-    int ch; // Use int to hold the return value of getchar()
-
-    printf("Please enter a character: ");
-    
-    // Read a single character from the keyboard
-    ch = getchar(); 
-
-    printf("You entered the character: %c\n", ch);
-
-    return 0;
-}
-</code></pre>
-                    </div>
-
-                    <h3 class="text-xl font-semibold mt-6 mb-2">Writing a Character: <code class="font-mono">putchar()</code></h3>
-                    <p class="mb-3">
-                        The <code class="bg-slate-200 px-2 py-1 rounded-md text-sm font-mono">putchar()</code> function writes a single character to the standard output (<code class="font-mono">stdout</code>), which is usually the screen.
-                    </p>
-                    <div class="code-block">
-<button class="copy-btn" onclick="copyCode(this)">Copy</button>
-<pre><code class="language-c">
-#include &lt;stdio.h&gt;
-
-int main() {
-    char myChar = 'A';
-
-    printf("The character is: ");
-
-    // Write a single character to the screen
-    putchar(myChar);
-    
-    // putchar can also print a newline
-    putchar('\n'); 
-
-    return 0;
-}
-</code></pre>
-                    </div>
-                </div>
-            </section>
-
-            <!-- Formatted Output Section -->
-            <section id="formatted-output">
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h2 class="text-2xl font-bold text-sky-700 mb-4 border-b pb-2">2. Formatted Output: <code class="font-mono">printf()</code></h2>
-                    <p class="mb-4">
-                        While <code class="font-mono">putchar()</code> is good for single characters, you'll usually want to print more complex things like numbers, strings, and formatted text. For this, C gives us the powerful <code class="bg-slate-200 px-2 py-1 rounded-md text-sm font-mono">printf()</code> function.
-                    </p>
-                    <p class="mb-4">
-                        The name <code class="font-mono">printf</code> stands for "print formatted". It allows you to construct a string with placeholders, called <strong class="text-slate-900">format specifiers</strong>, which are replaced by the values of variables you provide.
-                    </p>
-                    
-                    <h3 class="text-xl font-semibold mt-6 mb-2">Syntax</h3>
-                    <p class="mb-3">
-                        <code class="bg-slate-200 px-2 py-1 rounded-md text-sm font-mono">printf("format string", argument1, argument2, ...);</code>
-                    </p>
-                    
-                    <h3 class="text-xl font-semibold mt-6 mb-2">Common Format Specifiers</h3>
+                <!-- Arithmetic Operators -->
+                <section id="arithmetic" class="bg-white p-6 rounded-lg shadow-md">
+                    <h2 class="text-2xl font-semibold mb-4 border-l-4 border-blue-500 pl-4">Arithmetic Operators</h2>
+                    <p class="mb-4">These are used to perform common mathematical calculations.</p>
                     <div class="overflow-x-auto">
-                        <table class="w-full text-left border-collapse mt-4">
-                            <thead>
-                                <tr class="bg-slate-100">
-                                    <th class="border p-2 font-semibold">Specifier</th>
-                                    <th class="border p-2 font-semibold">Data Type</th>
-                                    <th class="border p-2 font-semibold">Example</th>
+                        <table class="w-full text-left border-collapse">
+                            <thead class="bg-gray-100">
+                                <tr>
+                                    <th class="p-3 font-semibold">Operator</th>
+                                    <th class="p-3 font-semibold">Name</th>
+                                    <th class="p-3 font-semibold">Example</th>
+                                    <th class="p-3 font-semibold">Result</th>
                                 </tr>
                             </thead>
                             <tbody>
-                                <tr>
-                                    <td class="border p-2 font-mono">%d or %i</td>
-                                    <td class="border p-2">Signed Integer</td>
-                                    <td class="border p-2">123, -45</td>
+                                <tr class="border-b">
+                                    <td class="p-3 font-mono">+</td>
+                                    <td class="p-3">Addition</td>
+                                    <td class="p-3 font-mono">10 + 5</td>
+                                    <td class="p-3 font-mono">15</td>
+                                </tr>
+                                <tr class="border-b">
+                                    <td class="p-3 font-mono">-</td>
+                                    <td class="p-3">Subtraction</td>
+                                    <td class="p-3 font-mono">10 - 5</td>
+                                    <td class="p-3 font-mono">5</td>
+                                </tr>
+                                <tr class="border-b">
+                                    <td class="p-3 font-mono">*</td>
+                                    <td class="p-3">Multiplication</td>
+                                    <td class="p-3 font-mono">10 * 5</td>
+                                    <td class="p-3 font-mono">50</td>
+                                </tr>
+                                <tr class="border-b">
+                                    <td class="p-3 font-mono">/</td>
+                                    <td class="p-3">Division</td>
+                                    <td class="p-3 font-mono">10 / 5</td>
+                                    <td class="p-3 font-mono">2</td>
                                 </tr>
                                 <tr>
-                                    <td class="border p-2 font-mono">%f</td>
-                                    <td class="border p-2">Floating-point number (float, double)</td>
-                                    <td class="border p-2">3.14159</td>
-                                </tr>
-                                <tr>
-                                    <td class="border p-2 font-mono">%c</td>
-                                    <td class="border p-2">Single Character</td>
-                                    <td class="border p-2">'a'</td>
-                                </tr>
-                                <tr>
-                                    <td class="border p-2 font-mono">%s</td>
-                                    <td class="border p-2">String (array of characters)</td>
-                                    <td class="border p-2">"Hello World"</td>
-                                </tr>
-                                <tr>
-                                    <td class="border p-2 font-mono">%%</td>
-                                    <td class="border p-2">Literal '%' sign</td>
-                                    <td class="border p-2">Prints a single %</td>
+                                    <td class="p-3 font-mono">%</td>
+                                    <td class="p-3">Modulus (Remainder)</td>
+                                    <td class="p-3 font-mono">10 % 3</td>
+                                    <td class="p-3 font-mono">1</td>
                                 </tr>
                             </tbody>
                         </table>
                     </div>
+                    <div class="code-block mt-4">
+                        <button class="copy-btn">Copy</button>
+                        <pre class="bg-gray-800 text-white p-4 rounded-md overflow-x-auto"><code class="language-c">int a = 10;
+int b = 3;
 
-                    <h3 class="text-xl font-semibold mt-6 mb-2">Example: Using <code class="font-mono">printf()</code></h3>
-                    <div class="code-block">
-<button class="copy-btn" onclick="copyCode(this)">Copy</button>
-<pre><code class="language-c">
-#include &lt;stdio.h&gt;
+printf("Sum: %d\n", a + b);       // Output: 13
+printf("Difference: %d\n", a - b); // Output: 7
+printf("Product: %d\n", a * b);    // Output: 30
+printf("Quotient: %d\n", a / b);   // Output: 3 (integer division)
+printf("Remainder: %d\n", a % b);  // Output: 1</code></pre>
+                    </div>
+                </section>
 
-int main() {
-    int age = 25;
-    float pi = 3.14159;
-    char grade = 'A';
-    char name[] = "Alex";
+                <!-- Relational Operators -->
+                <section id="relational" class="bg-white p-6 rounded-lg shadow-md">
+                    <h2 class="text-2xl font-semibold mb-4 border-l-4 border-blue-500 pl-4">Relational Operators</h2>
+                    <p class="mb-4">These operators compare two values and return a boolean result: true (1) or false (0).</p>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead class="bg-gray-100">
+                                <tr>
+                                    <th class="p-3 font-semibold">Operator</th>
+                                    <th class="p-3 font-semibold">Name</th>
+                                    <th class="p-3 font-semibold">Example (a=5, b=10)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b"><td class="p-3 font-mono">==</td><td class="p-3">Equal to</td><td class="p-3 font-mono">a == b is false (0)</td></tr>
+                                <tr class="border-b"><td class="p-3 font-mono">!=</td><td class="p-3">Not equal to</td><td class="p-3 font-mono">a != b is true (1)</td></tr>
+                                <tr class="border-b"><td class="p-3 font-mono">></td><td class="p-3">Greater than</td><td class="p-3 font-mono">a > b is false (0)</td></tr>
+                                <tr class="border-b"><td class="p-3 font-mono"><</td><td class="p-3">Less than</td><td class="p-3 font-mono">a < b is true (1)</td></tr>
+                                <tr class="border-b"><td class="p-3 font-mono">>=</td><td class="p-3">Greater than or equal to</td><td class="p-3 font-mono">a >= b is false (0)</td></tr>
+                                <tr><td class="p-3 font-mono"><=</td><td class="p-3">Less than or equal to</td><td class="p-3 font-mono">a <= b is true (1)</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="code-block mt-4">
+                        <button class="copy-btn">Copy</button>
+                        <pre class="bg-gray-800 text-white p-4 rounded-md overflow-x-auto"><code class="language-c">int age = 20;
 
-    // Printing different data types using their format specifiers
-    printf("Hello, my name is %s.\n", name);
-    printf("I am %d years old.\n", age);
-    printf("My favorite letter is %c, and my grade was %c.\n", grade, grade);
-    printf("The value of Pi is approximately %f.\n", pi);
+if (age >= 18) {
+    printf("You are eligible to vote.\n");
+} else {
+    printf("You are not eligible to vote.\n");
+}</code></pre>
+                    </div>
+                </section>
 
-    // You can also format floats to a specific precision
-    printf("Pi to two decimal places is %.2f.\n", pi);
-    
-    printf("I am 100%% sure about this.\n");
+                <!-- Logical Operators -->
+                <section id="logical" class="bg-white p-6 rounded-lg shadow-md">
+                    <h2 class="text-2xl font-semibold mb-4 border-l-4 border-blue-500 pl-4">Logical Operators</h2>
+                    <p class="mb-4">Used to combine two or more conditions/constraints.</p>
+                     <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead class="bg-gray-100">
+                                <tr>
+                                    <th class="p-3 font-semibold">Operator</th>
+                                    <th class="p-3 font-semibold">Name</th>
+                                    <th class="p-3 font-semibold">Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b"><td class="p-3 font-mono">&&</td><td class="p-3">Logical AND</td><td class="p-3">True only if ALL conditions are true.</td></tr>
+                                <tr class="border-b"><td class="p-3 font-mono">||</td><td class="p-3">Logical OR</td><td class="p-3">True if AT LEAST ONE condition is true.</td></tr>
+                                <tr><td class="p-3 font-mono">!</td><td class="p-3">Logical NOT</td><td class="p-3">Reverses the state (true becomes false, false becomes true).</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="code-block mt-4">
+                        <button class="copy-btn">Copy</button>
+                        <pre class="bg-gray-800 text-white p-4 rounded-md overflow-x-auto"><code class="language-c">int hasLicense = 1; // 1 for true
+int hasCar = 0;     // 0 for false
 
-    return 0;
+// AND example
+if (hasLicense && hasCar) {
+    printf("You can drive.\n");
 }
-</code></pre>
-                    </div>
-                </div>
-            </section>
-            
-            <!-- Formatted Input Section -->
-            <section id="formatted-input">
-                <div class="bg-white p-6 rounded-lg shadow-md">
-                    <h2 class="text-2xl font-bold text-sky-700 mb-4 border-b pb-2">3. Formatted Input: <code class="font-mono">scanf()</code></h2>
-                    <p class="mb-4">
-                        Just as <code class="font-mono">printf()</code> handles formatted output, <code class="bg-slate-200 px-2 py-1 rounded-md text-sm font-mono">scanf()</code> handles formatted input. It reads data from the standard input (keyboard) according to the format specifiers you provide and stores the data in variables.
-                    </p>
-                    
-                    <h3 class="text-xl font-semibold mt-6 mb-2">Syntax</h3>
-                    <p class="mb-3">
-                        <code class="bg-slate-200 px-2 py-1 rounded-md text-sm font-mono">scanf("format string", &variable1, &variable2, ...);</code>
-                    </p>
-                    
-                    <div class="warning-tip">
-                        <p class="font-bold mb-2 text-yellow-800">The Ampersand <code class="font-mono text-lg">&</code> is Crucial!</p>
-                        <p class="text-yellow-900">
-                            Notice the <code class="font-mono bg-yellow-200 px-1 rounded">&</code> symbol before each variable name. This is the "address-of" operator. It gives <code class="font-mono">scanf()</code> the memory address of the variable, so it knows <strong class="font-semibold">where</strong> to store the input data. Forgetting the <code class="font-mono">&</code> is one of the most common C programming mistakes and will cause your program to crash! (The only common exception is when reading into a string/character array, as the array name itself points to the first element's address).
-                        </p>
-                    </div>
 
-                    <h3 class="text-xl font-semibold mt-6 mb-2">Example: Using <code class="font-mono">scanf()</code></h3>
-                    <div class="code-block">
-<button class="copy-btn" onclick="copyCode(this)">Copy</button>
-<pre><code class="language-c">
-#include &lt;stdio.h&gt;
-
-int main() {
-    int userAge;
-    float userHeight;
-    char userInitial;
-    char userName[20]; // A character array to store a string
-
-    // Prompt the user for their name and read it
-    printf("Enter your first name: ");
-    scanf("%s", userName); // No '&' needed for character arrays
-
-    // Prompt the user for their age and read it
-    printf("Enter your age: ");
-    scanf("%d", &userAge); // Use '&' to get the address
-
-    // Prompt for height
-    printf("Enter your height in meters (e.g., 1.75): ");
-    scanf("%f", &userHeight);
-
-    // Prompt for initial
-    printf("Enter your middle initial: ");
-    scanf(" %c", &userInitial); // Note the space before %c
-
-    // Display the collected information
-    printf("\n--- User Information ---\n");
-    printf("Name: %s\n", userName);
-    printf("Age: %d\n", userAge);
-    printf("Height: %.2f meters\n", userHeight);
-    printf("Middle Initial: %c\n", userInitial);
-
-    return 0;
+// OR example
+if (hasLicense || hasCar) {
+    printf("You have either a license or a car (or both).\n");
 }
-</code></pre>
-                    </div>
-                    
-                    <div class="pro-tip">
-                        <p class="font-bold mb-2 text-sky-800">Pro Tip: The Space Before <code class="font-mono">%c</code></p>
-                        <p class="text-sky-900">
-                            In the example above, we used <code class="font-mono bg-sky-100 px-1 rounded">" %c"</code> (with a leading space) in the <code class="font-mono">scanf</code> for the character. Why? When you type input like "1.75" and press Enter, the newline character (<code class="font-mono">\n</code>) from the Enter key is left in the input buffer. The next <code class="font-mono">scanf("%c", ...)</code> would read that newline character instead of waiting for your input. The leading space in <code class="font-mono">" %c"</code> tells <code class="font-mono">scanf</code> to skip any whitespace (including newlines) before reading the actual character.
-                        </p>
-                    </div>
 
-                </div>
-            </section>
+// NOT example
+if (!hasCar) {
+    printf("You do not have a car.\n");
+}</code></pre>
+                    </div>
+                </section>
+
+                <!-- Assignment Operators -->
+                 <section id="assignment" class="bg-white p-6 rounded-lg shadow-md">
+                    <h2 class="text-2xl font-semibold mb-4 border-l-4 border-blue-500 pl-4">Assignment Operators</h2>
+                    <p class="mb-4">Used to assign values to variables. The basic operator is <code>=</code>, but there are shorthand versions.</p>
+                     <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead class="bg-gray-100">
+                                <tr><th class="p-3 font-semibold">Operator</th><th class="p-3 font-semibold">Example</th><th class="p-3 font-semibold">Equivalent to</th></tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b"><td class="p-3 font-mono">=</td><td class="p-3 font-mono">c = 10</td><td class="p-3 font-mono">c = 10</td></tr>
+                                <tr class="border-b"><td class="p-3 font-mono">+=</td><td class="p-3 font-mono">c += 5</td><td class="p-3 font-mono">c = c + 5</td></tr>
+                                <tr class="border-b"><td class="p-3 font-mono">-=</td><td class="p-3 font-mono">c -= 5</td><td class="p-3 font-mono">c = c - 5</td></tr>
+                                <tr class="border-b"><td class="p-3 font-mono">*=</td><td class="p-3 font-mono">c *= 5</td><td class="p-3 font-mono">c = c * 5</td></tr>
+                                <tr class="border-b"><td class="p-3 font-mono">/=</td><td class="p-3 font-mono">c /= 5</td><td class="p-3 font-mono">c = c / 5</td></tr>
+                                <tr><td class="p-3 font-mono">%=</td><td class="p-3 font-mono">c %= 3</td><td class="p-3 font-mono">c = c % 3</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                     <div class="code-block mt-4">
+                        <button class="copy-btn">Copy</button>
+                        <pre class="bg-gray-800 text-white p-4 rounded-md overflow-x-auto"><code class="language-c">int score = 100;
+score += 50; // score is now 150
+score -= 25; // score is now 125
+printf("Final score: %d\n", score);</code></pre>
+                    </div>
+                </section>
+
+                <!-- Increment and Decrement Operators -->
+                <section id="increment-decrement" class="bg-white p-6 rounded-lg shadow-md">
+                    <h2 class="text-2xl font-semibold mb-4 border-l-4 border-blue-500 pl-4">Increment & Decrement Operators</h2>
+                    <p class="mb-4">Used to increase (<code>++</code>) or decrease (<code>--</code>) a variable's value by one. They have two forms: prefix and postfix.</p>
+                    <ul class="list-disc list-inside space-y-2 mb-4">
+                        <li><strong>Prefix (++var):</strong> Increments the value <span class="font-bold">before</span> using it in the expression.</li>
+                        <li><strong>Postfix (var++):</strong> Increments the value <span class="font-bold">after</span> using its original value in the expression.</li>
+                    </ul>
+                     <div class="code-block mt-4">
+                        <button class="copy-btn">Copy</button>
+                        <pre class="bg-gray-800 text-white p-4 rounded-md overflow-x-auto"><code class="language-c">int a = 5;
+int b;
+
+// Postfix example
+b = a++; // b gets the original value of a (5), then a becomes 6
+printf("a = %d, b = %d\n", a, b); // Output: a = 6, b = 5
+
+int x = 5;
+int y;
+
+// Prefix example
+y = ++x; // x becomes 6, then y gets the new value of x (6)
+printf("x = %d, y = %d\n", x, y); // Output: x = 6, y = 6</code></pre>
+                    </div>
+                </section>
+
+                <!-- Conditional Operator -->
+                <section id="conditional" class="bg-white p-6 rounded-lg shadow-md">
+                    <h2 class="text-2xl font-semibold mb-4 border-l-4 border-blue-500 pl-4">Conditional (Ternary) Operator</h2>
+                    <p class="mb-4">A shorthand for an if-else statement. It takes three operands.</p>
+                    <div class="bg-gray-100 p-4 rounded-md font-mono text-center">
+                        condition ? value_if_true : value_if_false
+                    </div>
+                    <div class="code-block mt-4">
+                        <button class="copy-btn">Copy</button>
+                        <pre class="bg-gray-800 text-white p-4 rounded-md overflow-x-auto"><code class="language-c">int score = 85;
+char* result;
+
+// Using if-else
+if (score > 60) {
+    result = "Pass";
+} else {
+    result = "Fail";
+}
+printf("Result: %s\n", result);
+
+// Using conditional operator
+char* result_ternary = (score > 60) ? "Pass" : "Fail";
+printf("Result (Ternary): %s\n", result_ternary);</code></pre>
+                    </div>
+                </section>
+
+                <!-- Bitwise Operators -->
+                 <section id="bitwise" class="bg-white p-6 rounded-lg shadow-md">
+                    <h2 class="text-2xl font-semibold mb-4 border-l-4 border-blue-500 pl-4">Bitwise Operators</h2>
+                    <p class="mb-4">These operators perform operations on individual bits (0s and 1s) of integer types. They are used in low-level programming.</p>
+                     <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead class="bg-gray-100">
+                                <tr>
+                                    <th class="p-3 font-semibold">Operator</th>
+                                    <th class="p-3 font-semibold">Name</th>
+                                    <th class="p-3 font-semibold">Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b"><td class="p-3 font-mono">&</td><td class="p-3">Bitwise AND</td><td class="p-3">Sets bit to 1 if both bits are 1.</td></tr>
+                                <tr class="border-b"><td class="p-3 font-mono">|</td><td class="p-3">Bitwise OR</td><td class="p-3">Sets bit to 1 if at least one bit is 1.</td></tr>
+                                <tr class="border-b"><td class="p-3 font-mono">^</td><td class="p-3">Bitwise XOR</td><td class="p-3">Sets bit to 1 if the bits are different.</td></tr>
+                                <tr class="border-b"><td class="p-3 font-mono">~</td><td class="p-3">Bitwise NOT (Complement)</td><td class="p-3">Flips all the bits.</td></tr>
+                                <tr class="border-b"><td class="p-3 font-mono"><<</td><td class="p-3">Left Shift</td><td class="p-3">Shifts bits to the left, fills with 0s.</td></tr>
+                                <tr><td class="p-3 font-mono">>></td><td class="p-3">Right Shift</td><td class="p-3">Shifts bits to the right.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                     <div class="code-block mt-4">
+                        <button class="copy-btn">Copy</button>
+                        <pre class="bg-gray-800 text-white p-4 rounded-md overflow-x-auto"><code class="language-c">unsigned int a = 60; // 0011 1100
+unsigned int b = 13; // 0000 1101
+int result = 0;
+
+result = a & b;      // 12 -> 0000 1100
+result = a | b;      // 61 -> 0011 1101
+result = a ^ b;      // 49 -> 0011 0001
+result = ~a;         // -61 -> 1100 0011 (in 2's complement)
+result = a << 2;     // 240 -> 1111 0000
+result = a >> 2;     // 15  -> 0000 1111</code></pre>
+                    </div>
+                </section>
+
+                <!-- Special Operators -->
+                <section id="special" class="bg-white p-6 rounded-lg shadow-md">
+                    <h2 class="text-2xl font-semibold mb-4 border-l-4 border-blue-500 pl-4">Special Operators</h2>
+                    <p class="mb-4">These operators have unique functions.</p>
+                     <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead class="bg-gray-100">
+                                <tr>
+                                    <th class="p-3 font-semibold">Operator</th>
+                                    <th class="p-3 font-semibold">Name</th>
+                                    <th class="p-3 font-semibold">Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b"><td class="p-3 font-mono">sizeof()</td><td class="p-3">Sizeof</td><td class="p-3">Returns the size (in bytes) of a variable or data type.</td></tr>
+                                <tr class="border-b"><td class="p-3 font-mono">&</td><td class="p-3">Address-of</td><td class="p-3">Returns the memory address of a variable.</td></tr>
+                                <tr class="border-b"><td class="p-3 font-mono">*</td><td class="p-3">Pointer (Dereference)</td><td class="p-3">Accesses the value stored at a memory address.</td></tr>
+                                 <tr><td class="p-3 font-mono">,</td><td class="p-3">Comma</td><td class="p-3">Used to separate multiple expressions. The value of the whole expression is the value of the rightmost expression.</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <div class="code-block mt-4">
+                        <button class="copy-btn">Copy</button>
+                        <pre class="bg-gray-800 text-white p-4 rounded-md overflow-x-auto"><code class="language-c">int num = 10;
+printf("Size of int: %zu bytes\n", sizeof(int));
+printf("Address of num: %p\n", &num);
+
+int* ptr = &num;
+printf("Value at address: %d\n", *ptr);
+
+int x = (5, 10, 15); // x will be 15
+printf("Value of x: %d\n", x);</code></pre>
+                    </div>
+                </section>
+                
+                <!-- Precedence and Associativity -->
+                <section id="precedence" class="bg-white p-6 rounded-lg shadow-md">
+                    <h2 class="text-2xl font-semibold mb-4 border-l-4 border-blue-500 pl-4">Operator Precedence & Associativity</h2>
+                    <p class="mb-4"><strong>Precedence</strong> determines which operator is performed first in an expression with multiple operators. For example, multiplication has higher precedence than addition.</p>
+                    <p class="mb-4"><strong>Associativity</strong> determines the order in which operators with the same precedence are evaluated. It can be Left-to-Right or Right-to-Left.</p>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead class="bg-gray-100">
+                                <tr>
+                                    <th class="p-3 font-semibold">Precedence</th>
+                                    <th class="p-3 font-semibold">Operators</th>
+                                    <th class="p-3 font-semibold">Associativity</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr class="border-b"><td class="p-3">Highest</td><td class="p-3 font-mono">() [] -> . ++ -- (postfix)</td><td class="p-3">Left-to-right</td></tr>
+                                <tr class="border-b"><td class="p-3">...</td><td class="p-3 font-mono">++ -- (prefix) ! ~ * & sizeof</td><td class="p-3">Right-to-left</td></tr>
+                                <tr class="border-b"><td class="p-3">...</td><td class="p-3 font-mono">* / %</td><td class="p-3">Left-to-right</td></tr>
+                                <tr class="border-b"><td class="p-3">...</td><td class="p-3 font-mono">+ -</td><td class="p-3">Left-to-right</td></tr>
+                                <tr class="border-b"><td class="p-3">...</td><td class="p-3 font-mono"><< >></td><td class="p-3">Left-to-right</td></tr>
+                                <tr class="border-b"><td class="p-3">...</td><td class="p-3 font-mono">< <= > >=</td><td class="p-3">Left-to-right</td></tr>
+                                <tr class="border-b"><td class="p-3">...</td><td class="p-3 font-mono">== !=</td><td class="p-3">Left-to-right</td></tr>
+                                <tr class="border-b"><td class="p-3">...</td><td class="p-3 font-mono">& ^ | && ||</td><td class="p-3">Left-to-right</td></tr>
+                                <tr class="border-b"><td class="p-3">...</td><td class="p-3 font-mono">?:</td><td class="p-3">Right-to-left</td></tr>
+                                <tr class="border-b"><td class="p-3">...</td><td class="p-3 font-mono">= += -= *= /= %=</td><td class="p-3">Right-to-left</td></tr>
+                                <tr><td class="p-3">Lowest</td><td class="p-3 font-mono">,</td><td class="p-3">Left-to-right</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                     <div class="code-block mt-4">
+                        <button class="copy-btn">Copy</button>
+                        <pre class="bg-gray-800 text-white p-4 rounded-md overflow-x-auto"><code class="language-c">// Precedence example
+int result = 5 + 2 * 3; // 2 * 3 is done first (11)
+printf("Result: %d\n", result);
+
+// Associativity example
+int a = 10, b = 5, c = 2;
+result = a / b * c; // a / b is done first, then * c (4)
+printf("Result: %d\n", result);
+
+// Use parentheses to override precedence
+result = (5 + 2) * 3; // 5 + 2 is done first (21)
+printf("Result: %d\n", result);</code></pre>
+                    </div>
+                </section>
+
+            </div>
         </main>
-
-        <!-- Footer -->
-        <footer class="text-center mt-12 py-4 border-t">
-            <p class="text-slate-500">Happy Coding!</p>
-        </footer>
     </div>
 
     <script>
-        function copyCode(button) {
-            const codeBlock = button.parentElement;
-            const code = codeBlock.querySelector('code').innerText;
+        document.addEventListener('DOMContentLoaded', function() {
+            const copyButtons = document.querySelectorAll('.copy-btn');
             
-            // Using document.execCommand as it's more reliable in sandboxed environments
-            const textArea = document.createElement('textarea');
-            textArea.value = code;
-            document.body.appendChild(textArea);
-            textArea.select();
-            try {
-                document.execCommand('copy');
-                button.innerText = 'Copied!';
-                button.classList.add('copy-btn-success');
-                setTimeout(() => {
-                    button.innerText = 'Copy';
-                    button.classList.remove('copy-btn-success');
-                }, 2000);
-            } catch (err) {
-                console.error('Failed to copy text: ', err);
-                button.innerText = 'Error';
-            }
-            document.body.removeChild(textArea);
-        }
-
-        function downloadPDF() {
-            const downloadButton = document.getElementById('download-btn');
-            const content = document.querySelector('.container');
-            
-            // Temporarily hide the button to exclude it from the PDF
-            downloadButton.style.visibility = 'hidden';
-
-            const options = {
-                margin: 0.5,
-                filename: 'C_Programming_IO_Crash_Course.pdf',
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true },
-                jsPDF: { unit: 'in', format: 'letter', orientation: 'portrait' }
-            };
-
-            // Use html2pdf to generate the PDF and then restore the button
-            html2pdf().from(content).set(options).save().then(() => {
-                downloadButton.style.visibility = 'visible';
+            copyButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const codeBlock = this.nextElementSibling.querySelector('code');
+                    const textToCopy = codeBlock.innerText;
+                    
+                    // A modern way to copy to clipboard that may not work in all sandboxed environments
+                    if (navigator.clipboard && window.isSecureContext) {
+                        navigator.clipboard.writeText(textToCopy).then(() => {
+                           showCopiedMessage(this);
+                        }).catch(err => {
+                           console.error('Failed to copy text using Clipboard API', err);
+                           fallbackCopyTextToClipboard(textToCopy, this);
+                        });
+                    } else {
+                        // Fallback for older browsers or insecure contexts
+                        fallbackCopyTextToClipboard(textToCopy, this);
+                    }
+                });
             });
-        }
 
-        document.getElementById('download-btn').addEventListener('click', downloadPDF);
+            function fallbackCopyTextToClipboard(text, button) {
+                const textArea = document.createElement('textarea');
+                textArea.value = text;
+                textArea.style.position = 'fixed'; // Avoid scrolling to bottom
+                textArea.style.top = '0';
+                textArea.style.left = '0';
+                textArea.style.opacity = '0';
+
+                document.body.appendChild(textArea);
+                textArea.focus();
+                textArea.select();
+
+                try {
+                    const successful = document.execCommand('copy');
+                    if (successful) {
+                        showCopiedMessage(button);
+                    } else {
+                        console.error('Fallback: Unable to copy');
+                        alert('Oops, unable to copy');
+                    }
+                } catch (err) {
+                    console.error('Fallback: Oops, unable to copy', err);
+                    alert('Oops, unable to copy');
+                }
+
+                document.body.removeChild(textArea);
+            }
+
+            function showCopiedMessage(button) {
+                const originalText = button.innerText;
+                button.innerText = 'Copied!';
+                button.classList.add('copied');
+                
+                setTimeout(() => {
+                    button.innerText = originalText;
+                    button.classList.remove('copied');
+                }, 2000);
+            }
+
+            const downloadBtn = document.getElementById('download-pdf');
+            if (downloadBtn) {
+                downloadBtn.addEventListener('click', generatePDF);
+            }
+
+            function generatePDF() {
+                const downloadBtn = document.getElementById('download-pdf');
+                const originalBtnContent = downloadBtn.innerHTML;
+                downloadBtn.disabled = true;
+                downloadBtn.innerHTML = '<span class="animate-pulse">Generating...</span>';
+
+                const elementToPrint = document.querySelector('main');
+                const copyButtons = elementToPrint.querySelectorAll('.copy-btn');
+
+                // Temporarily hide copy buttons for a cleaner PDF
+                copyButtons.forEach(btn => btn.style.visibility = 'hidden');
+
+                const opt = {
+                    margin:       [0.5, 0.5, 0.5, 0.5], // top, left, bottom, right in inches
+                    filename:     'Operators_and_Expressions_Crash_Course.pdf',
+                    image:        { type: 'jpeg', quality: 0.98 },
+                    html2canvas:  { scale: 2, letterRendering: true, useCORS: true },
+                    jsPDF:        { unit: 'in', format: 'letter', orientation: 'portrait' }
+                };
+
+                html2pdf().from(elementToPrint).set(opt).save().then(() => {
+                    // Restore button and visibility of copy buttons after save is complete
+                    copyButtons.forEach(btn => btn.style.visibility = 'visible');
+                    downloadBtn.disabled = false;
+                    downloadBtn.innerHTML = originalBtnContent;
+                }).catch(err => {
+                    console.error("PDF generation failed:", err);
+                    // Also restore in case of error
+                    copyButtons.forEach(btn => btn.style.visibility = 'visible');
+                    downloadBtn.disabled = false;
+                    downloadBtn.innerHTML = originalBtnContent;
+                    alert('Sorry, there was an error generating the PDF.');
+                });
+            }
+        });
     </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
