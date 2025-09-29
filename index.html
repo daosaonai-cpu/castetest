@@ -149,6 +149,7 @@
         let currentPageNum = 1;
         let totalPages = 0;
         let isFullscreen = false;
+        let smoothedFingerTipPos = null; // For smoothing drawing
         
         // --- On-Canvas Button Control State ---
         let lastButtonPressTime = 0;
@@ -157,10 +158,12 @@
         // --- Configuration ---
         const drawingColor = '#ec4899'; // Pink color
         const drawingLineWidth = 6;
-        const eraserColor = 'rgba(239, 68, 68, 0.5)'; // Semi-transparent red
-        const eraserRadius = 30;
         const cursorColor = '#f87171';
         const cursorRadius = 5;
+        const smoothingFactor = 0.5; // Lower is smoother but has more lag.
+        const eraserRadius = 30; // The radius of the eraser circle
+        const eraserColor = 'rgba(255, 255, 255, 0.5)'; // Semi-transparent white
+
 
         // --- UI Feedback Functions ---
         function showNotification(message, duration = 3000) {
@@ -299,7 +302,12 @@
 
                 // Draw hand landmarks for visual feedback
                 window.drawConnectors(canvasCtx, handLandmarks, window.HAND_CONNECTIONS, { color: '#34d399', lineWidth: 5 });
-                const landmarkColor = currentMode === 'erasing' ? '#ef4444' : (currentMode === 'drawing' ? '#ec4899' : '#f87171');
+                
+                // Change landmark color based on the current mode
+                const landmarkColor =
+                    currentMode === 'drawing' ? '#ec4899' : // Pink when drawing
+                    currentMode === 'erasing' ? '#ffffff' : // White when erasing
+                    '#f87171'; // Red when idle
                 window.drawLandmarks(canvasCtx, handLandmarks, { color: landmarkColor, lineWidth: 2 });
             } else { // Hand not detected
                 if (currentMode === 'drawing') { // Finish any path if hand leaves screen
@@ -309,6 +317,7 @@
                     currentPath = [];
                 }
                 currentMode = 'idle';
+                smoothedFingerTipPos = null; // Reset smoothing when hand is lost
             }
             
             canvasCtx.restore();
@@ -369,51 +378,79 @@
 
         function handleGestures(handLandmarks) {
             const indexTip = handLandmarks[8];
-            const middleTip = handLandmarks[12];
             const thumbTip = handLandmarks[4];
-            
+            const middleTip = handLandmarks[12];
+            const ringTip = handLandmarks[16];
+            const pinkyTip = handLandmarks[20];
+
             // --- Gesture Recognition Logic ---
-            // Drawing: Index and middle fingertips are very close
-            const drawGestureDistance = Math.hypot(indexTip.x - middleTip.x, indexTip.y - middleTip.y);
+
+            // 1. Fist Gesture for Erasing
+            // A fist is when the tips of the fingers are below their second knuckle (PIP joint).
+            const isFist =
+                indexTip.y > handLandmarks[6].y &&
+                middleTip.y > handLandmarks[10].y &&
+                ringTip.y > handLandmarks[14].y &&
+                pinkyTip.y > handLandmarks[18].y;
+
+            // 2. Drawing Gesture: Index finger and thumb tips are very close
+            const drawGestureDistance = Math.hypot(indexTip.x - thumbTip.x, indexTip.y - thumbTip.y);
             const isDrawingGesture = drawGestureDistance < 0.04;
-            
-            // Erasing: A closed fist (all fingertips are close to the palm center)
-            const isFist = (
-                Math.hypot(thumbTip.x - handLandmarks[10].x, thumbTip.y - handLandmarks[10].y) < 0.1 &&
-                Math.hypot(indexTip.x - handLandmarks[6].x, indexTip.y - handLandmarks[6].y) < 0.1 &&
-                Math.hypot(handLandmarks[20].x - handLandmarks[14].x, handLandmarks[20].y - handLandmarks[14].y) < 0.1 // Pinky tip to middle knuckle
-            );
-            
+
             // --- Action Implementation ---
+
             if (isFist) {
                 currentMode = 'erasing';
-                if (currentMode === 'drawing' && currentPath.length > 1) { // Finish path before erasing
-                     allPaths.push({ points: currentPath, color: drawingColor, width: drawingLineWidth });
-                     currentPath = [];
+                // If we were just drawing, discard the current path
+                if (lastMode === 'drawing' && currentPath.length > 0) {
+                    currentPath = [];
                 }
 
+                // Use the center of the palm as the eraser position for stability
+                const palmCenterX = (handLandmarks[5].x + handLandmarks[9].x) / 2;
+                const palmCenterY = (handLandmarks[5].y + handLandmarks[9].y) / 2;
                 const eraserPos = {
-                    x: handLandmarks[9].x * canvasElement.width,
-                    y: handLandmarks[9].y * canvasElement.height
+                    x: palmCenterX * canvasElement.width,
+                    y: palmCenterY * canvasElement.height
                 };
-                // Draw eraser visual
+
+                // Draw the eraser visual feedback
                 canvasCtx.fillStyle = eraserColor;
                 canvasCtx.beginPath();
                 canvasCtx.arc(eraserPos.x, eraserPos.y, eraserRadius, 0, 2 * Math.PI);
                 canvasCtx.fill();
-                // Filter out points within the eraser radius
-                allPaths = allPaths.filter(path => !path.points.some(point => Math.hypot(point.x - eraserPos.x, point.y - eraserPos.y) < eraserRadius));
+
+                // Filter out paths that are touched by the eraser
+                allPaths = allPaths.filter(path =>
+                    !path.points.some(point =>
+                        Math.hypot(point.x - eraserPos.x, point.y - eraserPos.y) < eraserRadius
+                    )
+                );
+
             } else if (isDrawingGesture) {
                 currentMode = 'drawing';
-                const fingerTipPos = { x: indexTip.x * canvasElement.width, y: indexTip.y * canvasElement.height };
-                
-                // Start a new path or add to the current one
-                if (lastMode !== 'drawing') {
-                    currentPath = [fingerTipPos];
+                // --- Accuracy Improvement: Smoothing for Drawing ---
+                // Use the midpoint between index and thumb finger for a more stable anchor
+                const fingerTipMidpoint = {
+                    x: ((indexTip.x + thumbTip.x) / 2) * canvasElement.width,
+                    y: ((indexTip.y + thumbTip.y) / 2) * canvasElement.height
+                };
+
+                // Apply exponential moving average for smoother drawing
+                if (!smoothedFingerTipPos || lastMode !== 'drawing') {
+                    smoothedFingerTipPos = fingerTipMidpoint;
                 } else {
-                    currentPath.push(fingerTipPos);
+                    smoothedFingerTipPos.x = smoothedFingerTipPos.x * (1 - smoothingFactor) + fingerTipMidpoint.x * smoothingFactor;
+                    smoothedFingerTipPos.y = smoothedFingerTipPos.y * (1 - smoothingFactor) + fingerTipMidpoint.y * smoothingFactor;
                 }
-            } else { // Idle mode (hand is open, not drawing, not erasing)
+
+                // Start a new path or add the smoothed position to the current one
+                if (lastMode !== 'drawing') {
+                    currentPath = [{...smoothedFingerTipPos}];
+                } else {
+                    currentPath.push({...smoothedFingerTipPos}); // Push a copy
+                }
+            } else { // Idle mode (hand is open, not drawing or erasing)
                 currentMode = 'idle';
                 // If we were just drawing, finalize the path
                 if (lastMode === 'drawing') {
@@ -422,12 +459,20 @@
                     }
                     currentPath = [];
                 }
-                
-                // Draw a cursor at the index fingertip
-                const cursorPosition = { x: indexTip.x * canvasElement.width, y: indexTip.y * canvasElement.height };
+
+                // --- Accuracy Improvement: Smoothing for Cursor ---
+                const cursorTarget = { x: indexTip.x * canvasElement.width, y: indexTip.y * canvasElement.height };
+                if (!smoothedFingerTipPos || lastMode !== 'idle') { // Reset smoothing on mode change
+                    smoothedFingerTipPos = cursorTarget;
+                } else {
+                    smoothedFingerTipPos.x = smoothedFingerTipPos.x * (1 - smoothingFactor) + cursorTarget.x * smoothingFactor;
+                    smoothedFingerTipPos.y = smoothedFingerTipPos.y * (1 - smoothingFactor) + cursorTarget.y * smoothingFactor;
+                }
+
+                // Draw a smoothed cursor
                 canvasCtx.fillStyle = cursorColor;
                 canvasCtx.beginPath();
-                canvasCtx.arc(cursorPosition.x, cursorPosition.y, cursorRadius, 0, 2 * Math.PI);
+                canvasCtx.arc(smoothedFingerTipPos.x, smoothedFingerTipPos.y, cursorRadius, 0, 2 * Math.PI);
                 canvasCtx.fill();
             }
             lastMode = currentMode;
@@ -542,7 +587,7 @@
                 };
                 reader.readAsArrayBuffer(file);
             } else {
-                showNotification("Unsupported file type. Please upload an image or PDF.");
+                showNotification("Unsupported file-type. Please upload an image or PDF.");
             }
         });
 
@@ -568,6 +613,8 @@
     </script>
 </body>
 </html>
+
+
 
 
 
