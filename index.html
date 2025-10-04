@@ -3,616 +3,828 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NIELIT KOKRAJHAR EC AI Smart Class Env.</title>
-    <!-- Tailwind CSS for styling -->
+    <title>Enhanced Smart Attendance & Proctoring System</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- MediaPipe libraries -->
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.3/camera_utils.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils@0.6/control_utils.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils@0.3/drawing_utils.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4/hands.js" crossorigin="anonymous"></script>
-    <!-- PDF.js library -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.7.4/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.2/dist/coco-ssd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Custom styles for the loader, layout, and new UI elements */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
-        
         body {
             font-family: 'Inter', sans-serif;
         }
-        .loader {
-            border: 8px solid #f3f3f3; /* Light grey */
-            border-top: 8px solid #3498db; /* Blue */
-            border-radius: 50%;
-            width: 60px;
-            height: 60px;
-            animation: spin 1s linear infinite;
+        .video-wrapper.cheating {
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.9), 0 0 30px rgba(239, 68, 68, 0.9);
+            border-color: rgba(239, 68, 68, 1);
         }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .log-entry, .toast {
+            animation: fadeIn 0.5s ease-in-out;
         }
-        .input_video {
-            display: none;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        #output_canvas {
-            width: 100%;
-            height: 100%;
-            object-fit: contain; /* Use contain to see the whole page */
-        }
-        .mirrored {
-            transform: scaleX(-1); /* Mirror effect */
-        }
-        /* Style for disabled buttons */
-        .disabled-button {
-            background-color: #a0aec0; /* gray-500 */
-            cursor: not-allowed;
-            opacity: 0.6;
-        }
-        /* Style for notifications */
-        #notification-container {
+        .toast-container {
             position: fixed;
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            background-color: rgba(239, 68, 68, 0.8); /* red-500 with opacity */
-            color: white;
-            padding: 1rem 1.5rem;
-            border-radius: 0.5rem;
             z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s, visibility 0.3s;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-        }
-        #notification-container.show {
-            opacity: 1;
-            visibility: visible;
-        }
-        /* Fullscreen style for the container */
-        #container.fullscreen-mode {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            border-radius: 0;
-            z-index: 50;
-            background-color: #111827; /* bg-gray-900 */
         }
     </style>
 </head>
-<body class="bg-gray-900 text-white flex flex-col items-center justify-center min-h-screen p-4">
+<body class="bg-gray-900 text-white flex flex-col items-center min-h-screen p-4">
 
-    <div class="w-full max-w-4xl mx-auto">
-        <h1 class="text-3xl md:text-4xl font-bold text-center mb-2 text-blue-400">NIELIT KOKRAJHAR EC AI Smart Class Env.</h1>
-        <p class="text-center text-gray-400 mb-6">BANAJIT BORO</p>
-
-        <!-- Main container for the video feed and loader -->
-        <div id="container" class="relative w-full aspect-video rounded-lg shadow-2xl bg-gray-800 flex items-center justify-center overflow-hidden">
-            <canvas id="output_canvas" class="absolute top-0 left-0"></canvas>
-            <video class="input_video" id="input_video" autoplay playsinline></video>
-            <div id="loading-indicator" class="absolute inset-0 flex flex-col items-center justify-center bg-gray-800 bg-opacity-75 rounded-lg z-10">
-                <div class="loader"></div>
-                <p class="mt-4 text-lg">Initializing Camera...</p>
+    <div class="w-full max-w-7xl mx-auto bg-gray-800 rounded-2xl shadow-2xl p-6 md:p-8">
+        <h1 class="text-3xl md:text-4xl font-bold text-center mb-4 text-green-400">Smart Attendance & Proctoring System</h1>
+        
+        <!-- Live Dashboard -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 text-center">
+            <div class="bg-gray-700 p-4 rounded-xl">
+                <p class="text-sm text-gray-400">Time & Date</p>
+                <p id="liveClock" class="text-xl font-semibold text-green-300">--:--:-- --</p>
+            </div>
+            <div class="bg-gray-700 p-4 rounded-xl">
+                <p class="text-sm text-gray-400">Registered Users</p>
+                <p id="registeredCount" class="text-xl font-semibold text-blue-300">0</p>
+            </div>
+            <div class="bg-gray-700 p-4 rounded-xl">
+                <p class="text-sm text-gray-400">Currently Present</p>
+                <p id="presentCount" class="text-xl font-semibold text-teal-300">0</p>
             </div>
         </div>
-        
-        <!-- Controls -->
-        <div class="mt-4 flex justify-center items-center flex-wrap gap-4">
-            <button id="clear-button" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors">
-                Clear All
-            </button>
-            <button id="fullscreen-button" class="hidden bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors">
-                Fullscreen
-            </button>
-            <input type="file" id="file-upload" class="hidden" accept="image/*,application/pdf">
-            <label for="file-upload" class="bg-pink-500 hover:bg-pink-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors cursor-pointer">
-                Upload File
-            </label>
-            <!-- PDF Navigation -->
-            <button id="prev-page-button" class="hidden bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors">Prev</button>
-            <span id="page-indicator" class="hidden text-lg"></span>
-            <button id="next-page-button" class="hidden bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors">Next</button>
+
+        <!-- Camera Feed and Controls -->
+        <div class="flex flex-col md:flex-row gap-6 mb-6">
+            <div id="videoWrapper" class="relative w-full md:w-3/4 h-auto aspect-video bg-gray-900 rounded-xl overflow-hidden border-2 border-gray-700 transition-all duration-300">
+                <video id="video" width="100%" height="100%" autoplay muted playsinline class="rounded-xl scale-x-[-1]"></video> <!-- Mirrored Feed -->
+                <canvas id="canvas" class="absolute top-0 left-0"></canvas> <!-- Canvas is NOT mirrored via CSS anymore -->
+                <div id="examModeIndicator" class="absolute top-3 right-3 bg-red-600 text-white text-sm font-bold px-3 py-1 rounded-full hidden animate-pulse">
+                    PROCTORING ACTIVE
+                </div>
+            </div>
+            <div class="w-full md:w-1/4 flex flex-col justify-between bg-gray-700 p-3 rounded-xl">
+                <div>
+                    <h2 id="controlsHeader" class="text-xl font-semibold mb-3 text-green-300 cursor-pointer transition-colors duration-300 hover:text-sky-400">Controls</h2>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button id="registerBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed" disabled>Register</button>
+                        <button id="markAttendanceBtn" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed" disabled>Start Session</button>
+                        <button id="examModeBtn" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed col-span-2" disabled>Enable Exam Mode</button>
+                    </div>
+                     <button id="clearDataBtn" class="w-full bg-gray-600 hover:bg-red-800 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out mt-2 disabled:opacity-50 disabled:cursor-not-allowed" disabled>Clear All Data</button>
+                     <div class="grid grid-cols-2 gap-2 mt-2">
+                         <button id="downloadReportBtn" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed" disabled>Report (CSV)</button>
+                         <button id="downloadPdfReportBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed" disabled>Report (PDF)</button>
+                     </div>
+                </div>
+                 <div id="status" class="mt-3 text-center text-gray-300 p-2 bg-gray-800 rounded-lg">
+                     Initializing...
+                 </div>
+            </div>
+        </div>
+
+        <!-- Logs Section -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Attendance Log -->
+            <div>
+                <h2 class="text-2xl font-semibold mb-4 text-green-300 border-b-2 border-gray-600 pb-2">Attendance Log</h2>
+                <div id="attendanceLog" class="bg-gray-900 p-4 rounded-xl h-64 overflow-y-auto">
+                     <p id="initialLogMessage" class="text-gray-400">No attendance marked yet.</p>
+                </div>
+            </div>
+            <!-- Suspicious Activity Log -->
+            <div>
+                <h2 class="text-2xl font-semibold mb-4 text-red-400 border-b-2 border-gray-600 pb-2">Suspicious Activity Log</h2>
+                <div id="suspiciousActivityLog" class="bg-gray-900 p-4 rounded-xl h-64 overflow-y-auto">
+                     <p class="text-gray-400">Exam mode is not active.</p>
+                </div>
+            </div>
         </div>
     </div>
 
-    <!-- Notification container -->
-    <div id="notification-container"></div>
+    <!-- Modal for Registration & Confirmation -->
+    <div id="modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center hidden z-50">
+        <div class="bg-gray-800 p-8 rounded-2xl shadow-2xl w-full max-w-md text-center">
+            <h2 id="modalTitle" class="text-2xl font-bold mb-4 text-green-400">Register New Person</h2>
+            <p id="modalBody" class="mb-4 text-gray-300">Please enter a name and look at the camera.</p>
+            <div id="registrationStatus" class="mb-4 text-sm p-2 rounded-lg transition-colors duration-300">&nbsp;</div>
+            <input type="text" id="nameInput" placeholder="Enter Name" class="w-full bg-gray-700 text-white p-3 rounded-lg mb-4 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500">
+            <div id="modalActions" class="flex gap-4">
+                <button id="confirmBtn" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed">Save</button>
+                <button id="cancelBtn" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300">Cancel</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast Notification Container -->
+    <div id="toastContainer" class="toast-container"></div>
 
     <script type="module">
-        // Set the workerSrc for PDF.js
-        window.pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js`;
+        // --- Firebase SDK Imports ---
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, collection, addDoc, getDocs, writeBatch, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        
+        // --- DOM Elements ---
+        const video = document.getElementById('video');
+        const videoWrapper = document.getElementById('videoWrapper');
+        const canvas = document.getElementById('canvas');
+        const registerBtn = document.getElementById('registerBtn');
+        const markAttendanceBtn = document.getElementById('markAttendanceBtn');
+        const examModeBtn = document.getElementById('examModeBtn');
+        const controlsHeader = document.getElementById('controlsHeader');
+        const clearDataBtn = document.getElementById('clearDataBtn');
+        const attendanceLog = document.getElementById('attendanceLog');
+        const suspiciousActivityLog = document.getElementById('suspiciousActivityLog');
+        const statusDiv = document.getElementById('status');
+        const modal = document.getElementById('modal');
+        const nameInput = document.getElementById('nameInput');
+        const confirmBtn = document.getElementById('confirmBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const registrationStatus = document.getElementById('registrationStatus');
+        const liveClock = document.getElementById('liveClock');
+        const registeredCount = document.getElementById('registeredCount');
+        const presentCount = document.getElementById('presentCount');
+        const examModeIndicator = document.getElementById('examModeIndicator');
+        const toastContainer = document.getElementById('toastContainer');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalBody = document.getElementById('modalBody');
+        const downloadReportBtn = document.getElementById('downloadReportBtn');
+        const downloadPdfReportBtn = document.getElementById('downloadPdfReportBtn');
 
-        // --- Get references to the HTML elements ---
-        const videoElement = document.getElementById('input_video');
-        const canvasElement = document.getElementById('output_canvas');
-        const canvasCtx = canvasElement.getContext('2d');
-        const loadingIndicator = document.getElementById('loading-indicator');
-        const clearButton = document.getElementById('clear-button');
-        const fileUploadInput = document.getElementById('file-upload');
-        const prevPageButton = document.getElementById('prev-page-button');
-        const nextPageButton = document.getElementById('next-page-button');
-        const pageIndicator = document.getElementById('page-indicator');
-        const notificationContainer = document.getElementById('notification-container');
-        const fullscreenButton = document.getElementById('fullscreen-button');
-        const container = document.getElementById('container');
-
+        // --- Firebase State ---
+        let db, auth;
+        let usersCollectionRef;
+        let unsubscribeUsers;
 
         // --- State Variables ---
-        let currentMode = 'idle'; // 'idle', 'drawing', 'erasing'
-        let lastMode = 'idle';
-        let currentPath = [];
-        let allPaths = [];
-        let uploadedImage = null;
-        let pdfDoc = null;
-        let currentPageNum = 1;
-        let totalPages = 0;
-        let isFullscreen = false;
-        let smoothedFingerTipPos = null; // For smoothing drawing
-        
-        // --- On-Canvas Button Control State ---
-        let lastButtonPressTime = 0;
-        const BUTTON_PRESS_COOLDOWN = 1000; // 1 second cooldown
+        let registeredUsers = new Map();
+        let isSessionActive = false;
+        let isExamMode = false;
+        let isLiveMode = false;
+        let detectionIntervalId;
+        let registrationIntervalId;
+        let noFaceCounter = 0;
+        let cheatingAlertTimeout;
+        let cocoSsdModel = null;
+        let currentVisibleUsers = new Set();
+        let sessionAttendance = new Map();
+        let livenessChecks = new Map();
 
-        // --- Configuration ---
-        const drawingColor = '#ec4899'; // Pink color
-        const drawingLineWidth = 6;
-        const cursorColor = '#f87171';
-        const cursorRadius = 5;
-        const smoothingFactor = 0.5; // Lower is smoother but has more lag.
-        const eraserRadius = 30; // The radius of the eraser circle
-        const eraserColor = 'rgba(255, 255, 255, 0.5)'; // Semi-transparent white
+        const LIVENESS_TIMEOUT = 3000;
+        const EAR_THRESHOLD = 0.25;
 
+        // --- Initialization ---
+        window.onload = () => {
+            initializeFirebase();
+            loadModels();
+            startClock();
+            updateDashboard();
+        };
 
-        // --- UI Feedback Functions ---
-        function showNotification(message, duration = 3000) {
-            notificationContainer.textContent = message;
-            notificationContainer.classList.add('show');
-            setTimeout(() => {
-                notificationContainer.classList.remove('show');
-            }, duration);
+        async function initializeFirebase() {
+            try {
+                statusDiv.textContent = 'Connecting to database...';
+                const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+                const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+                
+                const app = initializeApp(firebaseConfig);
+                db = getFirestore(app);
+                auth = getAuth(app);
+
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await signInWithCustomToken(auth, __initial_auth_token);
+                } else {
+                    await signInAnonymously(auth);
+                }
+
+                usersCollectionRef = collection(db, `artifacts/${appId}/public/data/registered_users`);
+                listenForUsers();
+                statusDiv.textContent = 'Database connected.';
+            } catch (error) {
+                console.error("Firebase initialization failed:", error);
+                statusDiv.textContent = 'Database connection failed.';
+                showToast('Could not connect to the database.', 'error');
+            }
         }
 
-        // --- Fullscreen Toggle ---
-        function toggleFullscreen() {
-            isFullscreen = !isFullscreen;
+        async function loadModels() {
+            const MODEL_URL = 'https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@0.22.2/weights';
+            statusDiv.textContent = 'Loading AI models...';
+            try {
+                await Promise.all([
+                    faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL),
+                    faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
+                    faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
+                    faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL),
+                    cocoSsd.load().then(model => { cocoSsdModel = model; })
+                ]);
+                startVideo();
+            } catch (error) {
+                console.error("Error loading models:", error);
+                statusDiv.textContent = 'Error loading AI models.';
+            }
+        }
 
-            container.classList.toggle('fullscreen-mode', isFullscreen);
-            
-            // Hide siblings of the container (title, controls, etc.)
-            const siblings = [...container.parentElement.children];
-            siblings.forEach(child => {
-                if (child.id !== 'container') {
-                    child.classList.toggle('hidden', isFullscreen);
+        async function startVideo() {
+            statusDiv.textContent = 'Starting camera...';
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: {} });
+                video.srcObject = stream;
+                video.addEventListener('play', () => {
+                    statusDiv.textContent = 'Ready';
+                    const displaySize = { width: video.clientWidth, height: video.clientHeight };
+                    faceapi.matchDimensions(canvas, displaySize);
+                });
+            } catch (err) {
+                console.error("Error accessing webcam:", err);
+                statusDiv.textContent = 'Error: Could not access webcam.';
+            }
+        }
+        
+        // --- Event Listeners ---
+        registerBtn.addEventListener('click', () => {
+            modalTitle.textContent = 'Register New Person';
+            modalBody.textContent = 'Please enter a name and look at the camera.';
+            nameInput.style.display = 'block';
+            confirmBtn.textContent = 'Save';
+            confirmBtn.onclick = handleRegistrationSave;
+            modal.classList.remove('hidden');
+            startRegistrationFaceCheck();
+        });
+
+        clearDataBtn.addEventListener('click', () => {
+            if (registeredUsers.size === 0) {
+                showToast('No registered user data to clear.', 'info');
+                return;
+            }
+            modalTitle.textContent = 'Confirm Action';
+            modalBody.textContent = 'Are you sure you want to delete all registered user data from the database? This action cannot be undone.';
+            nameInput.style.display = 'none';
+            registrationStatus.style.display = 'none';
+            confirmBtn.textContent = 'Yes, Clear All Data';
+            confirmBtn.disabled = false;
+            confirmBtn.onclick = async () => {
+                try {
+                    const querySnapshot = await getDocs(usersCollectionRef);
+                    const batch = writeBatch(db);
+                    querySnapshot.forEach(doc => {
+                        batch.delete(doc.ref);
+                    });
+                    await batch.commit();
+                    
+                    showToast('All registered data has been cleared.', 'success');
+                    modal.classList.add('hidden');
+                    if (isSessionActive) stopSession();
+                    attendanceLog.innerHTML = '<p id="initialLogMessage" class="text-gray-400">No attendance marked yet.</p>';
+                    downloadReportBtn.disabled = true;
+                    downloadPdfReportBtn.disabled = true;
+                } catch(error) {
+                    console.error("Error clearing data: ", error);
+                    showToast('Failed to clear data.', 'error');
                 }
+            };
+            modal.classList.remove('hidden');
+        });
+
+        cancelBtn.addEventListener('click', () => {
+            modal.classList.add('hidden');
+            nameInput.value = '';
+            stopRegistrationFaceCheck();
+        });
+
+        markAttendanceBtn.addEventListener('click', () => {
+             if (registeredUsers.size === 0) {
+                 showToast("Please register at least one person first.", 'error');
+                 return;
+             }
+            isSessionActive = !isSessionActive;
+            if (isSessionActive) {
+                startSession();
+            } else {
+                stopSession();
+            }
+        });
+
+        examModeBtn.addEventListener('click', () => {
+            isExamMode = !isExamMode;
+            if(isExamMode) {
+                examModeBtn.textContent = 'Disable Exam Mode';
+                examModeBtn.classList.replace('bg-purple-600', 'bg-yellow-600');
+                examModeIndicator.classList.remove('hidden');
+                suspiciousActivityLog.innerHTML = '';
+            } else {
+                examModeBtn.textContent = 'Enable Exam Mode';
+                examModeBtn.classList.replace('bg-yellow-600', 'bg-purple-600');
+                examModeIndicator.classList.add('hidden');
+                suspiciousActivityLog.innerHTML = '<p class="text-gray-400">Exam mode is not active.</p>';
+            }
+        });
+        
+        downloadReportBtn.addEventListener('click', downloadAttendanceReport);
+        downloadPdfReportBtn.addEventListener('click', downloadPdfReport);
+
+        function toggleLiveMode() {
+            if (!isSessionActive) {
+                showToast('Start a session to enable Live Mode.', 'info');
+                return;
+            }
+
+            isLiveMode = !isLiveMode;
+             if(isLiveMode) {
+                controlsHeader.classList.add('text-sky-400');
+            } else {
+                controlsHeader.classList.remove('text-sky-400');
+            }
+        }
+
+        controlsHeader.addEventListener('click', toggleLiveMode);
+
+        window.addEventListener('keydown', (e) => {
+            // Prevent typing in input fields from triggering shortcuts
+            if (document.activeElement === nameInput) return;
+
+            if (e.key.toLowerCase() === 'p') {
+                toggleLiveMode();
+            }
+        });
+
+
+        // --- Session Management ---
+        function startSession() {
+            markAttendanceBtn.textContent = 'Stop Session';
+            markAttendanceBtn.classList.replace('bg-green-600', 'bg-red-600');
+            registerBtn.disabled = true;
+            clearDataBtn.disabled = true;
+            examModeBtn.disabled = false;
+            attendanceLog.innerHTML = '<p id="initialLogMessage" class="text-gray-400">Session started. Waiting for users...</p>';
+            sessionAttendance.clear();
+            livenessChecks.clear();
+            downloadReportBtn.disabled = true;
+            downloadPdfReportBtn.disabled = true;
+            startDetection();
+        }
+
+        function stopSession() {
+            isSessionActive = false;
+            isExamMode = false;
+            isLiveMode = false;
+            
+            markAttendanceBtn.textContent = 'Start Session';
+            markAttendanceBtn.classList.replace('bg-red-600', 'bg-green-600');
+            examModeBtn.textContent = 'Enable Exam Mode';
+            examModeBtn.classList.replace('bg-yellow-600', 'bg-purple-600');
+            controlsHeader.classList.remove('text-sky-400');
+            
+            registerBtn.disabled = false;
+            clearDataBtn.disabled = false;
+            examModeBtn.disabled = true;
+            
+            clearInterval(detectionIntervalId);
+            const context = canvas.getContext('2d');
+            if (context) context.clearRect(0, 0, canvas.width, canvas.height);
+            statusDiv.textContent = 'Ready';
+            suspiciousActivityLog.innerHTML = '<p class="text-gray-400">Exam mode is not active.</p>';
+            videoWrapper.classList.remove('cheating');
+            examModeIndicator.classList.add('hidden');
+            currentVisibleUsers.clear();
+            updateDashboard();
+        }
+
+        // --- Liveness & Detection Logic ---
+
+        function getPointDistance(p1, p2) {
+            return Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
+        }
+
+        function calculateEAR(eyeLandmarks) {
+            const p1 = eyeLandmarks[0];
+            const p2 = eyeLandmarks[1];
+            const p3 = eyeLandmarks[2];
+            const p4 = eyeLandmarks[3];
+            const p5 = eyeLandmarks[4];
+            const p6 = eyeLandmarks[5];
+
+            const verticalDist1 = getPointDistance(p2, p6);
+            const verticalDist2 = getPointDistance(p3, p5);
+            const horizontalDist = getPointDistance(p1, p4);
+
+            return (verticalDist1 + verticalDist2) / (2.0 * horizontalDist);
+        }
+
+        async function startDetection() {
+            statusDiv.textContent = 'Session started...';
+            const labeledFaceDescriptors = getLabeledFaceDescriptors();
+            if (!labeledFaceDescriptors || labeledFaceDescriptors.length === 0) {
+                showToast('No registered users found to start session.', 'error');
+                stopSession();
+                return;
+            }
+            const faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors, 0.6);
+
+            detectionIntervalId = setInterval(async () => {
+                const displaySize = { width: video.clientWidth, height: video.clientHeight };
+                faceapi.matchDimensions(canvas, displaySize);
+
+                const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptors();
+                const resizedDetections = faceapi.resizeResults(detections, displaySize);
+                
+                const context = canvas.getContext('2d');
+                context.clearRect(0, 0, canvas.width, canvas.height);
+
+                currentVisibleUsers.clear();
+                const results = resizedDetections.map(d => faceMatcher.findBestMatch(d.descriptor));
+                
+                let isCheckingLiveness = false;
+                
+                results.forEach((result, i) => {
+                    const box = resizedDetections[i].detection.box;
+                    const name = result.label;
+                    const { x, y, width, height } = box;
+                    const mirroredX = canvas.width - x - width;
+
+                    let label = name, color = '#4ade80'; // Default to green
+
+                    if (name !== 'unknown' && !sessionAttendance.has(name)) {
+                        if (isLiveMode) {
+                            const landmarks = resizedDetections[i].landmarks;
+                            let liveness = livenessChecks.get(name);
+                            if (!liveness) {
+                                livenessChecks.set(name, { status: 'pending', startTime: Date.now() });
+                                liveness = livenessChecks.get(name);
+                            }
+
+                            if (liveness.status === 'pending') {
+                                isCheckingLiveness = true;
+                                label = `${name}, BLINK NOW`;
+                                color = '#38bdf8'; // sky-500
+
+                                const leftEAR = calculateEAR(landmarks.getLeftEye());
+                                const rightEAR = calculateEAR(landmarks.getRightEye());
+                                
+                                statusDiv.textContent = `Liveness check for ${name}: EAR L: ${leftEAR.toFixed(2)}, R: ${rightEAR.toFixed(2)}`;
+                                
+                                if (leftEAR < EAR_THRESHOLD || rightEAR < EAR_THRESHOLD) {
+                                    liveness.status = 'passed';
+                                    updateAttendanceLog(name);
+                                } else if (Date.now() - liveness.startTime > LIVENESS_TIMEOUT) {
+                                    livenessChecks.delete(name);
+                                }
+                            }
+                        } else {
+                            // Live mode is off, mark attendance directly
+                            updateAttendanceLog(name);
+                        }
+                    }
+
+                    if (sessionAttendance.has(name)) {
+                        currentVisibleUsers.add(name);
+                    } else if (name === 'unknown') {
+                        label = 'Unknown';
+                        color = '#f87171'; // red-400
+                    } else if (isLiveMode) { // Not yet passed liveness in live mode
+                         label = `${name}, BLINK NOW`;
+                         color = '#38bdf8';
+                    }
+
+                    // Drawing logic
+                    context.strokeStyle = color;
+                    context.lineWidth = 2;
+                    context.strokeRect(mirroredX, y, width, height);
+                    context.font = '15px Inter';
+                    const textMetrics = context.measureText(label);
+                    context.fillStyle = color;
+                    const padding = 4;
+                    context.fillRect(mirroredX, y - (16 + padding), textMetrics.width + (padding * 2), 16 + padding);
+                    context.fillStyle = '#000';
+                    context.fillText(label, mirroredX + padding, y - 5);
+                });
+                
+                if (!isCheckingLiveness && isSessionActive) {
+                    statusDiv.textContent = 'Session in progress...';
+                }
+
+                updateDashboard();
+
+                if (isExamMode) {
+                    await runProctoringChecks(resizedDetections, results, context);
+                }
+
+            }, 500);
+        }
+        
+        async function runProctoringChecks(resizedDetections, faceResults, context) {
+            if (resizedDetections.length > 1) {
+                logSuspiciousActivity("Multiple faces detected.");
+            } else if (resizedDetections.length === 0) {
+                noFaceCounter++;
+                if (noFaceCounter > 4) {
+                   logSuspiciousActivity("Person not visible.");
+                }
+            } else {
+                noFaceCounter = 0;
+            }
+
+            if (cocoSsdModel) {
+                const predictions = await cocoSsdModel.detect(video);
+                const forbiddenObjects = ['cell phone', 'book'];
+                for (const prediction of predictions) {
+                    if (forbiddenObjects.includes(prediction.class) && prediction.score > 0.65) {
+                        logSuspiciousActivity(`${prediction.class.charAt(0).toUpperCase() + prediction.class.slice(1)} detected.`);
+                        
+                        const [x, y, width, height] = prediction.bbox;
+                        const mirroredX = canvas.width - x - width;
+
+                        context.strokeStyle = '#EF4444';
+                        context.lineWidth = 3;
+                        context.strokeRect(mirroredX, y, width, height);
+                        context.fillStyle = '#EF4444';
+                        context.font = '18px Inter';
+                        context.fillText(prediction.class, mirroredX, y > 20 ? y - 5 : 20);
+                    }
+                }
+            }
+        }
+
+        // --- UI & Data Update Functions ---
+        
+        function downloadPdfReport() {
+            if (sessionAttendance.size === 0 && suspiciousActivityLog.querySelectorAll('.log-entry').length === 0) {
+                showToast('No session data available to generate a report.', 'info');
+                return;
+            }
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const sessionDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            const sessionTime = new Date().toLocaleTimeString('en-US');
+
+            // --- Document Header ---
+            doc.setFontSize(18);
+            doc.text("Comprehensive Session Report", 14, 22);
+            doc.setFontSize(11);
+            doc.setTextColor(100);
+            doc.text(`Generated on: ${sessionDate} at ${sessionTime}`, 14, 30);
+
+            let lastY = 35;
+
+            // --- Attendance Table ---
+            if (sessionAttendance.size > 0) {
+                const attendanceBody = [];
+                sessionAttendance.forEach((details, name) => {
+                    attendanceBody.push([
+                        name,
+                        new Date(details.firstSeen).toLocaleString('en-US')
+                    ]);
+                });
+
+                doc.autoTable({
+                    startY: lastY + 5,
+                    head: [['Name', 'Time Marked Present']],
+                    body: attendanceBody,
+                    theme: 'striped',
+                    headStyles: { fillColor: [22, 160, 133] }, // Teal
+                });
+                lastY = doc.autoTable.previous.finalY;
+            } else {
+                doc.text("No attendance was recorded for this session.", 14, lastY + 10);
+                lastY += 10;
+            }
+
+            // --- Suspicious Activity Table ---
+            const suspiciousLogs = suspiciousActivityLog.querySelectorAll('.log-entry');
+            if (suspiciousLogs.length > 0) {
+                const suspiciousBody = [];
+                suspiciousLogs.forEach(log => {
+                    const message = log.querySelector('p').textContent;
+                    const time = log.querySelector('.time').textContent;
+                    suspiciousBody.push([message, time]);
+                });
+                
+                suspiciousBody.reverse(); // Show in chronological order
+
+                doc.autoTable({
+                    startY: lastY + 15,
+                    head: [['Suspicious Activity Detected', 'Time']],
+                    body: suspiciousBody,
+                    theme: 'striped',
+                    headStyles: { fillColor: [192, 57, 43] }, // Red
+                });
+            } else {
+                doc.text("No suspicious activity was logged during this session.", 14, lastY + 15);
+            }
+
+            // --- Save PDF ---
+            const timestamp = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+            doc.save(`session_report_${timestamp}.pdf`);
+        }
+        
+        function downloadAttendanceReport() {
+            if (sessionAttendance.size === 0) {
+                showToast('No attendance data to download.', 'info');
+                return;
+            }
+
+            let csvContent = "Name,Time Marked Present\r\n"; // CSV Header
+
+            sessionAttendance.forEach((details, name) => {
+                const timeString = new Date(details.firstSeen).toLocaleString('en-US');
+                const sanitizedName = `"${name.replace(/"/g, '""')}"`; // Handle names with commas or quotes
+                csvContent += `${sanitizedName},${timeString}\r\n`;
             });
 
-            if (isFullscreen) {
-                const exitButton = document.createElement('button');
-                exitButton.id = 'exit-fullscreen-btn';
-                exitButton.textContent = 'Exit Fullscreen (Esc)';
-                exitButton.className = 'fixed top-4 right-4 z-[100] bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-md';
-                exitButton.onclick = toggleFullscreen;
-                document.body.appendChild(exitButton);
-            } else {
-                const exitButton = document.getElementById('exit-fullscreen-btn');
-                if (exitButton) {
-                    exitButton.remove();
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            if (link.download !== undefined) { 
+                const url = URL.createObjectURL(blob);
+                const timestamp = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+                link.setAttribute("href", url);
+                link.setAttribute("download", `attendance_report_${timestamp}.csv`);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            }
+        }
+
+        function updateAttendanceLog(name) {
+            const time = new Date();
+
+            if (!sessionAttendance.has(name)) {
+                const initialMessage = document.getElementById('initialLogMessage');
+                if (initialMessage) {
+                    initialMessage.remove();
                 }
+                downloadReportBtn.disabled = false;
+                downloadPdfReportBtn.disabled = false;
+                showToast(`${name} marked present!`, 'success');
+                const newEntry = document.createElement('div');
+                newEntry.id = `attendance-${name.replace(/\s+/g, '-')}`;
+                newEntry.className = 'log-entry flex justify-between items-center bg-gray-800 p-3 rounded-lg mb-2';
+                newEntry.innerHTML = `
+                    <p class="font-semibold text-green-400">${name}</p>
+                    <div class="text-right">
+                        <span class="status-indicator bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">PRESENT</span>
+                        <p class="text-gray-400 text-sm mt-1">First seen: ${time.toLocaleTimeString()}</p>
+                    </div>`;
+                attendanceLog.prepend(newEntry);
+                sessionAttendance.set(name, { element: newEntry, lastSeen: time.getTime(), firstSeen: time.getTime() });
+            } else {
+                const user = sessionAttendance.get(name);
+                user.lastSeen = Date.now();
             }
         }
         
-        // --- Canvas Drawing Helper Functions ---
-        function drawPaths() {
-            canvasCtx.lineCap = 'round';
-            canvasCtx.lineJoin = 'round';
+        function logSuspiciousActivity(message) {
+            const time = new Date().toLocaleTimeString();
+            const lastLog = suspiciousActivityLog.firstChild;
+            if (lastLog && lastLog.dataset.message === message) return;
 
-            // Draw all completed paths
-            for (const path of allPaths) {
-                if (path.points.length < 2) continue;
-                canvasCtx.beginPath();
-                canvasCtx.strokeStyle = path.color;
-                canvasCtx.lineWidth = path.width;
-                canvasCtx.moveTo(path.points[0].x, path.points[0].y);
-                for (let i = 1; i < path.points.length; i++) {
-                    canvasCtx.lineTo(path.points[i].x, path.points[i].y);
-                }
-                canvasCtx.stroke();
-            }
-            // Draw the current path being drawn
-            if (currentPath.length > 1) {
-                canvasCtx.beginPath();
-                canvasCtx.strokeStyle = drawingColor;
-                canvasCtx.lineWidth = drawingLineWidth;
-                canvasCtx.moveTo(currentPath[0].x, currentPath[0].y);
-                for (let i = 1; i < currentPath.length; i++) {
-                    canvasCtx.lineTo(currentPath[i].x, currentPath[i].y);
-                }
-                canvasCtx.stroke();
-            }
+            downloadPdfReportBtn.disabled = false;
+            const newEntry = document.createElement('div');
+            newEntry.dataset.message = message;
+            newEntry.className = 'log-entry flex justify-between items-center bg-red-900 bg-opacity-50 p-3 rounded-lg mb-2';
+            newEntry.innerHTML = `<p class="font-semibold text-red-300">${message}</p><span class="text-gray-400 time">${time}</span>`;
+            suspiciousActivityLog.prepend(newEntry);
+
+            videoWrapper.classList.add('cheating');
+            clearTimeout(cheatingAlertTimeout);
+            cheatingAlertTimeout = setTimeout(() => videoWrapper.classList.remove('cheating'), 2000);
         }
         
-        // Helper to draw rounded rectangles for on-canvas buttons
-        function drawRoundRect(ctx, x, y, width, height, radius) {
-            ctx.beginPath();
-            ctx.moveTo(x + radius, y);
-            ctx.lineTo(x + width - radius, y);
-            ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
-            ctx.lineTo(x + width, y + height - radius);
-            ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
-            ctx.lineTo(x + radius, y + height);
-            ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
-            ctx.lineTo(x, y + radius);
-            ctx.quadraticCurveTo(x, y, x + radius, y);
-            ctx.closePath();
-            ctx.fill();
+        function updateDashboard() {
+            registeredCount.textContent = registeredUsers.size;
+            presentCount.textContent = sessionAttendance.size;
         }
 
-        // --- Main Animation Loop ---
-        function onResults(results) {
-            if (loadingIndicator.style.display !== 'none') {
-                loadingIndicator.style.display = 'none';
+        function startClock() {
+            setInterval(() => {
+                liveClock.textContent = new Date().toLocaleString('en-US', {
+                    hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true,
+                    weekday: 'short', month: 'short', day: 'numeric'
+                });
+            }, 1000);
+        }
+        
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            const colors = {
+                info: 'bg-blue-500',
+                success: 'bg-green-500',
+                error: 'bg-red-500'
+            };
+            toast.className = `toast text-white py-2 px-5 rounded-full shadow-lg ${colors[type] || colors.info}`;
+            toast.textContent = message;
+            toastContainer.appendChild(toast);
+
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        // --- Registration & Firebase Storage ---
+
+        async function handleRegistrationSave() {
+            stopRegistrationFaceCheck();
+            const name = nameInput.value.trim();
+            if (name === '') {
+                showToast('Please enter a name.', 'error');
+                startRegistrationFaceCheck();
+                return;
+            }
+            if (registeredUsers.has(name)) {
+                showToast('This name is already registered.', 'error');
+                startRegistrationFaceCheck();
+                return;
             }
 
-            // Toggle mirror effect based on content type
-            if (uploadedImage) {
-                // Don't mirror for PDF/Image
-                canvasElement.classList.remove('mirrored');
-            } else {
-                // Mirror for the live camera feed
-                canvasElement.classList.add('mirrored');
-            }
+            statusDiv.textContent = `Registering ${name}...`;
+            modal.classList.add('hidden');
 
-            // Set canvas dimensions
-            canvasElement.width = isFullscreen ? window.innerWidth : videoElement.videoWidth;
-            canvasElement.height = isFullscreen ? window.innerHeight : videoElement.videoHeight;
-
-
-            canvasCtx.save();
-            canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-
-            // 1. Draw the background (camera feed or uploaded file)
-            if (uploadedImage) {
-                canvasCtx.drawImage(uploadedImage, 0, 0, canvasElement.width, canvasElement.height);
-            } else {
-                canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
-            }
-
-            // 2. Draw user-made paths
-            drawPaths();
+            const detection = await faceapi.detectSingleFace(video).withFaceLandmarks().withFaceDescriptor();
             
-            // 3. Handle hand detection and gestures
-            if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
-                let handLandmarks = results.multiHandLandmarks[0];
-
-                // If viewing a PDF/image, we need to manually flip the hand coordinates
-                // because the canvas itself is not mirrored, but the camera input is.
-                if (uploadedImage) {
-                    handLandmarks = handLandmarks.map(landmark => {
-                        return { 
-                            ...landmark, 
-                            x: 1 - landmark.x 
-                        };
+            if (detection) {
+                try {
+                    await addDoc(usersCollectionRef, {
+                        name: name,
+                        descriptor: Array.from(detection.descriptor)
                     });
+                    showToast(`Registered ${name} successfully!`, 'success');
+                    nameInput.value = '';
+                } catch(error) {
+                    console.error("Error writing document: ", error);
+                    showToast('Failed to save registration.', 'error');
                 }
-
-                handlePdfNavigation(handLandmarks);
-                handleGestures(handLandmarks);
-
-                // Draw hand landmarks for visual feedback
-                window.drawConnectors(canvasCtx, handLandmarks, window.HAND_CONNECTIONS, { color: '#34d399', lineWidth: 5 });
-                
-                // Change landmark color based on the current mode
-                const landmarkColor =
-                    currentMode === 'drawing' ? '#ec4899' : // Pink when drawing
-                    currentMode === 'erasing' ? '#ffffff' : // White when erasing
-                    '#f87171'; // Red when idle
-                window.drawLandmarks(canvasCtx, handLandmarks, { color: landmarkColor, lineWidth: 2 });
-            } else { // Hand not detected
-                if (currentMode === 'drawing') { // Finish any path if hand leaves screen
-                    if (currentPath.length > 1) {
-                        allPaths.push({ points: currentPath, color: drawingColor, width: drawingLineWidth });
-                    }
-                    currentPath = [];
-                }
-                currentMode = 'idle';
-                smoothedFingerTipPos = null; // Reset smoothing when hand is lost
+            } else {
+                showToast('Registration failed. Could not capture face.', 'error');
             }
-            
-            canvasCtx.restore();
+            statusDiv.textContent = 'Ready';
         }
         
-        function handlePdfNavigation(handLandmarks) {
-            if (!pdfDoc) return;
-            
-            const buttonWidth = 120;
-            const buttonHeight = 70;
-            const buttonPadding = 20;
-            const buttonRadius = 15;
-
-            const prevButtonRect = { x: buttonPadding, y: buttonPadding, width: buttonWidth, height: buttonHeight };
-            const nextButtonRect = { x: canvasElement.width - buttonWidth - buttonPadding, y: buttonPadding, width: buttonWidth, height: buttonHeight };
-            
-            const indexTip = handLandmarks[8];
-            const indexTipPos = { x: indexTip.x * canvasElement.width, y: indexTip.y * canvasElement.height };
-            const now = Date.now();
-            let prevButtonHover = false;
-            let nextButtonHover = false;
-
-            // Check for Previous button touch
-            if (now - lastButtonPressTime > BUTTON_PRESS_COOLDOWN &&
-                indexTipPos.x > prevButtonRect.x && indexTipPos.x < prevButtonRect.x + prevButtonRect.width &&
-                indexTipPos.y > prevButtonRect.y && indexTipPos.y < prevButtonRect.y + prevButtonRect.height) {
-                prevButtonHover = true;
-                prevPageButton.click();
-                lastButtonPressTime = now;
-            }
-
-            // Check for Next button touch
-            if (now - lastButtonPressTime > BUTTON_PRESS_COOLDOWN &&
-                indexTipPos.x > nextButtonRect.x && indexTipPos.x < nextButtonRect.x + nextButtonRect.width &&
-                indexTipPos.y > nextButtonRect.y && indexTipPos.y < nextButtonRect.y + nextButtonRect.height) {
-                nextButtonHover = true;
-                nextPageButton.click();
-                lastButtonPressTime = now;
-            }
-            
-            // Draw the buttons
-            canvasCtx.font = 'bold 30px Inter';
-            canvasCtx.textAlign = 'center';
-            canvasCtx.textBaseline = 'middle';
-
-            // Previous Button
-            canvasCtx.fillStyle = prevButtonHover ? 'rgba(96, 165, 250, 0.8)' : 'rgba(96, 165, 250, 0.5)';
-            drawRoundRect(canvasCtx, prevButtonRect.x, prevButtonRect.y, prevButtonRect.width, prevButtonRect.height, buttonRadius);
-            canvasCtx.fillStyle = 'white';
-            canvasCtx.fillText('PREV', prevButtonRect.x + prevButtonRect.width / 2, prevButtonRect.y + prevButtonRect.height / 2);
-            
-            // Next Button
-            canvasCtx.fillStyle = nextButtonHover ? 'rgba(96, 165, 250, 0.8)' : 'rgba(96, 165, 250, 0.5)';
-            drawRoundRect(canvasCtx, nextButtonRect.x, nextButtonRect.y, nextButtonRect.width, nextButtonRect.height, buttonRadius);
-            canvasCtx.fillStyle = 'white';
-            canvasCtx.fillText('NEXT', nextButtonRect.x + nextButtonRect.width / 2, nextButtonRect.y + nextButtonRect.height / 2);
+        function startRegistrationFaceCheck() {
+            registrationStatus.style.display = 'block';
+            registrationIntervalId = setInterval(async () => {
+                const detection = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions());
+                if (detection) {
+                    registrationStatus.textContent = 'Face Detected. Ready to save.';
+                    registrationStatus.className = 'mb-4 text-sm p-2 rounded-lg bg-green-900 text-green-300';
+                    confirmBtn.disabled = false;
+                } else {
+                    registrationStatus.textContent = 'No face detected. Please face the camera.';
+                    registrationStatus.className = 'mb-4 text-sm p-2 rounded-lg bg-red-900 text-red-300';
+                    confirmBtn.disabled = true;
+                }
+            }, 500);
         }
 
-        function handleGestures(handLandmarks) {
-            const indexTip = handLandmarks[8];
-            const thumbTip = handLandmarks[4];
-            const middleTip = handLandmarks[12];
-            const ringTip = handLandmarks[16];
-            const pinkyTip = handLandmarks[20];
-
-            // --- Gesture Recognition Logic ---
-
-            // 1. Fist Gesture for Erasing
-            // A fist is when the tips of the fingers are below their second knuckle (PIP joint).
-            const isFist =
-                indexTip.y > handLandmarks[6].y &&
-                middleTip.y > handLandmarks[10].y &&
-                ringTip.y > handLandmarks[14].y &&
-                pinkyTip.y > handLandmarks[18].y;
-
-            // 2. Drawing Gesture: Index finger and thumb tips are very close
-            const drawGestureDistance = Math.hypot(indexTip.x - thumbTip.x, indexTip.y - thumbTip.y);
-            const isDrawingGesture = drawGestureDistance < 0.04;
-
-            // --- Action Implementation ---
-
-            if (isFist) {
-                currentMode = 'erasing';
-                // If we were just drawing, discard the current path
-                if (lastMode === 'drawing' && currentPath.length > 0) {
-                    currentPath = [];
-                }
-
-                // Use the center of the palm as the eraser position for stability
-                const palmCenterX = (handLandmarks[5].x + handLandmarks[9].x) / 2;
-                const palmCenterY = (handLandmarks[5].y + handLandmarks[9].y) / 2;
-                const eraserPos = {
-                    x: palmCenterX * canvasElement.width,
-                    y: palmCenterY * canvasElement.height
-                };
-
-                // Draw the eraser visual feedback
-                canvasCtx.fillStyle = eraserColor;
-                canvasCtx.beginPath();
-                canvasCtx.arc(eraserPos.x, eraserPos.y, eraserRadius, 0, 2 * Math.PI);
-                canvasCtx.fill();
-
-                // Filter out paths that are touched by the eraser
-                allPaths = allPaths.filter(path =>
-                    !path.points.some(point =>
-                        Math.hypot(point.x - eraserPos.x, point.y - eraserPos.y) < eraserRadius
-                    )
-                );
-
-            } else if (isDrawingGesture) {
-                currentMode = 'drawing';
-                // --- Accuracy Improvement: Smoothing for Drawing ---
-                // Use the midpoint between index and thumb finger for a more stable anchor
-                const fingerTipMidpoint = {
-                    x: ((indexTip.x + thumbTip.x) / 2) * canvasElement.width,
-                    y: ((indexTip.y + thumbTip.y) / 2) * canvasElement.height
-                };
-
-                // Apply exponential moving average for smoother drawing
-                if (!smoothedFingerTipPos || lastMode !== 'drawing') {
-                    smoothedFingerTipPos = fingerTipMidpoint;
-                } else {
-                    smoothedFingerTipPos.x = smoothedFingerTipPos.x * (1 - smoothingFactor) + fingerTipMidpoint.x * smoothingFactor;
-                    smoothedFingerTipPos.y = smoothedFingerTipPos.y * (1 - smoothingFactor) + fingerTipMidpoint.y * smoothingFactor;
-                }
-
-                // Start a new path or add the smoothed position to the current one
-                if (lastMode !== 'drawing') {
-                    currentPath = [{...smoothedFingerTipPos}];
-                } else {
-                    currentPath.push({...smoothedFingerTipPos}); // Push a copy
-                }
-            } else { // Idle mode (hand is open, not drawing or erasing)
-                currentMode = 'idle';
-                // If we were just drawing, finalize the path
-                if (lastMode === 'drawing') {
-                    if (currentPath.length > 1) {
-                        allPaths.push({ points: currentPath, color: drawingColor, width: drawingLineWidth });
-                    }
-                    currentPath = [];
-                }
-
-                // --- Accuracy Improvement: Smoothing for Cursor ---
-                const cursorTarget = { x: indexTip.x * canvasElement.width, y: indexTip.y * canvasElement.height };
-                if (!smoothedFingerTipPos || lastMode !== 'idle') { // Reset smoothing on mode change
-                    smoothedFingerTipPos = cursorTarget;
-                } else {
-                    smoothedFingerTipPos.x = smoothedFingerTipPos.x * (1 - smoothingFactor) + cursorTarget.x * smoothingFactor;
-                    smoothedFingerTipPos.y = smoothedFingerTipPos.y * (1 - smoothingFactor) + cursorTarget.y * smoothingFactor;
-                }
-
-                // Draw a smoothed cursor
-                canvasCtx.fillStyle = cursorColor;
-                canvasCtx.beginPath();
-                canvasCtx.arc(smoothedFingerTipPos.x, smoothedFingerTipPos.y, cursorRadius, 0, 2 * Math.PI);
-                canvasCtx.fill();
-            }
-            lastMode = currentMode;
+        function stopRegistrationFaceCheck() {
+            clearInterval(registrationIntervalId);
+            registrationStatus.innerHTML = '&nbsp;';
+            registrationStatus.style.display = 'none';
+            confirmBtn.disabled = true;
         }
-
-
-        // --- PDF Rendering ---
-        async function renderPdfPage(num) {
-            if (!pdfDoc || num < 1 || num > totalPages) return;
+        
+        function listenForUsers() {
+            if (unsubscribeUsers) unsubscribeUsers();
             
-            try {
-                const page = await pdfDoc.getPage(num);
-                const viewport = page.getViewport({ scale: 2.0 });
-                const tempCanvas = document.createElement('canvas');
-                const tempCtx = tempCanvas.getContext('2d');
-                tempCanvas.height = viewport.height;
-                tempCanvas.width = viewport.width;
+            unsubscribeUsers = onSnapshot(usersCollectionRef, (snapshot) => {
+                const newUsers = new Map();
+                snapshot.forEach(doc => {
+                    const userData = doc.data();
+                    newUsers.set(userData.name, new Float32Array(userData.descriptor));
+                });
+                registeredUsers = newUsers;
+                updateDashboard();
 
-                await page.render({ canvasContext: tempCtx, viewport: viewport }).promise;
-                
-                const img = new Image();
-                img.onload = () => {
-                    uploadedImage = img;
-                    allPaths = []; // Clear drawings for the new page
-                    currentPath = [];
-                };
-                img.src = tempCanvas.toDataURL();
-                pageIndicator.textContent = `Page ${num} of ${totalPages}`;
-                
-                // Update button states
-                prevPageButton.disabled = num <= 1;
-                nextPageButton.disabled = num >= totalPages;
-                prevPageButton.classList.toggle('disabled-button', num <= 1);
-                nextPageButton.classList.toggle('disabled-button', num >= totalPages);
+                registerBtn.disabled = false;
+                markAttendanceBtn.disabled = false;
+                clearDataBtn.disabled = false;
 
-            } catch(error) {
-                console.error("Failed to render PDF page:", error);
-                showNotification("Failed to render PDF page.");
-            }
+                if(isSessionActive) {
+                    clearInterval(detectionIntervalId);
+                    startDetection();
+                }
+
+            }, (error) => {
+                console.error("Error listening to user data:", error);
+                showToast('Error fetching user data.', 'error');
+            });
         }
-
-        // --- Initialization and Event Listeners ---
-        const hands = new window.Hands({
-            locateFile: (file) => {
-                return `https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4/${file}`;
-            }
-        });
-        hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.7, minTrackingConfidence: 0.7 });
-        hands.onResults(onResults);
-        const camera = new window.Camera(videoElement, { onFrame: async () => { await hands.send({ image: videoElement }); }, width: 1280, height: 720 });
-        camera.start();
-
-        clearButton.addEventListener('click', () => {
-            if (isFullscreen) {
-                toggleFullscreen();
-            }
-            fullscreenButton.classList.add('hidden');
-            allPaths = [];
-            currentPath = [];
-            uploadedImage = null; // Also clear the uploaded image background
-            pdfDoc = null;
-            fileUploadInput.value = ''; // Reset file input
-            // Hide PDF controls
-            prevPageButton.classList.add('hidden');
-            nextPageButton.classList.add('hidden');
-            pageIndicator.classList.add('hidden');
-        });
-
-        fileUploadInput.addEventListener('change', (event) => {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            fullscreenButton.classList.remove('hidden');
-
-            // Reset drawing and PDF state
-            allPaths = [];
-            currentPath = [];
-            pdfDoc = null;
-            uploadedImage = null;
-
-            if (file.type.startsWith('image/')) {
-                // Hide PDF controls
-                prevPageButton.classList.add('hidden');
-                nextPageButton.classList.add('hidden');
-                pageIndicator.classList.add('hidden');
-                
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const img = new Image();
-                    img.onload = () => { uploadedImage = img; };
-                    img.src = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            } else if (file.type === 'application/pdf') {
-                const reader = new FileReader();
-                reader.onload = async (e) => {
-                    try {
-                        const loadingTask = window.pdfjsLib.getDocument({ data: e.target.result });
-                        const pdf = await loadingTask.promise;
-                        pdfDoc = pdf;
-                        totalPages = pdf.numPages;
-                        currentPageNum = 1;
-                        await renderPdfPage(currentPageNum);
-                        // Show PDF controls
-                        prevPageButton.classList.remove('hidden');
-                        nextPageButton.classList.remove('hidden');
-                        pageIndicator.classList.remove('hidden');
-                    } catch (error) {
-                        console.error('Error loading PDF:', error);
-                        showNotification("Could not load the PDF file. It might be corrupted.");
-                    }
-                };
-                reader.readAsArrayBuffer(file);
-            } else {
-                showNotification("Unsupported file-type. Please upload an image or PDF.");
-            }
-        });
-
-        fullscreenButton.addEventListener('click', toggleFullscreen);
-
-        document.addEventListener('keydown', (event) => {
-            if (event.key === "Escape" && isFullscreen) {
-                toggleFullscreen();
-            }
-        });
-
-        nextPageButton.addEventListener('click', () => {
-            if (currentPageNum >= totalPages) return;
-            currentPageNum++;
-            renderPdfPage(currentPageNum);
-        });
-
-        prevPageButton.addEventListener('click', () => {
-            if (currentPageNum <= 1) return;
-            currentPageNum--;
-            renderPdfPage(currentPageNum);
-        });
+        
+        function getLabeledFaceDescriptors() {
+            return Array.from(registeredUsers.entries()).map(([name, descriptor]) => {
+                return new faceapi.LabeledFaceDescriptors(name, [descriptor]);
+            });
+        }
     </script>
 </body>
 </html>
+
 
 
 
