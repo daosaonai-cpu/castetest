@@ -123,12 +123,7 @@
     <!-- Toast Notification Container -->
     <div id="toastContainer" class="toast-container"></div>
 
-    <script type="module">
-        // --- Firebase SDK Imports ---
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, collection, addDoc, getDocs, writeBatch, onSnapshot } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        
+    <script>
         // --- DOM Elements ---
         const video = document.getElementById('video');
         const videoWrapper = document.getElementById('videoWrapper');
@@ -156,11 +151,6 @@
         const downloadReportBtn = document.getElementById('downloadReportBtn');
         const downloadPdfReportBtn = document.getElementById('downloadPdfReportBtn');
 
-        // --- Firebase State ---
-        let db, auth;
-        let usersCollectionRef;
-        let unsubscribeUsers;
-
         // --- State Variables ---
         let registeredUsers = new Map();
         let isSessionActive = false;
@@ -177,39 +167,19 @@
 
         const LIVENESS_TIMEOUT = 3000;
         const EAR_THRESHOLD = 0.25;
+        const LOCAL_STORAGE_KEY = 'smart_attendance_users';
 
         // --- Initialization ---
         window.onload = () => {
-            initializeFirebase();
+            initializeApp();
             loadModels();
             startClock();
-            updateDashboard();
         };
 
-        async function initializeFirebase() {
-            try {
-                statusDiv.textContent = 'Connecting to database...';
-                const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-                const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
-                
-                const app = initializeApp(firebaseConfig);
-                db = getFirestore(app);
-                auth = getAuth(app);
-
-                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
-                    await signInWithCustomToken(auth, __initial_auth_token);
-                } else {
-                    await signInAnonymously(auth);
-                }
-
-                usersCollectionRef = collection(db, `artifacts/${appId}/public/data/registered_users`);
-                listenForUsers();
-                statusDiv.textContent = 'Database connected.';
-            } catch (error) {
-                console.error("Firebase initialization failed:", error);
-                statusDiv.textContent = 'Database connection failed.';
-                showToast('Could not connect to the database.', 'error');
-            }
+        function initializeApp() {
+            statusDiv.textContent = 'Loading data...';
+            loadUsersFromLocalStorage();
+            updateDashboard();
         }
 
         async function loadModels() {
@@ -263,30 +233,22 @@
                 return;
             }
             modalTitle.textContent = 'Confirm Action';
-            modalBody.textContent = 'Are you sure you want to delete all registered user data from the database? This action cannot be undone.';
+            modalBody.textContent = 'Are you sure you want to delete all registered user data from local storage? This action cannot be undone.';
             nameInput.style.display = 'none';
             registrationStatus.style.display = 'none';
             confirmBtn.textContent = 'Yes, Clear All Data';
             confirmBtn.disabled = false;
-            confirmBtn.onclick = async () => {
-                try {
-                    const querySnapshot = await getDocs(usersCollectionRef);
-                    const batch = writeBatch(db);
-                    querySnapshot.forEach(doc => {
-                        batch.delete(doc.ref);
-                    });
-                    await batch.commit();
-                    
-                    showToast('All registered data has been cleared.', 'success');
-                    modal.classList.add('hidden');
-                    if (isSessionActive) stopSession();
-                    attendanceLog.innerHTML = '<p id="initialLogMessage" class="text-gray-400">No attendance marked yet.</p>';
-                    downloadReportBtn.disabled = true;
-                    downloadPdfReportBtn.disabled = true;
-                } catch(error) {
-                    console.error("Error clearing data: ", error);
-                    showToast('Failed to clear data.', 'error');
-                }
+            confirmBtn.onclick = () => {
+                registeredUsers.clear();
+                localStorage.removeItem(LOCAL_STORAGE_KEY);
+                updateDashboard();
+                
+                showToast('All registered data has been cleared.', 'success');
+                modal.classList.add('hidden');
+                if (isSessionActive) stopSession();
+                attendanceLog.innerHTML = '<p id="initialLogMessage" class="text-gray-400">No attendance marked yet.</p>';
+                downloadReportBtn.disabled = true;
+                downloadPdfReportBtn.disabled = true;
             };
             modal.classList.remove('hidden');
         });
@@ -727,7 +689,7 @@
             }, 3000);
         }
 
-        // --- Registration & Firebase Storage ---
+        // --- Registration & Local Storage ---
 
         async function handleRegistrationSave() {
             stopRegistrationFaceCheck();
@@ -749,17 +711,11 @@
             const detection = await faceapi.detectSingleFace(video).withFaceLandmarks().withFaceDescriptor();
             
             if (detection) {
-                try {
-                    await addDoc(usersCollectionRef, {
-                        name: name,
-                        descriptor: Array.from(detection.descriptor)
-                    });
-                    showToast(`Registered ${name} successfully!`, 'success');
-                    nameInput.value = '';
-                } catch(error) {
-                    console.error("Error writing document: ", error);
-                    showToast('Failed to save registration.', 'error');
-                }
+                registeredUsers.set(name, Array.from(detection.descriptor)); // Store as a plain array
+                saveUsersToLocalStorage();
+                updateDashboard();
+                showToast(`Registered ${name} successfully!`, 'success');
+                nameInput.value = '';
             } else {
                 showToast('Registration failed. Could not capture face.', 'error');
             }
@@ -789,41 +745,37 @@
             confirmBtn.disabled = true;
         }
         
-        function listenForUsers() {
-            if (unsubscribeUsers) unsubscribeUsers();
-            
-            unsubscribeUsers = onSnapshot(usersCollectionRef, (snapshot) => {
-                const newUsers = new Map();
-                snapshot.forEach(doc => {
-                    const userData = doc.data();
-                    newUsers.set(userData.name, new Float32Array(userData.descriptor));
-                });
-                registeredUsers = newUsers;
-                updateDashboard();
-
-                registerBtn.disabled = false;
-                markAttendanceBtn.disabled = false;
-                clearDataBtn.disabled = false;
-
-                if(isSessionActive) {
-                    clearInterval(detectionIntervalId);
-                    startDetection();
-                }
-
-            }, (error) => {
-                console.error("Error listening to user data:", error);
-                showToast('Error fetching user data.', 'error');
-            });
+        function saveUsersToLocalStorage() {
+            // Convert Map to an array of [key, value] pairs for JSON serialization
+            const usersArray = Array.from(registeredUsers.entries());
+            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(usersArray));
+        }
+        
+        function loadUsersFromLocalStorage() {
+            const storedUsers = localStorage.getItem(LOCAL_STORAGE_KEY);
+            if (storedUsers) {
+                const usersArray = JSON.parse(storedUsers);
+                // Convert array back to Map
+                registeredUsers = new Map(usersArray);
+            }
+            // Enable buttons after loading data
+            registerBtn.disabled = false;
+            markAttendanceBtn.disabled = false;
+            clearDataBtn.disabled = false;
         }
         
         function getLabeledFaceDescriptors() {
+            // Need to convert the stored plain array back to Float32Array for face-api
             return Array.from(registeredUsers.entries()).map(([name, descriptor]) => {
-                return new faceapi.LabeledFaceDescriptors(name, [descriptor]);
+                return new faceapi.LabeledFaceDescriptors(name, [new Float32Array(descriptor)]);
             });
         }
     </script>
 </body>
 </html>
+
+
+
 
 
 
