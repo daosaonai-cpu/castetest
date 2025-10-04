@@ -77,13 +77,13 @@
                     </div>
                      <button id="clearDataBtn" class="w-full bg-gray-600 hover:bg-red-800 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out mt-2 disabled:opacity-50 disabled:cursor-not-allowed" disabled>Clear All Data</button>
                      <div class="grid grid-cols-2 gap-2 mt-2">
-                         <button id="downloadReportBtn" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed" disabled>Report (CSV)</button>
-                         <button id="downloadPdfReportBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed" disabled>Report (PDF)</button>
+                        <button id="downloadReportBtn" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed" disabled>Report (CSV)</button>
+                        <button id="downloadPdfReportBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed" disabled>Report (PDF)</button>
                      </div>
                 </div>
                  <div id="status" class="mt-3 text-center text-gray-300 p-2 bg-gray-800 rounded-lg">
-                     Initializing...
-                 </div>
+                    Initializing...
+                </div>
             </div>
         </div>
 
@@ -123,7 +123,7 @@
     <!-- Toast Notification Container -->
     <div id="toastContainer" class="toast-container"></div>
 
-    <script>
+    <script type="module">
         // --- DOM Elements ---
         const video = document.getElementById('video');
         const videoWrapper = document.getElementById('videoWrapper');
@@ -167,19 +167,23 @@
 
         const LIVENESS_TIMEOUT = 3000;
         const EAR_THRESHOLD = 0.25;
-        const LOCAL_STORAGE_KEY = 'smart_attendance_users';
 
         // --- Initialization ---
         window.onload = () => {
-            initializeApp();
+            initializeLocalStorage();
             loadModels();
             startClock();
+            updateDashboard();
         };
 
-        function initializeApp() {
-            statusDiv.textContent = 'Loading data...';
-            loadUsersFromLocalStorage();
-            updateDashboard();
+        function initializeLocalStorage() {
+            statusDiv.textContent = 'Loading data from browser...';
+            loadRegisteredUsers();
+            statusDiv.textContent = 'Ready';
+            // Enable buttons after loading data
+            registerBtn.disabled = false;
+            markAttendanceBtn.disabled = false;
+            clearDataBtn.disabled = false;
         }
 
         async function loadModels() {
@@ -233,15 +237,14 @@
                 return;
             }
             modalTitle.textContent = 'Confirm Action';
-            modalBody.textContent = 'Are you sure you want to delete all registered user data from local storage? This action cannot be undone.';
+            modalBody.textContent = 'Are you sure you want to delete all registered user data from your browser? This action cannot be undone.';
             nameInput.style.display = 'none';
             registrationStatus.style.display = 'none';
             confirmBtn.textContent = 'Yes, Clear All Data';
             confirmBtn.disabled = false;
             confirmBtn.onclick = () => {
+                localStorage.removeItem('registeredUsers');
                 registeredUsers.clear();
-                localStorage.removeItem(LOCAL_STORAGE_KEY);
-                updateDashboard();
                 
                 showToast('All registered data has been cleared.', 'success');
                 modal.classList.add('hidden');
@@ -249,6 +252,7 @@
                 attendanceLog.innerHTML = '<p id="initialLogMessage" class="text-gray-400">No attendance marked yet.</p>';
                 downloadReportBtn.disabled = true;
                 downloadPdfReportBtn.disabled = true;
+                updateDashboard();
             };
             modal.classList.remove('hidden');
         });
@@ -261,9 +265,9 @@
 
         markAttendanceBtn.addEventListener('click', () => {
              if (registeredUsers.size === 0) {
-                 showToast("Please register at least one person first.", 'error');
-                 return;
-             }
+                showToast("Please register at least one person first.", 'error');
+                return;
+            }
             isSessionActive = !isSessionActive;
             if (isSessionActive) {
                 startSession();
@@ -711,8 +715,8 @@
             const detection = await faceapi.detectSingleFace(video).withFaceLandmarks().withFaceDescriptor();
             
             if (detection) {
-                registeredUsers.set(name, Array.from(detection.descriptor)); // Store as a plain array
-                saveUsersToLocalStorage();
+                registeredUsers.set(name, detection.descriptor);
+                saveRegisteredUsers();
                 updateDashboard();
                 showToast(`Registered ${name} successfully!`, 'success');
                 nameInput.value = '';
@@ -745,34 +749,43 @@
             confirmBtn.disabled = true;
         }
         
-        function saveUsersToLocalStorage() {
-            // Convert Map to an array of [key, value] pairs for JSON serialization
-            const usersArray = Array.from(registeredUsers.entries());
-            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(usersArray));
+        function saveRegisteredUsers() {
+            // Convert Map to a JSON-friendly format
+            const usersArray = Array.from(registeredUsers.entries()).map(([name, descriptor]) => {
+                return [name, Array.from(descriptor)]; // Convert Float32Array to regular array
+            });
+            localStorage.setItem('registeredUsers', JSON.stringify(usersArray));
         }
-        
-        function loadUsersFromLocalStorage() {
-            const storedUsers = localStorage.getItem(LOCAL_STORAGE_KEY);
-            if (storedUsers) {
-                const usersArray = JSON.parse(storedUsers);
-                // Convert array back to Map
-                registeredUsers = new Map(usersArray);
+
+        function loadRegisteredUsers() {
+            const usersJSON = localStorage.getItem('registeredUsers');
+            if (usersJSON) {
+                try {
+                    const usersArray = JSON.parse(usersJSON);
+                    const newUsers = new Map();
+                    usersArray.forEach(([name, descriptorArray]) => {
+                        newUsers.set(name, new Float32Array(descriptorArray));
+                    });
+                    registeredUsers = newUsers;
+                    updateDashboard();
+                } catch(e) {
+                    console.error("Failed to parse registered users from local storage:", e);
+                    showToast("Could not load user data from browser storage.", "error");
+                }
             }
-            // Enable buttons after loading data
-            registerBtn.disabled = false;
-            markAttendanceBtn.disabled = false;
-            clearDataBtn.disabled = false;
         }
         
         function getLabeledFaceDescriptors() {
-            // Need to convert the stored plain array back to Float32Array for face-api
             return Array.from(registeredUsers.entries()).map(([name, descriptor]) => {
-                return new faceapi.LabeledFaceDescriptors(name, [new Float32Array(descriptor)]);
+                return new faceapi.LabeledFaceDescriptors(name, [descriptor]);
             });
         }
     </script>
 </body>
 </html>
+
+
+
 
 
 
