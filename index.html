@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>C Programming Array Quiz</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
@@ -74,6 +76,17 @@
                 <button id="startQuizBtn" class="bg-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-blue-700 transition-colors duration-300 text-lg shadow-lg">Start Quiz</button>
             </div>
         </div>
+        
+        <div id="resultSection" class="hidden text-center mb-8">
+            <h1 class="text-3xl font-bold text-gray-900 mb-4">Quiz Complete!</h1>
+            <p class="text-2xl text-gray-700 mb-2">Your Score:</p>
+            <p id="score" class="text-5xl font-extrabold text-blue-600 mb-6"></p>
+            <p id="feedback" class="text-lg font-medium mb-8"></p>
+            <div class="flex justify-center items-center space-x-4">
+                <button id="tryAgainBtn" class="bg-indigo-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-indigo-700 transition-colors duration-300 text-lg shadow-lg">Try Again</button>
+                <button id="downloadPdfBtn" class="bg-gray-700 text-white font-bold py-3 px-8 rounded-lg hover:bg-gray-800 transition-colors duration-300 text-lg shadow-lg">Download as PDF</button>
+            </div>
+        </div>
 
         <div id="quizSection" class="hidden">
             <h1 class="text-3xl font-bold text-center text-gray-900 mb-8">C Array Questions</h1>
@@ -83,14 +96,6 @@
             <div class="text-center mt-8">
                  <button id="submitBtn" class="bg-green-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-green-700 transition-colors duration-300 text-lg shadow-lg">Submit Answers</button>
             </div>
-        </div>
-
-        <div id="resultSection" class="hidden text-center">
-            <h1 class="text-3xl font-bold text-gray-900 mb-4">Quiz Complete!</h1>
-            <p class="text-2xl text-gray-700 mb-2">Your Score:</p>
-            <p id="score" class="text-5xl font-extrabold text-blue-600 mb-6"></p>
-            <p id="feedback" class="text-lg font-medium mb-8"></p>
-            <button id="tryAgainBtn" class="bg-indigo-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-indigo-700 transition-colors duration-300 text-lg shadow-lg">Try Again</button>
         </div>
     </div>
 
@@ -148,6 +153,7 @@
             { question: "What does `char message[] = \"Hi\";` create?", options: ["An array of size 2", "An array of size 3", "An array of size 1", "An array of size 4"], answer: 1 }
         ];
 
+        const mainContainer = document.getElementById('mainContainer');
         const introSection = document.getElementById('introSection');
         const quizSection = document.getElementById('quizSection');
         const resultSection = document.getElementById('resultSection');
@@ -157,6 +163,7 @@
         const scoreEl = document.getElementById('score');
         const feedbackEl = document.getElementById('feedback');
         const tryAgainBtn = document.getElementById('tryAgainBtn');
+        const downloadPdfBtn = document.getElementById('downloadPdfBtn');
 
         function startQuiz() {
             introSection.classList.add('hidden');
@@ -207,7 +214,6 @@
                 }
             });
 
-            quizSection.classList.add('hidden');
             resultSection.classList.remove('hidden');
 
             const percentage = Math.round((score / quizData.length) * 100);
@@ -227,8 +233,7 @@
                  feedbackEl.className = 'text-lg font-medium mb-8 text-red-600';
             }
             
-            submitBtn.disabled = true;
-            submitBtn.classList.add('opacity-50', 'cursor-not-allowed');
+            submitBtn.parentElement.style.display = 'none';
             
             // Disable all radio buttons after submission
             const radioButtons = quizForm.querySelectorAll('input[type="radio"]');
@@ -237,15 +242,60 @@
 
         function tryAgain() {
             resultSection.classList.add('hidden');
+            quizSection.classList.add('hidden');
             introSection.classList.remove('hidden');
-            submitBtn.disabled = false;
-            submitBtn.classList.remove('opacity-50', 'cursor-not-allowed');
+            
+            submitBtn.parentElement.style.display = 'block';
+
             quizForm.reset();
              const labels = quizForm.querySelectorAll('label');
              labels.forEach(label => {
                 label.classList.remove('correct', 'incorrect');
              });
+
+            const radioButtons = quizForm.querySelectorAll('input[type="radio"]');
+            radioButtons.forEach(radio => radio.disabled = false);
         }
+
+        function downloadPDF() {
+            const { jsPDF } = window.jspdf;
+            const contentToPrint = document.getElementById('mainContainer');
+            const resultButtons = document.querySelector('#resultSection .flex');
+
+            // Hide buttons for a clean PDF
+            resultButtons.style.display = 'none';
+
+            html2canvas(contentToPrint, {scrollY: -window.scrollY, scale: 2}).then(canvas => {
+                const imgData = canvas.toDataURL('image/png');
+                const pdf = new jsPDF({
+                    orientation: 'p',
+                    unit: 'mm',
+                    format: 'a4'
+                });
+
+                const imgProps = pdf.getImageProperties(imgData);
+                const pdfWidth = pdf.internal.pageSize.getWidth();
+                const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+                let heightLeft = pdfHeight;
+                let position = 0;
+                pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
+                heightLeft -= pdf.internal.pageSize.getHeight();
+
+                while (heightLeft > 0) {
+                    position = -heightLeft + pdf.internal.pageSize.getHeight() ;
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
+                    heightLeft -= pdf.internal.pageSize.getHeight();
+                }
+
+                pdf.save("c-array-quiz-results.pdf");
+
+                // Show buttons again
+                resultButtons.style.display = 'flex';
+            });
+        }
+
 
         startQuizBtn.addEventListener('click', startQuiz);
         submitBtn.addEventListener('click', (e) => {
@@ -254,11 +304,15 @@
             window.scrollTo(0, 0); // Scroll to top to see results
         });
         tryAgainBtn.addEventListener('click', tryAgain);
+        downloadPdfBtn.addEventListener('click', downloadPDF);
 
     </script>
 
 </body>
 </html>
+
+
+
 
 
 
