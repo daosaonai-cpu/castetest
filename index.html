@@ -3,313 +3,630 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>C Programming Array Quiz</title>
+    <title>NIELIT KOKRAJHAR EC AI Smart Class Env.</title>
+    <!-- Tailwind CSS for styling -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- MediaPipe libraries -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.3/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils@0.6/control_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils@0.3/drawing_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4/hands.js" crossorigin="anonymous"></script>
+    <!-- PDF.js library -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <style>
+        /* Custom styles for the loader, layout, and new UI elements */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+        
         body {
             font-family: 'Inter', sans-serif;
         }
-        .quiz-container {
-            max-width: 800px;
-            margin: 2rem auto;
-            padding: 2rem;
-            background-color: #ffffff;
-            border-radius: 1rem;
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        .loader {
+            border: 8px solid #f3f3f3; /* Light grey */
+            border-top: 8px solid #3498db; /* Blue */
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
         }
-        .question {
-            margin-bottom: 1.5rem;
-            padding-bottom: 1.5rem;
-            border-bottom: 1px solid #e5e7eb;
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
-        .question:last-child {
-            border-bottom: none;
-            margin-bottom: 0;
-            padding-bottom: 0;
-        }
-        .options label {
-            display: block;
-            padding: 0.75rem 1rem;
-            margin-bottom: 0.5rem;
-            border-radius: 0.5rem;
-            cursor: pointer;
-            transition: background-color 0.3s, border-color 0.3s;
-            border: 1px solid #d1d5db;
-        }
-        .options label:hover {
-            background-color: #f3f4f6;
-        }
-        .options input[type="radio"]:checked + label {
-            background-color: #dbeafe;
-            border-color: #60a5fa;
-            font-weight: 500;
-        }
-        .options input[type="radio"] {
+        .input_video {
             display: none;
         }
-        .correct {
-            background-color: #d1fae5 !important;
-            border-color: #10b981 !important;
+        #output_canvas {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* Use contain to see the whole page */
         }
-        .incorrect {
-            background-color: #fee2e2 !important;
-            border-color: #ef4444 !important;
+        .mirrored {
+            transform: scaleX(-1); /* Mirror effect */
+        }
+        /* Style for disabled buttons */
+        .disabled-button {
+            background-color: #a0aec0; /* gray-500 */
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        /* Style for notifications */
+        #notification-container {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(239, 68, 68, 0.8); /* red-500 with opacity */
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        #notification-container.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        /* Fullscreen style for the container */
+        #container.fullscreen-mode {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            border-radius: 0;
+            z-index: 50;
+            background-color: #111827; /* bg-gray-900 */
         }
     </style>
 </head>
-<body class="bg-gray-100 text-gray-800">
+<body class="bg-gray-900 text-white flex flex-col items-center justify-center min-h-screen p-4">
 
-    <div id="mainContainer" class="quiz-container">
-        <div id="introSection">
-            <h1 class="text-3xl font-bold text-center text-gray-900 mb-4">Welcome to the C Array Quiz!</h1>
-            <p class="text-lg text-center text-gray-600 mb-6">Master the fundamentals of arrays in C programming.</p>
-            <div class="bg-gray-50 p-6 rounded-lg border border-gray-200">
-                 <h2 class="text-xl font-semibold text-gray-800 mb-3">Understanding Arrays in C</h2>
-                 <p class="text-gray-700 leading-relaxed">
-                    In C programming, an array is a fundamental data structure used to store a collection of elements of the same data type in contiguous memory locations. Think of it as a set of numbered boxes, where each box holds a value, and you can access any box using its number, which is called an index. The index always starts from 0 for the first element. To declare an array, you must specify the type of data it will hold, a name for the array, and the number of elements it can store inside square brackets `[]`. For example, `int scores[10];` declares an integer array named `scores` that can hold 10 integer values. The indices for this array would range from 0 to 9. You can initialize an array at the time of declaration, like this: `int numbers[5] = {10, 20, 30, 40, 50};`. If you provide initial values, you can even omit the size, and the compiler will calculate it for you: `int numbers[] = {10, 20, 30};`. Accessing an element is simple: you use the array name followed by the index in square brackets. For instance, to get the third element from the `numbers` array, you would use `numbers[2]`, which would give you the value 30. Similarly, you can change the value of an element, for example: `numbers[2] = 35;`. It's crucial to remember that C does not perform bounds checking on arrays, meaning if you try to access an element outside the valid index range (e.g., `scores[10]` in our first example), it can lead to unpredictable behavior and bugs in your program.
-                 </p>
-            </div>
-            <div class="text-center mt-8">
-                <button id="startQuizBtn" class="bg-blue-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-blue-700 transition-colors duration-300 text-lg shadow-lg">Start Quiz</button>
+    <div class="w-full max-w-4xl mx-auto">
+        <h1 class="text-3xl md:text-4xl font-bold text-center mb-2 text-blue-400">NIELIT KOKRAJHAR EC AI Smart Class Env.</h1>
+        <p class="text-center text-gray-400 mb-6">BANAJIT BORO</p>
+
+        <!-- Main container for the video feed and loader -->
+        <div id="container" class="relative w-full aspect-video rounded-lg shadow-2xl bg-gray-800 flex items-center justify-center overflow-hidden">
+            <canvas id="output_canvas" class="absolute top-0 left-0"></canvas>
+            <video class="input_video" id="input_video" autoplay playsinline></video>
+            <div id="loading-indicator" class="absolute inset-0 flex flex-col items-center justify-center bg-gray-800 bg-opacity-75 rounded-lg z-10">
+                <div class="loader"></div>
+                <p class="mt-4 text-lg">Initializing Camera...</p>
             </div>
         </div>
         
-        <div id="resultSection" class="hidden text-center mb-8">
-            <h1 class="text-3xl font-bold text-gray-900 mb-4">Quiz Complete!</h1>
-            <p class="text-2xl text-gray-700 mb-2">Your Score:</p>
-            <p id="score" class="text-5xl font-extrabold text-blue-600 mb-6"></p>
-            <p id="feedback" class="text-lg font-medium mb-8"></p>
-            <div class="flex justify-center items-center space-x-4">
-                <button id="tryAgainBtn" class="bg-indigo-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-indigo-700 transition-colors duration-300 text-lg shadow-lg">Try Again</button>
-                <button id="downloadPdfBtn" class="bg-gray-700 text-white font-bold py-3 px-8 rounded-lg hover:bg-gray-800 transition-colors duration-300 text-lg shadow-lg">Download as PDF</button>
-            </div>
-        </div>
-
-        <div id="quizSection" class="hidden">
-            <h1 class="text-3xl font-bold text-center text-gray-900 mb-8">C Array Questions</h1>
-            <form id="quizForm">
-                <!-- Questions will be injected here by JavaScript -->
-            </form>
-            <div class="text-center mt-8">
-                 <button id="submitBtn" class="bg-green-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-green-700 transition-colors duration-300 text-lg shadow-lg">Submit Answers</button>
-            </div>
+        <!-- Controls -->
+        <div class="mt-4 flex justify-center items-center flex-wrap gap-4">
+            <button id="clear-button" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors">
+                Clear All
+            </button>
+            <button id="fullscreen-button" class="hidden bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors">
+                Fullscreen
+            </button>
+            <input type="file" id="file-upload" class="hidden" accept="image/*,application/pdf">
+            <label for="file-upload" class="bg-pink-500 hover:bg-pink-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors cursor-pointer">
+                Upload File
+            </label>
+            <!-- PDF Navigation -->
+            <button id="prev-page-button" class="hidden bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors">Prev</button>
+            <span id="page-indicator" class="hidden text-lg"></span>
+            <button id="next-page-button" class="hidden bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors">Next</button>
         </div>
     </div>
 
-    <script>
-        const quizData = [
-            { question: "What is an array in C?", options: ["A collection of elements of different data types", "A collection of elements of the same data type", "A function", "A keyword"], answer: 1 },
-            { question: "How do you declare an integer array named 'arr' of size 10?", options: ["int arr;", "array arr[10];", "int arr[10];", "arr[10] of int;"], answer: 2 },
-            { question: "What is the index of the first element in a C array?", options: ["1", "-1", "0", "Depends on the declaration"], answer: 2 },
-            { question: "If an array is declared as `int arr[5];`, what is the index of the last element?", options: ["5", "4", "6", "0"], answer: 1 },
-            { question: "Which symbol is used to access an array element?", options: ["()", "{}", "[]", "<>"], answer: 2 },
-            { question: "How do you initialize all elements of an integer array to 0 at declaration?", options: ["int arr[5] = {0};", "int arr[5] = 0;", "int arr[5](0);", "int arr[5] = all(0);"], answer: 0 },
-            { question: "What is the memory allocation for array elements?", options: ["Random", "Contiguous", "Linked", "Dynamic"], answer: 1 },
-            { question: "What will `arr[3]` access in `int arr[] = {10, 20, 30, 40};`?", options: ["30", "40", "20", "Out of bounds"], answer: 1 },
-            { question: "Can the size of an array be changed after its declaration in C?", options: ["Yes, using a function", "Yes, by re-declaring it", "No", "Only if it's a global array"], answer: 2 },
-            { question: "If you declare `char name[50];`, what type of data can it store?", options: ["50 integers", "50 floating-point numbers", "50 characters", "50 different data types"], answer: 2 },
-            { question: "What is a common error when working with arrays?", options: ["Using a negative index", "Accessing elements out of bounds", "Dividing by zero", "Both A and B"], answer: 3 },
-            { question: "How do you get the third element from an array `arr`?", options: ["arr[3]", "arr(2)", "arr(3)", "arr[2]"], answer: 3 },
-            { question: "An array declaration `float prices[10];` means:", options: ["It can store 10 integer values", "It can store 10 float values", "It can store 9 float values", "It's an invalid declaration"], answer: 1 },
-            { question: "What is the correct way to initialize a character array with a string?", options: ["char str[] = 'hello';", "char str[] = {\"h\", \"e\"};", "char str[] = \"hello\";", "char str = \"hello\";"], answer: 2 },
-            { question: "What does `sizeof(arr)` return for `int arr[10];` assuming int is 4 bytes?", options: ["10", "4", "40", "20"], answer: 2 },
-            { question: "Array indices in C always start with _______.", options: ["-1", "1", "0", "any number"], answer: 2 },
-            { question: "Which of the following is a 2D array declaration?", options: ["int arr[10][10];", "int arr[10, 10];", "int arr(10, 10);", "int arr[10]; int arr[10];"], answer: 0 },
-            { question: "To store a name like 'John', what is the minimum size for a char array?", options: ["3", "4", "5", "6"], answer: 2 },
-            { question: "If `int a[3] = {1, 2, 3};`, what is the value of `a[1]`?", options: ["1", "2", "3", "Garbage value"], answer: 1 },
-            { question: "Is `int arr[-5];` a valid array declaration?", options: ["Yes", "No", "Compiler dependent", "Only on some systems"], answer: 1 },
-            { question: "What is the correct syntax to pass an array to a function?", options: ["func(arr[])", "func(arr)", "func(&arr)", "Both A and B"], answer: 3 },
-            { question: "An array is a ______ data structure.", options: ["Non-linear", "Linear", "Complex", "Abstract"], answer: 1 },
-            { question: "What is the value of `marks[4]` in `int marks[5] = {90, 85, 92, 78, 88};`?", options: ["92", "78", "88", "90"], answer: 2 },
-            { question: "C arrays are ____ based.", options: ["One", "Zero", "User-defined", "Negative"], answer: 1 },
-            { question: "What will happen if we access `arr[10]` in `int arr[10];`?", options: ["It will always result in 0", "The program will not compile", "It is a syntax error", "Undefined behavior"], answer: 3 },
-            { question: "How do you declare and initialize an array in one step?", options: ["int a[]; a = {1,2,3};", "int a[3] = {1,2,3};", "int a[3]; a={1,2,3};", "int a; a = {1,2,3};"], answer: 1 },
-            { question: "An array name is essentially a pointer to its ____ element.", options: ["first", "last", "middle", "second"], answer: 0 },
-            { question: "`char c[] = \"abc\";` is equivalent to:", options: ["char c[] = {'a','b','c'};", "char c[] = {'a','b','c','\\0'};", "char c[] = {'a','b','c', null};", "Invalid statement"], answer: 1 },
-            { question: "Can an array store elements of mixed data types like int and char?", options: ["Yes", "No", "Only with pointers", "Only in structs"], answer: 1 },
-            { question: "What is the size of `float data[5];`?", options: ["5 elements", "4 elements", "6 elements", "0 elements"], answer: 0 },
-            { question: "Accessing an array element is done using its _______.", options: ["value", "name", "index", "address"], answer: 2 },
-            { question: "In `double values[20];`, the valid index range is:", options: ["1 to 20", "0 to 20", "1 to 19", "0 to 19"], answer: 3 },
-            { question: "What is the correct way to find the number of elements in `int arr[] = {1,2,3,4,5};`?", options: ["length(arr)", "sizeof(arr) / sizeof(arr[0])", "arr.length", "count(arr)"], answer: 1 },
-            { question: "What is the default value of uninitialized elements in a local static array?", options: ["Garbage value", "0", "1", "-1"], answer: 1 },
-            { question: "What does `int arr[2][3]` represent?", options: ["An array of 2 elements, each being an array of 3 integers", "An array of 3 elements", "An array of 5 elements", "A syntax error"], answer: 0 },
-            { question: "How to access the element in the first row, second column of `int a[2][2]`?", options: ["a[1][0]", "a[0][1]", "a[1][2]", "a[2][1]"], answer: 1 },
-            { question: "Which header file is typically not required for basic array operations?", options: ["stdio.h", "string.h", "math.h", "All are required"], answer: 2 },
-            { question: "`arr[i]` is equivalent to:", options: ["*(arr + i)", "arr + i", "&(arr + i)", "*(arr) + i"], answer: 0 },
-            { question: "Can an array be returned by a function in C?", options: ["Yes, directly", "No", "Only by returning a pointer to it", "Only if it is global"], answer: 2 },
-            { question: "What is the maximum number of dimensions an array can have in C?", options: ["2", "8", "Compiler dependent", "1"], answer: 2 },
-            { question: "Which is not a property of a C array?", options: ["Fixed size", "Elements are of same type", "Stored in contiguous memory", "Size can be changed"], answer: 3 },
-            { question: "The process of arranging array data is called:", options: ["Indexing", "Sorting", "Allocating", "Declaring"], answer: 1 },
-            { question: "An array is also known as a:", options: ["Subscripted variable", "Function", "Pointer variable", "Header file"], answer: 0 },
-            { question: "What is stored in `myArray[1]` after `int myArray[3] = {5};`?", options: ["5", "Garbage value", "0", "Error"], answer: 2 },
-            { question: "The elements of a 2D array are stored in _______ order.", options: ["Row-major", "Column-major", "Random", "It depends on the OS"], answer: 0 },
-            { question: "To pass an entire array to a function, what do you pass?", options: ["The first element", "The last element", "The name of the array", "The size of the array"], answer: 2 },
-            { question: "What is the correct declaration for an array of 5 pointers to integers?", options: ["int *p[5];", "int (*p)[5];", "int p[5];", "pointer p[5];"], answer: 0 },
-            { question: "If you don't initialize a global array, its elements will be initialized to:", options: ["Garbage values", "1", "-1", "0"], answer: 3 },
-            { question: "What's the best way to iterate through all elements of an array?", options: ["A for loop", "A while loop", "A switch case", "An if-else ladder"], answer: 0 },
-            { question: "What does `char message[] = \"Hi\";` create?", options: ["An array of size 2", "An array of size 3", "An array of size 1", "An array of size 4"], answer: 1 }
-        ];
+    <!-- Notification container -->
+    <div id="notification-container"></div>
 
-        const mainContainer = document.getElementById('mainContainer');
-        const introSection = document.getElementById('introSection');
-        const quizSection = document.getElementById('quizSection');
-        const resultSection = document.getElementById('resultSection');
-        const startQuizBtn = document.getElementById('startQuizBtn');
-        const quizForm = document.getElementById('quizForm');
-        const submitBtn = document.getElementById('submitBtn');
-        const scoreEl = document.getElementById('score');
-        const feedbackEl = document.getElementById('feedback');
-        const tryAgainBtn = document.getElementById('tryAgainBtn');
-        const downloadPdfBtn = document.getElementById('downloadPdfBtn');
+    <script type="module">
+        // Set the workerSrc for PDF.js
+        window.pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js`;
 
-        function startQuiz() {
-            introSection.classList.add('hidden');
-            resultSection.classList.add('hidden');
-            quizSection.classList.remove('hidden');
-            renderQuestions();
+        // --- Get references to the HTML elements ---
+        const videoElement = document.getElementById('input_video');
+        const canvasElement = document.getElementById('output_canvas');
+        const canvasCtx = canvasElement.getContext('2d');
+        const loadingIndicator = document.getElementById('loading-indicator');
+        const clearButton = document.getElementById('clear-button');
+        const fileUploadInput = document.getElementById('file-upload');
+        const prevPageButton = document.getElementById('prev-page-button');
+        const nextPageButton = document.getElementById('next-page-button');
+        const pageIndicator = document.getElementById('page-indicator');
+        const notificationContainer = document.getElementById('notification-container');
+        const fullscreenButton = document.getElementById('fullscreen-button');
+        const container = document.getElementById('container');
+
+
+        // --- State Variables ---
+        let currentMode = 'idle'; // 'idle', 'drawing', 'erasing'
+        let lastMode = 'idle';
+        let currentPath = [];
+        let allPaths = [];
+        let uploadedImage = null;
+        let pdfDoc = null;
+        let currentPageNum = 1;
+        let totalPages = 0;
+        let isFullscreen = false;
+        let smoothedFingerTipPos = null; // For smoothing drawing
+        
+        // --- On-Canvas Button Control State ---
+        let lastButtonPressTime = 0;
+        const BUTTON_PRESS_COOLDOWN = 1000; // 1 second cooldown
+
+        // --- Configuration ---
+        const drawingColor = '#ec4899'; // Pink color
+        const drawingLineWidth = 6;
+        const cursorColor = '#f87171';
+        const cursorRadius = 5;
+        const smoothingFactor = 0.5; // Lower is smoother but has more lag.
+        const eraserRadius = 30; // The radius of the eraser circle
+        const eraserColor = 'rgba(255, 255, 255, 0.5)'; // Semi-transparent white
+
+
+        // --- UI Feedback Functions ---
+        function showNotification(message, duration = 3000) {
+            notificationContainer.textContent = message;
+            notificationContainer.classList.add('show');
+            setTimeout(() => {
+                notificationContainer.classList.remove('show');
+            }, duration);
         }
 
-        function renderQuestions() {
-            let quizHTML = '';
-            quizData.forEach((q, index) => {
-                quizHTML += `
-                    <div class="question">
-                        <p class="text-lg font-semibold mb-4">${index + 1}. ${q.question}</p>
-                        <div class="options" id="q${index}_options">
-                `;
-                q.options.forEach((option, i) => {
-                    quizHTML += `
-                        <div>
-                            <input type="radio" id="q${index}_option${i}" name="question${index}" value="${i}">
-                            <label for="q${index}_option${i}">${option}</label>
-                        </div>
-                    `;
-                });
-                quizHTML += `</div></div>`;
-            });
-            quizForm.innerHTML = quizHTML;
-        }
+        // --- Fullscreen Toggle ---
+        function toggleFullscreen() {
+            isFullscreen = !isFullscreen;
 
-        function showResults() {
-            const answerContainers = quizForm.querySelectorAll('.options');
-            let score = 0;
-            quizData.forEach((q, index) => {
-                const answerContainer = answerContainers[index];
-                const selector = `input[name="question${index}"]:checked`;
-                const userAnswerNode = (answerContainer.querySelector(selector) || {});
-                const userAnswer = parseInt(userAnswerNode.value);
-                
-                const labels = answerContainer.querySelectorAll('label');
-                const correctLabel = labels[q.answer];
-                correctLabel.classList.add('correct');
-
-                if (userAnswer === q.answer) {
-                    score++;
-                } else if (!isNaN(userAnswer)) {
-                    const wrongLabel = labels[userAnswer];
-                    wrongLabel.classList.add('incorrect');
+            container.classList.toggle('fullscreen-mode', isFullscreen);
+            
+            // Hide siblings of the container (title, controls, etc.)
+            const siblings = [...container.parentElement.children];
+            siblings.forEach(child => {
+                if (child.id !== 'container') {
+                    child.classList.toggle('hidden', isFullscreen);
                 }
             });
 
-            resultSection.classList.remove('hidden');
-
-            const percentage = Math.round((score / quizData.length) * 100);
-            scoreEl.textContent = `${score} / ${quizData.length} (${percentage}%)`;
-
-            if (percentage >= 90) {
-                feedbackEl.textContent = "Excellent! You have a strong grasp of C arrays.";
-                feedbackEl.className = 'text-lg font-medium mb-8 text-green-600';
-            } else if (percentage >= 70) {
-                feedbackEl.textContent = "Great job! You know your arrays well.";
-                feedbackEl.className = 'text-lg font-medium mb-8 text-blue-600';
-            } else if (percentage >= 50) {
-                feedbackEl.textContent = "Good effort. A little more practice will make you perfect!";
-                feedbackEl.className = 'text-lg font-medium mb-8 text-yellow-600';
+            if (isFullscreen) {
+                const exitButton = document.createElement('button');
+                exitButton.id = 'exit-fullscreen-btn';
+                exitButton.textContent = 'Exit Fullscreen (Esc)';
+                exitButton.className = 'fixed top-4 right-4 z-[100] bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-md';
+                exitButton.onclick = toggleFullscreen;
+                document.body.appendChild(exitButton);
             } else {
-                feedbackEl.textContent = "Don't worry! Review the introduction and try again. Practice is key!";
-                 feedbackEl.className = 'text-lg font-medium mb-8 text-red-600';
+                const exitButton = document.getElementById('exit-fullscreen-btn');
+                if (exitButton) {
+                    exitButton.remove();
+                }
+            }
+        }
+        
+        // --- Canvas Drawing Helper Functions ---
+        function drawPaths() {
+            canvasCtx.lineCap = 'round';
+            canvasCtx.lineJoin = 'round';
+
+            // Draw all completed paths
+            for (const path of allPaths) {
+                if (path.points.length < 2) continue;
+                canvasCtx.beginPath();
+                canvasCtx.strokeStyle = path.color;
+                canvasCtx.lineWidth = path.width;
+                canvasCtx.moveTo(path.points[0].x, path.points[0].y);
+                for (let i = 1; i < path.points.length; i++) {
+                    canvasCtx.lineTo(path.points[i].x, path.points[i].y);
+                }
+                canvasCtx.stroke();
+            }
+            // Draw the current path being drawn
+            if (currentPath.length > 1) {
+                canvasCtx.beginPath();
+                canvasCtx.strokeStyle = drawingColor;
+                canvasCtx.lineWidth = drawingLineWidth;
+                canvasCtx.moveTo(currentPath[0].x, currentPath[0].y);
+                for (let i = 1; i < currentPath.length; i++) {
+                    canvasCtx.lineTo(currentPath[i].x, currentPath[i].y);
+                }
+                canvasCtx.stroke();
+            }
+        }
+        
+        // Helper to draw rounded rectangles for on-canvas buttons
+        function drawRoundRect(ctx, x, y, width, height, radius) {
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + width - radius, y);
+            ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+            ctx.lineTo(x + width, y + height - radius);
+            ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+            ctx.lineTo(x + radius, y + height);
+            ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        // --- Main Animation Loop ---
+        function onResults(results) {
+            if (loadingIndicator.style.display !== 'none') {
+                loadingIndicator.style.display = 'none';
+            }
+
+            // Toggle mirror effect based on content type
+            if (uploadedImage) {
+                // Don't mirror for PDF/Image
+                canvasElement.classList.remove('mirrored');
+            } else {
+                // Mirror for the live camera feed
+                canvasElement.classList.add('mirrored');
+            }
+
+            // Set canvas dimensions
+            canvasElement.width = isFullscreen ? window.innerWidth : videoElement.videoWidth;
+            canvasElement.height = isFullscreen ? window.innerHeight : videoElement.videoHeight;
+
+
+            canvasCtx.save();
+            canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+
+            // 1. Draw the background (camera feed or uploaded file)
+            if (uploadedImage) {
+                canvasCtx.drawImage(uploadedImage, 0, 0, canvasElement.width, canvasElement.height);
+            } else {
+                canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+            }
+
+            // 2. Draw user-made paths
+            drawPaths();
+            
+            // 3. Handle hand detection and gestures
+            if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+                let handLandmarks = results.multiHandLandmarks[0];
+
+                // If viewing a PDF/image, we need to manually flip the hand coordinates
+                // because the canvas itself is not mirrored, but the camera input is.
+                if (uploadedImage) {
+                    handLandmarks = handLandmarks.map(landmark => {
+                        return { 
+                            ...landmark, 
+                            x: 1 - landmark.x 
+                        };
+                    });
+                }
+
+                handlePdfNavigation(handLandmarks);
+                handleGestures(handLandmarks);
+
+                // Draw hand landmarks for visual feedback
+                window.drawConnectors(canvasCtx, handLandmarks, window.HAND_CONNECTIONS, { color: '#34d399', lineWidth: 5 });
+                
+                // Change landmark color based on the current mode
+                const landmarkColor =
+                    currentMode === 'drawing' ? '#ec4899' : // Pink when drawing
+                    currentMode === 'erasing' ? '#ffffff' : // White when erasing
+                    '#f87171'; // Red when idle
+                window.drawLandmarks(canvasCtx, handLandmarks, { color: landmarkColor, lineWidth: 2 });
+            } else { // Hand not detected
+                if (currentMode === 'drawing') { // Finish any path if hand leaves screen
+                    if (currentPath.length > 1) {
+                        allPaths.push({ points: currentPath, color: drawingColor, width: drawingLineWidth });
+                    }
+                    currentPath = [];
+                }
+                currentMode = 'idle';
+                smoothedFingerTipPos = null; // Reset smoothing when hand is lost
             }
             
-            submitBtn.parentElement.style.display = 'none';
+            canvasCtx.restore();
+        }
+        
+        function handlePdfNavigation(handLandmarks) {
+            if (!pdfDoc) return;
             
-            // Disable all radio buttons after submission
-            const radioButtons = quizForm.querySelectorAll('input[type="radio"]');
-            radioButtons.forEach(radio => radio.disabled = true);
+            const buttonWidth = 120;
+            const buttonHeight = 70;
+            const buttonPadding = 20;
+            const buttonRadius = 15;
+
+            const prevButtonRect = { x: buttonPadding, y: buttonPadding, width: buttonWidth, height: buttonHeight };
+            const nextButtonRect = { x: canvasElement.width - buttonWidth - buttonPadding, y: buttonPadding, width: buttonWidth, height: buttonHeight };
+            
+            const indexTip = handLandmarks[8];
+            const indexTipPos = { x: indexTip.x * canvasElement.width, y: indexTip.y * canvasElement.height };
+            const now = Date.now();
+            let prevButtonHover = false;
+            let nextButtonHover = false;
+
+            // Check for Previous button touch
+            if (now - lastButtonPressTime > BUTTON_PRESS_COOLDOWN &&
+                indexTipPos.x > prevButtonRect.x && indexTipPos.x < prevButtonRect.x + prevButtonRect.width &&
+                indexTipPos.y > prevButtonRect.y && indexTipPos.y < prevButtonRect.y + prevButtonRect.height) {
+                prevButtonHover = true;
+                prevPageButton.click();
+                lastButtonPressTime = now;
+            }
+
+            // Check for Next button touch
+            if (now - lastButtonPressTime > BUTTON_PRESS_COOLDOWN &&
+                indexTipPos.x > nextButtonRect.x && indexTipPos.x < nextButtonRect.x + nextButtonRect.width &&
+                indexTipPos.y > nextButtonRect.y && indexTipPos.y < nextButtonRect.y + nextButtonRect.height) {
+                nextButtonHover = true;
+                nextPageButton.click();
+                lastButtonPressTime = now;
+            }
+            
+            // Draw the buttons
+            canvasCtx.font = 'bold 30px Inter';
+            canvasCtx.textAlign = 'center';
+            canvasCtx.textBaseline = 'middle';
+
+            // Previous Button
+            canvasCtx.fillStyle = prevButtonHover ? 'rgba(96, 165, 250, 0.8)' : 'rgba(96, 165, 250, 0.5)';
+            drawRoundRect(canvasCtx, prevButtonRect.x, prevButtonRect.y, prevButtonRect.width, prevButtonRect.height, buttonRadius);
+            canvasCtx.fillStyle = 'white';
+            canvasCtx.fillText('PREV', prevButtonRect.x + prevButtonRect.width / 2, prevButtonRect.y + prevButtonRect.height / 2);
+            
+            // Next Button
+            canvasCtx.fillStyle = nextButtonHover ? 'rgba(96, 165, 250, 0.8)' : 'rgba(96, 165, 250, 0.5)';
+            drawRoundRect(canvasCtx, nextButtonRect.x, nextButtonRect.y, nextButtonRect.width, nextButtonRect.height, buttonRadius);
+            canvasCtx.fillStyle = 'white';
+            canvasCtx.fillText('NEXT', nextButtonRect.x + nextButtonRect.width / 2, nextButtonRect.y + nextButtonRect.height / 2);
         }
 
-        function tryAgain() {
-            resultSection.classList.add('hidden');
-            quizSection.classList.add('hidden');
-            introSection.classList.remove('hidden');
-            
-            submitBtn.parentElement.style.display = 'block';
+        function handleGestures(handLandmarks) {
+            const indexTip = handLandmarks[8];
+            const thumbTip = handLandmarks[4];
+            const middleTip = handLandmarks[12];
+            const ringTip = handLandmarks[16];
+            const pinkyTip = handLandmarks[20];
 
-            quizForm.reset();
-             const labels = quizForm.querySelectorAll('label');
-             labels.forEach(label => {
-                label.classList.remove('correct', 'incorrect');
-             });
+            // --- Gesture Recognition Logic ---
 
-            const radioButtons = quizForm.querySelectorAll('input[type="radio"]');
-            radioButtons.forEach(radio => radio.disabled = false);
-        }
+            // 1. Fist Gesture for Erasing
+            // A fist is when the tips of the fingers are below their second knuckle (PIP joint).
+            const isFist =
+                indexTip.y > handLandmarks[6].y &&
+                middleTip.y > handLandmarks[10].y &&
+                ringTip.y > handLandmarks[14].y &&
+                pinkyTip.y > handLandmarks[18].y;
 
-        function downloadPDF() {
-            const { jsPDF } = window.jspdf;
-            const contentToPrint = document.getElementById('mainContainer');
-            const resultButtons = document.querySelector('#resultSection .flex');
+            // 2. Drawing Gesture: Index finger and thumb tips are very close
+            const drawGestureDistance = Math.hypot(indexTip.x - thumbTip.x, indexTip.y - thumbTip.y);
+            const isDrawingGesture = drawGestureDistance < 0.04;
 
-            // Hide buttons for a clean PDF
-            resultButtons.style.display = 'none';
+            // --- Action Implementation ---
 
-            html2canvas(contentToPrint, {scrollY: -window.scrollY, scale: 2}).then(canvas => {
-                const imgData = canvas.toDataURL('image/png');
-                const pdf = new jsPDF({
-                    orientation: 'p',
-                    unit: 'mm',
-                    format: 'a4'
-                });
-
-                const imgProps = pdf.getImageProperties(imgData);
-                const pdfWidth = pdf.internal.pageSize.getWidth();
-                const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-
-                let heightLeft = pdfHeight;
-                let position = 0;
-                pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
-                heightLeft -= pdf.internal.pageSize.getHeight();
-
-                while (heightLeft > 0) {
-                    position = -heightLeft + pdf.internal.pageSize.getHeight() ;
-                    pdf.addPage();
-                    pdf.addImage(imgData, 'PNG', 0, position, pdfWidth, pdfHeight);
-                    heightLeft -= pdf.internal.pageSize.getHeight();
+            if (isFist) {
+                currentMode = 'erasing';
+                // If we were just drawing, discard the current path
+                if (lastMode === 'drawing' && currentPath.length > 0) {
+                    currentPath = [];
                 }
 
-                pdf.save("c-array-quiz-results.pdf");
+                // Use the center of the palm as the eraser position for stability
+                const palmCenterX = (handLandmarks[5].x + handLandmarks[9].x) / 2;
+                const palmCenterY = (handLandmarks[5].y + handLandmarks[9].y) / 2;
+                const eraserPos = {
+                    x: palmCenterX * canvasElement.width,
+                    y: palmCenterY * canvasElement.height
+                };
 
-                // Show buttons again
-                resultButtons.style.display = 'flex';
-            });
+                // Draw the eraser visual feedback
+                canvasCtx.fillStyle = eraserColor;
+                canvasCtx.beginPath();
+                canvasCtx.arc(eraserPos.x, eraserPos.y, eraserRadius, 0, 2 * Math.PI);
+                canvasCtx.fill();
+
+                // Filter out paths that are touched by the eraser
+                allPaths = allPaths.filter(path =>
+                    !path.points.some(point =>
+                        Math.hypot(point.x - eraserPos.x, point.y - eraserPos.y) < eraserRadius
+                    )
+                );
+
+            } else if (isDrawingGesture) {
+                currentMode = 'drawing';
+                // --- Accuracy Improvement: Smoothing for Drawing ---
+                // Use the midpoint between index and thumb finger for a more stable anchor
+                const fingerTipMidpoint = {
+                    x: ((indexTip.x + thumbTip.x) / 2) * canvasElement.width,
+                    y: ((indexTip.y + thumbTip.y) / 2) * canvasElement.height
+                };
+
+                // Apply exponential moving average for smoother drawing
+                if (!smoothedFingerTipPos || lastMode !== 'drawing') {
+                    smoothedFingerTipPos = fingerTipMidpoint;
+                } else {
+                    smoothedFingerTipPos.x = smoothedFingerTipPos.x * (1 - smoothingFactor) + fingerTipMidpoint.x * smoothingFactor;
+                    smoothedFingerTipPos.y = smoothedFingerTipPos.y * (1 - smoothingFactor) + fingerTipMidpoint.y * smoothingFactor;
+                }
+
+                // Start a new path or add the smoothed position to the current one
+                if (lastMode !== 'drawing') {
+                    currentPath = [{...smoothedFingerTipPos}];
+                } else {
+                    currentPath.push({...smoothedFingerTipPos}); // Push a copy
+                }
+            } else { // Idle mode (hand is open, not drawing or erasing)
+                currentMode = 'idle';
+                // If we were just drawing, finalize the path
+                if (lastMode === 'drawing') {
+                    if (currentPath.length > 1) {
+                        allPaths.push({ points: currentPath, color: drawingColor, width: drawingLineWidth });
+                    }
+                    currentPath = [];
+                }
+
+                // --- Accuracy Improvement: Smoothing for Cursor ---
+                const cursorTarget = { x: indexTip.x * canvasElement.width, y: indexTip.y * canvasElement.height };
+                if (!smoothedFingerTipPos || lastMode !== 'idle') { // Reset smoothing on mode change
+                    smoothedFingerTipPos = cursorTarget;
+                } else {
+                    smoothedFingerTipPos.x = smoothedFingerTipPos.x * (1 - smoothingFactor) + cursorTarget.x * smoothingFactor;
+                    smoothedFingerTipPos.y = smoothedFingerTipPos.y * (1 - smoothingFactor) + cursorTarget.y * smoothingFactor;
+                }
+
+                // Draw a smoothed cursor
+                canvasCtx.fillStyle = cursorColor;
+                canvasCtx.beginPath();
+                canvasCtx.arc(smoothedFingerTipPos.x, smoothedFingerTipPos.y, cursorRadius, 0, 2 * Math.PI);
+                canvasCtx.fill();
+            }
+            lastMode = currentMode;
         }
 
 
-        startQuizBtn.addEventListener('click', startQuiz);
-        submitBtn.addEventListener('click', (e) => {
-            e.preventDefault(); // Prevent form submission
-            showResults();
-            window.scrollTo(0, 0); // Scroll to top to see results
+        // --- PDF Rendering ---
+        async function renderPdfPage(num) {
+            if (!pdfDoc || num < 1 || num > totalPages) return;
+            
+            try {
+                const page = await pdfDoc.getPage(num);
+                const viewport = page.getViewport({ scale: 2.0 });
+                const tempCanvas = document.createElement('canvas');
+                const tempCtx = tempCanvas.getContext('2d');
+                tempCanvas.height = viewport.height;
+                tempCanvas.width = viewport.width;
+
+                await page.render({ canvasContext: tempCtx, viewport: viewport }).promise;
+                
+                const img = new Image();
+                img.onload = () => {
+                    uploadedImage = img;
+                    allPaths = []; // Clear drawings for the new page
+                    currentPath = [];
+                };
+                img.src = tempCanvas.toDataURL();
+                pageIndicator.textContent = `Page ${num} of ${totalPages}`;
+                
+                // Update button states
+                prevPageButton.disabled = num <= 1;
+                nextPageButton.disabled = num >= totalPages;
+                prevPageButton.classList.toggle('disabled-button', num <= 1);
+                nextPageButton.classList.toggle('disabled-button', num >= totalPages);
+
+            } catch(error) {
+                console.error("Failed to render PDF page:", error);
+                showNotification("Failed to render PDF page.");
+            }
+        }
+
+        // --- Initialization and Event Listeners ---
+        const hands = new window.Hands({
+            locateFile: (file) => {
+                return `https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4/${file}`;
+            }
         });
-        tryAgainBtn.addEventListener('click', tryAgain);
-        downloadPdfBtn.addEventListener('click', downloadPDF);
+        hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.7, minTrackingConfidence: 0.7 });
+        hands.onResults(onResults);
+        const camera = new window.Camera(videoElement, { onFrame: async () => { await hands.send({ image: videoElement }); }, width: 1280, height: 720 });
+        camera.start();
 
+        clearButton.addEventListener('click', () => {
+            if (isFullscreen) {
+                toggleFullscreen();
+            }
+            fullscreenButton.classList.add('hidden');
+            allPaths = [];
+            currentPath = [];
+            uploadedImage = null; // Also clear the uploaded image background
+            pdfDoc = null;
+            fileUploadInput.value = ''; // Reset file input
+            // Hide PDF controls
+            prevPageButton.classList.add('hidden');
+            nextPageButton.classList.add('hidden');
+            pageIndicator.classList.add('hidden');
+        });
+
+        fileUploadInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            fullscreenButton.classList.remove('hidden');
+
+            // Reset drawing and PDF state
+            allPaths = [];
+            currentPath = [];
+            pdfDoc = null;
+            uploadedImage = null;
+
+            if (file.type.startsWith('image/')) {
+                // Hide PDF controls
+                prevPageButton.classList.add('hidden');
+                nextPageButton.classList.add('hidden');
+                pageIndicator.classList.add('hidden');
+                
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => { uploadedImage = img; };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            } else if (file.type === 'application/pdf') {
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    try {
+                        const loadingTask = window.pdfjsLib.getDocument({ data: e.target.result });
+                        const pdf = await loadingTask.promise;
+                        pdfDoc = pdf;
+                        totalPages = pdf.numPages;
+                        currentPageNum = 1;
+                        await renderPdfPage(currentPageNum);
+                        // Show PDF controls
+                        prevPageButton.classList.remove('hidden');
+                        nextPageButton.classList.remove('hidden');
+                        pageIndicator.classList.remove('hidden');
+                    } catch (error) {
+                        console.error('Error loading PDF:', error);
+                        showNotification("Could not load the PDF file. It might be corrupted.");
+                    }
+                };
+                reader.readAsArrayBuffer(file);
+            } else {
+                showNotification("Unsupported file-type. Please upload an image or PDF.");
+            }
+        });
+
+        fullscreenButton.addEventListener('click', toggleFullscreen);
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === "Escape" && isFullscreen) {
+                toggleFullscreen();
+            }
+        });
+
+        nextPageButton.addEventListener('click', () => {
+            if (currentPageNum >= totalPages) return;
+            currentPageNum++;
+            renderPdfPage(currentPageNum);
+        });
+
+        prevPageButton.addEventListener('click', () => {
+            if (currentPageNum <= 1) return;
+            currentPageNum--;
+            renderPdfPage(currentPageNum);
+        });
     </script>
-
 </body>
 </html>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
