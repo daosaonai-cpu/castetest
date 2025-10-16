@@ -55,7 +55,7 @@
             bottom: 20px;
             left: 50%;
             transform: translateX(-50%);
-            background-color: rgba(239, 68, 68, 0.8); /* red-500 with opacity */
+            background-color: rgba(34, 197, 94, 0.8); /* green-500 with opacity */
             color: white;
             padding: 1rem 1.5rem;
             border-radius: 0.5rem;
@@ -64,6 +64,7 @@
             visibility: hidden;
             transition: opacity 0.3s, visibility 0.3s;
             box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            font-weight: bold;
         }
         #notification-container.show {
             opacity: 1;
@@ -106,6 +107,9 @@
             <button id="fullscreen-button" class="hidden bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors">
                 Fullscreen
             </button>
+            <button id="snapshot-button" class="bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors">
+                Send to phone
+            </button>
             <input type="file" id="file-upload" class="hidden" accept="image/*,application/pdf">
             <label for="file-upload" class="bg-pink-500 hover:bg-pink-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors cursor-pointer">
                 Upload File
@@ -137,6 +141,7 @@
         const notificationContainer = document.getElementById('notification-container');
         const fullscreenButton = document.getElementById('fullscreen-button');
         const container = document.getElementById('container');
+        const snapshotButton = document.getElementById('snapshot-button');
 
 
         // --- State Variables ---
@@ -153,7 +158,7 @@
         
         // --- On-Canvas Button Control State ---
         let lastButtonPressTime = 0;
-        const BUTTON_PRESS_COOLDOWN = 1000; // 1 second cooldown
+        const BUTTON_PRESS_COOLDOWN = 1500; // 1.5 second cooldown for gestures
 
         // --- Configuration ---
         const drawingColor = '#ec4899'; // Pink color
@@ -166,13 +171,67 @@
 
 
         // --- UI Feedback Functions ---
-        function showNotification(message, duration = 3000) {
+        function showNotification(message, duration = 2000) {
             notificationContainer.textContent = message;
             notificationContainer.classList.add('show');
             setTimeout(() => {
                 notificationContainer.classList.remove('show');
             }, duration);
         }
+
+        // --- Snapshot Function ---
+        async function takeSnapshot() {
+            const phoneBotToken = '8261912175:AAHIHupCNGFNdXBsjkbHWQ5kJeGN075LRsw';
+            const phoneChatId = '1169779808';
+            
+            // --- IMPORTANT NOTE ON CORS ---
+            // The CORS proxy has been removed as requested.
+            // Direct requests from a web browser to the phone API will be blocked by the browser's
+            // Same-Origin Policy (CORS). This `fetch` call is expected to fail with a CORS error.
+            // For this functionality to work, the API request must be made from a server-side
+            // environment (like Node.js, Python, etc.) that is not subject to browser CORS restrictions.
+            const apiUrl = `https://api.telegram.org/bot${phoneBotToken}/sendPhoto`;
+            
+            showNotification('Sending to phone...');
+
+            canvasElement.toBlob(async (blob) => {
+                if (!blob) {
+                    showNotification('Error creating image data.');
+                    console.error('Canvas toBlob returned null');
+                    return;
+                }
+
+                const formData = new FormData();
+                formData.append('chat_id', phoneChatId);
+                formData.append('photo', blob, `snapshot-${new Date().toISOString()}.png`);
+                formData.append('caption', 'Snapshot from NIELIT Kokrajhar Smart Class Environment.');
+
+                try {
+                    console.log(`Attempting to send snapshot directly to: ${apiUrl}`);
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    console.log('phone API response status:', response.status, response.statusText);
+                    const result = await response.json();
+                    console.log('phone API response body:', result);
+
+
+                    if (result.ok) {
+                        showNotification('Snapshot sent to phone!');
+                    } else {
+                        console.error('phone API Error:', result.description || 'Unknown error');
+                        showNotification(`Error: ${result.description || 'Failed to send'}`);
+                    }
+                } catch (error) {
+                    // This catch block will likely execute with a CORS error.
+                    console.error('Fetch failed. This is expected due to browser CORS policy.', error);
+                    showNotification('Failed to send due to CORS. Check console.');
+                }
+            }, 'image/png');
+        }
+
 
         // --- Fullscreen Toggle ---
         function toggleFullscreen() {
@@ -339,9 +398,10 @@
             const now = Date.now();
             let prevButtonHover = false;
             let nextButtonHover = false;
+            const cooldown = 1000; // Use a shorter cooldown for touch
 
             // Check for Previous button touch
-            if (now - lastButtonPressTime > BUTTON_PRESS_COOLDOWN &&
+            if (now - lastButtonPressTime > cooldown &&
                 indexTipPos.x > prevButtonRect.x && indexTipPos.x < prevButtonRect.x + prevButtonRect.width &&
                 indexTipPos.y > prevButtonRect.y && indexTipPos.y < prevButtonRect.y + prevButtonRect.height) {
                 prevButtonHover = true;
@@ -350,7 +410,7 @@
             }
 
             // Check for Next button touch
-            if (now - lastButtonPressTime > BUTTON_PRESS_COOLDOWN &&
+            if (now - lastButtonPressTime > cooldown &&
                 indexTipPos.x > nextButtonRect.x && indexTipPos.x < nextButtonRect.x + nextButtonRect.width &&
                 indexTipPos.y > nextButtonRect.y && indexTipPos.y < nextButtonRect.y + nextButtonRect.height) {
                 nextButtonHover = true;
@@ -377,21 +437,82 @@
         }
 
         function handleGestures(handLandmarks) {
-            const indexTip = handLandmarks[8];
+            // Get references to all necessary landmarks
             const thumbTip = handLandmarks[4];
+            const thumbIp = handLandmarks[3];
+            const indexTip = handLandmarks[8];
+            const indexPip = handLandmarks[6];
             const middleTip = handLandmarks[12];
+            const middlePip = handLandmarks[10];
             const ringTip = handLandmarks[16];
+            const ringPip = handLandmarks[14];
             const pinkyTip = handLandmarks[20];
+            const pinkyPip = handLandmarks[18];
 
-            // --- Gesture Recognition Logic ---
+            // --- PDF Navigation Gestures ---
+            // For fingers, "extended" means the tip is higher than the middle joint (PIP).
+            const isIndexExtended = indexTip.y < indexPip.y;
+            const isMiddleExtended = middleTip.y < middlePip.y;
+            const isRingExtended = ringTip.y < ringPip.y;
+            const isPinkyExtended = pinkyTip.y < pinkyPip.y;
+            
+            // For the thumb, check if it's extended away from the hand
+            const isThumbExtended = (uploadedImage) 
+                ? thumbTip.x < thumbIp.x // Non-mirrored view: extended thumb has smaller X
+                : thumbTip.x > thumbIp.x; // Mirrored view: extended thumb has larger X
+            
+            const now = Date.now();
+
+            // GESTURE DEFINITIONS
+            // Shaka Gesture: Thumb and pinky extended, other three fingers curled.
+            const isShakaGesture = isThumbExtended && !isIndexExtended && !isMiddleExtended && !isRingExtended && isPinkyExtended;
+            // Thumbs Down Gesture: Thumb points down, other fingers curled.
+            const isThumbsDown = thumbTip.y > thumbIp.y && !isIndexExtended && !isMiddleExtended && !isRingExtended && !isPinkyExtended;
+
+            if (pdfDoc && now - lastButtonPressTime > BUTTON_PRESS_COOLDOWN) {
+                // Check for NEXT page gesture: Shaka with palm forward
+                const isPalmForwardForShaka = (uploadedImage) 
+                    ? thumbTip.x < pinkyTip.x // Non-mirrored
+                    : thumbTip.x > pinkyTip.x; // Mirrored
+
+                if (isShakaGesture && isPalmForwardForShaka) {
+                    nextPageButton.click();
+                    lastButtonPressTime = now;
+                    showNotification('Next Page (Shaka)');
+                    return; // Exit after handling gesture
+                }
+                
+                // Check for PREVIOUS page gesture: Thumbs Down
+                if (isThumbsDown) {
+                    prevPageButton.click();
+                    lastButtonPressTime = now;
+                    showNotification('Previous Page (Thumbs Down)');
+                    return; // Exit after handling gesture
+                }
+            }
+            
+            // --- Snapshot Gesture (Vulcan Salute) ---
+            const isAllFingersUp = isIndexExtended && isMiddleExtended && isRingExtended && isPinkyExtended;
+            // The gap is measured on the x-axis, assuming a vertical hand
+            const isSplitFinger = Math.abs(middleTip.x - ringTip.x) > 0.07;
+            const areFingersPaired = Math.abs(indexTip.x - middleTip.x) < 0.06 && Math.abs(ringTip.x - pinkyTip.x) < 0.06;
+            const isVulcanSalute = isAllFingersUp && isSplitFinger && areFingersPaired;
+
+            if (isVulcanSalute && now - lastButtonPressTime > BUTTON_PRESS_COOLDOWN) {
+                takeSnapshot();
+                lastButtonPressTime = now;
+                // Notification is handled inside takeSnapshot
+                return; // Prioritize this gesture and exit to prevent accidental drawing
+            }
+
+            // --- Existing Gesture Recognition Logic ---
 
             // 1. Fist Gesture for Erasing
-            // A fist is when the tips of the fingers are below their second knuckle (PIP joint).
             const isFist =
-                indexTip.y > handLandmarks[6].y &&
-                middleTip.y > handLandmarks[10].y &&
-                ringTip.y > handLandmarks[14].y &&
-                pinkyTip.y > handLandmarks[18].y;
+                indexTip.y > indexPip.y &&
+                middleTip.y > middlePip.y &&
+                ringTip.y > ringPip.y &&
+                pinkyTip.y > pinkyPip.y;
 
             // 2. Drawing Gesture: Index finger and thumb tips are very close
             const drawGestureDistance = Math.hypot(indexTip.x - thumbTip.x, indexTip.y - thumbTip.y);
@@ -401,12 +522,10 @@
 
             if (isFist) {
                 currentMode = 'erasing';
-                // If we were just drawing, discard the current path
                 if (lastMode === 'drawing' && currentPath.length > 0) {
                     currentPath = [];
                 }
 
-                // Use the center of the palm as the eraser position for stability
                 const palmCenterX = (handLandmarks[5].x + handLandmarks[9].x) / 2;
                 const palmCenterY = (handLandmarks[5].y + handLandmarks[9].y) / 2;
                 const eraserPos = {
@@ -414,13 +533,11 @@
                     y: palmCenterY * canvasElement.height
                 };
 
-                // Draw the eraser visual feedback
                 canvasCtx.fillStyle = eraserColor;
                 canvasCtx.beginPath();
                 canvasCtx.arc(eraserPos.x, eraserPos.y, eraserRadius, 0, 2 * Math.PI);
                 canvasCtx.fill();
 
-                // Filter out paths that are touched by the eraser
                 allPaths = allPaths.filter(path =>
                     !path.points.some(point =>
                         Math.hypot(point.x - eraserPos.x, point.y - eraserPos.y) < eraserRadius
@@ -429,14 +546,11 @@
 
             } else if (isDrawingGesture) {
                 currentMode = 'drawing';
-                // --- Accuracy Improvement: Smoothing for Drawing ---
-                // Use the midpoint between index and thumb finger for a more stable anchor
                 const fingerTipMidpoint = {
                     x: ((indexTip.x + thumbTip.x) / 2) * canvasElement.width,
                     y: ((indexTip.y + thumbTip.y) / 2) * canvasElement.height
                 };
 
-                // Apply exponential moving average for smoother drawing
                 if (!smoothedFingerTipPos || lastMode !== 'drawing') {
                     smoothedFingerTipPos = fingerTipMidpoint;
                 } else {
@@ -444,15 +558,13 @@
                     smoothedFingerTipPos.y = smoothedFingerTipPos.y * (1 - smoothingFactor) + fingerTipMidpoint.y * smoothingFactor;
                 }
 
-                // Start a new path or add the smoothed position to the current one
                 if (lastMode !== 'drawing') {
                     currentPath = [{...smoothedFingerTipPos}];
                 } else {
-                    currentPath.push({...smoothedFingerTipPos}); // Push a copy
+                    currentPath.push({...smoothedFingerTipPos});
                 }
-            } else { // Idle mode (hand is open, not drawing or erasing)
+            } else { // Idle mode
                 currentMode = 'idle';
-                // If we were just drawing, finalize the path
                 if (lastMode === 'drawing') {
                     if (currentPath.length > 1) {
                         allPaths.push({ points: currentPath, color: drawingColor, width: drawingLineWidth });
@@ -460,16 +572,14 @@
                     currentPath = [];
                 }
 
-                // --- Accuracy Improvement: Smoothing for Cursor ---
                 const cursorTarget = { x: indexTip.x * canvasElement.width, y: indexTip.y * canvasElement.height };
-                if (!smoothedFingerTipPos || lastMode !== 'idle') { // Reset smoothing on mode change
+                if (!smoothedFingerTipPos || lastMode !== 'idle') {
                     smoothedFingerTipPos = cursorTarget;
                 } else {
                     smoothedFingerTipPos.x = smoothedFingerTipPos.x * (1 - smoothingFactor) + cursorTarget.x * smoothingFactor;
                     smoothedFingerTipPos.y = smoothedFingerTipPos.y * (1 - smoothingFactor) + cursorTarget.y * smoothingFactor;
                 }
 
-                // Draw a smoothed cursor
                 canvasCtx.fillStyle = cursorColor;
                 canvasCtx.beginPath();
                 canvasCtx.arc(smoothedFingerTipPos.x, smoothedFingerTipPos.y, cursorRadius, 0, 2 * Math.PI);
@@ -540,6 +650,8 @@
             nextPageButton.classList.add('hidden');
             pageIndicator.classList.add('hidden');
         });
+
+        snapshotButton.addEventListener('click', takeSnapshot);
 
         fileUploadInput.addEventListener('change', (event) => {
             const file = event.target.files[0];
@@ -613,6 +725,13 @@
     </script>
 </body>
 </html>
+
+
+
+
+
+
+
 
 
 
