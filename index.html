@@ -3,474 +3,252 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BONO CHAI - Order Your Favorite Tea</title>
+    <title>C Programming Array Tutorial</title>
+    <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Inter font -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
+        /* Apply the Inter font family */
         body {
             font-family: 'Inter', sans-serif;
         }
-        .tea-card {
-            transition: transform 0.3s ease, box-shadow 0.3s ease;
-        }
-        .tea-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-        }
-        #cart-container {
-            transition: transform 0.3s ease-in-out;
-        }
-        .cart-item-enter {
-            animation: slide-in 0.5s forwards;
-        }
-        @keyframes slide-in {
-            from {
-                opacity: 0;
-                transform: translateX(100%);
-            }
-            to {
-                opacity: 1;
-                transform: translateX(0);
-            }
+        /* Custom styles for syntax highlighting in code blocks */
+        .code-keyword { color: #c792ea; } /* Purple for keywords */
+        .code-type { color: #82aaff; }    /* Blue for types */
+        .code-function { color: #c3e88d; } /* Green for functions */
+        .code-string { color: #ecc48d; }   /* Orange for strings */
+        .code-number { color: #f07178; }   /* Red for numbers */
+        .code-comment { color: #676e95; }  /* Gray for comments */
+        .code-var { color: #ffffff; }      /* White for variables */
+        
+        /* Smooth scrolling */
+        html {
+            scroll-behavior: smooth;
         }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800">
+<body class="bg-slate-100">
 
-    <!-- App Container -->
-    <div id="app" class="min-h-screen flex flex-col">
-
-        <!-- Header -->
-        <header class="bg-white/80 backdrop-blur-md shadow-sm sticky top-0 z-40">
-            <div class="container mx-auto px-4 sm:px-6 lg:px-8">
-                <div class="flex items-center justify-between h-16">
-                    <div class="flex items-center space-x-3">
-                        <svg class="h-8 w-8 text-emerald-600" width="24" height="24" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor" fill="none" stroke-linecap="round" stroke-linejoin="round">
-                            <path stroke="none" d="M0 0h24v24H0z" fill="none"/>
-                            <path d="M13 6v-2a1 1 0 0 0 -1 -1h-2a1 1 0 0 0 -1 1v2" />
-                            <path d="M13 6a1 1 0 0 1 1 1v3a1 1 0 0 1 -1 1h-6a1 1 0 0 1 -1 -1v-3a1 1 0 0 1 1 -1" />
-                            <path d="M14 11v5a2 2 0 0 1 -2 2h-4a2 2 0 0 1 -2 -2v-5" />
-                            <path d="M17 10h.01" />
-                            <path d="M19 13h.01" />
-                            <path d="M20 16h.01" />
-                        </svg>
-                        <h1 class="text-2xl font-bold text-gray-800">BONO CHAI</h1>
-                    </div>
-                    <button id="cart-button" class="relative flex items-center justify-center p-2 rounded-full hover:bg-gray-100 transition-colors">
-                        <i data-lucide="shopping-cart" class="h-6 w-6 text-gray-600"></i>
-                        <span id="cart-count" class="absolute -top-1 -right-1 bg-emerald-500 text-white text-xs font-semibold rounded-full h-5 w-5 flex items-center justify-center hidden">0</span>
-                    </button>
-                </div>
-            </div>
-        </header>
+    <div class="flex h-screen">
+        <!-- Sidebar Navigation -->
+        <aside id="sidebar" class="w-64 bg-slate-900 text-white p-6 fixed inset-y-0 left-0 transform -translate-x-full md:translate-x-0 z-30 transition-transform duration-300 ease-in-out">
+            <h2 class="text-2xl font-bold mb-6 text-center">C Arrays</h2>
+            <nav>
+                <ul class="space-y-2" id="nav-links">
+                    <li><a href="#intro" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-slate-700">Introduction</a></li>
+                    <li><a href="#declaration" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-slate-700">Declaration</a></li>
+                    <li><a href="#initialization" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-slate-700">Initialization</a></li>
+                    <li><a href="#accessing" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-slate-700">Accessing Elements</a></li>
+                    <li><a href="#loops" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-slate-700">Arrays & Loops</a></li>
+                    <li><a href="#pitfalls" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-slate-700">Common Pitfalls</a></li>
+                    <li><a href="#multidimensional" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-slate-700">Multi-dimensional</a></li>
+                </ul>
+            </nav>
+        </aside>
 
         <!-- Main Content -->
-        <main class="flex-grow container mx-auto px-4 sm:px-6 lg:px-8 py-8">
-            <!-- Hero Section -->
-            <section class="text-center mb-12">
-                <h2 class="text-4xl md:text-5xl font-extrabold text-gray-900 leading-tight">
-                    A Moment of Calm in Every Cup
-                </h2>
-                <p class="mt-4 text-lg text-gray-600 max-w-2xl mx-auto">
-                    Discover our curated collection of premium teas from around the world. Freshly brewed and delivered to you.
-                </p>
-            </section>
-
-            <!-- Menu Section -->
-            <section id="menu">
-                <h3 class="text-3xl font-bold text-gray-800 mb-8 border-l-4 border-emerald-500 pl-4">Our Menu</h3>
-                <div id="menu-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-                    <!-- Tea items will be injected here by JavaScript -->
-                </div>
-            </section>
-        </main>
-
-        <!-- Footer -->
-        <footer class="bg-white mt-12 border-t">
-            <div class="container mx-auto py-6 px-4 sm:px-6 lg:px-8 text-center text-gray-500">
-                <p>&copy; 2025 BONO CHAI. All Rights Reserved.</p>
-                <p class="text-sm">Enjoy responsibly.</p>
-            </div>
-        </footer>
-
-    </div>
-
-    <!-- Cart Sidebar -->
-    <div id="cart-sidebar" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden">
-        <div id="cart-container" class="fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-xl flex flex-col transform translate-x-full">
-            <!-- Cart Header -->
-            <div class="flex items-center justify-between p-4 border-b">
-                <h2 class="text-2xl font-bold text-gray-800">Your Cart</h2>
-                <button id="close-cart-button" class="p-2 rounded-full hover:bg-gray-100 transition-colors">
-                     <i data-lucide="x" class="h-6 w-6 text-gray-600"></i>
+        <div class="flex-1 flex flex-col md:ml-64">
+            <!-- Top Bar (Mobile) -->
+            <header class="bg-white shadow-md p-4 flex justify-between items-center md:hidden sticky top-0 z-20">
+                <h1 class="text-xl font-bold text-slate-800">C Array Tutorial</h1>
+                <button id="menu-toggle" class="text-slate-700 focus:outline-none">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
+                    </svg>
                 </button>
-            </div>
+            </header>
 
-            <!-- Cart Content -->
-            <div id="cart-content" class="flex-grow p-4 overflow-y-auto">
-                <div id="cart-items" class="divide-y divide-gray-200">
-                    <!-- Cart items will be injected here -->
-                </div>
-                <div id="empty-cart-message" class="text-center py-12">
-                    <i data-lucide="shopping-basket" class="h-16 w-16 mx-auto text-gray-300"></i>
-                    <p class="mt-4 text-gray-500">Your cart is empty.</p>
-                    <p class="text-sm text-gray-400">Add some tea from the menu to get started!</p>
-                </div>
-            </div>
+            <!-- Content Area -->
+            <main class="flex-1 p-6 md:p-10 overflow-y-auto">
+                <h1 class="text-3xl font-bold text-slate-900 mb-8 hidden md:block">C Programming Array Tutorial</h1>
 
-            <!-- Cart Footer -->
-            <div id="cart-footer" class="p-4 border-t bg-gray-50">
-                <div class="space-y-2 mb-4">
-                    <div class="flex justify-between text-gray-600">
-                        <span>Subtotal</span>
-                        <span id="cart-subtotal">₹0.00</span>
+                <!-- Section: Introduction -->
+                <section id="intro" class="bg-white p-6 rounded-lg shadow-md mb-8">
+                    <h2 class="text-2xl font-semibold mb-4 text-slate-800 border-b pb-2">What is an Array?</h2>
+                    <p class="text-slate-700 leading-relaxed">
+                        An array is a collection of items of the <span class="font-semibold">same data type</span> stored at <span class="font-semibold">contiguous memory locations</span>.
+                        <br><br>
+                        Imagine you want to store the grades of 5 students. Instead of creating 5 different variables (like <code>grade1</code>, <code>grade2</code>, <code>grade3</code>...), you can use a single array variable called <code>grades</code> to store all 5 values.
+                    </p>
+                </section>
+
+                <!-- Section: Declaration -->
+                <section id="declaration" class="bg-white p-6 rounded-lg shadow-md mb-8">
+                    <h2 class="text-2xl font-semibold mb-4 text-slate-800 border-b pb-2">Declaring an Array</h2>
+                    <p class="text-slate-700 leading-relaxed mb-4">
+                        To declare an array in C, you specify the data type of the elements and the number of elements the array will hold (its size).
+                    </p>
+                    <p class="text-slate-600 font-mono mb-4">Syntax: <code>type arrayName[arraySize];</code></p>
+                    
+                    <pre class="bg-slate-800 text-gray-100 p-4 rounded-md overflow-x-auto"><code class="language-c"><span class="code-comment">// This declares an array named 'scores' that can hold 10 integers.</span>
+<span class="code-type">int</span> <span class="code-var">scores</span>[<span class="code-number">10</span>];
+
+<span class="code-comment">// This declares an array named 'averages' that can hold 5 floating-point numbers.</span>
+<span class="code-type">float</span> <span class="code-var">averages</span>[<span class="code-number">5</span>];
+
+<span class="code-comment">// This declares an array named 'grades' that can hold 20 characters.</span>
+<span class="code-type">char</span> <span class="code-var">grades</span>[<span class="code-number">20</span>];
+</code></pre>
+                </section>
+
+                <!-- Section: Initialization -->
+                <section id="initialization" class="bg-white p-6 rounded-lg shadow-md mb-8">
+                    <h2 class="text-2xl font-semibold mb-4 text-slate-800 border-b pb-2">Initializing an Array</h2>
+                    <p class="text-slate-700 leading-relaxed mb-4">
+                        You can initialize an array at the time of declaration by providing the values in curly braces <code>{}</code>.
+                    </p>
+                    <pre class="bg-slate-800 text-gray-100 p-4 rounded-md overflow-x-auto"><code class="language-c"><span class="code-comment">// Initialize an integer array with 5 values</span>
+<span class="code-type">int</span> <span class="code-var">marks</span>[<span class="code-number">5</span>] = {<span class="code-number">90</span>, <span class="code-number">85</span>, <span class="code-number">92</span>, <span class="code-number">78</span>, <span class="code-number">95</span>};
+
+<span class="code-comment">// You can omit the size, and the compiler will calculate it</span>
+<span class="code-type">int</span> <span class{="code-var">ages</span>[] = {<span class="code-number">20</span>, <span class="code-number">22</span>, <span class="code-number">21</span>, <span class="code-number">19</span>}; <span class="code-comment">// Compiler knows size is 4</span>
+
+<span class="code-comment">// If you provide fewer values than the size, the rest are set to 0</span>
+<span class="code-type">float</span> <span class="code-var">salary</span>[<span class="code-number">10</span>] = {<span class="code-number">500.5</span>, <span class="code-number">650.0</span>}; <span class="code-comment">// First 2 are set, remaining 8 are 0.0</span>
+</code></pre>
+                </section>
+                
+                <!-- Section: Accessing Elements -->
+                <section id="accessing" class="bg-white p-6 rounded-lg shadow-md mb-8">
+                    <h2 class="text-2xl font-semibold mb-4 text-slate-800 border-b pb-2">Accessing Array Elements</h2>
+                    <p class="text-slate-700 leading-relaxed mb-4">
+                        You can access individual elements of an array using an <span class="font-semibold">index</span>.
+                    </p>
+                    <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-md mb-4" role="alert">
+                        <p class="font-bold">Crucial Point: Zero-Based Indexing</p>
+                        <p>In C, array indexing starts at <span class="font-bold">0</span>, not 1.
+                        <br>
+                        - The first element is at index <code>0</code>.
+                        - The second element is at index <code>1</code>.
+                        - ...
+                        - For an array of size <code>N</code>, the last element is at index <code>N-1</code>.
+                        </p>
                     </div>
-                     <div class="flex justify-between text-gray-600">
-                        <span>Taxes (GST 18%)</span>
-                        <span id="cart-tax">₹0.00</span>
-                    </div>
-                    <div class="flex justify-between text-lg font-bold text-gray-800">
-                        <span>Total</span>
-                        <span id="cart-total">₹0.00</span>
-                    </div>
-                </div>
-                <button id="checkout-button" class="w-full bg-emerald-600 text-white font-bold py-3 rounded-lg hover:bg-emerald-700 transition-all duration-300 disabled:bg-gray-400 disabled:cursor-not-allowed">
-                    Proceed to Checkout
-                </button>
-            </div>
+                    
+                    <pre class="bg-slate-800 text-gray-100 p-4 rounded-md overflow-x-auto"><code class="language-c"><span class="code-type">int</span> <span class="code-var">marks</span>[<span class="code-number">5</span>] = {<span class="code-number">90</span>, <span class="code-number">85</span>, <span class="code-number">92</span>, <span class="code-number">78</span>, <span class="code-number">95</span>};
+
+<span class="code-comment">// Access the first element (at index 0)</span>
+<span class="code-type">int</span> <span class="code-var">firstMark</span> = <span class="code-var">marks</span>[<span class="code-number">0</span>]; <span class="code-comment">// firstMark is 90</span>
+
+<span class="code-comment">// Access the third element (at index 2)</span>
+<span class="code-function">printf</span>(<span class="code-string">"The third mark is: %d\n"</span>, <span class="code-var">marks</span>[<span class="code-number">2</span>]); <span class="code-comment">// Prints 92</span>
+
+<span class="code-comment">// Change the value of the last element (at index 4)</span>
+<span class="code-var">marks</span>[<span class="code-number">4</span>] = <span class="code-number">98</span>; <span class="code-comment">// The 5th element (95) is now 98</span>
+</code></pre>
+                </section>
+
+                <!-- Section: Arrays & Loops -->
+                <section id="loops" class="bg-white p-6 rounded-lg shadow-md mb-8">
+                    <h2 class="text-2xl font-semibold mb-4 text-slate-800 border-b pb-2">Arrays and Loops</h2>
+                    <p class="text-slate-700 leading-relaxed mb-4">
+                        Arrays and <code>for</code> loops are a perfect match. You can use a loop to easily iterate over every element in an array.
+                    </p>
+                    <p class="text-slate-700 leading-relaxed mb-4">
+                        <strong>Example:</strong> Print all elements and calculate their sum.
+                    </p>
+                    <pre class="bg-slate-800 text-gray-100 p-4 rounded-md overflow-x-auto"><code class="language-c"><span class="code-keyword">#include</span> <span class="code-string">&lt;stdio.h&gt;</span>
+
+<span class="code-type">int</span> <span class="code-function">main</span>() {
+    <span class="code-type">int</span> <span class="code-var">ages</span>[] = {<span class="code-number">20</span>, <span class="code-number">22</span>, <span class="code-number">21</span>, <span class="code-number">19</span>, <span class="code-number">23</span>};
+    <span class="code-type">int</span> <span class="code-var">sum</span> = <span class="code-number">0</span>;
+    <span class="code-type">int</span> <span class="code-var">size</span> = <span class="code-number">5</span>;
+
+    <span class="code-function">printf</span>(<span class="code-string">"Listing all ages:\n"</span>);
+    
+    <span class="code-comment">// Loop from index 0 up to (but not including) 5</span>
+    <span class="code-keyword">for</span> (<span class="code-type">int</span> <span class="code-var">i</span> = <span class="code-number">0</span>; <span class="code-var">i</span> < <span class="code-var">size</span>; <span class="code-var">i</span>++) {
+        <span class="code-comment">// Print the element at the current index 'i'</span>
+        <span class="code-function">printf</span>(<span class="code-string">"Age at index %d: %d\n"</span>, <span class="code-var">i</span>, <span class="code-var">ages</span>[<span class="code-var">i</span>]);
+        
+        <span class="code-comment">// Add the current element to the sum</span>
+        <span class="code-var">sum</span> = <span class="code-var">sum</span> + <span class="code-var">ages</span>[<span class="code-var">i</span>];
+    }
+
+    <span class="code-function">printf</span>(<span class="code-string">"The sum of all ages is: %d\n"</span>, <span class="code-var">sum</span>);
+    
+    <span class="code-keyword">return</span> <span class="code-number">0</span>;
+}
+</code></pre>
+                </section>
+                
+                <!-- Section: Common Pitfalls -->
+                <section id="pitfalls" class="bg-white p-6 rounded-lg shadow-md mb-8">
+                    <h2 class="text-2xl font-semibold mb-4 text-slate-800 border-b pb-2">Common Pitfalls</h2>
+                    <ul class="list-disc list-inside text-slate-700 space-y-3">
+                        <li>
+                            <strong class="text-red-600">Off-by-One Error:</strong> Forgetting that arrays start at index 0. For <code>int arr[5]</code>, the valid indices are 0, 1, 2, 3, and 4.
+                        </li>
+                        <li>
+                            <strong class="text-red-600">Accessing Out of Bounds:</strong> Trying to access an element that doesn't exist, like <code>arr[5]</code> or <code>arr[-1]</code>. This is called a "buffer overflow" and can crash your program or lead to unpredictable behavior. C does <span class="font-semibold">not</span> stop you from doing this!
+                        </li>
+                        <li>
+                            <strong class="text-red-600">Uninitialized Arrays:</strong> Using an array without initializing it first. The array will contain "garbage values" (whatever was in that memory location before).
+                        </li>
+                    </ul>
+                </section>
+
+                <!-- Section: Multi-dimensional -->
+                <section id="multidimensional" class="bg-white p-6 rounded-lg shadow-md mb-8">
+                    <h2 class="text-2xl font-semibold mb-4 text-slate-800 border-b pb-2">A Quick Look: Multi-dimensional Arrays</h2>
+                    <p class="text-slate-700 leading-relaxed mb-4">
+                        You can also have arrays of arrays, known as multi-dimensional arrays. A 2D array is like a grid or a table.
+                    </p>
+                    <pre class="bg-slate-800 text-gray-100 p-4 rounded-md overflow-x-auto"><code class="language-c"><span class="code-comment">// Declare a 2D array (3 rows, 4 columns)</span>
+<span class="code-type">int</span> <span class="code-var">matrix</span>[<span class="code-number">3</span>][<span class="code-number">4</span>] = {
+    { <span class="code-number">1</span>,  <span class="code-number">2</span>,  <span class="code-number">3</span>,  <span class="code-number">4</span> }, <span class="code-comment">// Row 0</span>
+    { <span class="code-number">5</span>,  <span class="code-number">6</span>,  <span class="code-number">7</span>,  <span class="code-number">8</span> }, <span class="code-comment">// Row 1</span>
+    { <span class="code-number">9</span>, <span class="code-number">10</span>, <span class="code-number">11</span>, <span class="code-number">12</span> }  <span class="code-comment">// Row 2</span>
+};
+
+<span class="code-comment">// Access the element at Row 1, Column 2</span>
+<span class="code-type">int</span> <span class="code-var">element</span> = <span class="code-var">matrix</span>[<span class="code-number">1</span>][<span class="code-number">2</span>]; <span class="code-comment">// element is 7</span>
+
+<span class="code-comment">// You need nested loops to iterate over a 2D array</span>
+<span class="code-keyword">for</span> (<span class="code-type">int</span> <span class="code-var">i</span> = <span class="code-number">0</span>; <span class="code-var">i</span> < <span class="code-number">3</span>; <span class="code-var">i</span>++) { <span class="code-comment">// Loop over rows</span>
+    <span class="code-keyword">for</span> (<span class="code-type">int</span> <span class="code-var">j</span> = <span class="code-number">0</span>; <span class="code-var">j</span> < <span class="code-number">4</span>; <span class="code-var">j</span>++) { <span class="code-comment">// Loop over columns</span>
+        <span class="code-function">printf</span>(<span class="code-string">"%d "</span>, <span class="code-var">matrix</span>[<span class="code-var">i</span>][<span class="code-var">j</span>]);
+    }
+    <span class="code-function">printf</span>(<span class="code-string">"\n"</span>); <span class="code-comment">// Newline after each row</span>
+}
+</code></pre>
+                </section>
+
+                <!-- Footer -->
+                <footer class="text-center text-slate-500 mt-12 mb-4">
+                    Happy Coding!
+                </footer>
+            </main>
         </div>
     </div>
 
-    <!-- Order Modal -->
-    <div id="order-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4">
-        <div class="bg-white rounded-lg shadow-xl p-8 w-full max-w-md relative">
-            <button id="close-modal-button" class="absolute top-4 right-4 p-2 rounded-full hover:bg-gray-100 transition-colors">
-                <i data-lucide="x" class="h-6 w-6 text-gray-600"></i>
-            </button>
-            <div id="order-form-view">
-                <h2 class="text-2xl font-bold mb-4">Complete Your Order</h2>
-                <form id="order-form">
-                    <div class="mb-4">
-                        <label for="name" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                        <input type="text" id="name" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                    </div>
-                    <div class="mb-4">
-                        <label for="address" class="block text-sm font-medium text-gray-700 mb-1">Delivery Address</label>
-                        <textarea id="address" rows="3" required class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"></textarea>
-                    </div>
-                     <div class="mb-6">
-                        <label for="payment" class="block text-sm font-medium text-gray-700 mb-1">Payment Method</label>
-                        <select id="payment" class="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500">
-                            <option>Credit/Debit Card</option>
-                            <option>UPI</option>
-                            <option>Cash on Delivery</option>
-                        </select>
-                    </div>
-                    <button type="submit" class="w-full bg-emerald-600 text-white font-bold py-3 rounded-lg hover:bg-emerald-700 transition-all duration-300">
-                        Place Order
-                    </button>
-                </form>
-            </div>
-            <div id="order-success-view" class="hidden text-center">
-                 <div class="w-20 h-20 bg-emerald-100 rounded-full flex items-center justify-center mx-auto">
-                    <i data-lucide="check" class="h-12 w-12 text-emerald-600"></i>
-                </div>
-                <h2 class="text-2xl font-bold mt-6 mb-2">Thank You!</h2>
-                <p class="text-gray-600">Your order has been placed successfully. Your tea is on its way!</p>
-                 <button id="new-order-button" class="mt-8 w-full bg-emerald-600 text-white font-bold py-3 rounded-lg hover:bg-emerald-700 transition-all duration-300">
-                    Place Another Order
-                </button>
-            </div>
-        </div>
-    </div>
-
+    <!-- Overlay for mobile menu -->
+    <div id="overlay" class="fixed inset-0 bg-black bg-opacity-50 z-20 hidden md:hidden"></div>
 
     <script>
-        document.addEventListener('DOMContentLoaded', () => {
-            lucide.createIcons();
+        const menuToggle = document.getElementById('menu-toggle');
+        const sidebar = document.getElementById('sidebar');
+        const overlay = document.getElementById('overlay');
+        const navLinks = document.querySelectorAll('#nav-links a');
 
-            const menuData = [
-                { id: 1, name: 'Masala Chai', description: 'A classic blend of black tea and aromatic Indian spices.', price: 120, image: 'https://images.unsplash.com/photo-1594226359286-9a9979b0653d?q=80&w=400&auto=format&fit=crop' },
-                { id: 2, name: 'Assam Black Tea', description: 'A bold and malty tea from the lush valleys of Assam.', price: 100, image: 'https://images.unsplash.com/photo-1627435601361-ec25f2b74c20?q=80&w=400&auto=format&fit=crop' },
-                { id: 3, name: 'Darjeeling First Flush', description: 'A light, floral, and astringent tea, the "champagne of teas".', price: 250, image: 'https://images.unsplash.com/photo-1576092762262-d9b751f05448?q=80&w=400&auto=format&fit=crop' },
-                { id: 4, name: 'Nilgiri Green Tea', description: 'A smooth and mellow green tea from the Blue Mountains.', price: 150, image: 'https://images.unsplash.com/photo-1627891244191-b2b8c5415c85?q=80&w=400&auto=format&fit=crop' },
-                { id: 5, name: 'Chamomile Herbal Tea', description: 'A caffeine-free infusion known for its calming properties.', price: 180, image: 'https://images.unsplash.com/photo-1595891323495-53d116346764?q=80&w=400&auto=format&fit=crop' },
-                { id: 6, name: 'Peppermint Infusion', description: 'A refreshing and invigorating herbal tea, perfect after meals.', price: 160, image: 'https://images.unsplash.com/photo-1626072186125-98522746a815?q=80&w=400&auto=format&fit=crop' },
-                { id: 7, name: 'Earl Grey', description: 'Black tea infused with the citrusy essence of bergamot.', price: 140, image: 'https://images.unsplash.com/photo-1552392139-32a51f2a9657?q=80&w=400&auto=format&fit=crop' },
-                { id: 8, name: 'Kahwa', description: 'A traditional green tea from Kashmir with saffron and spices.', price: 220, image: 'https://images.unsplash.com/photo-1622359530856-782c3c6f0f2b?q=80&w=400&auto=format&fit=crop' }
-            ];
+        function toggleMenu() {
+            sidebar.classList.toggle('-translate-x-full');
+            overlay.classList.toggle('hidden');
+        }
 
-            let cart = [];
+        menuToggle.addEventListener('click', toggleMenu);
+        overlay.addEventListener('click', toggleMenu);
 
-            const menuGrid = document.getElementById('menu-grid');
-            const cartButton = document.getElementById('cart-button');
-            const cartSidebar = document.getElementById('cart-sidebar');
-            const cartContainer = document.getElementById('cart-container');
-            const closeCartButton = document.getElementById('close-cart-button');
-            const cartItemsContainer = document.getElementById('cart-items');
-            const cartCount = document.getElementById('cart-count');
-            const emptyCartMessage = document.getElementById('empty-cart-message');
-            const cartFooter = document.getElementById('cart-footer');
-            const cartSubtotalEl = document.getElementById('cart-subtotal');
-            const cartTaxEl = document.getElementById('cart-tax');
-            const cartTotalEl = document.getElementById('cart-total');
-            const checkoutButton = document.getElementById('checkout-button');
-            const orderModal = document.getElementById('order-modal');
-            const closeModalButton = document.getElementById('close-modal-button');
-            const orderForm = document.getElementById('order-form');
-            const orderFormView = document.getElementById('order-form-view');
-            const orderSuccessView = document.getElementById('order-success-view');
-            const newOrderButton = document.getElementById('new-order-button');
-            
-            // --- RENDER MENU ---
-            function renderMenu() {
-                menuGrid.innerHTML = menuData.map(item => `
-                    <div class="tea-card bg-white rounded-lg shadow-md overflow-hidden flex flex-col">
-                        <img src="${item.image}" alt="${item.name}" class="w-full h-48 object-cover bg-gray-200" onerror="this.onerror=null;this.src='https://placehold.co/400x300/E2E8F0/4A5568?text=${encodeURIComponent(item.name)}';">
-                        <div class="p-4 flex flex-col flex-grow">
-                            <h4 class="text-xl font-semibold text-gray-800">${item.name}</h4>
-                            <p class="text-gray-600 mt-2 flex-grow">${item.description}</p>
-                            <div class="flex justify-between items-center mt-4">
-                                <span class="text-lg font-bold text-emerald-600">₹${item.price.toFixed(2)}</span>
-                                <button data-id="${item.id}" class="add-to-cart-btn bg-emerald-500 text-white font-semibold px-4 py-2 rounded-lg hover:bg-emerald-600 transition-colors flex items-center gap-2">
-                                    <i data-lucide="plus" class="h-5 w-5"></i> Add
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                `).join('');
-                lucide.createIcons(); // Re-render icons for new buttons
-                addEventListenersToButtons();
-            }
-
-            // --- CART LOGIC ---
-            function addToCart(itemId) {
-                const itemInCart = cart.find(item => item.id === itemId);
-                if (itemInCart) {
-                    itemInCart.quantity++;
-                } else {
-                    const itemToAdd = menuData.find(item => item.id === itemId);
-                    cart.push({ ...itemToAdd, quantity: 1 });
-                }
-                updateCart();
-            }
-            
-            function updateQuantity(itemId, change) {
-                const itemInCart = cart.find(item => item.id === itemId);
-                if(itemInCart) {
-                    itemInCart.quantity += change;
-                    if(itemInCart.quantity <= 0) {
-                        cart = cart.filter(item => item.id !== itemId);
-                    }
-                }
-                updateCart();
-            }
-            
-            function updateCart() {
-                renderCartItems();
-                updateCartTotals();
-                updateCartCount();
-                
-                // Show/hide empty cart message and footer
-                if (cart.length === 0) {
-                    emptyCartMessage.classList.remove('hidden');
-                    cartFooter.classList.add('hidden');
-                } else {
-                    emptyCartMessage.classList.add('hidden');
-                    cartFooter.classList.remove('hidden');
-                }
-            }
-
-            function renderCartItems() {
-                cartItemsContainer.innerHTML = cart.map(item => `
-                    <div class="flex items-center justify-between py-4 cart-item-enter">
-                        <div class="flex items-center gap-4">
-                            <img src="${item.image}" alt="${item.name}" class="w-16 h-16 object-cover rounded-md">
-                            <div>
-                                <h5 class="font-semibold">${item.name}</h5>
-                                <p class="text-sm text-gray-500">₹${item.price.toFixed(2)}</p>
-                            </div>
-                        </div>
-                        <div class="flex items-center gap-3">
-                            <button data-id="${item.id}" class="quantity-change-btn p-1 rounded-full bg-gray-200 hover:bg-gray-300" data-change="-1"><i data-lucide="minus" class="h-4 w-4"></i></button>
-                            <span class="font-medium w-6 text-center">${item.quantity}</span>
-                             <button data-id="${item.id}" class="quantity-change-btn p-1 rounded-full bg-gray-200 hover:bg-gray-300" data-change="1"><i data-lucide="plus" class="h-4 w-4"></i></button>
-                        </div>
-                    </div>
-                `).join('');
-                 lucide.createIcons();
-            }
-
-            function updateCartTotals() {
-                const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-                const tax = subtotal * 0.18;
-                const total = subtotal + tax;
-                
-                cartSubtotalEl.textContent = `₹${subtotal.toFixed(2)}`;
-                cartTaxEl.textContent = `₹${tax.toFixed(2)}`;
-                cartTotalEl.textContent = `₹${total.toFixed(2)}`;
-                
-                checkoutButton.disabled = cart.length === 0;
-            }
-
-            function updateCartCount() {
-                const totalItems = cart.reduce((sum, item) => sum + item.quantity, 0);
-                if (totalItems > 0) {
-                    cartCount.textContent = totalItems;
-                    cartCount.classList.remove('hidden');
-                } else {
-                    cartCount.classList.add('hidden');
-                }
-            }
-            
-            // --- EVENT LISTENERS ---
-            function addEventListenersToButtons() {
-                document.querySelectorAll('.add-to-cart-btn').forEach(button => {
-                    button.onclick = (e) => {
-                        const itemId = parseInt(e.currentTarget.dataset.id);
-                        addToCart(itemId);
-                        openCart();
-                    };
-                });
-            }
-            
-            cartItemsContainer.addEventListener('click', e => {
-                const button = e.target.closest('.quantity-change-btn');
-                if(button) {
-                    const itemId = parseInt(button.dataset.id);
-                    const change = parseInt(button.dataset.change);
-                    updateQuantity(itemId, change);
+        // Close sidebar when a nav link is clicked on mobile
+        navLinks.forEach(link => {
+            link.addEventListener('click', () => {
+                if (window.innerWidth < 768) {
+                    toggleMenu();
                 }
             });
-
-            cartButton.addEventListener('click', openCart);
-            closeCartButton.addEventListener('click', closeCart);
-            cartSidebar.addEventListener('click', (e) => {
-                if(e.target === cartSidebar) {
-                    closeCart();
-                }
-            });
-
-            function openCart() {
-                cartSidebar.classList.remove('hidden');
-                setTimeout(() => cartContainer.classList.remove('translate-x-full'), 10);
-            }
-            
-            function closeCart() {
-                cartContainer.classList.add('translate-x-full');
-                setTimeout(() => cartSidebar.classList.add('hidden'), 300);
-            }
-
-            // --- MODAL LOGIC ---
-            checkoutButton.addEventListener('click', () => {
-                orderModal.classList.remove('hidden');
-                orderModal.classList.add('flex');
-                closeCart();
-            });
-
-            closeModalButton.addEventListener('click', () => {
-                orderModal.classList.add('hidden');
-                orderModal.classList.remove('flex');
-            });
-            
-            // --- TELEGRAM INTEGRATION ---
-            // This function attempts to send order details to a Telegram bot.
-            // IMPORTANT: For this to work, you need a backend server.
-            // Sending directly from the browser (client-side) like this is not secure
-            // and will likely be blocked by browser security policies (CORS).
-            // 1. Create a bot with @BotFather on Telegram to get a token.
-            // 2. Get the chat ID for @Huluda by having them message your bot first.
-            // 3. For a real application, create a serverless function or a small backend
-            //    to handle this API call securely.
-            async function sendOrderToTelegram() {
-                const botToken = '8201397576:AAEzEYOA0CDZd6dtepNUcF6SSla4t4Bl4Gg'; // <-- PASTE YOUR BOT TOKEN HERE
-                const chatId = '1169779808';   // <-- PASTE NUMERIC CHAT ID HERE
-
-                // Get details from the form and cart
-                const name = document.getElementById('name').value;
-                const address = document.getElementById('address').value;
-                const payment = document.getElementById('payment').value;
-                const total = document.getElementById('cart-total').textContent;
-
-                const itemsText = cart.map(item => 
-                    `- ${item.name} (x${item.quantity})`
-                ).join('\n');
-
-                const message = `
-New BONO CHAI Order! 🍵
--------------------------
-Customer: ${name}
-Address: ${address}
-Payment: ${payment}
--------------------------
-Items:
-${itemsText}
--------------------------
-Total: ${total}
-                `;
-
-                // If the token is a placeholder, don't even try to send.
-                if (chatId === 'USER_CHAT_ID_FOR_HULUDA') {
-                    console.warn('Telegram details not sent: Please configure chatId in the script.');
-                    console.log('--- Telegram Message Data ---');
-                    console.log(message);
-                    console.log('-----------------------------');
-                    return; // Exit the function
-                }
-
-                const apiUrl = `https://api.telegram.org/bot${botToken}/sendMessage`;
-
-                try {
-                    const response = await fetch(apiUrl, {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({
-                            chat_id: chatId,
-                            text: message,
-                        }),
-                    });
-                    const result = await response.json();
-                    if (result.ok) {
-                        console.log('Order details sent to Telegram successfully!');
-                    } else {
-                        console.error('Failed to send to Telegram:', result.description);
-                    }
-                } catch (error) {
-                    console.error('Error sending order to Telegram. This is expected if you are running this in a browser without a backend proxy due to CORS policy.', error);
-                }
-            }
-            
-            orderForm.addEventListener('submit', async (e) => {
-                e.preventDefault();
-                
-                // Send details to Telegram before showing success
-                await sendOrderToTelegram();
-
-                orderFormView.classList.add('hidden');
-                orderSuccessView.classList.remove('hidden');
-                cart = []; // Clear the cart
-                updateCart();
-            });
-            
-            newOrderButton.addEventListener('click', () => {
-                orderModal.classList.add('hidden');
-                orderModal.classList.remove('flex');
-                orderForm.reset();
-                orderFormView.classList.remove('hidden');
-                orderSuccessView.classList.add('hidden');
-            });
-
-            // --- INITIALIZE APP ---
-            renderMenu();
-            updateCart();
         });
     </script>
+
 </body>
 </html>
-
-
-
-
-
-
