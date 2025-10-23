@@ -49,6 +49,7 @@
                         <li><a href="#pitfalls" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-slate-700">Common Pitfalls</a></li>
                         <li><a href="#multidimensional" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-slate-700">Multi-dimensional Arrays</a></li>
                         <li><a href="#accessing-2d" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-slate-700">2D Array Example</a></li>
+                        <li><a href="#min-max" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-slate-700">Example: Finding Min & Max</a></li>
                     </ul>
                 </nav>
             </div>
@@ -260,6 +261,51 @@
 </code></pre>
                 </section>
 
+                <!-- Section: Finding Min & Max (New) -->
+                <section id="min-max" class="bg-white p-6 rounded-lg shadow-md mb-8">
+                    <h2 class="text-2xl font-semibold mb-4 text-slate-800 border-b pb-2">Example: Finding Min & Max</h2>
+                    <p class="text-slate-700 leading-relaxed mb-4">
+                        A common task is to iterate through an array to find its largest or smallest element. This example demonstrates how to find both.
+                    </p>
+                    <p class="text-slate-700 leading-relaxed mb-4">
+                        Notice the use of <code>sizeof(arr) / sizeof(arr[0])</code>. This is a robust C idiom to automatically calculate the number of elements in an array, making your code more flexible.
+                    </p>
+                    <pre class="bg-slate-800 text-gray-100 p-4 rounded-md overflow-x-auto"><code class="language-c"><span class="code-keyword">#include</span> <span class="code-string">&lt;stdio.h&gt;</span>
+
+<span class="code-type">int</span> <span class="code-function">main</span>() {
+    <span class="code-comment">// 1. Define and initialize an integer array</span>
+    <span class="code-type">int</span> <span class="code-var">arr</span>[] = {<span class="code-number">5</span>, <span class="code-number">10</span>, <span class="code-number">15</span>, <span class="code-number">20</span>};
+    
+    <span class="code-comment">// 2. Calculate the number of elements</span>
+    <span class="code-type">int</span> <span class="code-var">n</span> = <span class="code-keyword">sizeof</span>(<span class="code-var">arr</span>) / <span class="code-keyword">sizeof</span>(<span class="code-var">arr</span>[<span class="code-number">0</span>]);
+    
+    <span class="code-comment">// 3. Initialize min and max with the first element</span>
+    <span class="code-type">int</span> <span class="code-var">max</span> = <span class="code-var">arr</span>[<span class="code-number">0</span>];
+    <span class="code-type">int</span> <span class="code-var">min</span> = <span class="code-var">arr</span>[<span class="code-number">0</span>];
+    
+    <span class="code-comment">// 4. Iterate through the array starting from the second element</span>
+    <span class="code-comment">//    (We already checked the first element)</span>
+    <span class="code-keyword">for</span> (<span class="code-type">int</span> <span class="code-var">i</span> = <span class="code-number">1</span>; <span class="code-var">i</span> < <span class="code-var">n</span>; <span class="code-var">i</span>++) {
+        <span class="code-comment">// Check for a new maximum</span>
+        <span class="code-keyword">if</span> (<span class="code-var">arr</span>[<span class="code-var">i</span>] > <span class="code-var">max</span>) {
+            <span class="code-var">max</span> = <span class="code-var">arr</span>[<span class="code-var">i</span>];
+        }
+        
+        <span class="code-comment">// Check for a new minimum</span>
+        <span class="code-keyword">if</span> (<span class="code-var">arr</span>[<span class="code-var">i</span>] < <span class="code-var">min</span>) {
+            <span class="code-var">min</span> = <span class="code-var">arr</span>[<span class="code-var">i</span>];
+        }
+    }
+    
+    <span class="code-comment">// 5. Print the final results</span>
+    <span class="code-function">printf</span>(<span class="code-string">"Largest element: %d\n"</span>, <span class="code-var">max</span>);
+    <span class="code-function">printf</span>(<span class="code-string">"Smallest element: %d\n"</span>, <span class="code-var">min</span>);
+    
+    <span class="code-keyword">return</span> <span class="code-number">0</span>; <span class="code-comment">// Indicate successful execution</span>
+}
+</code></pre>
+                </section>
+
                 <!-- Footer -->
                 <footer class="text-center text-slate-500 mt-12 mb-4">
                     Happy Coding!
@@ -357,6 +403,7 @@
 
 </body>
 </html>
+
 
 
 
