@@ -3,252 +3,351 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>C Programming Array Tutorial</title>
+    <title>C Functions Tutorial</title>
     <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Load Inter font -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Apply the Inter font family */
+        /* Use the Inter font, which is clean and modern */
         body {
             font-family: 'Inter', sans-serif;
+            scroll-behavior: smooth; /* Smooth scrolling for nav links */
         }
-        /* Custom styles for syntax highlighting in code blocks */
-        .code-keyword { color: #c792ea; } /* Purple for keywords */
-        .code-type { color: #82aaff; }    /* Blue for types */
-        .code-function { color: #c3e88d; } /* Green for functions */
-        .code-string { color: #ecc48d; }   /* Orange for strings */
-        .code-number { color: #f07178; }   /* Red for numbers */
-        .code-comment { color: #676e95; }  /* Gray for comments */
-        .code-var { color: #ffffff; }      /* White for variables */
-        
-        /* Smooth scrolling */
-        html {
-            scroll-behavior: smooth;
+        /* Custom styles for code blocks for better readability */
+        pre {
+            background-color: #1f2937; /* Tailwind 'gray-800' */
+            color: #f3f4f6; /* Tailwind 'gray-100' */
+            padding: 1rem;
+            border-radius: 0.5rem; /* 8px */
+            overflow-x: auto;
+            font-family: 'Fira Code', 'Courier New', monospace;
+            font-size: 0.9rem;
+            line-height: 1.6;
+        }
+        code {
+            font-family: 'Fira Code', 'Courier New', monospace;
+        }
+        /* Style for inline code snippets */
+        :not(pre) > code {
+            background-color: #e5e7eb; /* Tailwind 'gray-200' */
+            color: #1e40af; /* Tailwind 'blue-800' */
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.25rem; /* 4px */
+            font-weight: 500;
+        }
+        /* Style for the sticky navigation */
+        .sticky-nav {
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
     </style>
 </head>
-<body class="bg-slate-100">
+<body class="bg-gradient-to-br from-gray-50 to-blue-100 min-h-screen">
 
-    <div class="flex h-screen">
-        <!-- Sidebar Navigation -->
-        <aside id="sidebar" class="w-64 bg-slate-900 text-white p-6 fixed inset-y-0 left-0 transform -translate-x-full md:translate-x-0 z-30 transition-transform duration-300 ease-in-out">
-            <h2 class="text-2xl font-bold mb-6 text-center">C Arrays</h2>
-            <nav>
-                <ul class="space-y-2" id="nav-links">
-                    <li><a href="#intro" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-slate-700">Introduction</a></li>
-                    <li><a href="#declaration" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-slate-700">Declaration</a></li>
-                    <li><a href="#initialization" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-slate-700">Initialization</a></li>
-                    <li><a href="#accessing" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-slate-700">Accessing Elements</a></li>
-                    <li><a href="#loops" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-slate-700">Arrays & Loops</a></li>
-                    <li><a href="#pitfalls" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-slate-700">Common Pitfalls</a></li>
-                    <li><a href="#multidimensional" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-slate-700">Multi-dimensional</a></li>
+    <!-- Main Content Container -->
+    <div class="container mx-auto max-w-4xl p-4 sm:p-8">
+        
+        <!-- Main Card -->
+        <div class="bg-white p-6 sm:p-10 rounded-xl shadow-2xl">
+
+            <!-- Header -->
+            <h1 class="text-3xl md:text-4xl font-bold text-blue-700 mb-4 text-center">
+                Understanding Functions in C
+            </h1>
+            <p class="text-lg text-gray-600 mb-8 text-center">
+                Your easy-to-understand, in-depth guide.
+            </p>
+
+            <!-- Sticky Navigation -->
+            <nav class="sticky-nav bg-white/80 backdrop-blur-md p-4 rounded-lg shadow-inner mb-10 border border-gray-200">
+                <ul class="flex flex-wrap justify-center gap-4 sm:gap-6">
+                    <li><a href="#what" class="text-sm sm:text-base font-medium text-blue-600 hover:text-blue-800 transition-colors">What is a Function?</a></li>
+                    <li><a href="#form" class="text-sm sm:text-base font-medium text-blue-600 hover:text-blue-800 transition-colors">1. The Form</a></li>
+                    <li><a href="#calling" class="text-sm sm:text-base font-medium text-blue-600 hover:text-blue-800 transition-colors">2. Calling Functions</a></li>
+                    <li><a href="#prototypes" class="text-sm sm:text-base font-medium text-blue-600 hover:text-blue-800 transition-colors">3. Prototypes</a></li>
+                    <li><a href="#return-types" class="text-sm sm:text-base font-medium text-blue-600 hover:text-blue-800 transition-colors">4. Return Types</a></li>
+                    <li><a href="#return-statement" class="text-sm sm:text-base font-medium text-blue-600 hover:text-blue-800 transition-colors">5. The 'return' Statement</a></li>
                 </ul>
             </nav>
-        </aside>
 
-        <!-- Main Content -->
-        <div class="flex-1 flex flex-col md:ml-64">
-            <!-- Top Bar (Mobile) -->
-            <header class="bg-white shadow-md p-4 flex justify-between items-center md:hidden sticky top-0 z-20">
-                <h1 class="text-xl font-bold text-slate-800">C Array Tutorial</h1>
-                <button id="menu-toggle" class="text-slate-700 focus:outline-none">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
-                    </svg>
-                </button>
-            </header>
+            <!-- Introduction -->
+            <div id="what" class="mb-10 pt-4">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-3">What is a Function?</h2>
+                <p class="text-gray-700 leading-relaxed">
+                    In C, a function is a self-contained block of code that performs a specific, single, well-defined task.
+                </p>
+                <p class="text-gray-700 leading-relaxed mt-4">
+                    Think of a function as a **specialist** you can hire. Instead of your <code>main()</code> function trying to do every single job by itself (calculating, printing, getting user input, etc.), it can "delegate" tasks to these specialists.
+                </p>
+                <p class="text-gray-700 leading-relaxed mt-4">
+                    For example, you can create an <code>addNumbers()</code> specialist. Its only job is to add two numbers. You "call" this specialist, give it the numbers (called <strong>arguments</strong>), it performs the calculation, and then it "returns" the result to you.
+                </p>
+                <p class="text-gray-700 leading-relaxed mt-4">
+                    This has two huge benefits:
+                </p>
+                <ul class="list-disc list-inside space-y-3 text-gray-700 mt-4 ml-4">
+                    <li>
+                        <strong>Reusability:</strong> Instead of writing the 10 lines of code for a complex task every time you need it, you write it *once* inside a function. Then, you can "call" that function 100 times from different places in your program. This saves time and reduces errors.
+                    </li>
+                    <li>
+                        <strong>Organization:</strong> It keeps your code clean and readable. Your <code>main()</code> function becomes a simple "to-do" list, calling other functions to get the work done. This makes it much easier to understand, debug, and maintain your program.
+                    </li>
+                </ul>
+            </div>
 
-            <!-- Content Area -->
-            <main class="flex-1 p-6 md:p-10 overflow-y-auto">
-                <h1 class="text-3xl font-bold text-slate-900 mb-8 hidden md:block">C Programming Array Tutorial</h1>
-
-                <!-- Section: Introduction -->
-                <section id="intro" class="bg-white p-6 rounded-lg shadow-md mb-8">
-                    <h2 class="text-2xl font-semibold mb-4 text-slate-800 border-b pb-2">What is an Array?</h2>
-                    <p class="text-slate-700 leading-relaxed">
-                        An array is a collection of items of the <span class="font-semibold">same data type</span> stored at <span class="font-semibold">contiguous memory locations</span>.
-                        <br><br>
-                        Imagine you want to store the grades of 5 students. Instead of creating 5 different variables (like <code>grade1</code>, <code>grade2</code>, <code>grade3</code>...), you can use a single array variable called <code>grades</code> to store all 5 values.
-                    </p>
-                </section>
-
-                <!-- Section: Declaration -->
-                <section id="declaration" class="bg-white p-6 rounded-lg shadow-md mb-8">
-                    <h2 class="text-2xl font-semibold mb-4 text-slate-800 border-b pb-2">Declaring an Array</h2>
-                    <p class="text-slate-700 leading-relaxed mb-4">
-                        To declare an array in C, you specify the data type of the elements and the number of elements the array will hold (its size).
-                    </p>
-                    <p class="text-slate-600 font-mono mb-4">Syntax: <code>type arrayName[arraySize];</code></p>
-                    
-                    <pre class="bg-slate-800 text-gray-100 p-4 rounded-md overflow-x-auto"><code class="language-c"><span class="code-comment">// This declares an array named 'scores' that can hold 10 integers.</span>
-<span class="code-type">int</span> <span class="code-var">scores</span>[<span class="code-number">10</span>];
-
-<span class="code-comment">// This declares an array named 'averages' that can hold 5 floating-point numbers.</span>
-<span class="code-type">float</span> <span class="code-var">averages</span>[<span class="code-number">5</span>];
-
-<span class="code-comment">// This declares an array named 'grades' that can hold 20 characters.</span>
-<span class="code-type">char</span> <span class="code-var">grades</span>[<span class="code-number">20</span>];
-</code></pre>
-                </section>
-
-                <!-- Section: Initialization -->
-                <section id="initialization" class="bg-white p-6 rounded-lg shadow-md mb-8">
-                    <h2 class="text-2xl font-semibold mb-4 text-slate-800 border-b pb-2">Initializing an Array</h2>
-                    <p class="text-slate-700 leading-relaxed mb-4">
-                        You can initialize an array at the time of declaration by providing the values in curly braces <code>{}</code>.
-                    </p>
-                    <pre class="bg-slate-800 text-gray-100 p-4 rounded-md overflow-x-auto"><code class="language-c"><span class="code-comment">// Initialize an integer array with 5 values</span>
-<span class="code-type">int</span> <span class="code-var">marks</span>[<span class="code-number">5</span>] = {<span class="code-number">90</span>, <span class="code-number">85</span>, <span class="code-number">92</span>, <span class="code-number">78</span>, <span class="code-number">95</span>};
-
-<span class="code-comment">// You can omit the size, and the compiler will calculate it</span>
-<span class="code-type">int</span> <span class{="code-var">ages</span>[] = {<span class="code-number">20</span>, <span class="code-number">22</span>, <span class="code-number">21</span>, <span class="code-number">19</span>}; <span class="code-comment">// Compiler knows size is 4</span>
-
-<span class="code-comment">// If you provide fewer values than the size, the rest are set to 0</span>
-<span class="code-type">float</span> <span class="code-var">salary</span>[<span class="code-number">10</span>] = {<span class="code-number">500.5</span>, <span class="code-number">650.0</span>}; <span class="code-comment">// First 2 are set, remaining 8 are 0.0</span>
-</code></pre>
-                </section>
-                
-                <!-- Section: Accessing Elements -->
-                <section id="accessing" class="bg-white p-6 rounded-lg shadow-md mb-8">
-                    <h2 class="text-2xl font-semibold mb-4 text-slate-800 border-b pb-2">Accessing Array Elements</h2>
-                    <p class="text-slate-700 leading-relaxed mb-4">
-                        You can access individual elements of an array using an <span class="font-semibold">index</span>.
-                    </p>
-                    <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-md mb-4" role="alert">
-                        <p class="font-bold">Crucial Point: Zero-Based Indexing</p>
-                        <p>In C, array indexing starts at <span class="font-bold">0</span>, not 1.
-                        <br>
-                        - The first element is at index <code>0</code>.
-                        - The second element is at index <code>1</code>.
-                        - ...
-                        - For an array of size <code>N</code>, the last element is at index <code>N-1</code>.
-                        </p>
-                    </div>
-                    
-                    <pre class="bg-slate-800 text-gray-100 p-4 rounded-md overflow-x-auto"><code class="language-c"><span class="code-type">int</span> <span class="code-var">marks</span>[<span class="code-number">5</span>] = {<span class="code-number">90</span>, <span class="code-number">85</span>, <span class="code-number">92</span>, <span class="code-number">78</span>, <span class="code-number">95</span>};
-
-<span class="code-comment">// Access the first element (at index 0)</span>
-<span class="code-type">int</span> <span class="code-var">firstMark</span> = <span class="code-var">marks</span>[<span class="code-number">0</span>]; <span class="code-comment">// firstMark is 90</span>
-
-<span class="code-comment">// Access the third element (at index 2)</span>
-<span class="code-function">printf</span>(<span class="code-string">"The third mark is: %d\n"</span>, <span class="code-var">marks</span>[<span class="code-number">2</span>]); <span class="code-comment">// Prints 92</span>
-
-<span class="code-comment">// Change the value of the last element (at index 4)</span>
-<span class="code-var">marks</span>[<span class="code-number">4</span>] = <span class="code-number">98</span>; <span class="code-comment">// The 5th element (95) is now 98</span>
-</code></pre>
-                </section>
-
-                <!-- Section: Arrays & Loops -->
-                <section id="loops" class="bg-white p-6 rounded-lg shadow-md mb-8">
-                    <h2 class="text-2xl font-semibold mb-4 text-slate-800 border-b pb-2">Arrays and Loops</h2>
-                    <p class="text-slate-700 leading-relaxed mb-4">
-                        Arrays and <code>for</code> loops are a perfect match. You can use a loop to easily iterate over every element in an array.
-                    </p>
-                    <p class="text-slate-700 leading-relaxed mb-4">
-                        <strong>Example:</strong> Print all elements and calculate their sum.
-                    </p>
-                    <pre class="bg-slate-800 text-gray-100 p-4 rounded-md overflow-x-auto"><code class="language-c"><span class="code-keyword">#include</span> <span class="code-string">&lt;stdio.h&gt;</span>
-
-<span class="code-type">int</span> <span class="code-function">main</span>() {
-    <span class="code-type">int</span> <span class="code-var">ages</span>[] = {<span class="code-number">20</span>, <span class="code-number">22</span>, <span class="code-number">21</span>, <span class="code-number">19</span>, <span class="code-number">23</span>};
-    <span class="code-type">int</span> <span class="code-var">sum</span> = <span class="code-number">0</span>;
-    <span class="code-type">int</span> <span class="code-var">size</span> = <span class="code-number">5</span>;
-
-    <span class="code-function">printf</span>(<span class="code-string">"Listing all ages:\n"</span>);
+            <!-- Section 1: The Form of a C Function (Syntax) -->
+            <div id="form" class="mb-10 pt-4">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-3">1. The Form (Syntax) of a C Function</h2>
+                <p class="text-gray-700 leading-relaxed mb-4">
+                    All C functions follow a specific blueprint, often called the "function definition." It tells the compiler everything it needs to know about the function.
+                </p>
+                <!-- Code Block for Syntax -->
+                <pre><code><span class="text-pink-400">return_type</span> <span class="text-blue-400">function_name</span>(<span class="text-green-400">parameter_list</span>) {
+    <span class="text-gray-500">// Body of the function</span>
+    <span class="text-green-400">type</span> <span class="text-gray-300">local_variable</span>; <span class="text-gray-500">// Variables declared here only exist here</span>
+    <span class="text-gray-500">// ... statements that do the work ...</span>
     
-    <span class="code-comment">// Loop from index 0 up to (but not including) 5</span>
-    <span class="code-keyword">for</span> (<span class="code-type">int</span> <span class="code-var">i</span> = <span class="code-number">0</span>; <span class="code-var">i</span> < <span class="code-var">size</span>; <span class="code-var">i</span>++) {
-        <span class="code-comment">// Print the element at the current index 'i'</span>
-        <span class="code-function">printf</span>(<span class="code-string">"Age at index %d: %d\n"</span>, <span class="code-var">i</span>, <span class="code-var">ages</span>[<span class="code-var">i</span>]);
-        
-        <span class="code-comment">// Add the current element to the sum</span>
-        <span class="code-var">sum</span> = <span class="code-var">sum</span> + <span class="code-var">ages</span>[<span class="code-var">i</span>];
-    }
-
-    <span class="code-function">printf</span>(<span class="code-string">"The sum of all ages is: %d\n"</span>, <span class="code-var">sum</span>);
-    
-    <span class="code-keyword">return</span> <span class="code-number">0</span>;
-}
-</code></pre>
-                </section>
+    <span class="text-pink-400">return</span> <span class="text-yellow-400">value</span>; <span class="text-gray-500">// Send a value back</span>
+}</code></pre>
                 
-                <!-- Section: Common Pitfalls -->
-                <section id="pitfalls" class="bg-white p-6 rounded-lg shadow-md mb-8">
-                    <h2 class="text-2xl font-semibold mb-4 text-slate-800 border-b pb-2">Common Pitfalls</h2>
-                    <ul class="list-disc list-inside text-slate-700 space-y-3">
-                        <li>
-                            <strong class="text-red-600">Off-by-One Error:</strong> Forgetting that arrays start at index 0. For <code>int arr[5]</code>, the valid indices are 0, 1, 2, 3, and 4.
-                        </li>
-                        <li>
-                            <strong class="text-red-600">Accessing Out of Bounds:</strong> Trying to access an element that doesn't exist, like <code>arr[5]</code> or <code>arr[-1]</code>. This is called a "buffer overflow" and can crash your program or lead to unpredictable behavior. C does <span class="font-semibold">not</span> stop you from doing this!
-                        </li>
-                        <li>
-                            <strong class="text-red-600">Uninitialized Arrays:</strong> Using an array without initializing it first. The array will contain "garbage values" (whatever was in that memory location before).
-                        </li>
+                <!-- Explanation of Parts -->
+                <p class="text-gray-700 leading-relaxed my-4">Let's break that down in detail:</p>
+                <ul class="list-disc list-inside space-y-4 text-gray-700">
+                    <li>
+                        <strong class="text-pink-500"><code>return_type</code></strong>: This is the data type of the value the function will send back *after* it's done.
+                        <ul class="list-circle list-inside ml-6 mt-2 space-y-2">
+                            <li>It can be any valid C type: <code>int</code>, <code>float</code>, <code>double</code>, <code>char</code>, etc.</li>
+                            <li>If the function's job is just to *do* something (like print to the screen) and not send a value back, you <strong>must</strong> use the special keyword <code>void</code>. This means "returns nothing."</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong class="text-blue-500"><code>function_name</code></strong>: The unique name you give your function.
+                        <ul class="list-circle list-inside ml-6 mt-2 space-y-2">
+                            <li>It follows the same rules as variable names (must start with a letter or underscore, can contain letters, numbers, underscores).</li>
+                            <li>Good names are descriptive and often use verbs, like <code>calculateArea</code>, <code>printReport</code>, or <code>getUserInput</code>.</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong class="text-green-500"><code>(parameter_list)</code></strong>: This is the function's "input." It's a list of variables that the function needs to receive to do its job.
+                        <ul class="list-circle list-inside ml-6 mt-2 space-y-2">
+                            <li>Each parameter must have a type and a name, like <code>(int num1, int num2)</code> or <code>(float radius, char unit)</code>.</li>
+                            <li>These parameters act as local variables inside the function.</li>
+                            <li>If the function takes no inputs, you should write <code>(void)</code>, like <code>int getRandomNumber(void)</code>. Many modern compilers also allow empty parentheses <code>()</code>.</li>
+                        </ul>
+                    </li>
+                    <li>
+                        <strong class="text-gray-600"><code>{ ... } (The Body)</code></strong>: The curly braces and all the code inside them are the "body" of the function.
+                        <ul class="list-circle list-inside ml-6 mt-2 space-y-2">
+                            <li>This is the code that actually runs when the function is called.</li>
+                            <li>Any variables you declare inside the body are **local** to that function. They are created when the function starts and destroyed when it ends. They cannot be seen or used by any other function (including <code>main()</code>).</li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
+
+            <!-- Section 2: How to 'Call' a Function -->
+            <div id="calling" class="mb-10 pt-4">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-3">2. How to "Call" a Function</h2>
+                <p class="text-gray-700 leading-relaxed mb-4">
+                    Defining a function is like writing a recipe. It doesn't do anything until you actually *use* it. Using a function is called "calling" it.
+                </p>
+                <p class="text-gray-700 leading-relaxed mb-4">
+                    When you call a function, you pass it values for its parameters. These values are called <strong>arguments</strong>.
+                </p>
+                <p class="text-gray-700 leading-relaxed mb-4">
+                    <strong class="text-gray-800">Parameters vs. Arguments:</strong>
+                    <ul class="list-disc list-inside ml-4 mt-2">
+                        <li><strong>Parameters</strong> are the variables in the function's *definition* (the "inputs" it expects). E.g., <code>int a, int b</code>.</li>
+                        <li><strong>Arguments</strong> are the actual values you *pass* to the function when you *call* it. E.g., <code>5, 10</code>.</li>
                     </ul>
-                </section>
-
-                <!-- Section: Multi-dimensional -->
-                <section id="multidimensional" class="bg-white p-6 rounded-lg shadow-md mb-8">
-                    <h2 class="text-2xl font-semibold mb-4 text-slate-800 border-b pb-2">A Quick Look: Multi-dimensional Arrays</h2>
-                    <p class="text-slate-700 leading-relaxed mb-4">
-                        You can also have arrays of arrays, known as multi-dimensional arrays. A 2D array is like a grid or a table.
-                    </p>
-                    <pre class="bg-slate-800 text-gray-100 p-4 rounded-md overflow-x-auto"><code class="language-c"><span class="code-comment">// Declare a 2D array (3 rows, 4 columns)</span>
-<span class="code-type">int</span> <span class="code-var">matrix</span>[<span class="code-number">3</span>][<span class="code-number">4</span>] = {
-    { <span class="code-number">1</span>,  <span class="code-number">2</span>,  <span class="code-number">3</span>,  <span class="code-number">4</span> }, <span class="code-comment">// Row 0</span>
-    { <span class="code-number">5</span>,  <span class="code-number">6</span>,  <span class="code-number">7</span>,  <span class="code-number">8</span> }, <span class="code-comment">// Row 1</span>
-    { <span class="code-number">9</span>, <span class="code-number">10</span>, <span class="code-number">11</span>, <span class="code-number">12</span> }  <span class="code-comment">// Row 2</span>
-};
-
-<span class="code-comment">// Access the element at Row 1, Column 2</span>
-<span class="code-type">int</span> <span class="code-var">element</span> = <span class="code-var">matrix</span>[<span class="code-number">1</span>][<span class="code-number">2</span>]; <span class="code-comment">// element is 7</span>
-
-<span class="code-comment">// You need nested loops to iterate over a 2D array</span>
-<span class="code-keyword">for</span> (<span class="code-type">int</span> <span class="code-var">i</span> = <span class="code-number">0</span>; <span class="code-var">i</span> < <span class="code-number">3</span>; <span class="code-var">i</span>++) { <span class="code-comment">// Loop over rows</span>
-    <span class="code-keyword">for</span> (<span class="code-type">int</span> <span class="code-var">j</span> = <span class="code-number">0</span>; <span class="code-var">j</span> < <span class="code-number">4</span>; <span class="code-var">j</span>++) { <span class="code-comment">// Loop over columns</span>
-        <span class="code-function">printf</span>(<span class="code-string">"%d "</span>, <span class="code-var">matrix</span>[<span class="code-var">i</span>][<span class="code-var">j</span>]);
-    }
-    <span class="code-function">printf</span>(<span class="code-string">"\n"</span>); <span class="code-comment">// Newline after each row</span>
+                </p>
+                
+                <h3 class="text-lg font-semibold text-gray-700 mt-6">Calling a Function That Returns a Value</h3>
+                <p class="text-gray-700 leading-relaxed mb-2">
+                    If a function has a return type (like <code>int</code>), it will send a value back. You almost always want to "catch" this value in a variable.
+                </p>
+                <pre><code><span class="text-pink-400">int</span> <span class="text-blue-400">addNumbers</span>(<span class="text-green-400">int</span> <span class="text-gray-300">a</span>, <span class="text-green-400">int</span> <span class="text-gray-300">b</span>) {
+    <span class="text-pink-400">return</span> a + b;
 }
-</code></pre>
-                </section>
 
-                <!-- Footer -->
-                <footer class="text-center text-slate-500 mt-12 mb-4">
-                    Happy Coding!
-                </footer>
-            </main>
+<span class="text-pink-400">int</span> <span class="text-blue-400">main</span>(<span class="text-green-400">void</span>) {
+    <span class="text-green-400">int</span> <span class="text-gray-300">sum1</span> = <span class="text-blue-400">addNumbers</span>(<span class="text-yellow-400">5</span>, <span class="text-yellow-400">3</span>);  <span class="text-gray-500">// Call the function, store the result in sum1</span>
+    <span class="text-green-400">int</span> <span class="text-gray-300">sum2</span> = <span class="text-blue-400">addNumbers</span>(<span class="text-yellow-400">100</span>, <span class="text-yellow-400">200</span>); <span class="text-gray-500">// Call it again with different arguments</span>
+
+    printf(<span class="text-yellow-400">"The first sum is: %d\n"</span>, sum1); <span class="text-gray-500">// Prints 8</span>
+    printf(<span class="text-yellow-400">"The second sum is: %d\n"</span>, sum2); <span class="text-gray-500">// Prints 300</span>
+    
+    <span class="text-pink-400">return</span> <span class="text-yellow-400">0</span>;
+}</code></pre>
+
+                <h3 class="text-lg font-semibold text-gray-700 mt-6">Calling a Function That Returns <code>void</code></h3>
+                <p class="text-gray-700 leading-relaxed mb-2">
+                    If a function returns <code>void</code>, it doesn't send a value back. You just call it on its own line. You cannot try to store its "result" in a variable.
+                </p>
+                <pre><code><span class="text-pink-400">void</span> <span class="text-blue-400">greetUser</span>(<span class="text-green-400">char</span>* <span class="text-gray-300">name</span>) {
+    printf(<span class="text-yellow-400">"Hello, %s! Welcome.\n"</span>, name);
+}
+
+<span class="text-pink-400">int</span> <span class="text-blue-400">main</span>(<span class="text-green-400">void</span>) {
+    <span class="text-blue-400">greetUser</span>(<span class="text-yellow-400">"Alice"</span>); <span class="text-gray-500">// Just call the function. It does its job (prints)</span>
+    <span class="text-blue-400">greetUser</span>(<span class="text-yellow-400">"Bob"</span>);   <span class="text-gray-500">// Call it again.</span>
+
+    <span class="text-gray-500">// int x = greetUser("Charlie"); // ERROR! Can't assign 'void' to 'int'</span>
+    
+    <span class="text-pink-400">return</span> <span class="text-yellow-400">0</span>;
+}</code></pre>
+            </div>
+
+            <!-- Section 3: Function Prototypes -->
+            <div id="prototypes" class="mb-10 pt-4">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-3">3. Function Prototypes (Declarations)</h2>
+                <p class="text-gray-700 leading-relaxed mb-4">
+                    The C compiler reads your code from top to bottom. If you try to *call* a function before you have *defined* it (or before the compiler has read its definition), the compiler will give you an error because it doesn't know that function exists.
+                </p>
+                <p class="text-gray-700 leading-relaxed mb-4">
+                    There are two ways to solve this:
+                    <ol class="list-decimal list-inside ml-4 mt-2">
+                        <li>Define all your functions *before* <code>main()</code>. This works, but can be messy.</li>
+                        <li>Use <strong>Function Prototypes</strong>. This is the preferred way.</li>
+                    </ol>
+                </p>
+                <p class="text-gray-700 leading-relaxed mb-4">
+                    A prototype (or declaration) is a single line, usually at the top of your file (before <code>main()</code>), that tells the compiler a function's "signature" *without* giving the body. It's like saying, "Hey compiler, I promise that *later* I will define a function with this name, these parameters, and this return type."
+                </p>
+                <p class="text-gray-700 leading-relaxed mb-4">
+                    A prototype is just the function's first line, ending with a semicolon <code>;</code>.
+                </p>
+                <pre><code><span class="text-gray-500">// main.c</span>
+<span class="text-pink-400">#include</span> <span class="text-yellow-400">&lt;stdio.h&gt;</span>
+
+<span class="text-gray-500">// --- Function Prototypes ---</span>
+<span class="text-pink-400">void</span> <span class="text-blue-400">greetUser</span>(<span class="text-green-400">char</span>* <span class="text-gray-300">name</span>);
+<span class="text-pink-400">int</span> <span class="text-blue-400">addNumbers</span>(<span class="text-green-400">int</span> <span class="text-gray-300">a</span>, <span class="text-green-400">int</span> <span class="text-gray-300">b</span>);
+
+<span class="text-gray-500">// --- Main Function ---</span>
+<span class="text-pink-400">int</span> <span class="text-blue-400">main</span>(<span class="text-green-400">void</span>) {
+    <span class="text-gray-500">// This is OK! The compiler saw the prototypes.</span>
+    <span class="text-blue-400">greetUser</span>(<span class="text-yellow-400">"Alice"</span>);
+    <span class="text-green-400">int</span> <span class="text-gray-300">sum</span> = <span class="text-blue-400">addNumbers</span>(<span class="text-yellow-400">10</span>, <span class="text-yellow-400">20</span>);
+    printf(<span class="text-yellow-400">"Sum is: %d\n"</span>, sum);
+    <span class="text-pink-400">return</span> <span class="text-yellow-400">0</span>;
+}
+
+<span class="text-gray-500">// --- Function Definitions ---</span>
+<span class="text-gray-500">// Now we provide the full "recipe" for each function</span>
+<span class="text-pink-400">void</span> <span class="text-blue-400">greetUser</span>(<span class="text-green-400">char</span>* <span class="text-gray-300">name</span>) {
+    printf(<span class="text-yellow-400">"Hello, %s! Welcome.\n"</span>, name);
+}
+
+<span class="text-pink-400">int</span> <span class="text-blue-400">addNumbers</span>(<span class="text-green-400">int</span> <span class="text-gray-300">a</span>, <span class="text-green-400">int</span> <span class="text-gray-300">b</span>) {
+    <span class="text-pink-400">return</span> a + b;
+}</code></pre>
+            </div>
+
+
+            <!-- Section 4: Return Values and Types -->
+            <div id="return-types" class="mb-10 pt-4">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-3">4. Return Values and Types</h2>
+                <p class="text-gray-700 leading-relaxed mb-4">
+                    The <code>return_type</code> is a <strong>strict promise</strong>. If you tell the compiler your function will return an <code>int</code>, it *must* return a valid <code>int</code>.
+                </p>
+                
+                <h3 class="text-lg font-semibold text-gray-700 mt-4">Example: Returning a Number (<code>int</code>)</h3>
+                <p class="text-gray-700 leading-relaxed mb-2">
+                    This function promises to return an <code>int</code>. The <code>return sum;</code> line fulfills that promise.
+                </p>
+                <pre><code><span class="text-pink-400">int</span> <span class="text-blue-400">addNumbers</span>(<span class="text-green-400">int</span> <span class="text-gray-300">a</span>, <span class="text-green-400">int</span> <span class="text-gray-300">b</span>) {
+    <span class="text-green-400">int</span> <span class="text-gray-300">sum</span> = a + b;
+    <span class="text-pink-400">return</span> <span class="text-yellow-400">sum</span>; <span class="text-gray-500">// We send back the 'sum', which is an int</span>
+}</code></pre>
+
+                <h3 class="text-lg font-semibold text-gray-700 mt-6">Example: Returning a Decimal (<code>float</code>)</h3>
+                <p class="text-gray-700 leading-relaxed mb-2">
+                    Here, the function promises a <code>float</code>. Note that we use <code>3.14159f</code> and <code>2.0f</code> to make sure the numbers are treated as floats, not doubles.
+                </p>
+                <pre><code><span class="text-pink-400">float</span> <span class="text-blue-400">calculateCircleArea</span>(<span class="text-green-400">float</span> <span class="text-gray-300">radius</span>) {
+    <span class="text-green-400">float</span> <span class="text-gray-300">pi</span> = <span class="text-yellow-400">3.14159f</span>;
+    <span class="text-green-400">float</span> <span class="text-gray-300">area</span> = pi * radius * radius;
+    <span class="text-pink-400">return</span> <span class="text-yellow-400">area</span>; <span class="text-gray-500">// Fulfills the 'float' promise</span>
+}</code></pre>
+
+                <h3 class="text-lg font-semibold text-gray-700 mt-6">Example: Returning Nothing (<code>void</code>)</h3>
+                <p class="text-gray-700 leading-relaxed mb-2">
+                    This function promises <code>void</code> (nothing). Its job is purely to perform an *action* (printing). It does not need a <code>return</code> statement at the end, as it will automatically return when it hits the closing brace <code>}</code>.
+                </p>
+                <pre><code><span class="text-pink-400">void</span> <span class="text-blue-400">greetUser</span>(<span class="text-green-400">char</span>* <span class="text-gray-300">name</span>) {
+    printf(<span class="text-yellow-400">"Hello, %s! Welcome.\n"</span>, name);
+    <span class="text-gray-500">// No 'return' statement is needed here.</span>
+}</code></pre>
+            </div>
+
+            <!-- Section 5: The 'return' Statement -->
+            <div id="return-statement" class="mb-10 pt-4">
+                <h2 class="text-2xl font-semibold text-gray-800 mb-3">5. The <code>return</code> Statement</h2>
+                <p class="text-gray-700 leading-relaxed mb-4">
+                    The <code>return</code> keyword is a powerful command. It does two critical things simultaneously:
+                </p>
+                <ol class="list-decimal list-inside space-y-3 text-gray-700">
+                    <li>
+                        <strong>It immediately exits the function.</strong> As soon as the program hits a <code>return</code>, the function stops running. Any code *after* the <code>return</code> statement (in the same block) will be ignored. This is called "unreachable code."
+                    </li>
+                    <li>
+                        <strong>It sends a value back</strong> (unless the function is <code>void</code>) to the exact spot where the function was called. The program execution then continues from that point.
+                    </li>
+                </ol>
+
+                <p class="text-gray-700 leading-relaxed my-4">
+                    The value you <code>return</code> <strong>must match</strong> the <code>return_type</code> you promised, or be safely convertible to it.
+                </p>
+                <pre><code><span class="text-pink-400">int</span> <span class="text-blue-400">giveMeFive</span>() {
+    <span class="text-pink-400">return</span> <span class="text-yellow-400">5</span>; <span class="text-gray-500">// This is valid. We promised an int, we returned an int.</span>
+    printf(<span class="text-yellow-400">"Hello!"</span>); <span class="text-gray-500">// UNREACHABLE CODE. This will never run.</span>
+}
+
+<span class="text-pink-400">int</span> <span class="text-blue-400">wrongFunction</span>() {
+    <span class="text-pink-400">return</span> <span class="text-yellow-400">"hello"</span>; <span class="text-gray-500">// COMPILE ERROR! We promised an int,</span>
+                       <span class="text-gray-500">// but we are trying to return a string literal (char*).</span>
+}</code></pre>
+                
+                <h3 class="text-lg font-semibold text-gray-700 mt-6">Using <code>return</code> in a <code>void</code> Function</h3>
+                <p class="text-gray-700 leading-relaxed mt-4">
+                    You *can* use <code>return;</code> (with no value) in a <code>void</code> function. This is commonly used to "exit early," often for validation or error-checking.
+                </p>
+                <pre><code><span class="text-pink-400">void</span> <span class="text-blue-400">printPositiveNumber</span>(<span class="text-green-400">int</span> <span class="text-gray-300">num</span>) {
+    <span class="text-pink-400">if</span> (num < <span class="text-yellow-400">0</span>) {
+        printf(<span class="text-yellow-400">"Error: Number is negative.\n"</span>);
+        <span class="text-pink-400">return</span>; <span class="text-gray-500">// Exit the function immediately.</span>
+    }
+    
+    <span class="text-gray-500">// This line will only run if the 'if' condition was false.</span>
+    printf(<span class="text-yellow-400">"Your positive number is: %d\n"</span>, num);
+}</code></pre>
+            </div>
+
+            <!-- Key Takeaways Box -->
+            <div class="mt-10 p-6 bg-blue-50 border-l-4 border-blue-500 rounded-r-lg">
+                <h3 class="text-xl font-semibold text-blue-800 mb-3">Key Takeaways</h3>
+                <ul class="list-disc list-inside space-y-3 text-blue-700">
+                    <li>Functions are <strong>reusable</strong> and <strong>organizing</strong> blocks of code.</li>
+                    <li>The function **definition** is the full recipe: <code>return_type name(parameters) { ... }</code>.</li>
+                    <li>A **prototype** is a declaration (like <code>int add(int, int);</code>) that tells the compiler a function exists before it's defined.</li>
+                    <li><strong>Parameters</strong> are the variables in the definition; <strong>Arguments</strong> are the values you pass when you *call* the function.</li>
+                    <li>The <code>return_type</code> is a <strong>strict promise</strong> of what data type the function will send back.</li>
+                    <li><code>void</code> is a special type that means "I promise to return <strong>nothing</strong>."</li>
+                    <li>The <code>return</code> keyword <strong>immediately stops the function</strong> and (if not <code>void</code>) <strong>sends one value</strong> back.</li>
+                </ul>
+            </div>
+
         </div>
+        <!-- End of Main Card -->
+
+        <!-- Footer -->
+        <footer class="text-center mt-6 pb-4">
+            <p class="text-gray-500 text-sm">memento mori</p>
+        </footer>
     </div>
-
-    <!-- Overlay for mobile menu -->
-    <div id="overlay" class="fixed inset-0 bg-black bg-opacity-50 z-20 hidden md:hidden"></div>
-
-    <script>
-        const menuToggle = document.getElementById('menu-toggle');
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('overlay');
-        const navLinks = document.querySelectorAll('#nav-links a');
-
-        function toggleMenu() {
-            sidebar.classList.toggle('-translate-x-full');
-            overlay.classList.toggle('hidden');
-        }
-
-        menuToggle.addEventListener('click', toggleMenu);
-        overlay.addEventListener('click', toggleMenu);
-
-        // Close sidebar when a nav link is clicked on mobile
-        navLinks.forEach(link => {
-            link.addEventListener('click', () => {
-                if (window.innerWidth < 768) {
-                    toggleMenu();
-                }
-            });
-        });
-    </script>
 
 </body>
 </html>
+
+
