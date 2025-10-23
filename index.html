@@ -8,6 +8,9 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Load Inter font -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Load jsPDF and html2canvas for PDF export -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <style>
         /* Apply the Inter font family */
         body {
@@ -32,19 +35,34 @@
 
     <div class="flex h-screen">
         <!-- Sidebar Navigation -->
-        <aside id="sidebar" class="w-64 bg-slate-900 text-white p-6 fixed inset-y-0 left-0 transform -translate-x-full md:translate-x-0 z-30 transition-transform duration-300 ease-in-out">
-            <h2 class="text-2xl font-bold mb-6 text-center">C Arrays</h2>
-            <nav>
-                <ul class="space-y-2" id="nav-links">
-                    <li><a href="#intro" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-slate-700">Introduction</a></li>
-                    <li><a href="#declaration" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-slate-700">Declaration</a></li>
-                    <li><a href="#initialization" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-slate-700">Initialization</a></li>
-                    <li><a href="#accessing" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-slate-700">Accessing Elements</a></li>
-                    <li><a href="#loops" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-slate-700">Arrays & Loops</a></li>
-                    <li><a href="#pitfalls" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-slate-700">Common Pitfalls</a></li>
-                    <li><a href="#multidimensional" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-slate-700">Multi-dimensional</a></li>
-                </ul>
-            </nav>
+        <aside id="sidebar" class="w-64 bg-slate-900 text-white p-6 fixed inset-y-0 left-0 transform -translate-x-full md:translate-x-0 z-30 transition-transform duration-300 ease-in-out flex flex-col">
+            <!-- Navigation Content -->
+            <div class="flex-1">
+                <h2 class="text-2xl font-bold mb-6 text-center">C Arrays</h2>
+                <nav>
+                    <ul class="space-y-2" id="nav-links">
+                        <li><a href="#intro" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-slate-700">Introduction</a></li>
+                        <li><a href="#declaration" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-slate-700">Declaration</a></li>
+                        <li><a href="#initialization" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-slate-700">Initialization</a></li>
+                        <li><a href="#accessing" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-slate-700">Accessing Elements</a></li>
+                        <li><a href="#loops" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-slate-700">Arrays & Loops</a></li>
+                        <li><a href="#pitfalls" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-slate-700">Common Pitfalls</a></li>
+                        <li><a href="#multidimensional" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-slate-700">Multi-dimensional Arrays</a></li>
+                        <li><a href="#accessing-2d" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-slate-700">2D Array Example</a></li>
+                    </ul>
+                </nav>
+            </div>
+            <!-- Download Button -->
+            <div class="mt-6 space-y-2">
+                <button id="download-btn" class="w-full bg-indigo-600 text-white py-2.5 px-4 rounded-lg transition duration-200 hover:bg-indigo-500 flex items-center justify-center space-x-2 text-sm font-medium">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
+                    <span>Download Tutorial (HTML)</span>
+                </button>
+                <button id="download-pdf-btn" class="w-full bg-rose-600 text-white py-2.5 px-4 rounded-lg transition duration-200 hover:bg-rose-500 flex items-center justify-center space-x-2 text-sm font-medium">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
+                    <span>Download as PDF</span>
+                </button>
+            </div>
         </aside>
 
         <!-- Main Content -->
@@ -60,7 +78,7 @@
             </header>
 
             <!-- Content Area -->
-            <main class="flex-1 p-6 md:p-10 overflow-y-auto">
+            <main id="main-content" class="flex-1 p-6 md:p-10 overflow-y-auto">
                 <h1 class="text-3xl font-bold text-slate-900 mb-8 hidden md:block">C Programming Array Tutorial</h1>
 
                 <!-- Section: Introduction -->
@@ -191,7 +209,7 @@
 
                 <!-- Section: Multi-dimensional -->
                 <section id="multidimensional" class="bg-white p-6 rounded-lg shadow-md mb-8">
-                    <h2 class="text-2xl font-semibold mb-4 text-slate-800 border-b pb-2">A Quick Look: Multi-dimensional Arrays</h2>
+                    <h2 class="text-2xl font-semibold mb-4 text-slate-800 border-b pb-2">Multi-dimensional Arrays</h2>
                     <p class="text-slate-700 leading-relaxed mb-4">
                         You can also have arrays of arrays, known as multi-dimensional arrays. A 2D array is like a grid or a table.
                     </p>
@@ -215,6 +233,33 @@
 </code></pre>
                 </section>
 
+                <!-- Section: Accessing 2D Elements (New) -->
+                <section id="accessing-2d" class="bg-white p-6 rounded-lg shadow-md mb-8">
+                    <h2 class="text-2xl font-semibold mb-4 text-slate-800 border-b pb-2">2D Array Example</h2>
+                    <p class="text-slate-700 leading-relaxed mb-4">
+                        Here is a complete, runnable C program that demonstrates how to declare a 2D array (a matrix) and access a specific element from it using its row and column index.
+                    </p>
+                    <pre class="bg-slate-800 text-gray-100 p-4 rounded-md overflow-x-auto"><code class="language-c"><span class="code-keyword">#include</span> <span class="code-string">&lt;stdio.h&gt;</span>
+
+<span class="code-type">int</span> <span class="code-function">main</span>() {
+    <span class="code-comment">// Define the 3x4 matrix</span>
+    <span class="code-type">int</span> <span class="code-var">matrix</span>[<span class="code-number">3</span>][<span class="code-number">4</span>] = {
+        { <span class="code-number">1</span>,  <span class="code-number">2</span>,  <span class="code-number">3</span>,  <span class="code-number">4</span> }, <span class="code-comment">// Row 0</span>
+        { <span class="code-number">5</span>,  <span class="code-number">6</span>,  <span class="code-number">7</span>,  <span class="code-number">8</span> }, <span class="code-comment">// Row 1</span>
+        { <span class="code-number">9</span>, <span class="code-number">10</span>, <span class="code-number">11</span>, <span class="code-number">12</span> }  <span class="code-comment">// Row 2</span>
+    };
+
+    <span class="code-comment">// Access the element at Row 1, Column 2</span>
+    <span class="code-type">int</span> <span class="code-var">element</span> = <span class="code-var">matrix</span>[<span class="code-number">1</span>][<span class="code-number">2</span>]; <span class="code-comment">// element will be 7</span>
+    
+    <span class="code-comment">// Print the specific element</span>
+    <span class="code-function">printf</span>(<span class="code-string">"Element at matrix[1][2]: %d\n"</span>, <span class="code-var">element</span>);
+
+    <span class="code-keyword">return</span> <span class="code-number">0</span>; <span class="code-comment">// Indicate successful execution</span>
+}
+</code></pre>
+                </section>
+
                 <!-- Footer -->
                 <footer class="text-center text-slate-500 mt-12 mb-4">
                     Happy Coding!
@@ -231,6 +276,10 @@
         const sidebar = document.getElementById('sidebar');
         const overlay = document.getElementById('overlay');
         const navLinks = document.querySelectorAll('#nav-links a');
+        const downloadBtn = document.getElementById('download-btn');
+        const downloadPdfBtn = document.getElementById('download-pdf-btn');
+        const mainContent = document.getElementById('main-content');
+        const { jsPDF } = window.jspdf;
 
         function toggleMenu() {
             sidebar.classList.toggle('-translate-x-full');
@@ -248,7 +297,66 @@
                 }
             });
         });
+
+        // Download button functionality (HTML)
+        downloadBtn.addEventListener('click', () => {
+            // Get the entire HTML content of the page
+            const htmlContent = document.documentElement.outerHTML;
+            // Create a Blob (binary large object) with the HTML content
+            const blob = new Blob([htmlContent], { type: 'text/html' });
+            // Create a temporary URL for the Blob
+            const url = URL.createObjectURL(blob);
+            
+            // Create a temporary <a> element to trigger the download
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'c_array_tutorial.html'; // This sets the default filename
+            document.body.appendChild(a);
+            a.click(); // Programmatically click the link
+            
+            // Clean up by removing the temporary <a> element and revoking the URL
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        });
+
+        // Download as PDF functionality
+        downloadPdfBtn.addEventListener('click', () => {
+            // Show loading state
+            const originalBtnContent = downloadPdfBtn.innerHTML;
+            downloadPdfBtn.disabled = true;
+            downloadPdfBtn.innerHTML = `
+                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span>Generating PDF...</span>
+            `;
+
+            const pdf = new jsPDF('p', 'mm', 'a4');
+            
+            // We need to tell jspdf the *actual* width of the content
+            // so it renders correctly, not just the scaled-down responsive width.
+            // A4 width is 210mm. We'll use 190mm for content with 10mm margins.
+            const contentWidth = mainContent.scrollWidth;
+            const pdfWidth = 190; 
+
+            pdf.html(mainContent, {
+                callback: function (doc) {
+                    doc.save('c_array_tutorial.pdf');
+                    // Restore button state
+                    downloadPdfBtn.disabled = false;
+                    downloadPdfBtn.innerHTML = originalBtnContent;
+                },
+                x: 10, // 10mm left margin
+                y: 10, // 10mm top margin
+                width: pdfWidth, // Content width in PDF (A4 is 210mm wide)
+                windowWidth: contentWidth // Source content width
+            });
+        });
     </script>
 
 </body>
 </html>
+
+
+
