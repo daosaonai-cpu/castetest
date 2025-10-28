@@ -3,407 +3,503 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>C Programming Array Tutorial</title>
+    <title>C Functions Exam Notes</title>
     <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Load Inter font -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Load jsPDF and html2canvas for PDF export -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <!-- Removed html2pdf.js script tag -->
     <style>
-        /* Apply the Inter font family */
+        /* Using Inter font */
         body {
             font-family: 'Inter', sans-serif;
         }
-        /* Custom styles for syntax highlighting in code blocks */
-        .code-keyword { color: #c792ea; } /* Purple for keywords */
-        .code-type { color: #82aaff; }    /* Blue for types */
-        .code-function { color: #c3e88d; } /* Green for functions */
-        .code-string { color: #ecc48d; }   /* Orange for strings */
-        .code-number { color: #f07178; }   /* Red for numbers */
-        .code-comment { color: #676e95; }  /* Gray for comments */
-        .code-var { color: #ffffff; }      /* White for variables */
-        
-        /* Smooth scrolling */
-        html {
-            scroll-behavior: smooth;
+        /* Style for the active navigation link */
+        .nav-link.active {
+            background-color: #3b82f6; /* blue-600 */
+            color: white;
+            font-weight: 600;
         }
+        .nav-link:not(.active):hover {
+            background-color: #f3f4f6; /* gray-100 */
+        }
+        /* Styles for the injected HTML content */
+        #content-area h2 {
+            font-size: 1.875rem; /* text-3xl */
+            font-weight: 700; /* bold */
+            color: #1f2937; /* gray-800 */
+            margin-bottom: 1.5rem; /* mb-6 */
+            border-bottom: 2px solid #e5e7eb; /* border-gray-200 */
+            padding-bottom: 0.5rem; /* pb-2 */
+        }
+        #content-area h3 {
+            font-size: 1.5rem; /* text-2xl */
+            font-weight: 600; /* semibold */
+            color: #374151; /* gray-700 */
+            margin-top: 2rem; /* mt-8 */
+            margin-bottom: 1rem; /* mb-4 */
+        }
+        #content-area p {
+            font-size: 1rem; /* text-base */
+            line-height: 1.6; /* leading-relaxed */
+            margin-bottom: 1.25rem; /* mb-5 */
+        }
+        #content-area ul {
+            list-style-type: disc;
+            margin-left: 1.5rem; /* ml-6 */
+            margin-bottom: 1.25rem; /* mb-5 */
+            line-height: 1.6;
+        }
+        #content-area code:not(pre code) {
+            background-color: #e5e7eb; /* gray-200 */
+            color: #be123c; /* rose-700 */
+            padding: 0.2rem 0.4rem;
+            border-radius: 0.25rem; /* rounded-md */
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9em;
+        }
+        #content-area pre {
+            background-color: #1f2937; /* gray-800 */
+            color: #f9fafb; /* gray-50 */
+            padding: 1rem; /* p-4 */
+            border-radius: 0.5rem; /* rounded-lg */
+            overflow-x: auto;
+            margin-bottom: 1.25rem; /* mb-5 */
+        }
+        #content-area pre code {
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 0.9em;
+        }
+        #content-area table {
+            width: 100%;
+            margin-bottom: 1.5rem; /* mb-6 */
+            border-collapse: collapse;
+            border: 1px solid #d1d5db; /* gray-300 */
+        }
+        #content-area th, #content-area td {
+            border: 1px solid #d1d5db; /* gray-300 */
+            padding: 0.75rem; /* p-3 */
+            text-align: left;
+            vertical-align: top;
+        }
+        #content-area th {
+            background-color: #f9fafb; /* gray-50 */
+            font-weight: 600; /* semibold */
+        }
+        #content-area tr:nth-child(even) {
+            background-color: #f9fafb; /* gray-50 */
+        }
+        /* Removed styles for #download-pdf-btn */
     </style>
 </head>
-<body class="bg-slate-100">
+<body class="bg-gray-100 text-gray-800">
 
-    <div class="flex h-screen">
-        <!-- Sidebar Navigation -->
-        <aside id="sidebar" class="w-64 bg-slate-900 text-white p-6 fixed inset-y-0 left-0 transform -translate-x-full md:translate-x-0 z-30 transition-transform duration-300 ease-in-out flex flex-col">
-            <!-- Navigation Content -->
-            <div class="flex-1">
-                <h2 class="text-2xl font-bold mb-6 text-center">C Arrays</h2>
-                <nav>
-                    <ul class="space-y-2" id="nav-links">
-                        <li><a href="#intro" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-slate-700">Introduction</a></li>
-                        <li><a href="#declaration" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-slate-700">Declaration</a></li>
-                        <li><a href="#initialization" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-slate-700">Initialization</a></li>
-                        <li><a href="#accessing" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-slate-700">Accessing Elements</a></li>
-                        <li><a href="#loops" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-slate-700">Arrays & Loops</a></li>
-                        <li><a href="#pitfalls" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-slate-700">Common Pitfalls</a></li>
-                        <li><a href="#multidimensional" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-slate-700">Multi-dimensional Arrays</a></li>
-                        <li><a href="#accessing-2d" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-slate-700">2D Array Example</a></li>
-                        <li><a href="#min-max" class="block py-2.5 px-4 rounded transition duration-200 hover:bg-slate-700">Example: Finding Min & Max</a></li>
-                    </ul>
-                </nav>
-            </div>
-            <!-- Download Button -->
-            <div class="mt-6 space-y-2">
-                <button id="download-btn" class="w-full bg-indigo-600 text-white py-2.5 px-4 rounded-lg transition duration-200 hover:bg-indigo-500 flex items-center justify-center space-x-2 text-sm font-medium">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path></svg>
-                    <span>Download Tutorial (HTML)</span>
-                </button>
-                <button id="download-pdf-btn" class="w-full bg-rose-600 text-white py-2.5 px-4 rounded-lg transition duration-200 hover:bg-rose-500 flex items-center justify-center space-x-2 text-sm font-medium">
-                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"></path></svg>
-                    <span>Download as PDF</span>
-                </button>
-            </div>
-        </aside>
-
-        <!-- Main Content -->
-        <div class="flex-1 flex flex-col md:ml-64">
-            <!-- Top Bar (Mobile) -->
-            <header class="bg-white shadow-md p-4 flex justify-between items-center md:hidden sticky top-0 z-20">
-                <h1 class="text-xl font-bold text-slate-800">C Array Tutorial</h1>
-                <button id="menu-toggle" class="text-slate-700 focus:outline-none">
-                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16m-7 6h7"></path>
-                    </svg>
-                </button>
-            </header>
-
-            <!-- Content Area -->
-            <main id="main-content" class="flex-1 p-6 md:p-10 overflow-y-auto">
-                <h1 class="text-3xl font-bold text-slate-900 mb-8 hidden md:block">C Programming Array Tutorial</h1>
-
-                <!-- Section: Introduction -->
-                <section id="intro" class="bg-white p-6 rounded-lg shadow-md mb-8">
-                    <h2 class="text-2xl font-semibold mb-4 text-slate-800 border-b pb-2">What is an Array?</h2>
-                    <p class="text-slate-700 leading-relaxed">
-                        An array is a collection of items of the <span class="font-semibold">same data type</span> stored at <span class="font-semibold">contiguous memory locations</span>.
-                        <br><br>
-                        Imagine you want to store the grades of 5 students. Instead of creating 5 different variables (like <code>grade1</code>, <code>grade2</code>, <code>grade3</code>...), you can use a single array variable called <code>grades</code> to store all 5 values.
-                    </p>
-                </section>
-
-                <!-- Section: Declaration -->
-                <section id="declaration" class="bg-white p-6 rounded-lg shadow-md mb-8">
-                    <h2 class="text-2xl font-semibold mb-4 text-slate-800 border-b pb-2">Declaring an Array</h2>
-                    <p class="text-slate-700 leading-relaxed mb-4">
-                        To declare an array in C, you specify the data type of the elements and the number of elements the array will hold (its size).
-                    </p>
-                    <p class="text-slate-600 font-mono mb-4">Syntax: <code>type arrayName[arraySize];</code></p>
-                    
-                    <pre class="bg-slate-800 text-gray-100 p-4 rounded-md overflow-x-auto"><code class="language-c"><span class="code-comment">// This declares an array named 'scores' that can hold 10 integers.</span>
-<span class="code-type">int</span> <span class="code-var">scores</span>[<span class="code-number">10</span>];
-
-<span class="code-comment">// This declares an array named 'averages' that can hold 5 floating-point numbers.</span>
-<span class="code-type">float</span> <span class="code-var">averages</span>[<span class="code-number">5</span>];
-
-<span class="code-comment">// This declares an array named 'grades' that can hold 20 characters.</span>
-<span class="code-type">char</span> <span class="code-var">grades</span>[<span class="code-number">20</span>];
-</code></pre>
-                </section>
-
-                <!-- Section: Initialization -->
-                <section id="initialization" class="bg-white p-6 rounded-lg shadow-md mb-8">
-                    <h2 class="text-2xl font-semibold mb-4 text-slate-800 border-b pb-2">Initializing an Array</h2>
-                    <p class="text-slate-700 leading-relaxed mb-4">
-                        You can initialize an array at the time of declaration by providing the values in curly braces <code>{}</code>.
-                    </p>
-                    <pre class="bg-slate-800 text-gray-100 p-4 rounded-md overflow-x-auto"><code class="language-c"><span class="code-comment">// Initialize an integer array with 5 values</span>
-<span class="code-type">int</span> <span class="code-var">marks</span>[<span class="code-number">5</span>] = {<span class="code-number">90</span>, <span class="code-number">85</span>, <span class="code-number">92</span>, <span class="code-number">78</span>, <span class="code-number">95</span>};
-
-<span class="code-comment">// You can omit the size, and the compiler will calculate it</span>
-<span class="code-type">int</span> <span class{="code-var">ages</span>[] = {<span class="code-number">20</span>, <span class="code-number">22</span>, <span class="code-number">21</span>, <span class="code-number">19</span>}; <span class="code-comment">// Compiler knows size is 4</span>
-
-<span class="code-comment">// If you provide fewer values than the size, the rest are set to 0</span>
-<span class="code-type">float</span> <span class="code-var">salary</span>[<span class="code-number">10</span>] = {<span class="code-number">500.5</span>, <span class="code-number">650.0</span>}; <span class="code-comment">// First 2 are set, remaining 8 are 0.0</span>
-</code></pre>
-                </section>
-                
-                <!-- Section: Accessing Elements -->
-                <section id="accessing" class="bg-white p-6 rounded-lg shadow-md mb-8">
-                    <h2 class="text-2xl font-semibold mb-4 text-slate-800 border-b pb-2">Accessing Array Elements</h2>
-                    <p class="text-slate-700 leading-relaxed mb-4">
-                        You can access individual elements of an array using an <span class="font-semibold">index</span>.
-                    </p>
-                    <div class="bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 p-4 rounded-md mb-4" role="alert">
-                        <p class="font-bold">Crucial Point: Zero-Based Indexing</p>
-                        <p>In C, array indexing starts at <span class="font-bold">0</span>, not 1.
-                        <br>
-                        - The first element is at index <code>0</code>.
-                        - The second element is at index <code>1</code>.
-                        - ...
-                        - For an array of size <code>N</code>, the last element is at index <code>N-1</code>.
-                        </p>
-                    </div>
-                    
-                    <pre class="bg-slate-800 text-gray-100 p-4 rounded-md overflow-x-auto"><code class="language-c"><span class="code-type">int</span> <span class="code-var">marks</span>[<span class="code-number">5</span>] = {<span class="code-number">90</span>, <span class="code-number">85</span>, <span class="code-number">92</span>, <span class="code-number">78</span>, <span class="code-number">95</span>};
-
-<span class="code-comment">// Access the first element (at index 0)</span>
-<span class="code-type">int</span> <span class="code-var">firstMark</span> = <span class="code-var">marks</span>[<span class="code-number">0</span>]; <span class="code-comment">// firstMark is 90</span>
-
-<span class="code-comment">// Access the third element (at index 2)</span>
-<span class="code-function">printf</span>(<span class="code-string">"The third mark is: %d\n"</span>, <span class="code-var">marks</span>[<span class="code-number">2</span>]); <span class="code-comment">// Prints 92</span>
-
-<span class="code-comment">// Change the value of the last element (at index 4)</span>
-<span class="code-var">marks</span>[<span class="code-number">4</span>] = <span class="code-number">98</span>; <span class="code-comment">// The 5th element (95) is now 98</span>
-</code></pre>
-                </section>
-
-                <!-- Section: Arrays & Loops -->
-                <section id="loops" class="bg-white p-6 rounded-lg shadow-md mb-8">
-                    <h2 class="text-2xl font-semibold mb-4 text-slate-800 border-b pb-2">Arrays and Loops</h2>
-                    <p class="text-slate-700 leading-relaxed mb-4">
-                        Arrays and <code>for</code> loops are a perfect match. You can use a loop to easily iterate over every element in an array.
-                    </p>
-                    <p class="text-slate-700 leading-relaxed mb-4">
-                        <strong>Example:</strong> Print all elements and calculate their sum.
-                    </p>
-                    <pre class="bg-slate-800 text-gray-100 p-4 rounded-md overflow-x-auto"><code class="language-c"><span class="code-keyword">#include</span> <span class="code-string">&lt;stdio.h&gt;</span>
-
-<span class="code-type">int</span> <span class="code-function">main</span>() {
-    <span class="code-type">int</span> <span class="code-var">ages</span>[] = {<span class="code-number">20</span>, <span class="code-number">22</span>, <span class="code-number">21</span>, <span class="code-number">19</span>, <span class="code-number">23</span>};
-    <span class="code-type">int</span> <span class="code-var">sum</span> = <span class="code-number">0</span>;
-    <span class="code-type">int</span> <span class="code-var">size</span> = <span class="code-number">5</span>;
-
-    <span class="code-function">printf</span>(<span class="code-string">"Listing all ages:\n"</span>);
-    
-    <span class="code-comment">// Loop from index 0 up to (but not including) 5</span>
-    <span class="code-keyword">for</span> (<span class="code-type">int</span> <span class="code-var">i</span> = <span class="code-number">0</span>; <span class="code-var">i</span> < <span class="code-var">size</span>; <span class="code-var">i</span>++) {
-        <span class="code-comment">// Print the element at the current index 'i'</span>
-        <span class="code-function">printf</span>(<span class="code-string">"Age at index %d: %d\n"</span>, <span class="code-var">i</span>, <span class="code-var">ages</span>[<span class="code-var">i</span>]);
+    <div class="container mx-auto max-w-7xl p-4 md:p-8">
         
-        <span class="code-comment">// Add the current element to the sum</span>
-        <span class="code-var">sum</span> = <span class="code-var">sum</span> + <span class="code-var">ages</span>[<span class="code-var">i</span>];
-    }
+        <!-- Header -->
+        <h1 class="text-3xl md:text-4xl font-bold text-center text-gray-800 mb-8">
+            C Programming: Exam Notes
+        </h1>
 
-    <span class="code-function">printf</span>(<span class="code-string">"The sum of all ages is: %d\n"</span>, <span class="code-var">sum</span>);
-    
-    <span class="code-keyword">return</span> <span class="code-number">0</span>;
-}
-</code></pre>
-                </section>
-                
-                <!-- Section: Common Pitfalls -->
-                <section id="pitfalls" class="bg-white p-6 rounded-lg shadow-md mb-8">
-                    <h2 class="text-2xl font-semibold mb-4 text-slate-800 border-b pb-2">Common Pitfalls</h2>
-                    <ul class="list-disc list-inside text-slate-700 space-y-3">
-                        <li>
-                            <strong class="text-red-600">Off-by-One Error:</strong> Forgetting that arrays start at index 0. For <code>int arr[5]</code>, the valid indices are 0, 1, 2, 3, and 4.
-                        </li>
-                        <li>
-                            <strong class="text-red-600">Accessing Out of Bounds:</strong> Trying to access an element that doesn't exist, like <code>arr[5]</code> or <code>arr[-1]</code>. This is called a "buffer overflow" and can crash your program or lead to unpredictable behavior. C does <span class="font-semibold">not</span> stop you from doing this!
-                        </li>
-                        <li>
-                            <strong class="text-red-600">Uninitialized Arrays:</strong> Using an array without initializing it first. The array will contain "garbage values" (whatever was in that memory location before).
-                        </li>
+        <!-- Main Layout -->
+        <div class="md:flex md:space-x-8">
+            
+            <!-- Navigation (Left Column) -->
+            <nav class="md:w-1/4 mb-6 md:mb-0">
+                <div class="sticky top-8">
+                    <!-- Download PDF Button Removed -->
+
+                    <h2 class="text-xl font-semibold mb-4 text-gray-700">Topics</h2>
+                    <ul id="nav-links" class="space-y-1">
+                        <!-- Navigation links will be inserted here by JS -->
                     </ul>
-                </section>
+                </div>
+            </nav>
 
-                <!-- Section: Multi-dimensional -->
-                <section id="multidimensional" class="bg-white p-6 rounded-lg shadow-md mb-8">
-                    <h2 class="text-2xl font-semibold mb-4 text-slate-800 border-b pb-2">Multi-dimensional Arrays</h2>
-                    <p class="text-slate-700 leading-relaxed mb-4">
-                        You can also have arrays of arrays, known as multi-dimensional arrays. A 2D array is like a grid or a table.
-                    </p>
-                    <pre class="bg-slate-800 text-gray-100 p-4 rounded-md overflow-x-auto"><code class="language-c"><span class="code-comment">// Declare a 2D array (3 rows, 4 columns)</span>
-<span class="code-type">int</span> <span class="code-var">matrix</span>[<span class="code-number">3</span>][<span class="code-number">4</span>] = {
-    { <span class="code-number">1</span>,  <span class="code-number">2</span>,  <span class="code-number">3</span>,  <span class="code-number">4</span> }, <span class="code-comment">// Row 0</span>
-    { <span class="code-number">5</span>,  <span class="code-number">6</span>,  <span class="code-number">7</span>,  <span class="code-number">8</span> }, <span class="code-comment">// Row 1</span>
-    { <span class="code-number">9</span>, <span class="code-number">10</span>, <span class="code-number">11</span>, <span class="code-number">12</span> }  <span class="code-comment">// Row 2</span>
-};
-
-<span class="code-comment">// Access the element at Row 1, Column 2</span>
-<span class="code-type">int</span> <span class="code-var">element</span> = <span class="code-var">matrix</span>[<span class="code-number">1</span>][<span class="code-number">2</span>]; <span class="code-comment">// element is 7</span>
-
-<span class="code-comment">// You need nested loops to iterate over a 2D array</span>
-<span class="code-keyword">for</span> (<span class="code-type">int</span> <span class="code-var">i</span> = <span class="code-number">0</span>; <span class="code-var">i</span> < <span class="code-number">3</span>; <span class="code-var">i</span>++) { <span class="code-comment">// Loop over rows</span>
-    <span class="code-keyword">for</span> (<span class="code-type">int</span> <span class="code-var">j</span> = <span class="code-number">0</span>; <span class="code-var">j</span> < <span class="code-number">4</span>; <span class="code-var">j</span>++) { <span class="code-comment">// Loop over columns</span>
-        <span class="code-function">printf</span>(<span class="code-string">"%d "</span>, <span class="code-var">matrix</span>[<span class="code-var">i</span>][<span class="code-var">j</span>]);
-    }
-    <span class="code-function">printf</span>(<span class="code-string">"\n"</span>); <span class="code-comment">// Newline after each row</span>
-}
-</code></pre>
-                </section>
-
-                <!-- Section: Accessing 2D Elements (New) -->
-                <section id="accessing-2d" class="bg-white p-6 rounded-lg shadow-md mb-8">
-                    <h2 class="text-2xl font-semibold mb-4 text-slate-800 border-b pb-2">2D Array Example</h2>
-                    <p class="text-slate-700 leading-relaxed mb-4">
-                        Here is a complete, runnable C program that demonstrates how to declare a 2D array (a matrix) and access a specific element from it using its row and column index.
-                    </p>
-                    <pre class="bg-slate-800 text-gray-100 p-4 rounded-md overflow-x-auto"><code class="language-c"><span class="code-keyword">#include</span> <span class="code-string">&lt;stdio.h&gt;</span>
-
-<span class="code-type">int</span> <span class="code-function">main</span>() {
-    <span class="code-comment">// Define the 3x4 matrix</span>
-    <span class="code-type">int</span> <span class="code-var">matrix</span>[<span class="code-number">3</span>][<span class="code-number">4</span>] = {
-        { <span class="code-number">1</span>,  <span class="code-number">2</span>,  <span class="code-number">3</span>,  <span class="code-number">4</span> }, <span class="code-comment">// Row 0</span>
-        { <span class="code-number">5</span>,  <span class="code-number">6</span>,  <span class="code-number">7</span>,  <span class="code-number">8</span> }, <span class="code-comment">// Row 1</span>
-        { <span class="code-number">9</span>, <span class="code-number">10</span>, <span class="code-number">11</span>, <span class="code-number">12</span> }  <span class="code-comment">// Row 2</span>
-    };
-
-    <span class="code-comment">// Access the element at Row 1, Column 2</span>
-    <span class="code-type">int</span> <span class="code-var">element</span> = <span class="code-var">matrix</span>[<span class="code-number">1</span>][<span class="code-number">2</span>]; <span class="code-comment">// element will be 7</span>
-    
-    <span class="code-comment">// Print the specific element</span>
-    <span class="code-function">printf</span>(<span class="code-string">"Element at matrix[1][2]: %d\n"</span>, <span class="code-var">element</span>);
-
-    <span class="code-keyword">return</span> <span class="code-number">0</span>; <span class="code-comment">// Indicate successful execution</span>
-}
-</code></pre>
-                </section>
-
-                <!-- Section: Finding Min & Max (New) -->
-                <section id="min-max" class="bg-white p-6 rounded-lg shadow-md mb-8">
-                    <h2 class="text-2xl font-semibold mb-4 text-slate-800 border-b pb-2">Example: Finding Min & Max</h2>
-                    <p class="text-slate-700 leading-relaxed mb-4">
-                        A common task is to iterate through an array to find its largest or smallest element. This example demonstrates how to find both.
-                    </p>
-                    <p class="text-slate-700 leading-relaxed mb-4">
-                        Notice the use of <code>sizeof(arr) / sizeof(arr[0])</code>. This is a robust C idiom to automatically calculate the number of elements in an array, making your code more flexible.
-                    </p>
-                    <pre class="bg-slate-800 text-gray-100 p-4 rounded-md overflow-x-auto"><code class="language-c"><span class="code-keyword">#include</span> <span class="code-string">&lt;stdio.h&gt;</span>
-
-<span class="code-type">int</span> <span class="code-function">main</span>() {
-    <span class="code-comment">// 1. Define and initialize an integer array</span>
-    <span class="code-type">int</span> <span class="code-var">arr</span>[] = {<span class="code-number">5</span>, <span class="code-number">10</span>, <span class="code-number">15</span>, <span class="code-number">20</span>};
-    
-    <span class="code-comment">// 2. Calculate the number of elements</span>
-    <span class="code-type">int</span> <span class="code-var">n</span> = <span class="code-keyword">sizeof</span>(<span class="code-var">arr</span>) / <span class="code-keyword">sizeof</span>(<span class="code-var">arr</span>[<span class="code-number">0</span>]);
-    
-    <span class="code-comment">// 3. Initialize min and max with the first element</span>
-    <span class="code-type">int</span> <span class="code-var">max</span> = <span class="code-var">arr</span>[<span class="code-number">0</span>];
-    <span class="code-type">int</span> <span class="code-var">min</span> = <span class="code-var">arr</span>[<span class="code-number">0</span>];
-    
-    <span class="code-comment">// 4. Iterate through the array starting from the second element</span>
-    <span class="code-comment">//    (We already checked the first element)</span>
-    <span class="code-keyword">for</span> (<span class="code-type">int</span> <span class="code-var">i</span> = <span class="code-number">1</span>; <span class="code-var">i</span> < <span class="code-var">n</span>; <span class="code-var">i</span>++) {
-        <span class="code-comment">// Check for a new maximum</span>
-        <span class="code-keyword">if</span> (<span class="code-var">arr</span>[<span class="code-var">i</span>] > <span class="code-var">max</span>) {
-            <span class="code-var">max</span> = <span class="code-var">arr</span>[<span class="code-var">i</span>];
-        }
-        
-        <span class="code-comment">// Check for a new minimum</span>
-        <span class="code-keyword">if</span> (<span class="code-var">arr</span>[<span class="code-var">i</span>] < <span class="code-var">min</span>) {
-            <span class="code-var">min</span> = <span class="code-var">arr</span>[<span class="code-var">i</span>];
-        }
-    }
-    
-    <span class="code-comment">// 5. Print the final results</span>
-    <span class="code-function">printf</span>(<span class="code-string">"Largest element: %d\n"</span>, <span class="code-var">max</span>);
-    <span class="code-function">printf</span>(<span class="code-string">"Smallest element: %d\n"</span>, <span class="code-var">min</span>);
-    
-    <span class="code-keyword">return</span> <span class="code-number">0</span>; <span class="code-comment">// Indicate successful execution</span>
-}
-</code></pre>
-                </section>
-
-                <!-- Footer -->
-                <footer class="text-center text-slate-500 mt-12 mb-4">
-                    Happy Coding!
-                </footer>
+            <!-- Content (Right Column) -->
+            <main id="content-area" class="md:w-3/4 bg-white p-6 md:p-10 rounded-2xl shadow-xl">
+                <!-- Content will be inserted here by JS -->
             </main>
+
         </div>
     </div>
 
-    <!-- Overlay for mobile menu -->
-    <div id="overlay" class="fixed inset-0 bg-black bg-opacity-50 z-20 hidden md:hidden"></div>
-
+    <!-- JavaScript Logic -->
     <script>
-        const menuToggle = document.getElementById('menu-toggle');
-        const sidebar = document.getElementById('sidebar');
-        const overlay = document.getElementById('overlay');
-        const navLinks = document.querySelectorAll('#nav-links a');
-        const downloadBtn = document.getElementById('download-btn');
-        const downloadPdfBtn = document.getElementById('download-pdf-btn');
-        const mainContent = document.getElementById('main-content');
-        const { jsPDF } = window.jspdf;
+        // Store all notes content as an array of objects
+        // HTML is used directly here, with escaping for code blocks
+        const notesData = [
+            {
+                title: "1. What is a Function?",
+                content: `
+                    <h2>1. What is a Function?</h2>
+                    <p>A function is a <strong>self-contained block of code</strong> that performs a specific, well-defined task.</p>
+                    <p>Every C program has at least one function, which is <code>main()</code>. A function can take inputs (called <strong>parameters</strong>) and can send a value back (called a <strong>return value</strong>).</p>
+                    
+                    <h3>Advantages of Using Functions</h3>
+                    <p>This is a very common exam question:</p>
+                    <ul>
+                        <li><strong>Modularity:</strong> Breaks a large, complex program into smaller, manageable, and logical pieces.</li>
+                        <li><strong>Reusability:</strong> A function can be "called" (used) many times from different parts of the program, avoiding code duplication.</li>
+                        <li><strong>Readability:</strong> Makes code easier to read and understand. A good function name (like <code>calculateAverage()</code>) immediately tells you what that code does.</li>
+                        <li><strong>Easier Debugging:</strong> It's much easier to find and fix errors (bugs) in a small, isolated function than in one giant program.</li>
+                    </ul>
+                `
+            },
+            {
+                title: "2. Types of Functions",
+                content: `
+                    <h2>2. Types of Functions</h2>
+                    <p>Functions are broadly divided into two categories:</p>
+                    
+                    <h3>A) Pre-defined (Library) Functions</h3>
+                    <p>These are built-in functions that are part of the C standard library. You don't need to write the code for them, just <code>#include</code> the correct header file to use them.</p>
+                    <ul>
+                        <li><code>printf()</code>, <code>scanf()</code>: From <code>&lt;stdio.h&gt;</code>. Used for formatted input/output.</li>
+                        <li><code>getchar()</code>, <code>putchar()</code>: From <code>&lt;stdio.h&gt;</code>. Used for single character I/O.</li>
+                        <li><code>gets()</code>, <code>puts()</code>: From <code>&lt;stdio.h&gt;</code>. Used for string I/O.</li>
+                        <li><code>fopen()</code>, <code>fclose()</code>: From <code>&lt;stdio.h&gt;</code>. Used for file operations.</li>
+                        <li><code>strcmp()</code>: From <code>&lt;string.h&gt;</code>. Used to compare two strings.</li>
+                        <li><code>ceil()</code>, <code>floor()</code>: From <code>&lt;math.h&gt;</code>. Used for rounding numbers.</li>
+                        <li><code>getch()</code>, <code>getche()</code>: From <code>&lt;conio.h&gt;</code> (non-standard). Used for single character input without waiting for Enter.</li>
+                    </ul>
 
-        function toggleMenu() {
-            sidebar.classList.toggle('-translate-x-full');
-            overlay.classList.toggle('hidden');
-        }
+                    <h3>B) User-defined Functions</h3>
+                    <p>These are functions that you, the programmer, create to perform specific tasks. <code>main()</code> is a special user-defined function.</p>
+                `
+            },
+            {
+                title: "3. Components of a Function",
+                content: `
+                    <h2>3. Components of a User-defined Function</h2>
+                    <p>There are three key parts to using a function:</p>
+                    
+                    <h3>1. Function Prototype (or Declaration)</h3>
+                    <ul>
+                        <li><strong>What it is:</strong> A single line that tells the compiler the function's name, its return type, and the types of its parameters. It ends with a semicolon.</li>
+                        <li><strong>Syntax:</strong> <code>return_type function_name(type1 param1, type2 param2);</code></li>
+                        <li><strong>Example:</strong> <code>float findAverage(int arr[], int n);</code></li>
+                        <li><strong>Is it mandatory?</strong> Not always, but it's best practice. It <strong>IS mandatory</strong> if you call the function <em>before</em> its definition appears in the code.</li>
+                    </ul>
+                    
+                    <h3>2. Function Definition</h3>
+                    <ul>
+                        <li><strong>What it is:</strong> This is the <em>actual code</em> for the function. It includes the function header (like the prototype, but no semicolon) and the function body (the code inside <code>{...}</code>).</li>
+                        <li><strong>Example:</strong>
+<pre><code class="language-c">float findAverage(int arr[], int n) {
+    int sum = 0;
+    for (int i = 0; i &lt; n; i++) {
+        sum += arr[i];
+    }
+    return (float)sum / n;
+}</code></pre>
+                        </li>
+                    </ul>
+                    
+                    <h3>3. Function Call</h3>
+                    <ul>
+                        <li><strong>What it is:</strong> This is the statement that <em>executes</em> the function.</li>
+                        <li><strong>Example:</strong> <code>float avg = findAverage(myArray, 5);</code></li>
+                    </ul>
+                `
+            },
+            {
+                title: "4. Call by Value vs. Reference",
+                content: `
+                    <h2>4. Parameter Passing: Call by Value vs. Call by Reference</h2>
+                    <p>This is a critical exam topic, often with a "swap two numbers" example.</p>
 
-        menuToggle.addEventListener('click', toggleMenu);
-        overlay.addEventListener('click', toggleMenu);
+                    <h3>A) Call by Value</h3>
+                    <ul>
+                        <li><strong>What happens:</strong> A <strong>copy</strong> of the argument's value is passed to the function.</li>
+                        <li><strong>Effect:</strong> Changes made to the parameter <em>inside</em> the function <strong>DO NOT</strong> affect the original variable in <code>main()</code>.</li>
+                        <li><strong>Default for:</strong> <code>int</code>, <code>float</code>, <code>char</code>, <code>struct</code>.</li>
+                    </ul>
+                    <p><strong>Example (Swap FAILS):</strong></p>
+<pre><code class="language-c">void swap(int a, int b) { // a and b are copies
+    int temp = a;
+    a = b;
+    b = temp;
+    // Only the copies are swapped
+}
 
-        // Close sidebar when a nav link is clicked on mobile
-        navLinks.forEach(link => {
-            link.addEventListener('click', () => {
-                if (window.innerWidth < 768) {
-                    toggleMenu();
-                }
-            });
+int main() {
+    int x = 10, y = 20;
+    swap(x, y);
+    // x is still 10, y is still 20
+}</code></pre>
+
+                    <h3>B) Call by Reference (Simulated in C using Pointers)</h3>
+                    <ul>
+                        <li><strong>What happens:</strong> The <strong>memory address</strong> of the argument is passed to the function.</li>
+                        <li><strong>Effect:</strong> The function receives a pointer. By dereferencing the pointer (<code>*</code>), it can access and change the <strong>original variable</strong> in <code>main()</code>.</li>
+                        <li><strong>How to do it:</strong> Pass the address (<code>&amp;var</code>) and write the function to accept a pointer (<code>*ptr</code>).</li>
+                    </ul>
+                    <p><strong>Example (Swap SUCCEEDS):</strong></p>
+<pre><code class="language-c">void swap(int *a, int *b) { // a and b are pointers
+    int temp = *a;  // Get value at address a
+    *a = *b;        // Put value at b into address a
+    *b = temp;      // Put temp into address b
+}
+
+int main() {
+    int x = 10, y = 20;
+    swap(&amp;x, &amp;y); // Pass the addresses of x and y
+    // x is now 20, y is now 10
+}</code></pre>
+                    
+                    <h3>Comparison Table</h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Feature</th>
+                                <th>Call by Value</th>
+                                <th>Call by Reference (using Pointers)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>What is passed?</strong></td>
+                                <td>A <strong>copy</strong> of the value.</td>
+                                <td>The <strong>memory address</strong> of the variable.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Original Variable</strong></td>
+                                <td><strong>Cannot</strong> be modified.</td>
+                                D<td><strong>Can</strong> be modified.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>How to Call</strong></td>
+                                <td><code>myFunc(x);</code></td>
+                                Read<td><code>myFunc(&amp;x);</code></td>
+                            </tr>
+                            <tr>
+                                <td><strong>Function Definition</strong></td>
+                                <td><code>void myFunc(int a)</code></td>
+                                <td><code>void myFunc(int *a)</code></td>
+                            </tr>
+                        </tbody>
+                    </table>
+                `
+            },
+            {
+                title: "5. Recursion",
+                content: `
+                    <h2>5. Recursion</h2>
+                    <ul>
+                        <li><strong>What it is:</strong> A process where a function calls itself, either directly or indirectly.</li>
+                        <li><strong>Working Principle:</strong> A recursive function must have two parts:
+                            <ol class="list-decimal ml-6 mt-2">
+                                <li><strong>Base Case:</strong> A simple condition that <strong>stops</strong> the recursion. Without this, you get an infinite loop (and a "stack overflow" crash).</li>
+                                <li><strong>Recursive Step:</strong> The part where the function calls itself, but with a "smaller" version of the problem that moves it closer to the base case.</li>
+                            </ol>
+                        </li>
+                    </ul>
+                    <p><strong>Example (Factorial - a common question):</strong></p>
+<pre><code class="language-c">long long factorial(int n) {
+    // 1. Base Case: Factorial of 0 or 1 is 1
+    if (n == 0 || n == 1) {
+        return 1;
+    }
+    // 2. Recursive Step: n * (n-1)!
+    else {
+        return n * factorial(n - 1);
+    }
+}
+
+/*
+How factorial(3) works:
+1. factorial(3) calls factorial(2)
+2.   factorial(2) calls factorial(1)
+3.     factorial(1) hits base case, returns 1
+4.   factorial(2) returns 2 * 1 = 2
+5. factorial(3) returns 3 * 2 = 6
+*/</code></pre>
+                `
+            },
+            {
+                title: "6. Important Functions & Keywords",
+                content: `
+                    <h2>6. Important Functions & Keywords from Exams</h2>
+                    
+                    <h3>The <code>main()</code> Function</h3>
+                    <ul>
+                        <li><strong>Is it user-defined?</strong> <strong>Yes.</strong> You, the programmer, must write the code for it. It's special because it's the <em>entry point</em> of the program, but it's not a pre-defined library function.</li>
+                        <li><strong>How many <code>main()</code> functions?</strong> Exactly <strong>one</strong>. A program can only have one starting point.</li>
+                        <li><strong>Run without <code>main()</code>?</strong> <strong>No.</strong> The C runtime environment is specifically designed to look for and execute <code>main()</code>.</li>
+                    </ul>
+
+                    <h3>The <code>void</code> Keyword</h3>
+                    <p><code>void</code> is a keyword that means "nothing" or "no type".</p>
+                    <ol class="list-decimal ml-6">
+                        <li><strong>As a Return Type:</strong> Used when a function does not return any value. (e.g., <code>void printHello(void)</code>)</li>
+                        <li><strong>As a Parameter List:</strong> Used to explicitly state that a function takes zero parameters. (e.g., <code>int getRandomNumber(void);</code>)</li>
+                    </ol>
+
+                    <h3><code>sizeof()</code> Operator</h3>
+                    <ul>
+                        <li><strong>Is it a function?</strong> <strong>No.</strong> It is a <strong>compile-time operator</strong>.</li>
+                        <li><strong>What it does:</strong> Returns the size (in bytes) of a data type or a variable.</li>
+                        <li><strong>Example:</strong> <code>int size = sizeof(int);</code> or <code>int size = sizeof(myArray);</code></li>
+                    </ul>
+
+                    <h3><code>scanf()</code> vs. <code>gets()</code></h3>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Function</th>
+                                <th>Stops Reading...</th>
+                                <th>Safety</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><code>scanf("%s", str)</code></td>
+                                Read<td>At the first <strong>whitespace</strong> (space, tab, newline).</td>
+                                <td>Unsafe. Can overflow the buffer.</td>
+                            </tr>
+                            <tr>
+                                <td><code>gets(str)</code></td>
+                                <td>At the <strong>newline</strong> (Enter key). Reads spaces.</td>
+                                <td><strong>Extremely Unsafe.</strong> Deprecated. Never use it.</td>
+                            </tr>
+                            <tr>
+                                <td><code>fgets(str, size, stdin)</code></td>
+                                <td>At newline (which it stores) or size limit.</td>
+                                <td><strong>Safe Alternative.</strong> Recommended.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+
+                    <h3><code>getch()</code> vs. <code>getche()</code> (from <code>&lt;conio.h&gt;</code>)</h3>
+                    <ul>
+                        <li><strong><code>getch()</code>:</strong> "Get Character". Reads a single key press <em>without*</em> displaying (echoing) it to the screen.</li>
+                        <li><strong><code>getche()</code>:</strong> "Get Character and Echo". Reads a single key press <em>and</em> displays it on the screen.</li>
+                        <li>Both are non-standard and do not wait for the Enter key.</li>
+                    </ul>
+                    
+                    <h3><code>fopen()</code>, <code>fclose()</code>, and <code>strcmp()</code></h3>
+                    <ul>
+                        <li><strong><code>fopen("file.txt", "mode")</code>:</strong> Opens a file. Returns a <code>FILE</code> pointer.
+                            <ul><li><code>"rb"</code> mode means <strong>R</strong>ead in <strong>B</strong>inary mode.</li></ul>
+                        </li>
+                        <li><strong><code>fclose(fp)</code>:</strong> Closes a file. <strong>Crucial for saving data</strong>, as it "flushes the buffer" (writes any pending data from memory to the disk).</li>
+                        <li><strong><code>strcmp(s1, s2)</code>:</strong> "String Compare".
+                            <ul>
+                                <li>Returns <code>0</code> if <code>s1</code> and <code>s2</code> are <strong>identical</strong>.</li>
+                                <li>Returns <code>&lt; 0</code> (negative) if <code>s1</code> comes <em>before</em> <code>s2</code> alphabetically.</li>
+                                <li>Returns <code>&gt; 0</code> (positive) if <code>s1</code> comes <em>after</em> <code>s2</code> alphabetically.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                `
+            },
+            {
+                title: "7. Macros vs. Functions",
+                content: `
+                    <h2>7. Macros vs. Functions</h2>
+                    <p>This is another common "difference between" question.</p>
+                    <table>
+                        <thead>
+                            <tr>
+                                <th>Feature</th>
+                                <th>Macro (<code>#define</code>)</th>
+                                <th>Function</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td><strong>Processing</strong></td>
+                                <td>By <strong>preprocessor</strong> (text replacement <em>before</em> compile).</td>
+                                <td>By <strong>compiler</strong> (compiled into machine code).</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Type Checking</strong></td>
+                                <td><strong>No.</strong> Can lead to unexpected errors.</td>
+                                <td><strong>Yes.</strong> Compiler checks argument types.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Execution</strong></td>
+                                <td>Faster (no call overhead), but can increase code size (code bloat).</td>
+                                D<td>Slower (has function call overhead), but smaller code size.</td>
+                            </tr>
+                            <tr>
+                                <td><strong>Debugging</strong></td>
+                                <td>Harder. Error is in expanded code, not the macro itself.</td>
+                                Read<td>Easier. You can step into a function with a debugger.</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                `
+            }
+        ];
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const navLinksContainer = document.getElementById('nav-links');
+            const contentArea = document.getElementById('content-area');
+            // Removed downloadBtn constant
+
+            let currentTopicTitle = "C Functions Notes"; // Default title
+
+            /**
+             * Initializes the navigation and loads the first topic
+             */
+            function init() {
+                // Create navigation links
+                notesData.forEach((item, index) => {
+                    const li = document.createElement('li');
+                    const a = document.createElement('a');
+                    a.href = '#';
+                    a.textContent = item.title;
+                    a.dataset.index = index;
+                    a.classList.add('nav-link', 'block', 'p-3', 'rounded-lg', 'transition-colors', 'duration-200');
+                    a.addEventListener('click', showContent);
+                    li.appendChild(a);
+                    navLinksContainer.appendChild(li);
+                });
+
+                // Load the first topic by default
+                loadContent(0);
+
+                // Removed event listener for the download button
+            }
+
+            /**
+             * Handles click on a nav link
+             */
+            function showContent(event) {
+                event.preventDefault();
+                const index = event.currentTarget.dataset.index;
+                loadContent(index);
+            }
+
+            /**
+             * Loads content into the main area and sets the active nav link
+             */
+            function loadContent(index) {
+                // Set the content
+                contentArea.innerHTML = notesData[index].content;
+                currentTopicTitle = notesData[index].title; // Update current title for PDF
+ 
+                // Update active class for nav links
+                const navLinks = document.querySelectorAll('.nav-link');
+                navLinks.forEach((link, i) => {
+                    if (i == index) {
+                        link.classList.add('active');
+                    } else {
+                        link.classList.remove('active');
+                    }
+                });
+            }
+
+            /**
+             * Generates and downloads a PDF of the current content
+             */
+            // Removed the downloadPDF() function
+
+            // Start the app
+            init();
         });
 
-        // Download button functionality (HTML)
-        downloadBtn.addEventListener('click', () => {
-            // Get the entire HTML content of the page
-            const htmlContent = document.documentElement.outerHTML;
-            // Create a Blob (binary large object) with the HTML content
-            const blob = new Blob([htmlContent], { type: 'text/html' });
-            // Create a temporary URL for the Blob
-            const url = URL.createObjectURL(blob);
-            
-            // Create a temporary <a> element to trigger the download
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = 'c_array_tutorial.html'; // This sets the default filename
-            document.body.appendChild(a);
-            a.click(); // Programmatically click the link
-            
-            // Clean up by removing the temporary <a> element and revoking the URL
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-        });
-
-        // Download as PDF functionality
-        downloadPdfBtn.addEventListener('click', () => {
-            // Show loading state
-            const originalBtnContent = downloadPdfBtn.innerHTML;
-            downloadPdfBtn.disabled = true;
-            downloadPdfBtn.innerHTML = `
-                <svg class="animate-spin -ml-1 mr-3 h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                <span>Generating PDF...</span>
-            `;
-
-            const pdf = new jsPDF('p', 'mm', 'a4');
-            
-            // We need to tell jspdf the *actual* width of the content
-            // so it renders correctly, not just the scaled-down responsive width.
-            // A4 width is 210mm. We'll use 190mm for content with 10mm margins.
-            const contentWidth = mainContent.scrollWidth;
-            const pdfWidth = 190; 
-
-            pdf.html(mainContent, {
-                callback: function (doc) {
-                    doc.save('c_array_tutorial.pdf');
-                    // Restore button state
-                    downloadPdfBtn.disabled = false;
-                    downloadPdfBtn.innerHTML = originalBtnContent;
-                },
-                x: 10, // 10mm left margin
-                y: 10, // 10mm top margin
-                width: pdfWidth, // Content width in PDF (A4 is 210mm wide)
-                windowWidth: contentWidth // Source content width
-            });
-        });
     </script>
-
 </body>
 </html>
-
-
-
 
