@@ -254,6 +254,132 @@
                 question: "IPv6 addresses starting with `fe80::` are what type?",
                 options: ["Multicast", "Global Unicast", "Loopback", "Link-Local"],
                 answer: "Link-Local"
+            },
+            // --- 25 New Easy Questions Below ---
+            {
+                question: "What does a Switch do in a Star topology?",
+                options: ["Connects all devices and forwards data", "Terminates the network", "Slows down the network", "Encrypts all data"],
+                answer: "Connects all devices and forwards data"
+            },
+            {
+                question: "Which topology is the most redundant and fault-tolerant?",
+                options: ["Bus", "Star", "Mesh", "Ring"],
+                answer: "Mesh"
+            },
+            {
+                question: "Which topology is generally the hardest to add new devices to?",
+                options: ["Star", "Bus", "Mesh", "Hybrid"],
+                answer: "Bus"
+            },
+            {
+                question: "What device is used to connect two different networks?",
+                options: ["Hub", "Switch", "Router", "Modem"],
+                answer: "Router"
+            },
+            {
+                question: "What is a 'node' on a network?",
+                options: ["A type of cable", "Any device connected to the network", "A packet of data", "The central server"],
+                answer: "Any device connected to the network"
+            },
+            {
+                question: "What does 'LAN' stand for?",
+                options: ["Local Area Network", "Large Area Network", "Local Access Node", "Link Access Network"],
+                answer: "Local Area Network"
+            },
+            {
+                question: "What does 'WAN' stand for?",
+                options: ["Wide Area Network", "Wireless Area Network", "Web Access Node", "Wired Area Network"],
+                answer: "Wide Area Network"
+            },
+            {
+                question: "The internet itself is an example of a...",
+                options: ["LAN", "WAN", "MAN", "PAN"],
+                answer: "WAN"
+            },
+            {
+                question: "What is a MAC Address?",
+                options: ["A type of IP address", "A physical hardware address", "A network username", "A software license key"],
+                answer: "A physical hardware address"
+            },
+            {
+                question: "How many octets are in an IPv4 address?",
+                options: ["2", "4", "6", "8"],
+                answer: "4"
+            },
+            {
+                question: "Each octet in an IPv4 address represents how many bits?",
+                options: ["4", "8", "16", "32"],
+                answer: "8"
+            },
+            {
+                question: "What is the maximum value for an octet in an IPv4 address?",
+                options: ["100", "255", "256", "999"],
+                answer: "255"
+            },
+            {
+                question: "Which protocol translates `google.com` into an IP address?",
+                options: ["DHCP", "HTTP", "FTP", "DNS"],
+                answer: "DNS"
+            },
+            {
+                question: "Which protocol automatically assigns an IP address to your computer?",
+                options: ["DNS", "DHCP", "SMTP", "IP"],
+                answer: "DHCP"
+            },
+            {
+                question: "An IP address starting with `10.` is a...",
+                options: ["Public IP", "Private IP", "Loopback IP", "Multicast IP"],
+                answer: "Private IP"
+            },
+            {
+                question: "What is the name of the network's 'phonebook'?",
+                options: ["DHCP", "DNS", "The Router", "The Subnet Mask"],
+                answer: "DNS"
+            },
+            {
+                question: "What is the 'Network ID'?",
+                options: ["The part of an IP address that identifies the specific device", "The part of an IP address that identifies the network", "The MAC address", "The name of the WiFi"],
+                answer: "The part of an IP address that identifies the network"
+            },
+            {
+                question: "What is the 'Host ID'?",
+                options: ["The part of an IP address that identifies the network", "The name of the computer", "The part of an IP address that identifies the specific device", "The password"],
+                answer: "The part of an IP address that identifies the specific device"
+            },
+            {
+                question: "Which topology has a 'terminator' at each end of the cable?",
+                options: ["Star", "Ring", "Mesh", "Bus"],
+                answer: "Bus"
+            },
+            {
+                question: "What does IPv6 use instead of decimal octets?",
+                options: ["Hexadecimal blocks", "Binary strings", "Simple numbers", "Letters only"],
+                answer: "Hexadecimal blocks"
+            },
+            {
+                question: "Why was IPv6 created?",
+                options: ["It's faster than IPv4", "It's more secure than IPv4", "We were running out of IPv4 addresses", "It's easier to remember"],
+                answer: "We were running out of IPv4 addresses"
+            },
+            {
+                question: "A 'data collision' is a common problem in which topology?",
+                options: ["Star", "Bus", "Mesh", "Tree"],
+                answer: "Bus"
+            },
+            {
+                question: "What is the primary disadvantage of a Star topology?",
+                options: ["It is very slow", "It has a central point of failure", "It is hard to add new devices", "It is not secure"],
+                answer: "It has a central point of failure"
+            },
+            {
+                question: "What is a 'subnet'?",
+                options: ["A network inside of another network", "A type of internet cable", "A backup network", "A very fast network"],
+                answer: "A network inside of another network"
+            },
+            {
+                question: "What does a 'router' do?",
+                options: ["Connects devices on the same network", "Forwards data packets between different networks", "Assigns IP addresses", "Translates domain names"],
+                answer: "Forwards data packets between different networks"
             }
         ];
 
@@ -392,7 +518,7 @@
         function showEndScreen() {
             // Hide quiz screen
             quizScreen.classList.add('hidden');
-            
+
             // Calculate percentage
             const percentage = (score / shuffledQuestions.length) * 100;
             
@@ -412,7 +538,4 @@
     </script>
 </body>
 </html>
-
-
-
 
