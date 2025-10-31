@@ -292,17 +292,20 @@
             });
 
             if (isFullscreen) {
-                const exitButton = document.createElement('button');
-                exitButton.id = 'exit-fullscreen-btn';
-                exitButton.textContent = 'Exit Fullscreen (Esc)';
-                exitButton.className = 'fixed top-4 right-4 z-[100] bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-md';
-                exitButton.onclick = toggleFullscreen;
-                document.body.appendChild(exitButton);
+                // --- Button creation removed as requested ---
+                // const exitButton = document.createElement('button');
+                // exitButton.id = 'exit-fullscreen-btn';
+                // exitButton.textContent = 'Exit Fullscreen (Esc)';
+                // exitButton.className = 'fixed top-4 right-4 z-[100] bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-md';
+                // exitButton.onclick = toggleFullscreen;
+                // document.body.appendChild(exitButton);
             } else {
-                const exitButton = document.getElementById('exit-fullscreen-btn');
-                if (exitButton) {
-                    exitButton.remove();
-                }
+                // --- Button removal logic removed as requested ---
+                // const exitButton = document.getElementById('exit-fullscreen-btn');
+                // if (exitButton) {
+                //     exitButton.remove();
+                // }
+                
                 // Also close palette when exiting fullscreen
                 if (isPaletteOpen) {
                     togglePalette();
@@ -1051,5 +1054,3 @@
     </script>
 </body>
 </html>
-
-
