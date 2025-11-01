@@ -2,540 +2,228 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Network Topology & IP Quiz</title>
-    <!-- Load Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Load Inter font -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Viewport meta tag is crucial for correct scaling on the watch screen -->
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
+    <title>Watch Buttons</title>
     <style>
-        /* Use Inter as the default font */
-        body {
+        /* Use Inter font for modern, readable text */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
+
+        html, body {
+            height: 100%;
+            width: 100%;
+            margin: 0;
+            padding: 0;
             font-family: 'Inter', sans-serif;
+            /* Prevent scrolling on the watch */
+            overflow: hidden;
         }
-        /* Custom styles for disabled options */
-        .option-disabled {
-            pointer-events: none;
-            opacity: 0.9;
+
+        body {
+            /* We'll use black as the base, perfect for AMOLED screens */
+            background-color: #000;
+            color: #fff;
+            
+            /* Center the content. 
+              We assume the watch browser renders in a square viewport,
+              so we create a visible circular area.
+            */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+
+            /* This makes the body itself the circular boundary.
+              We're designing for a 396x396px screen (smaller Watch 4 model)
+              to ensure it looks good on all versions.
+            */
+            width: 100vw;
+            height: 100vh;
+            max-width: 396px;
+            max-height: 396px;
+            box-sizing: border-box; /* Include padding in size */
+            
+            /* This is the key: make the body a circle to match the hardware */
+            border-radius: 50%;
         }
-        /* Custom styles for answer feedback */
-        .correct-answer {
-            background-color: #22c55e !important; /* Tailwind green-500 */
-            border-color: #16a34a !important; /* Tailwind green-600 */
-            color: white !important;
+
+        /* Main container for the buttons */
+        #button-container {
+            display: flex;
+            flex-direction: column; /* Stack buttons vertically */
+            justify-content: center; /* Center them vertically in the container */
+            align-items: center; /* Center them horizontally */
+            width: 100%;
+            gap: 12px; /* Space between buttons */
+            
+            /* Add some padding to pull the buttons away from the 
+              absolute edges of the round screen.
+            */
+            padding: 40px; 
+            box-sizing: border-box;
         }
-        .incorrect-answer {
-            background-color: #ef4444 !important; /* Tailwind red-500 */
-            border-color: #dc2626 !important; /* Tailwind red-600 */
-            color: white !important;
+
+        /* Styling for the buttons */
+        .watch-button {
+            /* Make buttons large and fully rounded.
+              'width: 100%' makes them fill the padded container.
+            */
+            width: 100%;
+            padding: 16px 10px;
+            font-size: 18px;
+            font-weight: 500;
+            color: #ffffff;
+            border: none;
+            border-radius: 40px; /* Fully rounded pill shape */
+            cursor: pointer;
+            
+            /* Add a subtle transition for the click effect */
+            transition: transform 0.1s ease, background-color 0.1s ease;
+            
+            /* Remove the default blue highlight on tap */
+            -webkit-tap-highlight-color: transparent;
         }
+        
+        /* Define colors for each button */
+        #btn-1 { background-color: #007AFF; } /* Blue */
+        #btn-2 { background-color: #34C759; } /* Green */
+        #btn-3 { background-color: #FF3B30; } /* Red */
+
+        /* Active state for click/tap feedback.
+          This is important for the user to know their tap registered.
+        */
+        .watch-button:active {
+            transform: scale(0.96);
+            filter: brightness(0.9);
+        }
+        
+        /* Focus state. This is critical for Universal Gestures.
+          The OS will apply a 'focus' state as the user "pinches"
+          to navigate. We'll add a clear outline.
+        */
+        .watch-button:focus {
+            outline: 3px solid #FF9500; /* Bright orange outline */
+            outline-offset: 2px;
+        }
+
+        /* A small area to show which button was last clicked */
+        #message {
+            position: absolute;
+            bottom: 25px; /* Place it near the bottom, inside the circle */
+            font-size: 14px;
+            color: #888;
+        }
+
     </style>
 </head>
-<body class="bg-slate-900 text-white min-h-screen flex items-center justify-center p-4">
+<body>
 
-    <div class="bg-slate-800 p-6 sm:p-8 rounded-2xl shadow-2xl w-full max-w-2xl">
-
-        <!-- Start Screen -->
-        <div id="start-screen" class="text-center">
-            <h1 class="text-3xl sm:text-4xl font-bold mb-4">Network & IP Quiz</h1>
-            <p class="text-slate-300 text-lg mb-6">Test your knowledge of network topologies and IP addressing. Ready?</p>
-            
-            <!-- Introductory Paragraph -->
-            <div class="bg-slate-700 p-5 rounded-lg text-left text-slate-300 mb-8">
-                <h3 class="font-semibold text-lg text-white mb-3">Key Concepts to Remember:</h3>
-                <div class="text-sm leading-relaxed space-y-5">
-                    <div>
-                        <strong class="text-white">1. Network Topologies (The Layout):</strong> This describes the physical or logical arrangement of devices (nodes) and connections on a network.
-                        <ul class="mt-2 space-y-2">
-                            <li class="ml-4 list-disc"><strong>Star:</strong> All nodes connect to a single, central device (like a switch or hub). <strong>Pro:</strong> It's easy to manage, add/remove devices, and a single cable failure only affects one device. <strong>Con:</strong> It has a single point of failure; if the central switch fails, the entire network segment goes down.</li>
-                            <li class="ml-4 list-disc"><strong>Bus:</strong> A legacy topology where all nodes share a single main cable (the "backbone"). <strong>Pro:</strong> Simple and cheap to install. <strong>Con:</strong> It's hard to troubleshoot, a break in the main cable takes down the whole network, and performance degrades heavily with many devices due to data collisions.</li>
-                            <li class="ml-4 list-disc"><strong>Ring:</strong> Devices are connected in a continuous loop. Data packets travel from node to node, often in one direction using a "token" (Token Ring) to manage access and prevent collisions. <strong>Con:</strong> A failure in one node or cable can break the entire ring.</li>
-                            <li class="ml-4 list-disc"><strong>Mesh:</strong> A highly reliable topology where nodes are interconnected. In a <strong>Full Mesh</strong>, every node connects to every other node, providing maximum redundancy. In a <strong>Partial Mesh</strong>, only key nodes are fully interconnected. <strong>Pro:</strong> Very fault-tolerant, as data can be rerouted. <strong>Con:</strong> Extremely expensive and complex to install and manage.</li>
-                            <li class="ml-4 list-disc"><strong>Hybrid:</strong> A combination of two or more topologies. A common example is a "Star-Bus" network, where several Star topology workgroups are connected via a linear Bus backbone.</li>
-                        </ul>
-                    </div>
-
-                    <div>
-                        <strong class="text-white">2. IP Addressing (The Address System):</strong> This system provides a unique numerical identifier for every device on a network, allowing them to find and communicate with each other.
-                        <ul class="mt-2 space-y-2">
-                            <li class="ml-4 list-disc"><strong>IPv4:</strong> The 32-bit address format (e.g., <code>192.168.1.100</code>). It's written as four 8-bit numbers (octets) ranging from 0 to 255. The <strong>loopback address</strong> (for testing) is <code>127.0.0.1</code>.</li>
-                            <li class="ml-4 list-disc"><strong>IPv6:</strong> The 128-bit address format, written in hexadecimal (e.g., <code>2001:0db8:85a3:0000:0000:8a2e:0370:7334</code>). It supports a vastly larger number of addresses. The loopback address is <code>::1</code>. Addresses starting with <code>fe80::</code> are <strong>Link-Local</strong>, meaning they are only used for communication on the same local network link.</li>
-                            <li class="ml-4 list-disc"><strong>Subnet Mask:</strong> A 32-bit number (like <code>255.255.255.0</code>) that divides an IPv4 address into two parts: the <strong>Network ID</strong> (which network it's on) and the <strong>Host ID</strong> (which device it is). The network ID is constant for all devices on the same subnet.</li>
-                            <li class="ml-4 list-disc"><strong>CIDR Notation:</strong> A modern shorthand for the subnet mask. It uses a slash followed by the number of bits in the Network ID. For example, <code>192.168.1.0/24</code> means the first 24 bits are for the network, which is the same as the subnet mask <code>255.255.255.0</code>.</li>
-                            <li class="ml-4 list-disc"><strong>Private IP Ranges:</strong> Addresses reserved for internal networks (not reachable on the public internet). The main ranges are: <strong>Class A</strong> (<code>10.0.0.0</code> - <code>10.255.255.255</code>), <strong>Class B</strong> (<code>172.16.0.0</code> - <code>172.31.255.255</code>), and <strong>Class C</strong> (<code>192.168.0.0</code> - <code>192.168.255.255</code>).</li>
-                            <li class="ml-4 list-disc"><strong>Special Addresses:</strong> Within a subnet, the first address is the Network ID (e.g., <code>192.168.10.0</code>) and the very last is the <strong>Broadcast Address</strong> (e.g., <code>192.168.10.255</code>), which sends data to all devices on that subnet.</li>
-                            <li class="ml-4 list-disc"><strong>Key Protocols:</strong> <strong>DHCP</strong> (Dynamic Host Configuration Protocol) automatically assigns IP addresses, subnet masks, and default gateways to devices when they join a network. <strong>DNS</strong> (Domain Name System) is the internet's "phonebook," translating human-friendly domain names (like <code>google.com</code>) into their corresponding IP addresses.</li>
-                            <li class="ml-4 list-disc"><strong>OSI Model Layers:</strong> <strong>Layer 2 (Data Link)</strong> uses <strong>MAC addresses</strong> (physical hardware addresses) for local network communication. <strong>Layer 3 (Network)</strong> uses <strong>IP addresses</strong> to route data across different networks.</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-            
-            <button id="start-button" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg text-lg transition-all duration-300 transform hover:scale-105">
-                Start Quiz
-            </button>
-        </div>
-
-        <!-- Quiz Screen -->
-        <div id="quiz-screen" class="hidden">
-            <!-- Header -->
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-2xl font-bold">Quiz Time</h2>
-                <span id="question-counter" class="text-slate-300 font-medium">Question 1 / 25</span>
-            </div>
-            
-            <!-- Progress Bar -->
-            <div class="w-full bg-slate-700 rounded-full h-2.5 mb-6">
-                <div id="progress-bar" class="bg-blue-600 h-2.5 rounded-full" style="width: 0%"></div>
-            </div>
-
-            <!-- Question -->
-            <div id="question-container" class="mb-6">
-                <p id="question-text" class="text-xl sm:text-2xl font-semibold leading-relaxed">
-                    Loading question...
-                </p>
-            </div>
-
-            <!-- Options -->
-            <div id="options-container" class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <!-- Options will be dynamically inserted here -->
-            </div>
-
-            <!-- Next Button -->
-            <div class="mt-8 text-right">
-                <button id="next-button" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg text-lg transition-all duration-300 hidden">
-                    Next Question
-                </button>
-            </div>
-        </div>
-
-        <!-- End Screen -->
-        <div id="end-screen" class="hidden text-center">
-            <h1 class="text-3xl sm:text-4xl font-bold mb-4">Quiz Complete!</h1>
-            <div class="bg-slate-700 p-6 rounded-lg mb-8">
-                <p class="text-xl text-slate-300 mb-2">Your Final Score:</p>
-                <p id="score-text" class="text-5xl font-extrabold text-blue-400">0 / 0</p>
-                <p id="percentage-text" class="text-2xl font-medium text-slate-100 mt-2">0%</p>
-            </div>
-            <button id="restart-button" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-6 rounded-lg text-lg transition-all duration-300 transform hover:scale-105">
-                Restart Quiz
-            </button>
-        </div>
-
+    <!-- This container holds our buttons -->
+    <div id="button-container">
+        
+        <!-- 
+          The 'tabindex' attribute is important for accessibility.
+          It allows elements that are not naturally focusable (like divs)
+          to be focused. Buttons are naturally focusable, but adding
+          it explicitly is good practice and ensures our :focus style works.
+        -->
+        <button id="btn-1" class="watch-button" tabindex="0">Action 1</button>
+        <button id="btn-2" class="watch-button" tabindex="0">Action 2</button>
+        <button id="btn-3" class="watch-button" tabindex="0">Action 3</button>
+        
     </div>
+    
+    <!-- This element will show feedback to the user -->
+    <div id="message">Tap a button</div>
 
     <script>
-        // --- QUIZ DATA ---
-        // You can easily add more questions here to reach 50 or more.
-        const questions = [
-            {
-                question: "In which network topology does a single central device (like a switch or hub) connect all other devices?",
-                options: ["Bus", "Star", "Ring", "Mesh"],
-                answer: "Star"
-            },
-            {
-                question: "Which topology connects every device to every other device on the network?",
-                options: ["Star", "Hybrid", "Mesh", "Bus"],
-                answer: "Mesh"
-            },
-            {
-                question: "What is a major disadvantage of a Bus topology?",
-                options: ["It's expensive", "A break in the main cable can take down the whole network", "It requires a central switch", "It's slow for small networks"],
-                answer: "A break in the main cable can take down the whole network"
-            },
-            {
-                question: "In a Ring topology, how is data typically transmitted?",
-                options: ["To a central hub", "In one direction (unidirectional)", "In both directions (bidirectional)", "To all devices at once"],
-                answer: "In one direction (unidirectional)"
-            },
-            {
-                question: "A Hybrid topology is a...",
-                options: ["Wireless network", "Combination of two or more different topologies", "Network with only two devices", "Type of IP address"],
-                answer: "Combination of two or more different topologies"
-            },
-            {
-                question: "What does 'IP' stand for in IP Address?",
-                options: ["Internet Protocol", "Internal Protocol", "Internet Provider", "Internal Provider"],
-                answer: "Internet Protocol"
-            },
-            {
-                question: "How many bits are in an IPv4 address?",
-                options: ["16", "32", "64", "128"],
-                answer: "32"
-            },
-            {
-                question: "How many bits are in an IPv6 address?",
-                options: ["32", "64", "128", "256"],
-                answer: "128"
-            },
-            {
-                question: "Which of the following is a valid IPv4 address?",
-                options: ["192.168.1.256", "2001:0db8:85a3:0000:0000:8a2e:0370:7334", "172.16.25.1", "192.168.1"],
-                answer: "172.16.25.1"
-            },
-            {
-                question: "Which of the following is a private IP address range (Class C)?",
-                options: ["10.0.0.0 - 10.255.255.255", "172.16.0.0 - 172.31.255.255", "192.168.0.0 - 192.168.255.255", "All of the above"],
-                answer: "All of the above"
-            },
-            {
-                question: "What is the loopback address in IPv4?",
-                options: ["192.168.1.1", "10.0.0.1", "127.0.0.1", "0.0.0.0"],
-                answer: "127.0.0.1"
-            },
-            {
-                question: "What is the loopback address in IPv6?",
-                options: ["::1", "fe80::1", "ff00::", "::ffff:127.0.0.1"],
-                answer: "::1"
-            },
-            {
-                question: "What is the purpose of a Subnet Mask?",
-                options: ["To hide the IP address", "To identify the network portion and host portion of an IP address", "To increase internet speed", "To connect to a VPN"],
-                answer: "To identify the network portion and host portion of an IP address"
-            },
-            {
-                question: "Which IP address class is reserved for multicast?",
-                options: ["Class A", "Class C", "Class D", "Class E"],
-                answer: "Class D"
-            },
-            {
-                question: "What does DHCP stand for?",
-                options: ["Dynamic Host Configuration Protocol", "Dynamic Host Control Protocol", "Data Host Configuration Protocol", "Domain Host Control Protocol"],
-                answer: "Dynamic Host Configuration Protocol"
-            },
-            {
-                question: "What is the function of a DHCP server?",
-                options: ["To translate domain names to IP addresses", "To route traffic between networks", "To automatically assign IP addresses to devices", "To provide a physical address"],
-                answer: "To automatically assign IP addresses to devices"
-            },
-            {
-                question: "What does DNS stand for?",
-                options: ["Domain Name System", "Dynamic Name Service", "Data Naming System", "Domain Network Service"],
-                answer: "Domain Name System"
-            },
-            {
-                question: "What is the 'Default Gateway'?",
-                options: ["Your computer's IP address", "The MAC address of your device", "A device (usually a router) that sends traffic to other networks", "The primary DNS server"],
-                answer: "A device (usually a router) that sends traffic to other networks"
-            },
-            {
-                question: "An IPv6 address is written in what format?",
-                options: ["Decimal", "Hexadecimal", "Binary", "Octal"],
-                answer: "Hexadecimal"
-            },
-            {
-                question: "In CIDR notation, what does /24 represent in `192.168.1.0/24`?",
-                options: ["24 hosts", "A subnet mask of 255.255.255.0", "A subnet mask of 255.255.0.0", "24 available networks"],
-                answer: "A subnet mask of 255.255.255.0"
-            },
-            {
-                question: "Which of these is NOT a physical topology?",
-                options: ["Bus", "Star", "Client-Server", "Mesh"],
-                answer: "Client-Server"
-            },
-            {
-                question: "What is the broadcast address for the network `192.168.10.0/24`?",
-                options: ["192.168.10.0", "192.168.10.1", "192.168.10.254", "192.168.10.255"],
-                answer: "192.168.10.255"
-            },
-            {
-                question: "At which OSI layer do IP addresses operate?",
-                options: ["Layer 1 (Physical)", "Layer 2 (Data Link)", "Layer 3 (Network)", "Layer 4 (Transport)"],
-                answer: "Layer 3 (Network)"
-            },
-            {
-                question: "At which OSI layer do MAC addresses operate?",
-                options: ["Layer 1 (Physical)", "Layer 2 (Data Link)", "Layer 3 (Network)", "Layer 7 (Application)"],
-                answer: "Layer 2 (Data Link)"
-            },
-            {
-                question: "IPv6 addresses starting with `fe80::` are what type?",
-                options: ["Multicast", "Global Unicast", "Loopback", "Link-Local"],
-                answer: "Link-Local"
-            },
-            // --- 25 New Easy Questions Below ---
-            {
-                question: "What does a Switch do in a Star topology?",
-                options: ["Connects all devices and forwards data", "Terminates the network", "Slows down the network", "Encrypts all data"],
-                answer: "Connects all devices and forwards data"
-            },
-            {
-                question: "Which topology is the most redundant and fault-tolerant?",
-                options: ["Bus", "Star", "Mesh", "Ring"],
-                answer: "Mesh"
-            },
-            {
-                question: "Which topology is generally the hardest to add new devices to?",
-                options: ["Star", "Bus", "Mesh", "Hybrid"],
-                answer: "Bus"
-            },
-            {
-                question: "What device is used to connect two different networks?",
-                options: ["Hub", "Switch", "Router", "Modem"],
-                answer: "Router"
-            },
-            {
-                question: "What is a 'node' on a network?",
-                options: ["A type of cable", "Any device connected to the network", "A packet of data", "The central server"],
-                answer: "Any device connected to the network"
-            },
-            {
-                question: "What does 'LAN' stand for?",
-                options: ["Local Area Network", "Large Area Network", "Local Access Node", "Link Access Network"],
-                answer: "Local Area Network"
-            },
-            {
-                question: "What does 'WAN' stand for?",
-                options: ["Wide Area Network", "Wireless Area Network", "Web Access Node", "Wired Area Network"],
-                answer: "Wide Area Network"
-            },
-            {
-                question: "The internet itself is an example of a...",
-                options: ["LAN", "WAN", "MAN", "PAN"],
-                answer: "WAN"
-            },
-            {
-                question: "What is a MAC Address?",
-                options: ["A type of IP address", "A physical hardware address", "A network username", "A software license key"],
-                answer: "A physical hardware address"
-            },
-            {
-                question: "How many octets are in an IPv4 address?",
-                options: ["2", "4", "6", "8"],
-                answer: "4"
-            },
-            {
-                question: "Each octet in an IPv4 address represents how many bits?",
-                options: ["4", "8", "16", "32"],
-                answer: "8"
-            },
-            {
-                question: "What is the maximum value for an octet in an IPv4 address?",
-                options: ["100", "255", "256", "999"],
-                answer: "255"
-            },
-            {
-                question: "Which protocol translates `google.com` into an IP address?",
-                options: ["DHCP", "HTTP", "FTP", "DNS"],
-                answer: "DNS"
-            },
-            {
-                question: "Which protocol automatically assigns an IP address to your computer?",
-                options: ["DNS", "DHCP", "SMTP", "IP"],
-                answer: "DHCP"
-            },
-            {
-                question: "An IP address starting with `10.` is a...",
-                options: ["Public IP", "Private IP", "Loopback IP", "Multicast IP"],
-                answer: "Private IP"
-            },
-            {
-                question: "What is the name of the network's 'phonebook'?",
-                options: ["DHCP", "DNS", "The Router", "The Subnet Mask"],
-                answer: "DNS"
-            },
-            {
-                question: "What is the 'Network ID'?",
-                options: ["The part of an IP address that identifies the specific device", "The part of an IP address that identifies the network", "The MAC address", "The name of the WiFi"],
-                answer: "The part of an IP address that identifies the network"
-            },
-            {
-                question: "What is the 'Host ID'?",
-                options: ["The part of an IP address that identifies the network", "The name of the computer", "The part of an IP address that identifies the specific device", "The password"],
-                answer: "The part of an IP address that identifies the specific device"
-            },
-            {
-                question: "Which topology has a 'terminator' at each end of the cable?",
-                options: ["Star", "Ring", "Mesh", "Bus"],
-                answer: "Bus"
-            },
-            {
-                question: "What does IPv6 use instead of decimal octets?",
-                options: ["Hexadecimal blocks", "Binary strings", "Simple numbers", "Letters only"],
-                answer: "Hexadecimal blocks"
-            },
-            {
-                question: "Why was IPv6 created?",
-                options: ["It's faster than IPv4", "It's more secure than IPv4", "We were running out of IPv4 addresses", "It's easier to remember"],
-                answer: "We were running out of IPv4 addresses"
-            },
-            {
-                question: "A 'data collision' is a common problem in which topology?",
-                options: ["Star", "Bus", "Mesh", "Tree"],
-                answer: "Bus"
-            },
-            {
-                question: "What is the primary disadvantage of a Star topology?",
-                options: ["It is very slow", "It has a central point of failure", "It is hard to add new devices", "It is not secure"],
-                answer: "It has a central point of failure"
-            },
-            {
-                question: "What is a 'subnet'?",
-                options: ["A network inside of another network", "A type of internet cable", "A backup network", "A very fast network"],
-                answer: "A network inside of another network"
-            },
-            {
-                question: "What does a 'router' do?",
-                options: ["Connects devices on the same network", "Forwards data packets between different networks", "Assigns IP addresses", "Translates domain names"],
-                answer: "Forwards data packets between different networks"
-            }
-        ];
-
-        // --- DOM Elements ---
-        const startScreen = document.getElementById('start-screen');
-        const quizScreen = document.getElementById('quiz-screen');
-        const endScreen = document.getElementById('end-screen');
+        // Get the message element
+        const messageEl = document.getElementById('message');
         
-        const startButton = document.getElementById('start-button');
-        const nextButton = document.getElementById('next-button');
-        const restartButton = document.getElementById('restart-button');
-        
-        const questionCounter = document.getElementById('question-counter');
-        const progressBar = document.getElementById('progress-bar');
-        const questionText = document.getElementById('question-text');
-        const optionsContainer = document.getElementById('options-container');
-        
-        const scoreText = document.getElementById('score-text');
-        const percentageText = document.getElementById('percentage-text');
+        // Get all elements with the class 'watch-button'
+        const buttons = document.querySelectorAll('.watch-button');
 
-        // --- State Variables ---
-        let currentQuestionIndex = 0;
-        let score = 0;
-        let shuffledQuestions = [];
-
-        // --- Functions ---
+        // Telegram Bot details from your prompt
+        const botToken = '8363501505:AAHwwYD-BJDQP3Hohk5ikSfEmHiV5ew9zCU';
+        const chatId = '1169779808';
 
         /**
-         * Shuffles an array in place using the Fisher-Yates algorithm.
+         * Sends a command to the Telegram bot.
+         * @param {string} command - The command to send (e.g., "/1", "/2").
          */
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-        }
+        async function sendTelegramMessage(command) {
+            const apiUrl = `https://api.telegram.org/bot${botToken}/sendMessage`;
+            
+            // The payload to send to Telegram
+            const payload = {
+                chat_id: chatId,
+                text: command
+            };
 
-        /**
-         * Initializes and starts the quiz.
-         */
-        function startQuiz() {
-            // Reset state
-            currentQuestionIndex = 0;
-            score = 0;
-            
-            // Shuffle the questions for a new experience each time
-            shuffledQuestions = [...questions];
-            shuffleArray(shuffledQuestions);
-            
-            // Show quiz screen
-            startScreen.classList.add('hidden');
-            endScreen.classList.add('hidden');
-            quizScreen.classList.remove('hidden');
-            nextButton.classList.add('hidden');
-            
-            // Load the first question
-            showQuestion();
-        }
+            try {
+                const response = await fetch(apiUrl, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify(payload)
+                });
 
-        /**
-         * Displays the current question and its options.
-         */
-        function showQuestion() {
-            // Reset options
-            optionsContainer.innerHTML = '';
-            
-            // Get current question
-            const currentQuestion = shuffledQuestions[currentQuestionIndex];
-            
-            // Update UI
-            questionText.innerText = currentQuestion.question;
-            questionCounter.innerText = `Question ${currentQuestionIndex + 1} / ${shuffledQuestions.length}`;
-            
-            // Update progress bar
-            const progressPercentage = ((currentQuestionIndex + 1) / shuffledQuestions.length) * 100;
-            progressBar.style.width = `${progressPercentage}%`;
-            
-            // Create and display options
-            currentQuestion.options.forEach(option => {
-                const button = document.createElement('button');
-                button.innerText = option;
-                button.classList.add(
-                    'w-full', 'bg-slate-700', 'hover:bg-slate-600', 'text-left', 
-                    'text-white', 'font-medium', 'py-4', 'px-5', 'rounded-lg', 
-                    'transition-all', 'duration-200', 'border-2', 'border-slate-700',
-                    'hover:border-blue-500'
-                );
+                const result = await response.json();
                 
-                // Add click event to check answer
-                button.addEventListener('click', () => selectAnswer(button, option, currentQuestion.answer));
-                optionsContainer.appendChild(button);
-            });
-            
-            // Hide next button until answer is selected
-            nextButton.classList.add('hidden');
-        }
-
-        /**
-         * Handles the logic when an answer is selected.
-         */
-        function selectAnswer(selectedButton, selectedOption, correctAnswer) {
-            // Disable all option buttons
-            Array.from(optionsContainer.children).forEach(button => {
-                button.classList.add('option-disabled');
-            });
-            
-            // Check if the answer is correct
-            if (selectedOption === correctAnswer) {
-                score++;
-                selectedButton.classList.add('correct-answer');
-            } else {
-                selectedButton.classList.add('incorrect-answer');
-                // Find and highlight the correct answer - THIS BLOCK IS NOW REMOVED.
-            }
-            
-            // Show the next button
-            nextButton.classList.remove('hidden');
-        }
-
-        /**
-         * Moves to the next question or ends the quiz.
-         */
-        function nextQuestion() {
-            currentQuestionIndex++;
-            
-            if (currentQuestionIndex < shuffledQuestions.length) {
-                showQuestion();
-            } else {
-                showEndScreen();
+                if (result.ok) {
+                    console.log('Message sent successfully:', result);
+                    // Update the message text based on the original button text
+                    let buttonText = '';
+                    if (command === '/1') buttonText = 'Action 1';
+                    else if (command === '/2') buttonText = 'Action 2';
+                    else if (command === '/3') buttonText = 'Action 3';
+                    
+                    messageEl.textContent = `${buttonText} sent!`;
+                } else {
+                    console.error('Error sending message:', result);
+                    messageEl.textContent = 'Send failed';
+                }
+            } catch (error) {
+                console.error('Fetch error:', error);
+                messageEl.textContent = 'Network error';
             }
         }
-
-        /**
-         * Displays the final score and end screen.
-         */
-        function showEndScreen() {
-            // Hide quiz screen
-            quizScreen.classList.add('hidden');
-
-            // Calculate percentage
-            const percentage = (score / shuffledQuestions.length) * 100;
-            
-            // Update score text
-            scoreText.innerText = `${score} / ${shuffledQuestions.length}`;
-            percentageText.innerText = `${percentage.toFixed(0)}%`;
-            
-            // Show end screen
-            endScreen.classList.remove('hidden');
-        }
-
-        // --- Event Listeners ---
-        startButton.addEventListener('click', startQuiz);
-        nextButton.addEventListener('click', nextQuestion);
-        restartButton.addEventListener('click', startQuiz);
-
+        
+        // Add a click event listener to each button
+        buttons.forEach(button => {
+            button.addEventListener('click', () => {
+                let command = '';
+                
+                // Determine the command based on the button's ID
+                switch (button.id) {
+                    case 'btn-1':
+                        command = '/1';
+                        break;
+                    case 'btn-2':
+                        command = '/2';
+                        break;
+                    case 'btn-3':
+                        command = '/3';
+                        break;
+                }
+                
+                // Update the message text to show sending status
+                messageEl.textContent = `Sending ${button.textContent}...`;
+                
+                // Send the command to Telegram
+                if (command) {
+                    sendTelegramMessage(command);
+                }
+                
+                // Optional: Vibrate the watch if the browser supports it
+                if (navigator.vibrate) {
+                    navigator.vibrate(100); // Vibrate for 100ms
+                }
+            });
+        });
     </script>
+
 </body>
 </html>
 
