@@ -2,226 +2,593 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <!-- Viewport meta tag is crucial for correct scaling on the watch screen -->
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <title>Watch Buttons</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gesture Piano (Pitch Bend Logic)</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Use Inter font for modern, readable text */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;700&display=swap');
-
-        html, body {
-            height: 100%;
-            width: 100%;
-            margin: 0;
-            padding: 0;
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+        body {
             font-family: 'Inter', sans-serif;
-            /* Prevent scrolling on the watch */
+            background-color: #0d0e12;
+            overflow: hidden; /* Prevent scrolling */
+        }
+        .container {
+            max-width: 100%;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 20px;
+        }
+        #video-container {
+            position: relative;
+            width: 90vw;
+            max-width: 640px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0, 255, 255, 0.2);
+            border-radius: 12px;
             overflow: hidden;
         }
-
-        body {
-            /* We'll use black as the base, perfect for AMOLED screens */
-            background-color: #000;
-            color: #fff;
-            
-            /* Center the content. 
-              We assume the watch browser renders in a square viewport,
-              so we create a visible circular area.
-            */
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-
-            /* This makes the body itself the circular boundary.
-              We're designing for a 396x396px screen (smaller Watch 4 model)
-              to ensure it looks good on all versions.
-            */
-            width: 100vw;
-            height: 100vh;
-            max-width: 396px;
-            max-height: 396px;
-            box-sizing: border-box; /* Include padding in size */
-            
-            /* This is the key: make the body a circle to match the hardware */
-            border-radius: 50%;
-        }
-
-        /* Main container for the buttons */
-        #button-container {
-            display: flex;
-            flex-direction: column; /* Stack buttons vertically */
-            justify-content: center; /* Center them vertically in the container */
-            align-items: center; /* Center them horizontally */
+        video, canvas {
+            display: block;
             width: 100%;
-            gap: 12px; /* Space between buttons */
-            
-            /* Add some padding to pull the buttons away from the 
-              absolute edges of the round screen.
-            */
-            padding: 40px; 
-            box-sizing: border-box;
+            height: auto;
+            transform: scaleX(-1); /* Mirror view */
         }
-
-        /* Styling for the buttons */
-        .watch-button {
-            /* Make buttons large and fully rounded.
-              'width: 100%' makes them fill the padded container.
-            */
-            width: 100%;
-            padding: 16px 10px;
-            font-size: 18px;
-            font-weight: 500;
-            color: #ffffff;
-            border: none;
-            border-radius: 40px; /* Fully rounded pill shape */
-            cursor: pointer;
-            
-            /* Add a subtle transition for the click effect */
-            transition: transform 0.1s ease, background-color 0.1s ease;
-            
-            /* Remove the default blue highlight on tap */
-            -webkit-tap-highlight-color: transparent;
-        }
-        
-        /* Define colors for each button */
-        #btn-1 { background-color: #007AFF; } /* Blue */
-        #btn-2 { background-color: #34C759; } /* Green */
-        #btn-3 { background-color: #FF3B30; } /* Red */
-
-        /* Active state for click/tap feedback.
-          This is important for the user to know their tap registered.
-        */
-        .watch-button:active {
-            transform: scale(0.96);
-            filter: brightness(0.9);
-        }
-        
-        /* Focus state. This is critical for Universal Gestures.
-          The OS will apply a 'focus' state as the user "pinches"
-          to navigate. We'll add a clear outline.
-        */
-        .watch-button:focus {
-            outline: 3px solid #FF9500; /* Bright orange outline */
-            outline-offset: 2px;
-        }
-
-        /* A small area to show which button was last clicked */
-        #message {
+        canvas {
             position: absolute;
-            bottom: 25px; /* Place it near the bottom, inside the circle */
-            font-size: 14px;
-            color: #888;
+            top: 0;
+            left: 0;
+            z-index: 10;
+        }
+        .control-panel {
+            min-height: 150px; /* Adjusted height for new controls */
+            background: #1a1b26;
+            padding: 16px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
+            width: 90vw;
+            max-width: 640px;
+        }
+        .status-pill {
+            padding: 4px 12px;
+            border-radius: 9999px;
+            font-size: 0.875rem;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+        }
+        .status-pill::before {
+            content: '';
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-ready {
+            color: #00ffaa;
+            background-color: rgba(0, 255, 170, 0.15);
+        }
+        .status-ready::before {
+            background-color: #00ffaa;
+        }
+        .status-error {
+            color: #ff4444;
+            background-color: rgba(255, 68, 68, 0.15);
+        }
+        .status-error::before {
+            background-color: #ff4444;
+        }
+        .status-pending {
+            color: #ffc107;
+            background-color: rgba(255, 193, 7, 0.15);
+        }
+        .status-pending::before {
+            background-color: #ffc107;
         }
 
+        .gradient-button {
+            background-image: linear-gradient(90deg, #6366f1, #00f3ff);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: transform 0.1s, box-shadow 0.1s;
+        }
+
+        .gradient-button:hover {
+            box-shadow: 0 4px 15px rgba(0, 243, 255, 0.4);
+            transform: translateY(-1px);
+        }
+        .gradient-button:disabled {
+            background-image: linear-gradient(90deg, #3730a3, #00a0a8);
+            cursor: not-allowed;
+            opacity: 0.6;
+            box-shadow: none;
+        }
+
+        @media (max-width: 640px) {
+            #video-container, .control-panel {
+                width: 95vw;
+            }
+        }
     </style>
 </head>
 <body>
 
-    <!-- This container holds our buttons -->
-    <div id="button-container">
+    <div class="container">
+        <h1 class="text-3xl font-bold mb-4 text-white">Gesture Piano</h1>
+
+        <!-- Video and Canvas Container -->
+        <div id="video-container">
+            <video id="webcam" class="hidden" autoplay playsinline></video>
+            <canvas id="gesture-canvas" class="z-20"></canvas>
+            <div id="no-camera-placeholder" class="bg-gray-800 h-80 flex items-center justify-center text-gray-400 text-center p-4">
+                Camera feed will appear here after clicking 'Start'.
+            </div>
+        </div>
         
-        <!-- 
-          The 'tabindex' attribute is important for accessibility.
-          It allows elements that are not naturally focusable (like divs)
-          to be focused. Buttons are naturally focusable, but adding
-          it explicitly is good practice and ensures our :focus style works.
-        -->
-        <button id="btn-1" class="watch-button" tabindex="0">Action 1</button>
-        <button id="btn-2" class="watch-button" tabindex="0">Action 2</button>
-        <button id="btn-3" class="watch-button" tabindex="0">Action 3</button>
-        
+        <!-- Control Panel -->
+        <div class="control-panel text-white">
+            <div class="mb-4">
+                <button id="start-button" class="gradient-button w-full">
+                    Start Camera & Piano
+                </button>
+            </div>
+
+            <div class="flex flex-col space-y-2 mb-4 text-sm">
+                <p id="synth-status" class="status-pending">Piano is off (Click 'Start').</p>
+                <p id="detection-status" class="status-ready">Ready to detect hands.</p>
+            </div>
+
+            <h3 class="text-lg font-semibold border-b border-gray-700 pb-1 mb-2 text-cyan-400">Piano Controls</h3>
+            <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
+                <div class="flex justify-between">
+                    <span class="font-medium text-gray-300">Left Hand Note:</span>
+                    <span id="note-left-display" class="text-indigo-400 font-mono">--</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="font-medium text-gray-300">Right Hand Note:</span>
+                    <span id="note-right-display" class="text-indigo-400 font-mono">--</span>
+                </div>
+                <!-- NEW: Pitch Bend Displays -->
+                <div class="flex justify-between">
+                    <span class="font-medium text-gray-300">Left Hand Bend:</span>
+                    <span id="bend-left-display" class="text-indigo-400 font-mono">0</span>
+                </div>
+                <div class="flex justify-between">
+                    <span class="font-medium text-gray-300">Right Hand Bend:</span>
+                    <span id="bend-right-display" class="text-indigo-400 font-mono">0</span>
+                </div>
+            </div>
+        </div>
     </div>
-    
-    <!-- This element will show feedback to the user -->
-    <div id="message">Tap a button</div>
+
+    <!-- Tone.js CDN -->
+    <script src="https://unpkg.com/tone@14.8.49/build/Tone.js"></script>
+    <!-- MediaPipe Hands CDN -->
+    <!-- FIX: Corrected mediapip to mediapipe -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4/hands.min.js"></script>
+    <!-- MediaPipe Camera Utils -->
+    <!-- FIX: Corrected mediapip to mediapipe -->
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.3/camera_utils.js"></script>
 
     <script>
-        // Get the message element
-        const messageEl = document.getElementById('message');
-        
-        // Get all elements with the class 'watch-button'
-        const buttons = document.querySelectorAll('.watch-button');
+        const video = document.getElementById('webcam');
+        const canvasElement = document.getElementById('gesture-canvas');
+        const canvasCtx = canvasElement.getContext('2d');
+        const startButton = document.getElementById('start-button');
+        const synthStatus = document.getElementById('synth-status');
+        const detectionStatus = document.getElementById('detection-status');
+        const placeholder = document.getElementById('no-camera-placeholder');
 
-        // Telegram Bot details from your prompt
-        const botToken = '8363501505:AAHwwYD-BJDQP3Hohk5ikSfEmHiV5ew9zCU';
-        const chatId = '1169779808';
+        // --- Note Displays ---
+        const noteLeftDisplay = document.getElementById('note-left-display');
+        const noteRightDisplay = document.getElementById('note-right-display');
+        const bendLeftDisplay = document.getElementById('bend-left-display');
+        const bendRightDisplay = document.getElementById('bend-right-display');
 
-        /**
-         * Sends a command to the Telegram bot.
-         * @param {string} command - The command to send (e.g., "/1", "/2").
-         */
-        async function sendTelegramMessage(command) {
-            const apiUrl = `https://api.telegram.org/bot${botToken}/sendMessage`;
-            
-            // The payload to send to Telegram
-            const payload = {
-                chat_id: chatId,
-                text: command
-            };
+        // Tone.js instances
+        let synthLeft = null; // One synth for each hand
+        let synthRight = null;
+        let isAudioChainInitialized = false;
+        let hands = null;
 
-            try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify(payload)
-                });
+        // --- NEW: Hand State & Note Maps (from image) ---
+        const pinchThreshold = 0.08; // Adjusted threshold for fingertip pinching
 
-                const result = await response.json();
-                
-                if (result.ok) {
-                    console.log('Message sent successfully:', result);
-                    // Update the message text based on the original button text
-                    let buttonText = '';
-                    if (command === '/1') buttonText = 'Action 1';
-                    else if (command === '/2') buttonText = 'Action 2';
-                    else if (command === '/3') buttonText = 'Action 3';
-                    
-                    messageEl.textContent = `${buttonText} sent!`;
-                } else {
-                    console.error('Error sending message:', result);
-                    messageEl.textContent = 'Send failed';
+        // Note mapping based on image
+        const leftHandNotes = {
+            'index': 'C4',
+            'middle': 'D4',
+            'ring': 'E4',
+            'pinky': 'F4'
+        };
+        const rightHandNotes = {
+            'index': 'G4',
+            'middle': 'A4',
+            'ring': 'B4',
+            'pinky': 'C5'
+        };
+
+        // State objects to track what each hand is doing
+        let handStates = {
+            'Left': { note: null, pinchingFinger: null, isPinching: false, isVisible: false, basePitchX: null },
+            'Right': { note: null, pinchingFinger: null, isPinching: false, isVisible: false, basePitchX: null }
+        };
+
+        // Configuration
+        const LANDMARK_THUMB_TIP = 4;
+        const LANDMARK_INDEX_TIP = 8;
+        const LANDMARK_MIDDLE_TIP = 12;
+        const LANDMARK_RING_TIP = 16;
+        const LANDMARK_PINKY_TIP = 20;
+        const LANDMARK_WRIST = 0;
+        let camera = null;
+
+        // --- Utility Functions ---
+
+        function mapRange(value, inMin, inMax, outMin, outMax) {
+            // Clamp the value to the input range
+            const clampedValue = Math.max(inMin, Math.min(value, inMax));
+            return (clampedValue - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
+        }
+
+        // --- NEW: Helper to get 2D distance ---
+        function getDistance(p1, p2) {
+            // Check if points are valid
+            if (!p1 || !p2) {
+                return Infinity; // Return a large distance if a point is missing
+            }
+            const dx = p1.x - p2.x;
+            const dy = p1.y - p2.y;
+            return Math.sqrt(dx * dx + dy * dy);
+        }
+
+        function updateStatus(element, text, type) {
+            element.textContent = text;
+            element.className = `status-pill mt-1 ${type === 'ready' ? 'status-ready' : type === 'error' ? 'status-error' : 'status-pending'}`;
+        }
+
+        // --- Audio Setup (Tone.js) ---
+
+        async function setupAudioChain() {
+            if (Tone.context.state !== 'running') {
+                try {
+                    await Tone.start();
+                    console.log('Tone.js AudioContext started.');
+                } catch (e) {
+                    console.error("Tone.start() failed:", e);
+                    updateStatus(synthStatus, 'Audio context failed. Please interact.', 'error');
+                    return;
                 }
-            } catch (error) {
-                console.error('Fetch error:', error);
-                messageEl.textContent = 'Network error';
+            }
+            
+            if (!isAudioChainInitialized) {
+                try {
+                    // 1. Create all audio nodes
+                    let compressor = new Tone.Compressor(-12, 3).toDestination();
+                    let reverb = new Tone.Reverb({ decay: 1.5, wet: 0.3 }).connect(compressor);
+                    let delay = new Tone.FeedbackDelay(0.25, 0.4).connect(reverb);
+                    delay.wet.value = 0.1;
+                    
+                    let filter = new Tone.Filter(12000, "lowpass").connect(delay);
+                    
+                    let distortion = new Tone.Distortion(0.1).connect(filter);
+                    distortion.wet.value = 0.2;
+
+                    // Create panners for stereo separation
+                    let pannerLeft = new Tone.Panner(-0.5).connect(distortion);
+                    let pannerRight = new Tone.Panner(0.5).connect(distortion);
+                    
+                    // 2. Create a PolySynth for each hand
+                    const synthSettings = {
+                        harmonicity: 1,
+                        modulationIndex: 10, 
+                        oscillator: { type: "sine" },
+                        envelope: { attack: 0.01, decay: 0.1, sustain: 0.5, release: 0.05 }, 
+                        modulation: { type: "sawtooth" },
+                        modulationEnvelope: { attack: 0.01, decay: 0.2, sustain: 0.3, release: 0.05 } 
+                    };
+
+                    synthLeft = new Tone.PolySynth(Tone.FMSynth, synthSettings).connect(pannerLeft);
+                    synthRight = new Tone.PolySynth(Tone.FMSynth, synthSettings).connect(pannerRight);
+                    
+                    // Set pitch bend range (+/- 2 semitones = 200 cents)
+                    synthLeft.set({ detune: 0, pitchDecay: 0.0, glide: 0.0 });
+                    synthRight.set({ detune: 0, pitchDecay: 0.0, glide: 0.0 });
+
+
+                    Tone.Destination.volume.value = 0; 
+
+                    isAudioChainInitialized = true;
+                    updateStatus(synthStatus, 'Piano chain initialized.', 'ready');
+                } catch (e) {
+                    console.error("Error setting up Tone.js chain:", e);
+                    updateStatus(synthStatus, 'Error setting up audio.', 'error');
+                }
             }
         }
-        
-        // Add a click event listener to each button
-        buttons.forEach(button => {
-            button.addEventListener('click', () => {
-                let command = '';
+
+        // --- MediaPipe Hand Processing (HEAVILY MODIFIED) ---
+
+        function onResults(results) {
+            canvasCtx.save();
+            canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+            canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+
+            // Reset visibility state
+            handStates['Left'].isVisible = false;
+            handStates['Right'].isVisible = false;
+
+            if (isAudioChainInitialized && results.multiHandLandmarks) {
                 
-                // Determine the command based on the button's ID
-                switch (button.id) {
-                    case 'btn-1':
-                        command = '/1';
-                        break;
-                    case 'btn-2':
-                        command = '/2';
-                        break;
-                    case 'btn-3':
-                        command = '/3';
-                        break;
+                if (results.multiHandLandmarks.length === 0) {
+                        updateStatus(detectionStatus, 'Searching for hand...', 'pending');
+                } else if (results.multiHandLandmarks.length === 1) {
+                        updateStatus(detectionStatus, 'One hand detected.', 'ready');
+                } else {
+                        updateStatus(detectionStatus, 'Two hands detected.', 'ready');
                 }
-                
-                // Update the message text to show sending status
-                messageEl.textContent = `Sending ${button.textContent}...`;
-                
-                // Send the command to Telegram
-                if (command) {
-                    sendTelegramMessage(command);
+
+                // Loop through all detected hands
+                for (let i = 0; i < results.multiHandLandmarks.length; i++) {
+                    const landmarks = results.multiHandLandmarks[i];
+                    if (!landmarks || landmarks.length === 0) continue;
+
+                    const handedness = results.multiHandedness[i].label; // 'Left' or 'Right'
+                    
+                    if (!handStates[handedness]) continue; 
+                    
+                    const hand = handStates[handedness];
+                    const currentSynth = (handedness === 'Left') ? synthLeft : synthRight;
+                    const noteDisplay = (handedness === 'Left') ? noteLeftDisplay : noteRightDisplay;
+                    const bendDisplay = (handedness === 'Left') ? bendLeftDisplay : bendRightDisplay;
+                    
+                    hand.isVisible = true;
+                    
+                    // Draw hand landmarks
+                    const color = (handedness === 'Left') ? '#FF00FF' : '#00FFC0';
+                    if (typeof drawConnectors === 'function' && typeof drawLandmarks === 'function' && typeof Hands !== 'undefined' && Hands.HAND_CONNECTIONS) {
+                         drawConnectors(canvasCtx, landmarks, Hands.HAND_CONNECTIONS, { color: color, lineWidth: 3 });
+                         drawLandmarks(canvasCtx, landmarks, { color: '#FF0000', lineWidth: 1, radius: 4 });
+                    }
+
+                    // --- Get all key landmarks ---
+                    const wrist = landmarks[LANDMARK_WRIST];
+                    const thumbTip = landmarks[LANDMARK_THUMB_TIP];
+                    const indexTip = landmarks[LANDMARK_INDEX_TIP];
+                    const middleTip = landmarks[LANDMARK_MIDDLE_TIP];
+                    const ringTip = landmarks[LANDMARK_RING_TIP];
+                    const pinkyTip = landmarks[LANDMARK_PINKY_TIP];
+
+                    if (!wrist) continue; // Need wrist for pitch bend
+
+                    // --- 1. Calculate Pinch Gesture & Note ---
+                    const noteMap = (handedness === 'Left') ? leftHandNotes : rightHandNotes;
+
+                    const dists = {
+                        'index': getDistance(thumbTip, indexTip),
+                        'middle': getDistance(thumbTip, middleTip),
+                        'ring': getDistance(thumbTip, ringTip),
+                        'pinky': getDistance(thumbTip, pinkyTip)
+                    };
+
+                    let closestFinger = null;
+                    let minDistance = Infinity;
+                    for (const [finger, dist] of Object.entries(dists)) {
+                        if (dist < minDistance) {
+                            minDistance = dist;
+                            closestFinger = finger;
+                        }
+                    }
+
+                    const isPinching = minDistance < pinchThreshold;
+                    const note = isPinching ? noteMap[closestFinger] : null;
+                    const pinchingFinger = isPinching ? closestFinger : null;
+
+                    // --- 2. Set fixed Velocity ---
+                    const velocity = 0.7; // Fixed velocity
+                    let bendValue = 0; // Default bend
+
+                    // --- 3. Update Synth State ---
+                    if (isPinching && !hand.isPinching) {
+                        // Pinch started
+                        if (note) {
+                            currentSynth.triggerAttack(note, Tone.now(), velocity);
+                            hand.isPinching = true;
+                            hand.note = note;
+                            hand.pinchingFinger = pinchingFinger;
+                            hand.basePitchX = wrist.x; // Store initial X position for pitch bend
+                        }
+                    } else if (!isPinching && hand.isPinching) {
+                        // Pinch released
+                        if (hand.note) {
+                            currentSynth.triggerRelease(hand.note);
+                        }
+                        currentSynth.set({ detune: 0 }); // Reset detune on release
+                        hand.isPinching = false;
+                        hand.note = null;
+                        hand.pinchingFinger = null;
+                        hand.basePitchX = null;
+                    } else if (isPinching && hand.isPinching && hand.pinchingFinger !== pinchingFinger) {
+                        // Slid to a new note
+                        if (hand.note) {
+                            currentSynth.triggerRelease(hand.note);
+                        }
+                        if (note) {
+                            currentSynth.triggerAttack(note, Tone.now(), velocity);
+                            hand.note = note;
+                            hand.pinchingFinger = pinchingFinger;
+                            hand.basePitchX = wrist.x; // Reset base X for new note
+                            currentSynth.set({ detune: 0 }); // Reset detune
+                        }
+                    } else if (isPinching && hand.isPinching) {
+                        // --- 4. Calculate Pitch Bend (while holding) ---
+                        if (hand.basePitchX) {
+                            const bendOffset = wrist.x - hand.basePitchX;
+                            // Map X offset to detune value (+/- 200 cents = 2 semitones)
+                            // A larger offset range (0.3) makes it less sensitive
+                            bendValue = mapRange(bendOffset, -0.3, 0.3, -200, 200); 
+                            currentSynth.set({ detune: bendValue });
+                        }
+                    }
+
+                    // Update displays
+                    noteDisplay.textContent = hand.isPinching ? hand.note : '--';
+                    bendDisplay.textContent = hand.isPinching ? bendValue.toFixed(0) : '0';
                 }
-                
-                // Optional: Vibrate the watch if the browser supports it
-                if (navigator.vibrate) {
-                    navigator.vibrate(100); // Vibrate for 100ms
+            }
+
+            // --- 5. Handle Hand Disappearance ---
+            ['Left', 'Right'].forEach(handLabel => {
+                const hand = handStates[handLabel];
+                if (!hand.isVisible) {
+                    if (hand.isPinching) {
+                        const currentSynth = (handLabel === 'Left') ? synthLeft : synthRight;
+                        if(hand.note) currentSynth.triggerRelease(hand.note);
+                        currentSynth.set({ detune: 0 }); // Reset detune
+                        hand.isPinching = false;
+                        hand.note = null;
+                        hand.pinchingFinger = null;
+                        hand.basePitchX = null;
+                    }
+                    // Reset displays
+                    const noteDisplay = (handLabel === 'Left') ? noteLeftDisplay : noteRightDisplay;
+                    const bendDisplay = (handLabel === 'Left') ? bendLeftDisplay : bendRightDisplay;
+                    noteDisplay.textContent = '--';
+                    bendDisplay.textContent = '0';
                 }
             });
+
+            canvasCtx.restore();
+        }
+
+        function initMediaPipe() {
+            if (typeof Hands === 'undefined') {
+                console.error("MediaPipe Hands library not loaded.");
+                updateStatus(detectionStatus, 'Error: Hands lib failed.', 'error');
+                return;
+            }
+
+            hands = new Hands({
+                locateFile: (file) => {
+                    // FIX: Corrected mediapip to mediapipe
+                    return `https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4/${file}`;
+                }
+            });
+
+            hands.setOptions({
+                maxNumHands: 2,
+                modelComplexity: 1,
+                minDetectionConfidence: 0.7,
+                minTrackingConfidence: 0.5
+            });
+
+            hands.onResults(onResults);
+        }
+
+        // --- Main Initialization and Control Flow ---
+
+        document.getElementById('start-button').addEventListener('click', async () => {
+            await setupAudioChain();
+            
+            if (!isAudioChainInitialized) {
+                console.warn("Audio chain not ready, aborting camera start.");
+                return;
+            }
+
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: 'user' }
+                });
+
+                video.srcObject = stream;
+                video.addEventListener('loadeddata', () => {
+                    canvasElement.width = video.videoWidth;
+                    canvasElement.height = video.videoHeight;
+                    video.classList.remove('hidden');
+                    placeholder.classList.add('hidden');
+                    
+                    if (camera) {
+                        camera.start(); 
+                        updateStatus(synthStatus, 'Camera and Piano are active. Use your hands!', 'ready');
+                        startButton.disabled = true;
+                        startButton.textContent = 'Piano Active';
+                    } else {
+                         console.error("Camera utility not initialized.");
+                         updateStatus(synthStatus, 'Error: Camera utility failed.', 'error');
+                    }
+                }, { once: true });
+                
+                video.play();
+
+            } catch (error) {
+                console.error("Could not access the camera:", error);
+                updateStatus(synthStatus, 'Error accessing camera. Check permissions.', 'error');
+            }
         });
+
+        window.onload = () => {
+            initMediaPipe();
+            
+            if (typeof Camera === 'undefined') {
+                console.error("MediaPipe Camera utility not loaded.");
+                updateStatus(synthStatus, 'Error: Camera lib failed.', 'error');
+                return;
+            }
+
+            camera = new Camera(video, {
+                onFrame: async () => {
+                    if (hands && video.readyState >= 3) { 
+                        try {
+                            await hands.send({ image: video });
+                        } catch (e) {
+                            console.error("Error sending frame to MediaPipe:", e);
+                        }
+                    }
+                },
+                width: 640,
+                height: 480
+            });
+            
+            canvasElement.width = 640;
+            canvasElement.height = 480;
+        };
+
+        // Fallback functions in case MediaPipe's drawing_utils are not loaded
+        if (typeof drawConnectors === 'undefined') {
+            window.drawConnectors = function(ctx, landmarks, connections, options) {
+                ctx.strokeStyle = options.color || '#00FF00';
+                ctx.lineWidth = options.lineWidth || 2;
+                if (!connections || !Array.isArray(connections) || !landmarks || landmarks.length === 0) return;
+                for (const connection of connections) {
+                    const [start, end] = connection;
+                    if (!landmarks[start] || !landmarks[end]) continue;
+                    ctx.beginPath();
+                    ctx.moveTo(landmarks[start].x * ctx.canvas.width, landmarks[start].y * ctx.canvas.height);
+                    ctx.lineTo(landmarks[end].x * ctx.canvas.width, landmarks[end].y * ctx.canvas.height);
+                    ctx.stroke();
+                }
+            }
+        }
+
+        if (typeof drawLandmarks === 'undefined') {
+            window.drawLandmarks = function(ctx, landmarks, options) {
+                ctx.fillStyle = options.color || '#FF0000';
+                const radius = options.radius || 3;
+                if (!landmarks || landmarks.length === 0) return;
+                for (const landmark of landmarks) {
+                    if (!landmark) continue;
+                    ctx.beginPath();
+                    ctx.arc(landmark.x * ctx.canvas.width, landmark.y * ctx.canvas.height, radius, 0, 2 * Math.PI);
+                    ctx.fill();
+                }
+            }
+        }
     </script>
 
 </body>
