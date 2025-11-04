@@ -3,594 +3,765 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gesture Piano (Pitch Bend Logic)</title>
-    <!-- Tailwind CSS CDN -->
+    <title>CleanBTC By Banajit Boro</title>
+    <!-- Load Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load Inter font -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Load Lucide icons -->
+    <script type="module" src="https://unpkg.com/lucide-react@latest/dist/umd/lucide.js"></script>
+    <script src="https://unpkg.com/lucide-element@latest/dist/lucide-element.js"></script>
+
+    <!-- NEW: Load TensorFlow.js and the COCO-SSD model -->
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
+
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #0d0e12;
-            overflow: hidden; /* Prevent scrolling */
         }
-        .container {
-            max-width: 100%;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            padding-top: 20px;
-        }
-        #video-container {
-            position: relative;
-            width: 90vw;
-            max-width: 640px;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 30px rgba(0, 255, 255, 0.2);
-            border-radius: 12px;
-            overflow: hidden;
-        }
-        video, canvas {
-            display: block;
-            width: 100%;
-            height: auto;
-            transform: scaleX(-1); /* Mirror view */
-        }
-        canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 10;
-        }
-        .control-panel {
-            min-height: 150px; /* Adjusted height for new controls */
-            background: #1a1b26;
-            padding: 16px;
-            border-radius: 12px;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.5);
-            width: 90vw;
-            max-width: 640px;
-        }
-        .status-pill {
-            padding: 4px 12px;
-            border-radius: 9999px;
-            font-size: 0.875rem;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-        }
-        .status-pill::before {
-            content: '';
-            width: 8px;
-            height: 8px;
+        /* Simple spinner for loading states */
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 24px;
+            height: 24px;
             border-radius: 50%;
-            margin-right: 8px;
+            border-left-color: #059669; /* emerald-600 */
+            animation: spin 1s ease infinite;
         }
-        .status-ready {
-            color: #00ffaa;
-            background-color: rgba(0, 255, 170, 0.15);
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
-        .status-ready::before {
-            background-color: #00ffaa;
-        }
-        .status-error {
-            color: #ff4444;
-            background-color: rgba(255, 68, 68, 0.15);
-        }
-        .status-error::before {
-            background-color: #ff4444;
-        }
-        .status-pending {
-            color: #ffc107;
-            background-color: rgba(255, 193, 7, 0.15);
-        }
-        .status-pending::before {
-            background-color: #ffc107;
-        }
-
-        .gradient-button {
-            background-image: linear-gradient(90deg, #6366f1, #00f3ff);
-            color: white;
-            border: none;
-            padding: 10px 20px;
+        
+        /* --- NEW: Styles for Live Detection --- */
+        /* Style for the detection box */
+        .detection-box {
+            position: absolute;
+            border: 2px solid #10e379;
             border-radius: 8px;
-            font-weight: bold;
-            cursor: pointer;
-            transition: transform 0.1s, box-shadow 0.1s;
+            box-sizing: border-box;
+            background: rgba(16, 227, 121, 0.1);
         }
-
-        .gradient-button:hover {
-            box-shadow: 0 4px 15px rgba(0, 243, 255, 0.4);
-            transform: translateY(-1px);
+        /* Style for the text label */
+        .detection-label {
+            position: absolute;
+            top: -20px;
+            left: 0;
+            background: #10e379;
+            color: black;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 4px;
+            white-space: nowrap;
         }
-        .gradient-button:disabled {
-            background-image: linear-gradient(90deg, #3730a3, #00a0a8);
-            cursor: not-allowed;
-            opacity: 0.6;
-            box-shadow: none;
-        }
-
-        @media (max-width: 640px) {
-            #video-container, .control-panel {
-                width: 95vw;
-            }
+        /* Ensure video feed is mirrored horizontally (like a webcam) */
+        .mirrored {
+            transform: scaleX(-1);
         }
     </style>
 </head>
-<body>
+<body class="bg-slate-50 text-slate-900 antialiased">
 
-    <div class="container">
-        <h1 class="text-3xl font-bold mb-4 text-white">Gesture Piano</h1>
+    <!-- Main Application Container -->
+    <div id="app" class="flex flex-col min-h-screen">
 
-        <!-- Video and Canvas Container -->
-        <div id="video-container">
-            <video id="webcam" class="hidden" autoplay playsinline></video>
-            <canvas id="gesture-canvas" class="z-20"></canvas>
-            <div id="no-camera-placeholder" class="bg-gray-800 h-80 flex items-center justify-center text-gray-400 text-center p-4">
-                Camera feed will appear here after clicking 'Start'.
+        <!-- Header -->
+        <header class="bg-white shadow-md sticky top-0 z-10">
+            <div class="container mx-auto max-w-6xl px-4 py-4 flex justify-between items-center">
+                <div class="flex items-center gap-3">
+                    <div class="bg-emerald-600 p-2 rounded-lg">
+                        <lucide-element name="leaf" class="text-white" size="24"></lucide-element>
+                    </div>
+                    <h1 class="text-2xl font-bold text-emerald-700">CleanBTC By Banajit Boro</h1>
+                </div>
+                <div class="text-sm text-slate-600 hidden sm:block">
+                    "Together for a cleaner, prouder Bodoland."
+                </div>
             </div>
-        </div>
-        
-        <!-- Control Panel -->
-        <div class="control-panel text-white">
-            <div class="mb-4">
-                <button id="start-button" class="gradient-button w-full">
-                    Start Camera & Piano
+        </header>
+
+        <!-- Main Content -->
+        <main class="flex-grow container mx-auto max-w-6xl px-4 py-8">
+            <div class="flex justify-center">
+                <div class="w-full max-w-lg">
+                    <div class="bg-white p-6 rounded-xl shadow-lg sticky top-32">
+                        <h2 class="text-xl font-semibold mb-4 text-slate-800">Report a Garbage Hotspot</h2>
+                        
+                        <form id="report-form">
+                            <!-- Description -->
+                            <div class="mb-4">
+                                <label for="description" class="block text-sm font-medium text-slate-700 mb-1">Description</label>
+                                <textarea id="description" name="description" rows="3" class="w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" placeholder="e.g., 'Large pile of plastic near the market...'"></textarea>
+                                <small id="description-error" class="text-red-500 text-xs hidden">Description cannot be empty.</small>
+                            </div>
+
+                            <!-- Photo Upload -->
+                            <div class="mb-4">
+                                <label for="photo" class="block text-sm font-medium text-slate-700 mb-1">Upload Photo (Optional)</label>
+                                <input type="file" id="photo" name="photo" accept="image/*" class="w-full text-sm text-slate-500
+                                    file:mr-4 file:py-2 file:px-4
+                                    file:rounded-md file:border-0
+                                    file:text-sm file:font-semibold
+                                    file:bg-emerald-50 file:text-emerald-700
+                                    hover:file:bg-emerald-100 cursor-pointer"/>
+                                <small class="text-xs text-slate-500 mt-1">Note: Photo will be sent to Telegram.</small>
+                            </div>
+
+                            <!-- Location -->
+                            <div class="mb-6">
+                                <label class="block text-sm font-medium text-slate-700 mb-1">Location</label>
+                                <button type="button" id="location-btn" class="w-full flex items-center justify-center gap-2 px-4 py-2 border border-slate-300 rounded-md shadow-sm text-sm font-medium text-slate-700 bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500">
+                                    <lucide-element name="map-pin" class="text-slate-500" size="16"></lucide-element>
+                                    Get Current Location
+                                </button>
+                                <div id="location-display" class="mt-2 text-xs text-slate-600"></div>
+                                <small id="location-error" class="text-red-500 text-xs hidden">Please fetch your location.</small>
+                                
+                                <div id="manual-location-div" class="mt-4">
+                                    <label for="manual-location" class="block text-xs font-medium text-slate-600 mb-1">Or, Enter Lat, Long (e.g., "26.14, 91.73")</label>
+                                    <input type="text" id="manual-location" name="manual-location" class="w-full px-2 py-1.5 border border-slate-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-1 focus:ring-emerald-500" placeholder="26.1445, 91.7362">
+                                    <small id="manual-location-error" class="text-red-500 text-xs hidden">Invalid format. Use "lat, long".</small>
+                                </div>
+                            </div>
+
+                            <!-- Submit Button -->
+                            <div>
+                                <button type="submit" id="submit-btn" class="w-full flex items-center justify-center gap-3 px-4 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500">
+                                    <span id="submit-text">Submit Report</span>
+                                    <div id="submit-spinner" class="spinner hidden"></div>
+                                </button>
+                            </div>
+                        </form>
+
+                        <!-- NEW: Live Detection Button -->
+                        <div class="mt-4 pt-4 border-t border-slate-200">
+                             <button type="button" id="open-detector-btn" class="w-full flex items-center justify-center gap-3 px-4 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
+                                <lucide-element name="camera" size="20"></lucide-element>
+                                Start Live Detection
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <!-- Footer -->
+        <footer class="border-t border-slate-200 bg-white mt-12">
+            <div class="container mx-auto max-w-6xl px-4 py-6 text-center text-sm text-slate-500">
+                A citizen-driven initiative for a cleaner Bodoland.
+            </div>
+        </footer>
+
+        <!-- Custom Modal for Messages -->
+        <div id="message-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 hidden">
+            <div class="bg-white rounded-lg shadow-xl p-6 max-w-sm w-full text-center">
+                <div id="modal-icon" class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
+                    <lucide-element name="check" class="h-6 w-6 text-green-600" size="24"></lucide-element>
+                </div>
+                <h3 id="modal-title" class="text-lg font-medium text-slate-900 mt-4">Success!</h3>
+                <p id="modal-message" class="text-sm text-slate-600 mt-2">Your report has been submitted.</p>
+                <button id="modal-close" class="mt-4 w-full px-4 py-2 bg-emerald-600 text-white rounded-md shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500">
+                    Close
                 </button>
             </div>
+        </div>
 
-            <div class="flex flex-col space-y-2 mb-4 text-sm">
-                <p id="synth-status" class="status-pending">Piano is off (Click 'Start').</p>
-                <p id="detection-status" class="status-ready">Ready to detect hands.</p>
+        <!-- NEW: Live Detection Modal -->
+        <div id="detection-modal" class="fixed inset-0 bg-gray-900 z-40 flex flex-col items-center justify-center p-4 text-white hidden">
+            
+            <!-- NEW: Back Button (Top Left) -->
+            <button id="detection-back-btn" class="absolute top-4 left-4 z-50 p-2 bg-gray-700 rounded-full text-white hover:bg-gray-600">
+                <lucide-element name="arrow-left" size="24"></lucide-element>
+            </button>
+
+            <!-- Close Button (Top Right) -->
+            <button id="detection-close-btn" class="absolute top-4 right-4 z-50 p-2 bg-gray-700 rounded-full text-white hover:bg-gray-600">
+                <lucide-element name="x" size="24"></lucide-element>
+            </button>
+
+            <!-- Header Text -->
+            <h1 class="text-2xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-500">
+                Live Garbage Detector
+            </h1>
+
+            <!-- Video Container -->
+            <div id="videoContainer" class="relative w-full max-w-3xl aspect-video bg-gray-800 rounded-xl shadow-lg overflow-hidden mb-4">
+                <!-- Status Message (Loading, Error, etc.) -->
+                <div id="status" class="absolute inset-0 flex items-center justify-center z-20 bg-gray-800 bg-opacity-90">
+                    <div class="text-center">
+                        <svg class="mx-auto h-12 w-12 text-gray-400 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
+                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                        </svg>
+                        <p id="status-text" class="mt-4 text-lg font-medium">Loading AI Model...</p>
+                        <p class="text-sm text-gray-500">This may take a moment.</p>
+                    </div>
+                </div>
+
+                <!-- Live Video Feed (hidden) -->
+                <video id="webcam" autoplay playsinline muted class="absolute opacity-0 w-full h-full object-cover mirrored"></video>
+                
+                <!-- Canvas for Drawing Detections (visible) -->
+                <canvas id="canvas" class="absolute top-0 left-0 w-full h-full object-cover mirrored"></canvas>
+
+                <!-- Container for detection boxes -->
+                <div id="detectionLayer" class="absolute top-0 left-0 w-full h-full mirrored"></div>
             </div>
 
-            <h3 class="text-lg font-semibold border-b border-gray-700 pb-1 mb-2 text-cyan-400">Piano Controls</h3>
-            <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-sm">
-                <div class="flex justify-between">
-                    <span class="font-medium text-gray-300">Left Hand Note:</span>
-                    <span id="note-left-display" class="text-indigo-400 font-mono">--</span>
-                </div>
-                <div class="flex justify-between">
-                    <span class="font-medium text-gray-300">Right Hand Note:</span>
-                    <span id="note-right-display" class="text-indigo-400 font-mono">--</span>
-                </div>
-                <!-- NEW: Pitch Bend Displays -->
-                <div class="flex justify-between">
-                    <span class="font-medium text-gray-300">Left Hand Bend:</span>
-                    <span id="bend-left-display" class="text-indigo-400 font-mono">0</span>
-                </div>
-                <div class="flex justify-between">
-                    <span class="font-medium text-gray-300">Right Hand Bend:</span>
-                    <span id="bend-right-display" class="text-indigo-400 font-mono">0</span>
-                </div>
+            <!-- Control Button -->
+            <div class="text-center">
+                <button id="capture-btn" class="flex items-center justify-center gap-3 w-full max-w-xs px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
+                    <span id="capture-btn-text">
+                        <lucide-element name="aperture" size="20"></lucide-element>
+                        Capture & Report Bottle
+                    </span>
+                    <div id="capture-spinner" class="spinner hidden"></div>
+                </button>
             </div>
         </div>
+
+
     </div>
 
-    <!-- Tone.js CDN -->
-    <script src="https://unpkg.com/tone@14.8.49/build/Tone.js"></script>
-    <!-- MediaPipe Hands CDN -->
-    <!-- FIX: Corrected mediapip to mediapipe -->
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4/hands.min.js"></script>
-    <!-- MediaPipe Camera Utils -->
-    <!-- FIX: Corrected mediapip to mediapipe -->
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.3/camera_utils.js"></script>
+    <script type="module">
+        // --- GLOBAL VARIABLES ---
+        // --- DOM Elements (Manual Report) ---
+        const locationBtn = document.getElementById('location-btn');
+        const locationDisplay = document.getElementById('location-display');
+        const reportForm = document.getElementById('report-form');
+        const descriptionInput = document.getElementById('description');
+        const photoInput = document.getElementById('photo');
+        const submitBtn = document.getElementById('submit-btn');
+        const submitText = document.getElementById('submit-text');
+        const submitSpinner = document.getElementById('submit-spinner');
+        const descriptionError = document.getElementById('description-error');
+        const locationError = document.getElementById('location-error');
+        const manualLocationDiv = document.getElementById('manual-location-div');
+        const manualLocationInput = document.getElementById('manual-location');
+        const manualLocationError = document.getElementById('manual-location-error');
 
-    <script>
-        const video = document.getElementById('webcam');
-        const canvasElement = document.getElementById('gesture-canvas');
-        const canvasCtx = canvasElement.getContext('2d');
-        const startButton = document.getElementById('start-button');
-        const synthStatus = document.getElementById('synth-status');
-        const detectionStatus = document.getElementById('detection-status');
-        const placeholder = document.getElementById('no-camera-placeholder');
+        // --- DOM Elements (Modals) ---
+        const modal = document.getElementById('message-modal');
+        const modalIcon = document.getElementById('modal-icon');
+        const modalTitle = document.getElementById('modal-title');
+        const modalMessage = document.getElementById('modal-message');
+        const modalClose = document.getElementById('modal-close');
 
-        // --- Note Displays ---
-        const noteLeftDisplay = document.getElementById('note-left-display');
-        const noteRightDisplay = document.getElementById('note-right-display');
-        const bendLeftDisplay = document.getElementById('bend-left-display');
-        const bendRightDisplay = document.getElementById('bend-right-display');
+        // --- NEW: DOM Elements (Live Detection) ---
+        const detectionModal = document.getElementById('detection-modal');
+        const openDetectorBtn = document.getElementById('open-detector-btn');
+        const closeDetectorBtn = document.getElementById('detection-close-btn');
+        const videoEl = document.getElementById('webcam');
+        const canvasEl = document.getElementById('canvas');
+        const ctxEl = canvasEl.getContext('2d');
+        const detectionLayerEl = document.getElementById('detectionLayer');
+        const statusEl = document.getElementById('status');
+        const statusText = document.getElementById('status-text');
+        const videoContainer = document.getElementById('videoContainer');
+        const captureBtn = document.getElementById('capture-btn');
+        const captureBtnText = document.getElementById('capture-btn-text');
+        const captureSpinner = document.getElementById('capture-spinner');
+        const backDetectorBtn = document.getElementById('detection-back-btn'); // Added this line
 
-        // Tone.js instances
-        let synthLeft = null; // One synth for each hand
-        let synthRight = null;
-        let isAudioChainInitialized = false;
-        let hands = null;
 
-        // --- NEW: Hand State & Note Maps (from image) ---
-        const pinchThreshold = 0.08; // Adjusted threshold for fingertip pinching
+        // --- TELEGRAM CONFIG ---
+        const TELEGRAM_BOT_TOKEN = "8363501505:AAHwwYD-BJDQP3Hohk5ikSfEmHiV5ew9zCU";
+        const TELEGRAM_CHAT_ID = "1169779808";
 
-        // Note mapping based on image
-        const leftHandNotes = {
-            'index': 'C4',
-            'middle': 'D4',
-            'ring': 'E4',
-            'pinky': 'F4'
-        };
-        const rightHandNotes = {
-            'index': 'G4',
-            'middle': 'A4',
-            'ring': 'B4',
-            'pinky': 'C5'
-        };
 
-        // State objects to track what each hand is doing
-        let handStates = {
-            'Left': { note: null, pinchingFinger: null, isPinching: false, isVisible: false, basePitchX: null },
-            'Right': { note: null, pinchingFinger: null, isPinching: false, isVisible: false, basePitchX: null }
-        };
+        // --- APP STATE ---
+        let currentLocation = null;
+        
+        // --- NEW: Live Detection State ---
+        let model = null;
+        let isWebcamActive = false;
+        let animationFrameId = null;
+        let isAutoCapturing = false; // Flag to prevent multiple captures at once
+        let autoCaptureCooldown = false; // Flag to prevent rapid-fire captures
 
-        // Configuration
-        const LANDMARK_THUMB_TIP = 4;
-        const LANDMARK_INDEX_TIP = 8;
-        const LANDMARK_MIDDLE_TIP = 12;
-        const LANDMARK_RING_TIP = 16;
-        const LANDMARK_PINKY_TIP = 20;
-        const LANDMARK_WRIST = 0;
-        let camera = null;
-
-        // --- Utility Functions ---
-
-        function mapRange(value, inMin, inMax, outMin, outMax) {
-            // Clamp the value to the input range
-            const clampedValue = Math.max(inMin, Math.min(value, inMax));
-            return (clampedValue - inMin) * (outMax - outMin) / (inMax - inMin) + outMin;
+        // --- MODAL/MESSAGE FUNCTIONS ---
+        function showModal(title, message, isError = false) {
+            modalTitle.textContent = title;
+            modalMessage.textContent = message;
+            
+            modalIcon.innerHTML = isError 
+                ? '<lucide-element name="alert-triangle" class="h-6 w-6 text-red-600" size="24"></lucide-element>' 
+                : '<lucide-element name="check" class="h-6 w-6 text-green-600" size="24"></lucide-element>';
+            modalIcon.className = `mx-auto flex items-center justify-center h-12 w-12 rounded-full ${isError ? 'bg-red-100' : 'bg-green-100'}`;
+            
+            modal.classList.remove('hidden');
         }
 
-        // --- NEW: Helper to get 2D distance ---
-        function getDistance(p1, p2) {
-            // Check if points are valid
-            if (!p1 || !p2) {
-                return Infinity; // Return a large distance if a point is missing
-            }
-            const dx = p1.x - p2.x;
-            const dy = p1.y - p2.y;
-            return Math.sqrt(dx * dx + dy * dy);
-        }
+        modalClose.addEventListener('click', () => {
+            modal.classList.add('hidden');
+        });
 
-        function updateStatus(element, text, type) {
-            element.textContent = text;
-            element.className = `status-pill mt-1 ${type === 'ready' ? 'status-ready' : type === 'error' ? 'status-error' : 'status-pending'}`;
-        }
+        
+        // --- FORM HANDLING ---
 
-        // --- Audio Setup (Tone.js) ---
-
-        async function setupAudioChain() {
-            if (Tone.context.state !== 'running') {
-                try {
-                    await Tone.start();
-                    console.log('Tone.js AudioContext started.');
-                } catch (e) {
-                    console.error("Tone.start() failed:", e);
-                    updateStatus(synthStatus, 'Audio context failed. Please interact.', 'error');
+        // NEW: Refactored location logic into a reusable Promise
+        function fetchCurrentLocation() {
+            return new Promise((resolve, reject) => {
+                if (!navigator.geolocation) {
+                    reject(new Error("Geolocation is not supported by your browser."));
                     return;
                 }
-            }
-            
-            if (!isAudioChainInitialized) {
-                try {
-                    // 1. Create all audio nodes
-                    let compressor = new Tone.Compressor(-12, 3).toDestination();
-                    let reverb = new Tone.Reverb({ decay: 1.5, wet: 0.3 }).connect(compressor);
-                    let delay = new Tone.FeedbackDelay(0.25, 0.4).connect(reverb);
-                    delay.wet.value = 0.1;
-                    
-                    let filter = new Tone.Filter(12000, "lowpass").connect(delay);
-                    
-                    let distortion = new Tone.Distortion(0.1).connect(filter);
-                    distortion.wet.value = 0.2;
 
-                    // Create panners for stereo separation
-                    let pannerLeft = new Tone.Panner(-0.5).connect(distortion);
-                    let pannerRight = new Tone.Panner(0.5).connect(distortion);
-                    
-                    // 2. Create a PolySynth for each hand
-                    const synthSettings = {
-                        harmonicity: 1,
-                        modulationIndex: 10, 
-                        oscillator: { type: "sine" },
-                        envelope: { attack: 0.01, decay: 0.1, sustain: 0.5, release: 0.05 }, 
-                        modulation: { type: "sawtooth" },
-                        modulationEnvelope: { attack: 0.01, decay: 0.2, sustain: 0.3, release: 0.05 } 
-                    };
-
-                    synthLeft = new Tone.PolySynth(Tone.FMSynth, synthSettings).connect(pannerLeft);
-                    synthRight = new Tone.PolySynth(Tone.FMSynth, synthSettings).connect(pannerRight);
-                    
-                    // Set pitch bend range (+/- 2 semitones = 200 cents)
-                    synthLeft.set({ detune: 0, pitchDecay: 0.0, glide: 0.0 });
-                    synthRight.set({ detune: 0, pitchDecay: 0.0, glide: 0.0 });
-
-
-                    Tone.Destination.volume.value = 0; 
-
-                    isAudioChainInitialized = true;
-                    updateStatus(synthStatus, 'Piano chain initialized.', 'ready');
-                } catch (e) {
-                    console.error("Error setting up Tone.js chain:", e);
-                    updateStatus(synthStatus, 'Error setting up audio.', 'error');
-                }
-            }
-        }
-
-        // --- MediaPipe Hand Processing (HEAVILY MODIFIED) ---
-
-        function onResults(results) {
-            canvasCtx.save();
-            canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-            canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
-
-            // Reset visibility state
-            handStates['Left'].isVisible = false;
-            handStates['Right'].isVisible = false;
-
-            if (isAudioChainInitialized && results.multiHandLandmarks) {
-                
-                if (results.multiHandLandmarks.length === 0) {
-                        updateStatus(detectionStatus, 'Searching for hand...', 'pending');
-                } else if (results.multiHandLandmarks.length === 1) {
-                        updateStatus(detectionStatus, 'One hand detected.', 'ready');
-                } else {
-                        updateStatus(detectionStatus, 'Two hands detected.', 'ready');
-                }
-
-                // Loop through all detected hands
-                for (let i = 0; i < results.multiHandLandmarks.length; i++) {
-                    const landmarks = results.multiHandLandmarks[i];
-                    if (!landmarks || landmarks.length === 0) continue;
-
-                    const handedness = results.multiHandedness[i].label; // 'Left' or 'Right'
-                    
-                    if (!handStates[handedness]) continue; 
-                    
-                    const hand = handStates[handedness];
-                    const currentSynth = (handedness === 'Left') ? synthLeft : synthRight;
-                    const noteDisplay = (handedness === 'Left') ? noteLeftDisplay : noteRightDisplay;
-                    const bendDisplay = (handedness === 'Left') ? bendLeftDisplay : bendRightDisplay;
-                    
-                    hand.isVisible = true;
-                    
-                    // Draw hand landmarks
-                    const color = (handedness === 'Left') ? '#FF00FF' : '#00FFC0';
-                    if (typeof drawConnectors === 'function' && typeof drawLandmarks === 'function' && typeof Hands !== 'undefined' && Hands.HAND_CONNECTIONS) {
-                         drawConnectors(canvasCtx, landmarks, Hands.HAND_CONNECTIONS, { color: color, lineWidth: 3 });
-                         drawLandmarks(canvasCtx, landmarks, { color: '#FF0000', lineWidth: 1, radius: 4 });
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const coords = {
+                            latitude: position.coords.latitude,
+                            longitude: position.coords.longitude
+                        };
+                        resolve(coords);
+                    },
+                    (error) => {
+                        console.error(`Error getting location. Code: ${error.code}, Message: ${error.message}`);
+                        reject(error);
                     }
-
-                    // --- Get all key landmarks ---
-                    const wrist = landmarks[LANDMARK_WRIST];
-                    const thumbTip = landmarks[LANDMARK_THUMB_TIP];
-                    const indexTip = landmarks[LANDMARK_INDEX_TIP];
-                    const middleTip = landmarks[LANDMARK_MIDDLE_TIP];
-                    const ringTip = landmarks[LANDMARK_RING_TIP];
-                    const pinkyTip = landmarks[LANDMARK_PINKY_TIP];
-
-                    if (!wrist) continue; // Need wrist for pitch bend
-
-                    // --- 1. Calculate Pinch Gesture & Note ---
-                    const noteMap = (handedness === 'Left') ? leftHandNotes : rightHandNotes;
-
-                    const dists = {
-                        'index': getDistance(thumbTip, indexTip),
-                        'middle': getDistance(thumbTip, middleTip),
-                        'ring': getDistance(thumbTip, ringTip),
-                        'pinky': getDistance(thumbTip, pinkyTip)
-                    };
-
-                    let closestFinger = null;
-                    let minDistance = Infinity;
-                    for (const [finger, dist] of Object.entries(dists)) {
-                        if (dist < minDistance) {
-                            minDistance = dist;
-                            closestFinger = finger;
-                        }
-                    }
-
-                    const isPinching = minDistance < pinchThreshold;
-                    const note = isPinching ? noteMap[closestFinger] : null;
-                    const pinchingFinger = isPinching ? closestFinger : null;
-
-                    // --- 2. Set fixed Velocity ---
-                    const velocity = 0.7; // Fixed velocity
-                    let bendValue = 0; // Default bend
-
-                    // --- 3. Update Synth State ---
-                    if (isPinching && !hand.isPinching) {
-                        // Pinch started
-                        if (note) {
-                            currentSynth.triggerAttack(note, Tone.now(), velocity);
-                            hand.isPinching = true;
-                            hand.note = note;
-                            hand.pinchingFinger = pinchingFinger;
-                            hand.basePitchX = wrist.x; // Store initial X position for pitch bend
-                        }
-                    } else if (!isPinching && hand.isPinching) {
-                        // Pinch released
-                        if (hand.note) {
-                            currentSynth.triggerRelease(hand.note);
-                        }
-                        currentSynth.set({ detune: 0 }); // Reset detune on release
-                        hand.isPinching = false;
-                        hand.note = null;
-                        hand.pinchingFinger = null;
-                        hand.basePitchX = null;
-                    } else if (isPinching && hand.isPinching && hand.pinchingFinger !== pinchingFinger) {
-                        // Slid to a new note
-                        if (hand.note) {
-                            currentSynth.triggerRelease(hand.note);
-                        }
-                        if (note) {
-                            currentSynth.triggerAttack(note, Tone.now(), velocity);
-                            hand.note = note;
-                            hand.pinchingFinger = pinchingFinger;
-                            hand.basePitchX = wrist.x; // Reset base X for new note
-                            currentSynth.set({ detune: 0 }); // Reset detune
-                        }
-                    } else if (isPinching && hand.isPinching) {
-                        // --- 4. Calculate Pitch Bend (while holding) ---
-                        if (hand.basePitchX) {
-                            const bendOffset = wrist.x - hand.basePitchX;
-                            // Map X offset to detune value (+/- 200 cents = 2 semitones)
-                            // A larger offset range (0.3) makes it less sensitive
-                            bendValue = mapRange(bendOffset, -0.3, 0.3, -200, 200); 
-                            currentSynth.set({ detune: bendValue });
-                        }
-                    }
-
-                    // Update displays
-                    noteDisplay.textContent = hand.isPinching ? hand.note : '--';
-                    bendDisplay.textContent = hand.isPinching ? bendValue.toFixed(0) : '0';
-                }
-            }
-
-            // --- 5. Handle Hand Disappearance ---
-            ['Left', 'Right'].forEach(handLabel => {
-                const hand = handStates[handLabel];
-                if (!hand.isVisible) {
-                    if (hand.isPinching) {
-                        const currentSynth = (handLabel === 'Left') ? synthLeft : synthRight;
-                        if(hand.note) currentSynth.triggerRelease(hand.note);
-                        currentSynth.set({ detune: 0 }); // Reset detune
-                        hand.isPinching = false;
-                        hand.note = null;
-                        hand.pinchingFinger = null;
-                        hand.basePitchX = null;
-                    }
-                    // Reset displays
-                    const noteDisplay = (handLabel === 'Left') ? noteLeftDisplay : noteRightDisplay;
-                    const bendDisplay = (handLabel === 'Left') ? bendLeftDisplay : bendRightDisplay;
-                    noteDisplay.textContent = '--';
-                    bendDisplay.textContent = '0';
-                }
+                );
             });
-
-            canvasCtx.restore();
         }
 
-        function initMediaPipe() {
-            if (typeof Hands === 'undefined') {
-                console.error("MediaPipe Hands library not loaded.");
-                updateStatus(detectionStatus, 'Error: Hands lib failed.', 'error');
+        // 1. Get Location (for manual form)
+        locationBtn.addEventListener('click', async () => {
+            locationBtn.disabled = true;
+            locationDisplay.textContent = "Fetching location...";
+
+            try {
+                const coords = await fetchCurrentLocation();
+                currentLocation = coords;
+                locationDisplay.textContent = `Lat: ${currentLocation.latitude.toFixed(4)}, Long: ${currentLocation.longitude.toFixed(4)}`;
+                locationDisplay.classList.add('text-green-600');
+                locationDisplay.classList.remove('text-red-500');
+                locationError.classList.add('hidden');
+                
+                // Clear manual input when auto-location succeeds
+                manualLocationInput.value = "";
+                manualLocationError.classList.add('hidden');
+            } catch (error) {
+                currentLocation = null;
+                locationDisplay.textContent = "Could not get location. Please allow permissions.";
+                locationDisplay.classList.add('text-red-500');
+                locationDisplay.classList.remove('text-green-600');
+                
+                if (error.code === 1) {
+                    locationDisplay.textContent = "Location blocked. Try entering manually.";
+                } else {
+                    showModal("Location Error", "Could not get location. Please ensure you have enabled location permissions.", true);
+                }
+            } finally {
+                locationBtn.disabled = false;
+            }
+        });
+
+        // Add listener for manual input to clear auto-location
+        manualLocationInput.addEventListener('input', () => {
+            currentLocation = null;
+            locationDisplay.textContent = "";
+            locationDisplay.classList.remove('text-green-600', 'text-red-500');
+            locationError.classList.add('hidden');
+        });
+
+        // 2. Submit Manual Report
+        reportForm.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const description = descriptionInput.value.trim();
+            const file = photoInput.files[0];
+            
+            // Validation
+            let hasError = false;
+            if (!description) {
+                descriptionError.classList.remove('hidden');
+                hasError = true;
+            } else {
+                descriptionError.classList.add('hidden');
+            }
+
+            let locationToSubmit = currentLocation;
+
+            if (!locationToSubmit) {
+                const manualCoords = manualLocationInput.value.trim();
+                if (manualCoords) {
+                    const parts = manualCoords.split(',');
+                    if (parts.length === 2 && !isNaN(parseFloat(parts[0])) && !isNaN(parseFloat(parts[1]))) {
+                        locationToSubmit = {
+                            latitude: parseFloat(parts[0].trim()),
+                            longitude: parseFloat(parts[1].trim())
+                        };
+                        manualLocationError.classList.add('hidden');
+                        locationError.classList.add('hidden');
+                    } else {
+                        manualLocationError.classList.remove('hidden');
+                        hasError = true;
+                    }
+                } else {
+                    locationError.classList.remove('hidden');
+                    hasError = true;
+                }
+            } else {
+                locationError.classList.add('hidden');
+                manualLocationError.classList.add('hidden');
+            }
+
+            if (hasError) {
                 return;
             }
 
-            hands = new Hands({
-                locateFile: (file) => {
-                    // FIX: Corrected mediapip to mediapipe
-                    return `https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4/${file}`;
-                }
-            });
+            setSubmitLoading(true);
 
-            hands.setOptions({
-                maxNumHands: 2,
-                modelComplexity: 1,
-                minDetectionConfidence: 0.7,
-                minTrackingConfidence: 0.5
-            });
+            try {
+                await sendTelegramNotification(description, locationToSubmit, file);
+                console.log("Telegram notification sent.");
+                
+                reportForm.reset();
+                currentLocation = null;
+                locationDisplay.textContent = "";
+                locationDisplay.classList.remove('text-green-600', 'text-red-500');
+                manualLocationError.classList.add('hidden');
+                
+                showModal("Success!", "Your report has been submitted. Thank you!");
 
-            hands.onResults(onResults);
+            } catch (error) {
+                console.error("Error submitting report:", error);
+                showModal("Submission Error", `Could not submit your report: ${error.message}`, true);
+            } finally {
+                setSubmitLoading(false);
+            }
+        });
+        
+        function setSubmitLoading(isLoading) {
+            if (isLoading) {
+                submitBtn.disabled = true;
+                submitText.classList.add('hidden');
+                submitSpinner.classList.remove('hidden');
+            } else {
+                submitBtn.disabled = false;
+                submitText.classList.remove('hidden');
+                submitSpinner.classList.add('hidden');
+            }
         }
 
-        // --- Main Initialization and Control Flow ---
+        // 3. Send Telegram Notification (Used by both manual and live capture)
+        async function sendTelegramNotification(description, location, file) {
+            if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
+                console.warn("Telegram token or chat ID is missing. Skipping notification.");
+                return;
+            }
 
-        document.getElementById('start-button').addEventListener('click', async () => {
-            await setupAudioChain();
+            const loc = location;
+            const googleMapsLink = `https://www.google.com/maps?q=${loc.latitude},${loc.longitude}`;
+
+            let message = `<b>New CleanBTC Report!</b>\n\n`;
+            message += `<b>Description:</b>\n${description}\n\n`;
+            message += `<b>Location:</b> ${loc.latitude.toFixed(5)}, ${loc.longitude.toFixed(5)}\n`;
+            message += `<a href="${googleMapsLink}">View on Google Maps</a>\n\n`;
+            message += `<b>User ID:</b> <code>WebApp User</code>`;
+
+            if (file) {
+                const telegramApiUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`;
+                const formData = new FormData();
+                formData.append('chat_id', TELEGRAM_CHAT_ID);
+                formData.append('photo', file, file.name || 'snapshot.jpg');
+                formData.append('caption', message);
+                formData.append('parse_mode', 'HTML');
+                
+                const response = await fetch(telegramApiUrl, {
+                    method: 'POST',
+                    body: formData 
+                });
+                
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(`Telegram API error (sendPhoto): ${errorData.description}`);
+                }
+                return response.json();
+
+            } else {
+                const telegramApiUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+                const response = await fetch(telegramApiUrl, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        chat_id: TELEGRAM_CHAT_ID,
+                        text: message,
+                        parse_mode: 'HTML',
+                        disable_web_page_preview: true
+                    })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(`Telegram API error (sendMessage): ${errorData.description}`);
+                }
+                return response.json();
+            }
+        }
+
+        // --- NEW: LIVE DETECTION FUNCTIONS ---
+
+        // 1. Open Detector Modal and Load Model (if needed)
+        openDetectorBtn.addEventListener('click', async () => {
+            detectionModal.classList.remove('hidden');
             
-            if (!isAudioChainInitialized) {
-                console.warn("Audio chain not ready, aborting camera start.");
+            if (!model) {
+                await loadModel();
+            }
+            
+            if (model) {
+                startWebcam();
+            }
+        });
+
+        // 2. Close Detector Modal
+        closeDetectorBtn.addEventListener('click', () => {
+            stopWebcam();
+        });
+
+        // NEW: Back Button Event Listener
+        backDetectorBtn.addEventListener('click', () => {
+            stopWebcam();
+        });
+
+        // 3. Load AI Model
+        async function loadModel() {
+            try {
+                statusEl.classList.remove('hidden');
+                statusEl.classList.add('flex');
+                statusText.textContent = "Loading AI Model...";
+                model = await cocoSsd.load();
+                statusText.textContent = "Model Loaded!";
+                // Give user a second to read "Model Loaded"
+                setTimeout(() => {
+                    statusEl.classList.add('hidden');
+                    statusEl.classList.remove('flex');
+                }, 1000);
+            } catch (err) {
+                console.error("Error loading model: ", err);
+                statusText.textContent = "Error loading model. Please refresh.";
+            }
+        }
+
+        // 4. Start Webcam and Detection
+        async function startWebcam() {
+            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
+                statusText.textContent = "Webcam not supported.";
+                statusEl.classList.remove('hidden');
+                statusEl.classList.add('flex');
                 return;
             }
 
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: 'user' }
+                    'audio': false,
+                    'video': { facingMode: 'environment' } // Prefer rear camera
+                });
+                videoEl.srcObject = stream;
+                
+                videoEl.onloadedmetadata = () => {
+                    canvasEl.width = videoEl.videoWidth;
+                    canvasEl.height = videoEl.videoHeight;
+                    
+                    statusEl.classList.add('hidden');
+                    statusEl.classList.remove('flex');
+                    videoEl.classList.remove('opacity-0');
+                    
+                    isWebcamActive = true;
+                    runDetection();
+                };
+            } catch (err) {
+                console.error("Error accessing webcam: ", err);
+                statusText.textContent = "Error accessing webcam. Please grant permission.";
+                statusEl.classList.remove('hidden');
+                statusEl.classList.add('flex');
+            }
+        }
+
+        // 5. Stop Webcam and Detection
+        function stopWebcam() {
+            if (videoEl.srcObject) {
+                videoEl.srcObject.getTracks().forEach(track => track.stop());
+            }
+            videoEl.srcObject = null;
+            isWebcamActive = false;
+
+            if (animationFrameId) {
+                cancelAnimationFrame(animationFrameId);
+            }
+
+            ctxEl.clearRect(0, 0, canvasEl.width, canvasEl.height);
+            detectionLayerEl.innerHTML = '';
+            
+            videoEl.classList.add('opacity-0');
+            detectionModal.classList.add('hidden');
+            // captureBtn.disabled = true; // No longer needed
+        }
+
+        // 6. Detection Loop
+        async function runDetection() {
+            if (!model || !isWebcamActive) return;
+
+            const predictions = await model.detect(videoEl);
+
+            ctxEl.clearRect(0, 0, canvasEl.width, canvasEl.height);
+            detectionLayerEl.innerHTML = '';
+            
+            ctxEl.drawImage(videoEl, 0, 0, canvasEl.width, canvasEl.height);
+
+            const bottles = predictions.filter(p => p.class === 'bottle');
+
+            for (const bottle of bottles) {
+                drawBoundingBox(bottle);
+            }
+
+            // --- MODIFIED: Auto-capture logic ---
+            // Check if a bottle is detected, and we're not already capturing, and not on cooldown
+            if (bottles.length > 0 && !isAutoCapturing && !autoCaptureCooldown) {
+                isAutoCapturing = true; // Set flag to prevent re-triggering
+                autoCaptureCooldown = true; // Set cooldown flag
+                
+                // Trigger the automatic capture process
+                triggerAutoCapture(); 
+                
+                // Set a cooldown period (e.g., 10 seconds) before another auto-capture can happen
+                setTimeout(() => {
+                    autoCaptureCooldown = false;
+                    console.log("Cooldown finished. Ready for next detection.");
+                }, 10000); // 10 second cooldown
+            }
+            // --- END MODIFIED LOGIC ---
+
+            animationFrameId = requestAnimationFrame(runDetection);
+        }
+
+        // 7. Draw Bounding Box
+        function drawBoundingBox(prediction) {
+            const [x, y, width, height] = prediction.bbox;
+            const confidence = Math.round(prediction.score * 100);
+
+            const box = document.createElement('div');
+            box.className = 'detection-box';
+            
+            const videoWidth = videoEl.videoWidth;
+            const videoHeight = videoEl.videoHeight;
+            
+            box.style.left = `${(x / videoWidth) * 100}%`;
+            box.style.top = `${(y / videoHeight) * 100}%`;
+            box.style.width = `${(width / videoWidth) * 100}%`;
+            box.style.height = `${(height / videoHeight) * 100}%`;
+
+            const label = document.createElement('div');
+            label.className = 'detection-label';
+            label.textContent = `Bottle: ${confidence}%`;
+            label.style.transform = 'scaleX(-1)'; // Un-mirror the text
+            
+            box.appendChild(label);
+            detectionLayerEl.appendChild(box);
+        }
+
+        // 8. Handle Capture & Report - REMOVED CLICK LISTENER
+        // captureBtn.addEventListener('click', async () => { ... });
+        
+        // NEW: Function to handle automatic capture
+        async function triggerAutoCapture() {
+            console.log("Bottle detected! Starting auto-capture...");
+            
+            // Show status on video feed
+            statusText.textContent = "Bottle detected! Capturing...";
+            statusEl.classList.remove('hidden');
+            statusEl.classList.add('flex');
+
+            try {
+                // 1. Get Location
+                statusText.textContent = "Bottle detected! Getting location...";
+                const location = await fetchCurrentLocation();
+                
+                // 2. Get Snapshot (needs to be in a promise)
+                statusText.textContent = "Bottle detected! Taking snapshot...";
+                const blob = await new Promise((resolve, reject) => {
+                    canvasEl.toBlob((b) => {
+                        if (b) {
+                            resolve(b);
+                        } else {
+                            reject(new Error("Failed to create canvas blob."));
+                        }
+                    }, 'image/jpeg', 0.9);
                 });
 
-                video.srcObject = stream;
-                video.addEventListener('loadeddata', () => {
-                    canvasElement.width = video.videoWidth;
-                    canvasElement.height = video.videoHeight;
-                    video.classList.remove('hidden');
-                    placeholder.classList.add('hidden');
-                    
-                    if (camera) {
-                        camera.start(); 
-                        updateStatus(synthStatus, 'Camera and Piano are active. Use your hands!', 'ready');
-                        startButton.disabled = true;
-                        startButton.textContent = 'Piano Active';
-                    } else {
-                         console.error("Camera utility not initialized.");
-                         updateStatus(synthStatus, 'Error: Camera utility failed.', 'error');
-                    }
-                }, { once: true });
+                const file = new File([blob], 'bottle_snapshot.jpg', { type: 'image/jpeg' });
+                const description = "Live Detection: Bottle Spotted (Auto-Captured)";
+
+                // 3. Send Report
+                statusText.textContent = "Bottle detected! Sending report...";
+                await sendTelegramNotification(description, location, file);
                 
-                video.play();
+                // 4. Show success in main modal
+                showModal("Success!", "Live report auto-submitted successfully. Thank you!");
+                
+                // 5. Briefly show success message on video feed
+                statusText.textContent = "Report Sent!";
+                setTimeout(() => {
+                    statusEl.classList.add('hidden');
+                    statusEl.classList.remove('flex');
+                }, 2000); // Hide "Report Sent!" after 2 seconds
 
             } catch (error) {
-                console.error("Could not access the camera:", error);
-                updateStatus(synthStatus, 'Error accessing camera. Check permissions.', 'error');
+                // --- MODIFIED ERROR HANDLING ---
+                console.error("Error during auto-capture:", error.message ? error.message : error);
+                let errorMessage = "Could not auto-submit report. Please try again.";
+                let errorTitle = "Auto-Capture Error";
+                let statusMessage = "Auto-capture failed.";
+
+                // Check if this is the location error
+                if (error && (error.code === 1 || (error.message && error.message.toLowerCase().includes("geolocation")))) {
+                    errorTitle = "Location Error";
+                    errorMessage = "Could not get your location (permission denied). Please use the manual report form to enter location.";
+                    statusMessage = "Location blocked. Report manually.";
+                }
+
+                // Show error in main modal
+                showModal(errorTitle, errorMessage, true);
+
+                // Show error on video feed
+                statusText.textContent = statusMessage;
+                setTimeout(() => {
+                    statusEl.classList.add('hidden');
+                    statusEl.classList.remove('flex');
+                }, 3000); // Hide error after 3 seconds
+                // --- END MODIFIED ERROR HANDLING ---
+
+            } finally {
+                // IMPORTANT: Reset the capture lock
+                isAutoCapturing = false;
+                console.log("Auto-capture finished. Ready for next detection (after cooldown).");
             }
+        }
+
+
+        // --- START THE APP ---
+        document.addEventListener('DOMContentLoaded', () => {
+            // Hide the manual capture button as it's now automatic
+            document.getElementById('capture-btn').classList.add('hidden');
+
+            // Lucide icon rendering workaround
+            const observer = new MutationObserver((mutations) => {
+                if (window.lucide) {
+                    window.lucide.createIcons();
+                }
+            });
+            observer.observe(document.body, { childList: true, subtree: true });
         });
 
-        window.onload = () => {
-            initMediaPipe();
-            
-            if (typeof Camera === 'undefined') {
-                console.error("MediaPipe Camera utility not loaded.");
-                updateStatus(synthStatus, 'Error: Camera lib failed.', 'error');
-                return;
-            }
-
-            camera = new Camera(video, {
-                onFrame: async () => {
-                    if (hands && video.readyState >= 3) { 
-                        try {
-                            await hands.send({ image: video });
-                        } catch (e) {
-                            console.error("Error sending frame to MediaPipe:", e);
-                        }
-                    }
-                },
-                width: 640,
-                height: 480
-            });
-            
-            canvasElement.width = 640;
-            canvasElement.height = 480;
-        };
-
-        // Fallback functions in case MediaPipe's drawing_utils are not loaded
-        if (typeof drawConnectors === 'undefined') {
-            window.drawConnectors = function(ctx, landmarks, connections, options) {
-                ctx.strokeStyle = options.color || '#00FF00';
-                ctx.lineWidth = options.lineWidth || 2;
-                if (!connections || !Array.isArray(connections) || !landmarks || landmarks.length === 0) return;
-                for (const connection of connections) {
-                    const [start, end] = connection;
-                    if (!landmarks[start] || !landmarks[end]) continue;
-                    ctx.beginPath();
-                    ctx.moveTo(landmarks[start].x * ctx.canvas.width, landmarks[start].y * ctx.canvas.height);
-                    ctx.lineTo(landmarks[end].x * ctx.canvas.width, landmarks[end].y * ctx.canvas.height);
-                    ctx.stroke();
-                }
-            }
-        }
-
-        if (typeof drawLandmarks === 'undefined') {
-            window.drawLandmarks = function(ctx, landmarks, options) {
-                ctx.fillStyle = options.color || '#FF0000';
-                const radius = options.radius || 3;
-                if (!landmarks || landmarks.length === 0) return;
-                for (const landmark of landmarks) {
-                    if (!landmark) continue;
-                    ctx.beginPath();
-                    ctx.arc(landmark.x * ctx.canvas.width, landmark.y * ctx.canvas.height, radius, 0, 2 * Math.PI);
-                    ctx.fill();
-                }
-            }
-        }
     </script>
-
 </body>
 </html>
+
+
+
 
