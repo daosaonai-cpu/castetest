@@ -3,765 +3,1084 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CleanBTC By Banajit Boro</title>
-    <!-- Load Tailwind CSS -->
+    <title>NIELIT Smart Attendance & Proctoring System</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Load Inter font -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.23/jspdf.plugin.autotable.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@1.7.4/dist/tf.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.2/dist/coco-ssd.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/face-api.js@0.22.2/dist/face-api.min.js"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <!-- Load Lucide icons -->
-    <script type="module" src="https://unpkg.com/lucide-react@latest/dist/umd/lucide.js"></script>
-    <script src="https://unpkg.com/lucide-element@latest/dist/lucide-element.js"></script>
-
-    <!-- NEW: Load TensorFlow.js and the COCO-SSD model -->
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd"></script>
-
     <style>
         body {
             font-family: 'Inter', sans-serif;
         }
-        /* Simple spinner for loading states */
-        .spinner {
-            border: 4px solid rgba(0, 0, 0, 0.1);
-            width: 24px;
-            height: 24px;
-            border-radius: 50%;
-            border-left-color: #059669; /* emerald-600 */
-            animation: spin 1s ease infinite;
+        .video-wrapper.cheating {
+            box-shadow: 0 0 20px rgba(239, 68, 68, 0.9), 0 0 30px rgba(239, 68, 68, 0.9);
+            border-color: rgba(239, 68, 68, 1);
         }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
+        .log-entry, .toast {
+            animation: fadeIn 0.5s ease-in-out;
         }
-        
-        /* --- NEW: Styles for Live Detection --- */
-        /* Style for the detection box */
-        .detection-box {
-            position: absolute;
-            border: 2px solid #10e379;
-            border-radius: 8px;
-            box-sizing: border-box;
-            background: rgba(16, 227, 121, 0.1);
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        /* Style for the text label */
-        .detection-label {
-            position: absolute;
-            top: -20px;
-            left: 0;
-            background: #10e379;
-            color: black;
-            font-size: 12px;
-            font-weight: 600;
-            padding: 2px 6px;
-            border-radius: 4px;
-            white-space: nowrap;
-        }
-        /* Ensure video feed is mirrored horizontally (like a webcam) */
-        .mirrored {
-            transform: scaleX(-1);
+        .toast-container {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 1000;
         }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-900 antialiased">
+<body class="bg-gray-900 text-white flex flex-col items-center min-h-screen p-4">
 
-    <!-- Main Application Container -->
-    <div id="app" class="flex flex-col min-h-screen">
-
-        <!-- Header -->
-        <header class="bg-white shadow-md sticky top-0 z-10">
-            <div class="container mx-auto max-w-6xl px-4 py-4 flex justify-between items-center">
-                <div class="flex items-center gap-3">
-                    <div class="bg-emerald-600 p-2 rounded-lg">
-                        <lucide-element name="leaf" class="text-white" size="24"></lucide-element>
-                    </div>
-                    <h1 class="text-2xl font-bold text-emerald-700">CleanBTC By Banajit Boro</h1>
-                </div>
-                <div class="text-sm text-slate-600 hidden sm:block">
-                    "Together for a cleaner, prouder Bodoland."
-                </div>
+    <div class="w-full max-w-7xl mx-auto bg-gray-800 rounded-2xl shadow-2xl p-6 md:p-8">
+        <h1 class="text-3xl md:text-4xl font-bold text-center mb-4 text-green-400 [text-shadow:0_2px_8px_rgba(0,0,0,0.4)]">NIELIT KOKRAJHAR Attendance & Proctoring</h1>
+        
+        <!-- Live Dashboard -->
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6 text-center">
+            <div class="bg-gray-700 p-4 rounded-xl">
+                <p class="text-sm text-gray-400">Time & Date</p>
+                <p id="liveClock" class="text-xl font-semibold text-green-300">--:--:-- --</p>
             </div>
-        </header>
-
-        <!-- Main Content -->
-        <main class="flex-grow container mx-auto max-w-6xl px-4 py-8">
-            <div class="flex justify-center">
-                <div class="w-full max-w-lg">
-                    <div class="bg-white p-6 rounded-xl shadow-lg sticky top-32">
-                        <h2 class="text-xl font-semibold mb-4 text-slate-800">Report a Garbage Hotspot</h2>
-                        
-                        <form id="report-form">
-                            <!-- Description -->
-                            <div class="mb-4">
-                                <label for="description" class="block text-sm font-medium text-slate-700 mb-1">Description</label>
-                                <textarea id="description" name="description" rows="3" class="w-full px-3 py-2 border border-slate-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-emerald-500" placeholder="e.g., 'Large pile of plastic near the market...'"></textarea>
-                                <small id="description-error" class="text-red-500 text-xs hidden">Description cannot be empty.</small>
-                            </div>
-
-                            <!-- Photo Upload -->
-                            <div class="mb-4">
-                                <label for="photo" class="block text-sm font-medium text-slate-700 mb-1">Upload Photo (Optional)</label>
-                                <input type="file" id="photo" name="photo" accept="image/*" class="w-full text-sm text-slate-500
-                                    file:mr-4 file:py-2 file:px-4
-                                    file:rounded-md file:border-0
-                                    file:text-sm file:font-semibold
-                                    file:bg-emerald-50 file:text-emerald-700
-                                    hover:file:bg-emerald-100 cursor-pointer"/>
-                                <small class="text-xs text-slate-500 mt-1">Note: Photo will be sent to Telegram.</small>
-                            </div>
-
-                            <!-- Location -->
-                            <div class="mb-6">
-                                <label class="block text-sm font-medium text-slate-700 mb-1">Location</label>
-                                <button type="button" id="location-btn" class="w-full flex items-center justify-center gap-2 px-4 py-2 border border-slate-300 rounded-md shadow-sm text-sm font-medium text-slate-700 bg-white hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500">
-                                    <lucide-element name="map-pin" class="text-slate-500" size="16"></lucide-element>
-                                    Get Current Location
-                                </button>
-                                <div id="location-display" class="mt-2 text-xs text-slate-600"></div>
-                                <small id="location-error" class="text-red-500 text-xs hidden">Please fetch your location.</small>
-                                
-                                <div id="manual-location-div" class="mt-4">
-                                    <label for="manual-location" class="block text-xs font-medium text-slate-600 mb-1">Or, Enter Lat, Long (e.g., "26.14, 91.73")</label>
-                                    <input type="text" id="manual-location" name="manual-location" class="w-full px-2 py-1.5 border border-slate-300 rounded-md shadow-sm text-sm focus:outline-none focus:ring-1 focus:ring-emerald-500" placeholder="26.1445, 91.7362">
-                                    <small id="manual-location-error" class="text-red-500 text-xs hidden">Invalid format. Use "lat, long".</small>
-                                </div>
-                            </div>
-
-                            <!-- Submit Button -->
-                            <div>
-                                <button type="submit" id="submit-btn" class="w-full flex items-center justify-center gap-3 px-4 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-emerald-600 hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500">
-                                    <span id="submit-text">Submit Report</span>
-                                    <div id="submit-spinner" class="spinner hidden"></div>
-                                </button>
-                            </div>
-                        </form>
-
-                        <!-- NEW: Live Detection Button -->
-                        <div class="mt-4 pt-4 border-t border-slate-200">
-                             <button type="button" id="open-detector-btn" class="w-full flex items-center justify-center gap-3 px-4 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-blue-600 hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500">
-                                <lucide-element name="camera" size="20"></lucide-element>
-                                Start Live Detection
-                            </button>
-                        </div>
-
-                    </div>
-                </div>
+            <div class="bg-gray-700 p-4 rounded-xl">
+                <p class="text-sm text-gray-400">Registered Users</p>
+                <p id="registeredCount" class="text-xl font-semibold text-blue-300">0</p>
             </div>
-        </main>
-
-        <!-- Footer -->
-        <footer class="border-t border-slate-200 bg-white mt-12">
-            <div class="container mx-auto max-w-6xl px-4 py-6 text-center text-sm text-slate-500">
-                A citizen-driven initiative for a cleaner Bodoland.
-            </div>
-        </footer>
-
-        <!-- Custom Modal for Messages -->
-        <div id="message-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 flex items-center justify-center p-4 hidden">
-            <div class="bg-white rounded-lg shadow-xl p-6 max-w-sm w-full text-center">
-                <div id="modal-icon" class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-green-100">
-                    <lucide-element name="check" class="h-6 w-6 text-green-600" size="24"></lucide-element>
-                </div>
-                <h3 id="modal-title" class="text-lg font-medium text-slate-900 mt-4">Success!</h3>
-                <p id="modal-message" class="text-sm text-slate-600 mt-2">Your report has been submitted.</p>
-                <button id="modal-close" class="mt-4 w-full px-4 py-2 bg-emerald-600 text-white rounded-md shadow-sm hover:bg-emerald-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-emerald-500">
-                    Close
-                </button>
+            <div class="bg-gray-700 p-4 rounded-xl">
+                <p class="text-sm text-gray-400">Currently Present</p>
+                <p id="presentCount" class="text-xl font-semibold text-teal-300">0</p>
             </div>
         </div>
 
-        <!-- NEW: Live Detection Modal -->
-        <div id="detection-modal" class="fixed inset-0 bg-gray-900 z-40 flex flex-col items-center justify-center p-4 text-white hidden">
-            
-            <!-- NEW: Back Button (Top Left) -->
-            <button id="detection-back-btn" class="absolute top-4 left-4 z-50 p-2 bg-gray-700 rounded-full text-white hover:bg-gray-600">
-                <lucide-element name="arrow-left" size="24"></lucide-element>
-            </button>
-
-            <!-- Close Button (Top Right) -->
-            <button id="detection-close-btn" class="absolute top-4 right-4 z-50 p-2 bg-gray-700 rounded-full text-white hover:bg-gray-600">
-                <lucide-element name="x" size="24"></lucide-element>
-            </button>
-
-            <!-- Header Text -->
-            <h1 class="text-2xl font-bold mb-4 text-transparent bg-clip-text bg-gradient-to-r from-green-400 to-blue-500">
-                Live Garbage Detector
-            </h1>
-
-            <!-- Video Container -->
-            <div id="videoContainer" class="relative w-full max-w-3xl aspect-video bg-gray-800 rounded-xl shadow-lg overflow-hidden mb-4">
-                <!-- Status Message (Loading, Error, etc.) -->
-                <div id="status" class="absolute inset-0 flex items-center justify-center z-20 bg-gray-800 bg-opacity-90">
-                    <div class="text-center">
-                        <svg class="mx-auto h-12 w-12 text-gray-400 animate-spin" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                        </svg>
-                        <p id="status-text" class="mt-4 text-lg font-medium">Loading AI Model...</p>
-                        <p class="text-sm text-gray-500">This may take a moment.</p>
-                    </div>
+        <!-- Camera Feed and Controls -->
+        <div class="flex flex-col md:flex-row gap-6 mb-6">
+            <div id="videoWrapper" class="relative w-full md:w-3/4 h-auto aspect-video bg-gray-900 rounded-xl overflow-hidden border-2 border-gray-700 transition-all duration-300">
+                <video id="video" width="100%" height="100%" autoplay muted playsinline class="rounded-xl scale-x-[-1]"></video> <!-- Mirrored Feed -->
+                <canvas id="canvas" class="absolute top-0 left-0"></canvas> <!-- Canvas is NOT mirrored via CSS anymore -->
+                <div id="examModeIndicator" class="absolute top-3 right-3 bg-red-600 text-white text-sm font-bold px-3 py-1 rounded-full hidden animate-pulse">
+                    PROCTORING ACTIVE
                 </div>
-
-                <!-- Live Video Feed (hidden) -->
-                <video id="webcam" autoplay playsinline muted class="absolute opacity-0 w-full h-full object-cover mirrored"></video>
-                
-                <!-- Canvas for Drawing Detections (visible) -->
-                <canvas id="canvas" class="absolute top-0 left-0 w-full h-full object-cover mirrored"></canvas>
-
-                <!-- Container for detection boxes -->
-                <div id="detectionLayer" class="absolute top-0 left-0 w-full h-full mirrored"></div>
             </div>
-
-            <!-- Control Button -->
-            <div class="text-center">
-                <button id="capture-btn" class="flex items-center justify-center gap-3 w-full max-w-xs px-6 py-3 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500 disabled:opacity-50 disabled:cursor-not-allowed" disabled>
-                    <span id="capture-btn-text">
-                        <lucide-element name="aperture" size="20"></lucide-element>
-                        Capture & Report Bottle
-                    </span>
-                    <div id="capture-spinner" class="spinner hidden"></div>
-                </button>
+            <div class="w-full md:w-1/4 flex flex-col justify-between bg-gray-700 p-3 rounded-xl">
+                <div>
+                    <h2 id="controlsHeader" class="text-xl font-semibold mb-3 text-green-300 cursor-pointer transition-colors duration-300 hover:text-sky-400">Controls</h2>
+                    <div class="grid grid-cols-2 gap-2">
+                        <button id="registerBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed" disabled>Register</button>
+                        <button id="markAttendanceBtn" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed" disabled>Start Session</button>
+                        <button id="examModeBtn" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed col-span-2" disabled>Enable Exam Mode</button>
+                    </div>
+                     <button id="clearDataBtn" class="w-full bg-gray-600 hover:bg-red-800 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out mt-2 disabled:opacity-50 disabled:cursor-not-allowed" disabled>Clear All Data</button>
+                     <div class="grid grid-cols-2 gap-2 mt-2">
+                         <button id="downloadReportBtn" class="w-full bg-teal-600 hover:bg-teal-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed" disabled>Report (CSV)</button>
+                         <button id="downloadPdfReportBtn" class="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300 ease-in-out disabled:opacity-50 disabled:cursor-not-allowed" disabled>Report (PDF)</button>
+                     </div>
+                </div>
+                 <div id="status" class="mt-3 text-center text-gray-300 p-2 bg-gray-800 rounded-lg">
+                     Initializing...
+                 </div>
             </div>
         </div>
 
-
+        <!-- Logs Section -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+            <!-- Attendance Log -->
+            <div>
+                <h2 class="text-2xl font-semibold mb-4 text-green-300 border-b-2 border-gray-600 pb-2">Attendance Log</h2>
+                <div id="attendanceLog" class="bg-gray-900 p-4 rounded-xl h-64 overflow-y-auto">
+                     <p id="initialLogMessage" class="text-gray-400">No attendance marked yet.</p>
+                </div>
+            </div>
+            <!-- Suspicious Activity Log -->
+            <div>
+                <h2 class="text-2xl font-semibold mb-4 text-red-400 border-b-2 border-gray-600 pb-2">Suspicious Activity Log</h2>
+                <div id="suspiciousActivityLog" class="bg-gray-900 p-4 rounded-xl h-64 overflow-y-auto">
+                     <p class="text-gray-400">Exam mode is not active.</p>
+                </div>
+            </div>
+        </div>
     </div>
 
-    <script type="module">
-        // --- GLOBAL VARIABLES ---
-        // --- DOM Elements (Manual Report) ---
-        const locationBtn = document.getElementById('location-btn');
-        const locationDisplay = document.getElementById('location-display');
-        const reportForm = document.getElementById('report-form');
-        const descriptionInput = document.getElementById('description');
-        const photoInput = document.getElementById('photo');
-        const submitBtn = document.getElementById('submit-btn');
-        const submitText = document.getElementById('submit-text');
-        const submitSpinner = document.getElementById('submit-spinner');
-        const descriptionError = document.getElementById('description-error');
-        const locationError = document.getElementById('location-error');
-        const manualLocationDiv = document.getElementById('manual-location-div');
-        const manualLocationInput = document.getElementById('manual-location');
-        const manualLocationError = document.getElementById('manual-location-error');
+    <!-- Modal for Registration & Confirmation -->
+    <div id="modal" class="fixed inset-0 bg-black bg-opacity-75 flex items-center justify-center hidden z-50">
+        <div class="bg-gray-800 p-8 rounded-2xl shadow-2xl w-full max-w-md text-center">
+            <h2 id="modalTitle" class="text-2xl font-bold mb-4 text-green-400">Register New Person</h2>
+            <p id="modalBody" class="mb-4 text-gray-300">Please enter a name and look at the camera.</p>
+            <div id="registrationStatus" class="mb-4 text-sm p-2 rounded-lg transition-colors duration-300">&nbsp;</div>
+            <input type="text" id="nameInput" placeholder="Enter Name" class="w-full bg-gray-700 text-white p-3 rounded-lg mb-4 border border-gray-600 focus:outline-none focus:ring-2 focus:ring-green-500">
+            <div id="modalActions" class="flex gap-4">
+                <button id="confirmBtn" class="w-full bg-green-600 hover:bg-green-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300 disabled:opacity-50 disabled:cursor-not-allowed">Save</button>
+                <button id="cancelBtn" class="w-full bg-red-600 hover:bg-red-700 text-white font-bold py-2 px-4 rounded-lg transition duration-300">Cancel</button>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Toast Notification Container -->
+    <div id="toastContainer" class="toast-container"></div>
 
-        // --- DOM Elements (Modals) ---
-        const modal = document.getElementById('message-modal');
-        const modalIcon = document.getElementById('modal-icon');
-        const modalTitle = document.getElementById('modal-title');
-        const modalMessage = document.getElementById('modal-message');
-        const modalClose = document.getElementById('modal-close');
+    <script>
+        // --- DOM Elements ---
+        const video = document.getElementById('video');
+        const videoWrapper = document.getElementById('videoWrapper');
+        const canvas = document.getElementById('canvas');
+        const registerBtn = document.getElementById('registerBtn');
+        const markAttendanceBtn = document.getElementById('markAttendanceBtn');
+        const examModeBtn = document.getElementById('examModeBtn');
+        const controlsHeader = document.getElementById('controlsHeader');
+        const clearDataBtn = document.getElementById('clearDataBtn');
+        const attendanceLog = document.getElementById('attendanceLog');
+        const suspiciousActivityLog = document.getElementById('suspiciousActivityLog');
+        const statusDiv = document.getElementById('status');
+        const modal = document.getElementById('modal');
+        const nameInput = document.getElementById('nameInput');
+        const confirmBtn = document.getElementById('confirmBtn');
+        const cancelBtn = document.getElementById('cancelBtn');
+        const registrationStatus = document.getElementById('registrationStatus');
+        const liveClock = document.getElementById('liveClock');
+        const registeredCount = document.getElementById('registeredCount');
+        const presentCount = document.getElementById('presentCount');
+        const examModeIndicator = document.getElementById('examModeIndicator');
+        const toastContainer = document.getElementById('toastContainer');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalBody = document.getElementById('modalBody');
+        const downloadReportBtn = document.getElementById('downloadReportBtn');
+        const downloadPdfReportBtn = document.getElementById('downloadPdfReportBtn');
 
-        // --- NEW: DOM Elements (Live Detection) ---
-        const detectionModal = document.getElementById('detection-modal');
-        const openDetectorBtn = document.getElementById('open-detector-btn');
-        const closeDetectorBtn = document.getElementById('detection-close-btn');
-        const videoEl = document.getElementById('webcam');
-        const canvasEl = document.getElementById('canvas');
-        const ctxEl = canvasEl.getContext('2d');
-        const detectionLayerEl = document.getElementById('detectionLayer');
-        const statusEl = document.getElementById('status');
-        const statusText = document.getElementById('status-text');
-        const videoContainer = document.getElementById('videoContainer');
-        const captureBtn = document.getElementById('capture-btn');
-        const captureBtnText = document.getElementById('capture-btn-text');
-        const captureSpinner = document.getElementById('capture-spinner');
-        const backDetectorBtn = document.getElementById('detection-back-btn'); // Added this line
+        // --- State Variables ---
+        let registeredUsers = new Map();
+        let isSessionActive = false;
+        let isExamMode = false;
+        let isLiveMode = false;
+        let detectionIntervalId;
+        let registrationIntervalId;
+        let noFaceCounter = 0;
+        let cheatingAlertTimeout;
+        let cocoSsdModel = null;
+        let currentVisibleUsers = new Set();
+        let sessionAttendance = new Map();
+        let livenessChecks = new Map();
 
-
-        // --- TELEGRAM CONFIG ---
-        const TELEGRAM_BOT_TOKEN = "8363501505:AAHwwYD-BJDQP3Hohk5ikSfEmHiV5ew9zCU";
-        const TELEGRAM_CHAT_ID = "1169779808";
-
-
-        // --- APP STATE ---
-        let currentLocation = null;
+        // --- Telegram Bot Integration ---
+        // WARNING: Exposing your bot token on the client-side is a major security risk.
+        // This is for demonstration purposes only. In a production app, this should be on a server.
+        const BOT_TOKEN = '8201397576:AAEzEYOA0CDZd6dtepNUcF6SSla4t4Bl4Gg';
+        const CHAT_ID = '1169779808'; // Default Chat ID, but commands can be received from any chat.
+        let lastUpdateId = 0;
+        let telegramPollIntervalId = null;
+        let isPollingTelegram = false; // Add this line to act as a lock
         
-        // --- NEW: Live Detection State ---
-        let model = null;
-        let isWebcamActive = false;
-        let animationFrameId = null;
-        let isAutoCapturing = false; // Flag to prevent multiple captures at once
-        let autoCaptureCooldown = false; // Flag to prevent rapid-fire captures
+        // --- NEW: Throttling for Telegram alerts ---
+        let lastTelegramAlerts = new Map();
+        const TELEGRAM_ALERT_THROTTLE = 10000; // 10 seconds (in milliseconds)
 
-        // --- MODAL/MESSAGE FUNCTIONS ---
-        function showModal(title, message, isError = false) {
-            modalTitle.textContent = title;
-            modalMessage.textContent = message;
-            
-            modalIcon.innerHTML = isError 
-                ? '<lucide-element name="alert-triangle" class="h-6 w-6 text-red-600" size="24"></lucide-element>' 
-                : '<lucide-element name="check" class="h-6 w-6 text-green-600" size="24"></lucide-element>';
-            modalIcon.className = `mx-auto flex items-center justify-center h-12 w-12 rounded-full ${isError ? 'bg-red-100' : 'bg-green-100'}`;
-            
-            modal.classList.remove('hidden');
+        const LIVENESS_TIMEOUT = 3000;
+        const EAR_THRESHOLD = 0.25;
+        const LOCAL_STORAGE_KEY = 'smart_attendance_users';
+
+        // --- Initialization ---
+        window.onload = () => {
+            initializeApp();
+            loadModels();
+            startClock();
+            startTelegramPolling();
+        };
+
+        function initializeApp() {
+            statusDiv.textContent = 'Loading data...';
+            loadUsersFromLocalStorage();
+            updateDashboard();
         }
 
-        modalClose.addEventListener('click', () => {
-            modal.classList.add('hidden');
+        async function loadModels() {
+            const MODEL_URL = 'https://cdn.jsdelivr.net/gh/justadudewhohacks/face-api.js@0.22.2/weights';
+            statusDiv.textContent = 'Loading AI models...';
+            try {
+                await Promise.all([
+                    faceapi.nets.ssdMobilenetv1.loadFromUri(MODEL_URL),
+                    faceapi.nets.tinyFaceDetector.loadFromUri(MODEL_URL),
+                    faceapi.nets.faceLandmark68Net.loadFromUri(MODEL_URL),
+                    faceapi.nets.faceRecognitionNet.loadFromUri(MODEL_URL),
+                    cocoSsd.load().then(model => { cocoSsdModel = model; })
+                ]);
+                startVideo();
+            } catch (error) {
+                console.error("Error loading models:", error);
+                statusDiv.textContent = 'Error loading AI models.';
+            }
+        }
+
+        async function startVideo() {
+            statusDiv.textContent = 'Starting camera...';
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({ video: {} });
+                video.srcObject = stream;
+                video.addEventListener('play', () => {
+                    statusDiv.textContent = 'Ready';
+                    const displaySize = { width: video.clientWidth, height: video.clientHeight };
+                    faceapi.matchDimensions(canvas, displaySize);
+                });
+            } catch (err) {
+                console.error("Error accessing webcam:", err);
+                statusDiv.textContent = 'Error: Could not access webcam.';
+            }
+        }
+        
+        // --- Event Listeners ---
+        registerBtn.addEventListener('click', () => {
+            modalTitle.textContent = 'Register New Person';
+            modalBody.textContent = 'Please enter a name and look at the camera.';
+            nameInput.style.display = 'block';
+            confirmBtn.textContent = 'Save';
+            confirmBtn.onclick = handleRegistrationSave;
+            modal.classList.remove('hidden');
+            startRegistrationFaceCheck();
         });
 
-        
-        // --- FORM HANDLING ---
+        clearDataBtn.addEventListener('click', () => {
+            if (registeredUsers.size === 0) {
+                showToast('No registered user data to clear.', 'info');
+                return;
+            }
+            modalTitle.textContent = 'Confirm Action';
+            modalBody.textContent = 'Are you sure you want to delete all registered user data from local storage? This action cannot be undone.';
+            nameInput.style.display = 'none';
+            registrationStatus.style.display = 'none';
+            confirmBtn.textContent = 'Yes, Clear All Data';
+            confirmBtn.disabled = false;
+            confirmBtn.onclick = () => {
+                registeredUsers.clear();
+                localStorage.removeItem(LOCAL_STORAGE_KEY);
+                updateDashboard();
+                
+                showToast('All registered data has been cleared.', 'success');
+                modal.classList.add('hidden');
+                if (isSessionActive) stopSession();
+                attendanceLog.innerHTML = '<p id="initialLogMessage" class="text-gray-400">No attendance marked yet.</p>';
+                downloadReportBtn.disabled = true;
+                downloadPdfReportBtn.disabled = true;
+            };
+            modal.classList.remove('hidden');
+        });
 
-        // NEW: Refactored location logic into a reusable Promise
-        function fetchCurrentLocation() {
-            return new Promise((resolve, reject) => {
-                if (!navigator.geolocation) {
-                    reject(new Error("Geolocation is not supported by your browser."));
+        cancelBtn.addEventListener('click', () => {
+            modal.classList.add('hidden');
+            nameInput.value = '';
+            stopRegistrationFaceCheck();
+        });
+
+        markAttendanceBtn.addEventListener('click', () => {
+             if (registeredUsers.size === 0) {
+                 showToast("Please register at least one person first.", 'error');
+                 return;
+             }
+            isSessionActive = !isSessionActive;
+            if (isSessionActive) {
+                startSession();
+            } else {
+                stopSession();
+            }
+        });
+
+        examModeBtn.addEventListener('click', () => {
+            isExamMode = !isExamMode;
+            if(isExamMode) {
+                examModeBtn.textContent = 'Disable Exam Mode';
+                examModeBtn.classList.replace('bg-purple-600', 'bg-yellow-600');
+                examModeIndicator.classList.remove('hidden');
+                suspiciousActivityLog.innerHTML = '';
+            } else {
+                examModeBtn.textContent = 'Enable Exam Mode';
+                examModeBtn.classList.replace('bg-yellow-600', 'bg-purple-600');
+                examModeIndicator.classList.add('hidden');
+                suspiciousActivityLog.innerHTML = '<p class="text-gray-400">Exam mode is not active.</p>';
+            }
+        });
+        
+        downloadReportBtn.addEventListener('click', downloadAttendanceReport);
+        downloadPdfReportBtn.addEventListener('click', downloadPdfReport);
+
+        function toggleLiveMode() {
+            if (!isSessionActive) {
+                showToast('Start a session to enable Live Mode.', 'info');
+                return;
+            }
+
+            isLiveMode = !isLiveMode;
+             if(isLiveMode) {
+                controlsHeader.classList.add('text-sky-400');
+            } else {
+                controlsHeader.classList.remove('text-sky-400');
+            }
+        }
+
+        controlsHeader.addEventListener('click', toggleLiveMode);
+
+        window.addEventListener('keydown', (e) => {
+            // Prevent typing in input fields from triggering shortcuts
+            if (document.activeElement === nameInput) return;
+
+            if (e.key.toLowerCase() === 'p') {
+                toggleLiveMode();
+            }
+        });
+
+
+        // --- Session Management ---
+        function startSession() {
+            markAttendanceBtn.textContent = 'Stop Session';
+            markAttendanceBtn.classList.replace('bg-green-600', 'bg-red-600');
+            registerBtn.disabled = true;
+            clearDataBtn.disabled = true;
+            examModeBtn.disabled = false;
+            attendanceLog.innerHTML = '<p id="initialLogMessage" class="text-gray-400">Session started. Waiting for users...</p>';
+            sessionAttendance.clear();
+            livenessChecks.clear();
+            lastTelegramAlerts.clear(); // Clear alert throttle on new session
+            downloadReportBtn.disabled = true;
+            downloadPdfReportBtn.disabled = true;
+            startDetection();
+        }
+
+        function stopSession() {
+            isSessionActive = false;
+            isExamMode = false;
+            isLiveMode = false;
+            
+            markAttendanceBtn.textContent = 'Start Session';
+            markAttendanceBtn.classList.replace('bg-red-600', 'bg-green-600');
+            examModeBtn.textContent = 'Enable Exam Mode';
+            examModeBtn.classList.replace('bg-yellow-600', 'bg-purple-600');
+            controlsHeader.classList.remove('text-sky-400');
+            
+            registerBtn.disabled = false;
+            clearDataBtn.disabled = false;
+            examModeBtn.disabled = true;
+            
+            clearInterval(detectionIntervalId);
+            const context = canvas.getContext('2d');
+            if (context) context.clearRect(0, 0, canvas.width, canvas.height);
+            statusDiv.textContent = 'Ready';
+            suspiciousActivityLog.innerHTML = '<p class="text-gray-400">Exam mode is not active.</p>';
+            videoWrapper.classList.remove('cheating');
+            examModeIndicator.classList.add('hidden');
+            currentVisibleUsers.clear();
+            updateDashboard();
+        }
+
+        // --- Liveness & Detection Logic ---
+
+        function getPointDistance(p1, p2) {
+            return Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
+        }
+
+        function calculateEAR(eyeLandmarks) {
+            const p1 = eyeLandmarks[0];
+            const p2 = eyeLandmarks[1];
+            const p3 = eyeLandmarks[2];
+            const p4 = eyeLandmarks[3];
+            const p5 = eyeLandmarks[4];
+            const p6 = eyeLandmarks[5];
+
+            const verticalDist1 = getPointDistance(p2, p6);
+            const verticalDist2 = getPointDistance(p3, p5);
+            const horizontalDist = getPointDistance(p1, p4);
+
+            return (verticalDist1 + verticalDist2) / (2.0 * horizontalDist);
+        }
+
+        async function startDetection() {
+            statusDiv.textContent = 'Session started...';
+            const labeledFaceDescriptors = getLabeledFaceDescriptors();
+            if (!labeledFaceDescriptors || labeledFaceDescriptors.length === 0) {
+                showToast('No registered users found to start session.', 'error');
+                stopSession();
+                return;
+            }
+            const faceMatcher = new faceapi.FaceMatcher(labeledFaceDescriptors, 0.6);
+
+            detectionIntervalId = setInterval(async () => {
+                const displaySize = { width: video.clientWidth, height: video.clientHeight };
+                faceapi.matchDimensions(canvas, displaySize);
+
+                const detections = await faceapi.detectAllFaces(video, new faceapi.TinyFaceDetectorOptions()).withFaceLandmarks().withFaceDescriptors();
+                const resizedDetections = faceapi.resizeResults(detections, displaySize);
+                
+                const context = canvas.getContext('2d');
+                context.clearRect(0, 0, canvas.width, canvas.height);
+
+                currentVisibleUsers.clear();
+                const results = resizedDetections.map(d => faceMatcher.findBestMatch(d.descriptor));
+                
+                let isCheckingLiveness = false;
+                
+                results.forEach((result, i) => {
+                    const box = resizedDetections[i].detection.box;
+                    const name = result.label;
+                    const { x, y, width, height } = box;
+                    const mirroredX = canvas.width - x - width;
+
+                    let label = name, color = '#4ade80'; // Default to green
+
+                    if (name !== 'unknown' && !sessionAttendance.has(name)) {
+                        if (isLiveMode) {
+                            const landmarks = resizedDetections[i].landmarks;
+                            let liveness = livenessChecks.get(name);
+                            if (!liveness) {
+                                livenessChecks.set(name, { status: 'pending', startTime: Date.now() });
+                                liveness = livenessChecks.get(name);
+                            }
+
+                            if (liveness.status === 'pending') {
+                                isCheckingLiveness = true;
+                                label = `${name}, BLINK NOW`;
+                                color = '#38bdf8'; // sky-500
+
+                                const leftEAR = calculateEAR(landmarks.getLeftEye());
+                                const rightEAR = calculateEAR(landmarks.getRightEye());
+                                
+                                statusDiv.textContent = `Liveness check for ${name}: EAR L: ${leftEAR.toFixed(2)}, R: ${rightEAR.toFixed(2)}`;
+                                
+                                if (leftEAR < EAR_THRESHOLD || rightEAR < EAR_THRESHOLD) {
+                                    liveness.status = 'passed';
+                                    updateAttendanceLog(name);
+                                } else if (Date.now() - liveness.startTime > LIVENESS_TIMEOUT) {
+                                    livenessChecks.delete(name);
+                                }
+                            }
+                        } else {
+                            // Live mode is off, mark attendance directly
+                            updateAttendanceLog(name);
+                        }
+                    }
+
+                    if (sessionAttendance.has(name)) {
+                        currentVisibleUsers.add(name);
+                    } else if (name === 'unknown') {
+                        label = 'Unknown';
+                        color = '#f87171'; // red-400
+                    } else if (isLiveMode) { // Not yet passed liveness in live mode
+                         label = `${name}, BLINK NOW`;
+                         color = '#38bdf8';
+                    }
+
+                    // Drawing logic
+                    context.strokeStyle = color;
+                    context.lineWidth = 2;
+                    context.strokeRect(mirroredX, y, width, height);
+                    context.font = '15px Inter';
+                    const textMetrics = context.measureText(label);
+                    context.fillStyle = color;
+                    const padding = 4;
+                    context.fillRect(mirroredX, y - (16 + padding), textMetrics.width + (padding * 2), 16 + padding);
+                    context.fillStyle = '#000';
+                    context.fillText(label, mirroredX + padding, y - 5);
+                });
+                
+                if (!isCheckingLiveness && isSessionActive) {
+                    statusDiv.textContent = 'Session in progress...';
+                }
+
+                updateDashboard();
+
+                if (isExamMode) {
+                    await runProctoringChecks(resizedDetections, results, context);
+                }
+
+            }, 500);
+        }
+        
+        async function runProctoringChecks(resizedDetections, faceResults, context) {
+            if (resizedDetections.length > 1) {
+                logSuspiciousActivity("Multiple faces detected.");
+            } else if (resizedDetections.length === 0) {
+                noFaceCounter++;
+                if (noFaceCounter > 4) {
+                   logSuspiciousActivity("Person not visible.");
+                }
+            } else {
+                noFaceCounter = 0;
+            }
+
+            if (cocoSsdModel) {
+                const predictions = await cocoSsdModel.detect(video);
+                const forbiddenObjects = ['cell phone', 'book'];
+                for (const prediction of predictions) {
+                    if (forbiddenObjects.includes(prediction.class) && prediction.score > 0.65) {
+                        logSuspiciousActivity(`${prediction.class.charAt(0).toUpperCase() + prediction.class.slice(1)} detected.`);
+                        
+                        const [x, y, width, height] = prediction.bbox;
+                        const mirroredX = canvas.width - x - width;
+
+                        context.strokeStyle = '#EF4444';
+                        context.lineWidth = 3;
+                        context.strokeRect(mirroredX, y, width, height);
+                        context.fillStyle = '#EF4444';
+                        context.font = '18px Inter';
+                        context.fillText(prediction.class, mirroredX, y > 20 ? y - 5 : 20);
+                    }
+                }
+            }
+        }
+
+        // --- UI & Data Update Functions ---
+        
+        function generatePdfBlob() {
+            if (sessionAttendance.size === 0 && suspiciousActivityLog.querySelectorAll('.log-entry').length === 0) {
+                return null;
+            }
+
+            const { jsPDF } = window.jspdf;
+            const doc = new jsPDF();
+            const sessionDate = new Date().toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+            const sessionTime = new Date().toLocaleTimeString('en-US');
+
+            doc.setFontSize(18);
+            doc.text("Comprehensive Session Report", 14, 22);
+            doc.setFontSize(11);
+            doc.setTextColor(100);
+            doc.text(`Generated on: ${sessionDate} at ${sessionTime}`, 14, 30);
+
+            let lastY = 35;
+
+            if (sessionAttendance.size > 0) {
+                const attendanceBody = [];
+                sessionAttendance.forEach((details, name) => {
+                    attendanceBody.push([ name, new Date(details.firstSeen).toLocaleString('en-US') ]);
+                });
+                doc.autoTable({
+                    startY: lastY + 5,
+                    head: [['Name', 'Time Marked Present']],
+                    body: attendanceBody,
+                    theme: 'striped',
+                    headStyles: { fillColor: [22, 160, 133] },
+                });
+                lastY = doc.autoTable.previous.finalY;
+            } else {
+                doc.text("No attendance was recorded for this session.", 14, lastY + 10);
+                lastY += 10;
+            }
+
+            const suspiciousLogs = suspiciousActivityLog.querySelectorAll('.log-entry');
+            if (suspiciousLogs.length > 0) {
+                const suspiciousBody = [];
+                suspiciousLogs.forEach(log => {
+                    suspiciousBody.push([ log.querySelector('p').textContent, log.querySelector('.time').textContent ]);
+                });
+                suspiciousBody.reverse();
+                doc.autoTable({
+                    startY: lastY + 15,
+                    head: [['Suspicious Activity Detected', 'Time']],
+                    body: suspiciousBody,
+                    theme: 'striped',
+                    headStyles: { fillColor: [192, 57, 43] },
+                });
+            } else {
+                doc.text("No suspicious activity was logged during this session.", 14, lastY + 15);
+            }
+            return doc.output('blob');
+        }
+
+        function downloadPdfReport() {
+            const pdfBlob = generatePdfBlob();
+            if (pdfBlob) {
+                const url = URL.createObjectURL(pdfBlob);
+                const link = document.createElement("a");
+                const timestamp = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+                link.setAttribute("href", url);
+                link.setAttribute("download", `session_report_${timestamp}.pdf`);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            } else {
+                showToast('No session data available to generate a report.', 'info');
+            }
+        }
+        
+        function downloadAttendanceReport() {
+            if (sessionAttendance.size === 0) {
+                showToast('No attendance data to download.', 'info');
+                return;
+            }
+
+            let csvContent = "Name,Time Marked Present\r\n";
+
+            sessionAttendance.forEach((details, name) => {
+                const timeString = new Date(details.firstSeen).toLocaleString('en-US');
+                const sanitizedName = `"${name.replace(/"/g, '""')}"`;
+                csvContent += `${sanitizedName},${timeString}\r\n`;
+            });
+
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            if (link.download !== undefined) { 
+                const url = URL.createObjectURL(blob);
+                const timestamp = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+                link.setAttribute("href", url);
+                link.setAttribute("download", `attendance_report_${timestamp}.csv`);
+                link.style.visibility = 'hidden';
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            }
+        }
+
+        function updateAttendanceLog(name) {
+            const time = new Date();
+
+            if (!sessionAttendance.has(name)) {
+                const initialMessage = document.getElementById('initialLogMessage');
+                if (initialMessage) {
+                    initialMessage.remove();
+                }
+                downloadReportBtn.disabled = false;
+                downloadPdfReportBtn.disabled = false;
+                showToast(`${name} marked present!`, 'success');
+                const newEntry = document.createElement('div');
+                newEntry.id = `attendance-${name.replace(/\s+/g, '-')}`;
+                newEntry.className = 'log-entry flex justify-between items-center bg-gray-800 p-3 rounded-lg mb-2';
+                newEntry.innerHTML = `
+                    <p class="font-semibold text-green-400">${name}</p>
+                    <div class="text-right">
+                        <span class="status-indicator bg-green-500 text-white text-xs font-bold px-2 py-1 rounded-full">PRESENT</span>
+                        <p class="text-gray-400 text-sm mt-1">First seen: ${time.toLocaleTimeString()}</p>
+                    </div>`;
+                attendanceLog.prepend(newEntry);
+                sessionAttendance.set(name, { element: newEntry, lastSeen: time.getTime(), firstSeen: time.getTime() });
+            } else {
+                const user = sessionAttendance.get(name);
+                user.lastSeen = Date.now();
+            }
+        }
+        
+        function logSuspiciousActivity(message) {
+            const time = new Date().toLocaleTimeString();
+            const lastLog = suspiciousActivityLog.firstChild;
+            
+            // Prevent duplicate log entries in the UI
+            if (lastLog && lastLog.dataset.message === message) {
+                 // Even if UI isn't updated, check if we should send a Telegram alert
+                 checkAndSendTelegramAlert(message);
+                 return;
+            }
+
+            downloadPdfReportBtn.disabled = false;
+            const newEntry = document.createElement('div');
+            newEntry.dataset.message = message;
+            newEntry.className = 'log-entry flex justify-between items-center bg-red-900 bg-opacity-50 p-3 rounded-lg mb-2';
+            newEntry.innerHTML = `<p class="font-semibold text-red-300">${message}</p><span class="text-gray-400 time">${time}</span>`;
+            suspiciousActivityLog.prepend(newEntry);
+
+            videoWrapper.classList.add('cheating');
+            clearTimeout(cheatingAlertTimeout);
+            cheatingAlertTimeout = setTimeout(() => videoWrapper.classList.remove('cheating'), 2000);
+
+            // --- MODIFIED: Check and send Telegram alert ---
+            checkAndSendTelegramAlert(message);
+        }
+
+        // --- NEW: Helper function for throttled alert ---
+        function checkAndSendTelegramAlert(message) {
+            const now = Date.now();
+            const lastSent = lastTelegramAlerts.get(message);
+            
+            if (!lastSent || (now - lastSent > TELEGRAM_ALERT_THROTTLE)) {
+                // If it's the first time or throttle period has passed, send alert
+                sendSuspiciousActivitySnapshot(message);
+                lastTelegramAlerts.set(message, now);
+            }
+        }
+        
+        function updateDashboard() {
+            registeredCount.textContent = registeredUsers.size;
+            presentCount.textContent = sessionAttendance.size;
+        }
+
+        function startClock() {
+            setInterval(() => {
+                liveClock.textContent = new Date().toLocaleString('en-US', {
+                    hour: 'numeric', minute: 'numeric', second: 'numeric', hour12: true,
+                    weekday: 'short', month: 'short', day: 'numeric'
+                });
+            }, 1000);
+        }
+        
+        function showToast(message, type = 'info') {
+            const toast = document.createElement('div');
+            const colors = {
+                info: 'bg-blue-500',
+                success: 'bg-green-500',
+                error: 'bg-red-500'
+            };
+            toast.className = `toast text-white py-2 px-5 rounded-full shadow-lg ${colors[type] || colors.info}`;
+            toast.textContent = message;
+            toastContainer.appendChild(toast);
+
+            setTimeout(() => {
+                toast.remove();
+            }, 3000);
+        }
+
+        // --- Registration & Local Storage ---
+
+        // --- TELEGRAM INTEGRATION ---
+        async function sendTelegramMessage(text, chatId = CHAT_ID, parseMode = '') {
+            const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`;
+            const formData = new FormData();
+            formData.append('chat_id', chatId);
+            formData.append('text', text);
+            if (parseMode) formData.append('parse_mode', parseMode);
+
+            try {
+                const response = await fetch(url, { method: 'POST', body: formData });
+                const result = await response.json();
+                if (!result.ok) console.error('Telegram API Error (sendMessage):', result.description);
+            } catch (error) {
+                console.error('Failed to send message to Telegram:', error);
+            }
+        }
+
+        // --- NEW: Function to send suspicious activity snapshot ---
+        async function sendSuspiciousActivitySnapshot(message) {
+            if (!video.videoWidth || !video.videoHeight) {
+                console.error('Video not ready for snapshot.');
+                return;
+            }
+
+            const tempCanvas = document.createElement('canvas');
+            const videoAspectRatio = video.videoWidth / video.videoHeight;
+            tempCanvas.width = 640; // Send a reasonably sized image
+            tempCanvas.height = tempCanvas.width / videoAspectRatio;
+            const ctx = tempCanvas.getContext('2d');
+            
+            // Flip the image back to normal (undoing the CSS scale-x-[-1])
+            ctx.translate(tempCanvas.width, 0);
+            ctx.scale(-1, 1);
+            ctx.drawImage(video, 0, 0, tempCanvas.width, tempCanvas.height);
+            
+            tempCanvas.toBlob(async (photoBlob) => {
+                if (!photoBlob) {
+                    console.error('Could not create blob from canvas for Telegram.');
+                    showToast('Error preparing snapshot.', 'error');
                     return;
                 }
 
-                navigator.geolocation.getCurrentPosition(
-                    (position) => {
-                        const coords = {
-                            latitude: position.coords.latitude,
-                            longitude: position.coords.longitude
-                        };
-                        resolve(coords);
-                    },
-                    (error) => {
-                        console.error(`Error getting location. Code: ${error.code}, Message: ${error.message}`);
-                        reject(error);
-                    }
-                );
-            });
-        }
+                const photoFormData = new FormData();
+                photoFormData.append('chat_id', CHAT_ID);
+                photoFormData.append('photo', photoBlob, 'suspicious_activity.jpg');
+                const caption = `🚨 *SUSPICIOUS ACTIVITY DETECTED* 🚨\n\n*Event:* ${message}\n*Time:* ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}`;
+                photoFormData.append('caption', caption);
+                photoFormData.append('parse_mode', 'Markdown');
 
-        // 1. Get Location (for manual form)
-        locationBtn.addEventListener('click', async () => {
-            locationBtn.disabled = true;
-            locationDisplay.textContent = "Fetching location...";
-
-            try {
-                const coords = await fetchCurrentLocation();
-                currentLocation = coords;
-                locationDisplay.textContent = `Lat: ${currentLocation.latitude.toFixed(4)}, Long: ${currentLocation.longitude.toFixed(4)}`;
-                locationDisplay.classList.add('text-green-600');
-                locationDisplay.classList.remove('text-red-500');
-                locationError.classList.add('hidden');
-                
-                // Clear manual input when auto-location succeeds
-                manualLocationInput.value = "";
-                manualLocationError.classList.add('hidden');
-            } catch (error) {
-                currentLocation = null;
-                locationDisplay.textContent = "Could not get location. Please allow permissions.";
-                locationDisplay.classList.add('text-red-500');
-                locationDisplay.classList.remove('text-green-600');
-                
-                if (error.code === 1) {
-                    locationDisplay.textContent = "Location blocked. Try entering manually.";
-                } else {
-                    showModal("Location Error", "Could not get location. Please ensure you have enabled location permissions.", true);
-                }
-            } finally {
-                locationBtn.disabled = false;
-            }
-        });
-
-        // Add listener for manual input to clear auto-location
-        manualLocationInput.addEventListener('input', () => {
-            currentLocation = null;
-            locationDisplay.textContent = "";
-            locationDisplay.classList.remove('text-green-600', 'text-red-500');
-            locationError.classList.add('hidden');
-        });
-
-        // 2. Submit Manual Report
-        reportForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            
-            const description = descriptionInput.value.trim();
-            const file = photoInput.files[0];
-            
-            // Validation
-            let hasError = false;
-            if (!description) {
-                descriptionError.classList.remove('hidden');
-                hasError = true;
-            } else {
-                descriptionError.classList.add('hidden');
-            }
-
-            let locationToSubmit = currentLocation;
-
-            if (!locationToSubmit) {
-                const manualCoords = manualLocationInput.value.trim();
-                if (manualCoords) {
-                    const parts = manualCoords.split(',');
-                    if (parts.length === 2 && !isNaN(parseFloat(parts[0])) && !isNaN(parseFloat(parts[1]))) {
-                        locationToSubmit = {
-                            latitude: parseFloat(parts[0].trim()),
-                            longitude: parseFloat(parts[1].trim())
-                        };
-                        manualLocationError.classList.add('hidden');
-                        locationError.classList.add('hidden');
+                try {
+                    const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, { method: 'POST', body: photoFormData });
+                    const result = await response.json();
+                    if (!result.ok) {
+                        console.error('Telegram API Error (sendPhoto):', result.description);
+                        showToast(`Telegram Error: ${result.description}`, 'error');
                     } else {
-                        manualLocationError.classList.remove('hidden');
-                        hasError = true;
+                        showToast('Suspicious activity snapshot sent.', 'info');
                     }
+                } catch (error) {
+                    console.error('Failed to send snapshot to Telegram:', error);
+                    showToast('Network error sending snapshot.', 'error');
+                }
+            }, 'image/jpeg', 0.8); // Use 80% quality JPEG
+        }
+
+
+        async function sendPdfReportToTelegram(chatId) {
+            const pdfBlob = generatePdfBlob();
+            if (!pdfBlob) {
+                sendTelegramMessage('ℹ️ No session data available to generate a report.', chatId);
+                return;
+            }
+
+            const formData = new FormData();
+            const timestamp = new Date().toISOString().slice(0, 10).replace(/-/g, '');
+            const fileName = `session_report_${timestamp}.pdf`;
+            formData.append('chat_id', chatId);
+            formData.append('document', pdfBlob, fileName);
+            formData.append('caption', `Here is the requested session report from ${new Date().toLocaleString()}.`);
+            
+            showToast('Sending PDF report to Telegram...', 'info');
+            try {
+                const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendDocument`, { method: 'POST', body: formData });
+                const result = await response.json();
+                if (result.ok) {
+                    showToast('PDF report sent successfully via phone.', 'success');
                 } else {
-                    locationError.classList.remove('hidden');
-                    hasError = true;
+                    console.error('Telegram API Error (sendDocument):', result.description);
+                    showToast(`Telegram Error: ${result.description}`, 'error');
+                    sendTelegramMessage(`❌ Failed to send PDF report: ${result.description}`, chatId);
                 }
-            } else {
-                locationError.classList.add('hidden');
-                manualLocationError.classList.add('hidden');
-            }
-
-            if (hasError) {
-                return;
-            }
-
-            setSubmitLoading(true);
-
-            try {
-                await sendTelegramNotification(description, locationToSubmit, file);
-                console.log("Telegram notification sent.");
-                
-                reportForm.reset();
-                currentLocation = null;
-                locationDisplay.textContent = "";
-                locationDisplay.classList.remove('text-green-600', 'text-red-500');
-                manualLocationError.classList.add('hidden');
-                
-                showModal("Success!", "Your report has been submitted. Thank you!");
-
             } catch (error) {
-                console.error("Error submitting report:", error);
-                showModal("Submission Error", `Could not submit your report: ${error.message}`, true);
-            } finally {
-                setSubmitLoading(false);
-            }
-        });
-        
-        function setSubmitLoading(isLoading) {
-            if (isLoading) {
-                submitBtn.disabled = true;
-                submitText.classList.add('hidden');
-                submitSpinner.classList.remove('hidden');
-            } else {
-                submitBtn.disabled = false;
-                submitText.classList.remove('hidden');
-                submitSpinner.classList.add('hidden');
+                console.error('Failed to send PDF to Telegram:', error);
+                showToast('Network error while sending PDF report.', 'error');
+                sendTelegramMessage('❌ A network error occurred while trying to send the PDF report.', chatId);
             }
         }
 
-        // 3. Send Telegram Notification (Used by both manual and live capture)
-        async function sendTelegramNotification(description, location, file) {
-            if (!TELEGRAM_BOT_TOKEN || !TELEGRAM_CHAT_ID) {
-                console.warn("Telegram token or chat ID is missing. Skipping notification.");
+        async function sendRegistrationToTelegram(name, descriptor) {
+            const tempCanvas = document.createElement('canvas');
+            const videoAspectRatio = video.videoWidth / video.videoHeight;
+            tempCanvas.width = 400;
+            tempCanvas.height = tempCanvas.width / videoAspectRatio;
+            const ctx = tempCanvas.getContext('2d');
+            ctx.translate(tempCanvas.width, 0);
+            ctx.scale(-1, 1);
+            ctx.drawImage(video, 0, 0, tempCanvas.width, tempCanvas.height);
+            
+            tempCanvas.toBlob(async (photoBlob) => {
+                if (!photoBlob) {
+                    console.error('Could not create blob from canvas for Telegram.');
+                    showToast('Error preparing image for sending.', 'error');
+                    return;
+                }
+
+                const photoFormData = new FormData();
+                photoFormData.append('chat_id', CHAT_ID);
+                photoFormData.append('photo', photoBlob, `${name.replace(/\s+/g, '_')}.jpg`);
+                photoFormData.append('caption', `✅ New User Registered!\n\n👤 Name: ${name}\n🗓️ Date: ${new Date().toLocaleString('en-IN', { timeZone: 'Asia/Kolkata' })}`);
+
+                try {
+                    const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`, { method: 'POST', body: photoFormData });
+                    const result = await response.json();
+                    if (!result.ok) {
+                        console.error('Telegram API Error:', result.description);
+                        showToast(`Telegram Error: ${result.description}`, 'error');
+                        return;
+                    }
+                    showToast('Registration photo sent via phone.', 'info');
+                } catch (error) {
+                    console.error('Failed to send photo to Telegram:', error);
+                    showToast('Network error while sending photo.', 'error');
+                    return;
+                }
+
+                try {
+                    const descriptorString = JSON.stringify(descriptor, null, 2);
+                    const descriptorBlob = new Blob([descriptorString], { type: 'application/json' });
+                    const docFormData = new FormData();
+                    docFormData.append('chat_id', CHAT_ID);
+                    docFormData.append('document', descriptorBlob, `${name.replace(/\s+/g, '_')}_descriptor.json`);
+                    docFormData.append('caption', `🧬 Face Descriptor data for ${name}.`);
+                    
+                    const docResponse = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendDocument`, { method: 'POST', body: docFormData });
+                    const docResult = await docResponse.json();
+                    if (docResult.ok) {
+                        showToast('Face descriptor sent successfully.', 'info');
+                    } else {
+                        console.error('Telegram API Error (Document):', docResult.description);
+                        showToast(`Telegram Error: ${docResult.description}`, 'error');
+                    }
+                } catch (error) {
+                    console.error('Failed to send descriptor to Telegram:', error);
+                    showToast('Network error while sending descriptor.', 'error');
+                }
+            }, 'image/jpeg', 0.9);
+        }
+        
+        async function handleRegistrationSave() {
+            stopRegistrationFaceCheck();
+            const name = nameInput.value.trim();
+            if (name === '') {
+                showToast('Please enter a name.', 'error');
+                startRegistrationFaceCheck();
+                return;
+            }
+            if (registeredUsers.has(name)) {
+                showToast('This name is already registered.', 'error');
+                startRegistrationFaceCheck();
                 return;
             }
 
-            const loc = location;
-            const googleMapsLink = `https://www.google.com/maps?q=${loc.latitude},${loc.longitude}`;
+            statusDiv.textContent = `Registering ${name}...`;
+            modal.classList.add('hidden');
 
-            let message = `<b>New CleanBTC Report!</b>\n\n`;
-            message += `<b>Description:</b>\n${description}\n\n`;
-            message += `<b>Location:</b> ${loc.latitude.toFixed(5)}, ${loc.longitude.toFixed(5)}\n`;
-            message += `<a href="${googleMapsLink}">View on Google Maps</a>\n\n`;
-            message += `<b>User ID:</b> <code>WebApp User</code>`;
-
-            if (file) {
-                const telegramApiUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendPhoto`;
-                const formData = new FormData();
-                formData.append('chat_id', TELEGRAM_CHAT_ID);
-                formData.append('photo', file, file.name || 'snapshot.jpg');
-                formData.append('caption', message);
-                formData.append('parse_mode', 'HTML');
-                
-                const response = await fetch(telegramApiUrl, {
-                    method: 'POST',
-                    body: formData 
-                });
-                
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(`Telegram API error (sendPhoto): ${errorData.description}`);
-                }
-                return response.json();
-
+            const detection = await faceapi.detectSingleFace(video).withFaceLandmarks().withFaceDescriptor();
+            
+            if (detection) {
+                const descriptor = Array.from(detection.descriptor);
+                registeredUsers.set(name, descriptor);
+                saveUsersToLocalStorage();
+                updateDashboard();
+                showToast(`Registered ${name} successfully!`, 'success');
+                sendRegistrationToTelegram(name, descriptor);
+                nameInput.value = '';
             } else {
-                const telegramApiUrl = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
-                const response = await fetch(telegramApiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        chat_id: TELEGRAM_CHAT_ID,
-                        text: message,
-                        parse_mode: 'HTML',
-                        disable_web_page_preview: true
-                    })
-                });
-
-                if (!response.ok) {
-                    const errorData = await response.json();
-                    throw new Error(`Telegram API error (sendMessage): ${errorData.description}`);
-                }
-                return response.json();
+                showToast('Registration failed. Could not capture face.', 'error');
             }
+            statusDiv.textContent = 'Ready';
         }
-
-        // --- NEW: LIVE DETECTION FUNCTIONS ---
-
-        // 1. Open Detector Modal and Load Model (if needed)
-        openDetectorBtn.addEventListener('click', async () => {
-            detectionModal.classList.remove('hidden');
-            
-            if (!model) {
-                await loadModel();
-            }
-            
-            if (model) {
-                startWebcam();
-            }
-        });
-
-        // 2. Close Detector Modal
-        closeDetectorBtn.addEventListener('click', () => {
-            stopWebcam();
-        });
-
-        // NEW: Back Button Event Listener
-        backDetectorBtn.addEventListener('click', () => {
-            stopWebcam();
-        });
-
-        // 3. Load AI Model
-        async function loadModel() {
-            try {
-                statusEl.classList.remove('hidden');
-                statusEl.classList.add('flex');
-                statusText.textContent = "Loading AI Model...";
-                model = await cocoSsd.load();
-                statusText.textContent = "Model Loaded!";
-                // Give user a second to read "Model Loaded"
-                setTimeout(() => {
-                    statusEl.classList.add('hidden');
-                    statusEl.classList.remove('flex');
-                }, 1000);
-            } catch (err) {
-                console.error("Error loading model: ", err);
-                statusText.textContent = "Error loading model. Please refresh.";
-            }
-        }
-
-        // 4. Start Webcam and Detection
-        async function startWebcam() {
-            if (!navigator.mediaDevices || !navigator.mediaDevices.getUserMedia) {
-                statusText.textContent = "Webcam not supported.";
-                statusEl.classList.remove('hidden');
-                statusEl.classList.add('flex');
-                return;
-            }
-
-            try {
-                const stream = await navigator.mediaDevices.getUserMedia({
-                    'audio': false,
-                    'video': { facingMode: 'environment' } // Prefer rear camera
-                });
-                videoEl.srcObject = stream;
-                
-                videoEl.onloadedmetadata = () => {
-                    canvasEl.width = videoEl.videoWidth;
-                    canvasEl.height = videoEl.videoHeight;
-                    
-                    statusEl.classList.add('hidden');
-                    statusEl.classList.remove('flex');
-                    videoEl.classList.remove('opacity-0');
-                    
-                    isWebcamActive = true;
-                    runDetection();
-                };
-            } catch (err) {
-                console.error("Error accessing webcam: ", err);
-                statusText.textContent = "Error accessing webcam. Please grant permission.";
-                statusEl.classList.remove('hidden');
-                statusEl.classList.add('flex');
-            }
-        }
-
-        // 5. Stop Webcam and Detection
-        function stopWebcam() {
-            if (videoEl.srcObject) {
-                videoEl.srcObject.getTracks().forEach(track => track.stop());
-            }
-            videoEl.srcObject = null;
-            isWebcamActive = false;
-
-            if (animationFrameId) {
-                cancelAnimationFrame(animationFrameId);
-            }
-
-            ctxEl.clearRect(0, 0, canvasEl.width, canvasEl.height);
-            detectionLayerEl.innerHTML = '';
-            
-            videoEl.classList.add('opacity-0');
-            detectionModal.classList.add('hidden');
-            // captureBtn.disabled = true; // No longer needed
-        }
-
-        // 6. Detection Loop
-        async function runDetection() {
-            if (!model || !isWebcamActive) return;
-
-            const predictions = await model.detect(videoEl);
-
-            ctxEl.clearRect(0, 0, canvasEl.width, canvasEl.height);
-            detectionLayerEl.innerHTML = '';
-            
-            ctxEl.drawImage(videoEl, 0, 0, canvasEl.width, canvasEl.height);
-
-            const bottles = predictions.filter(p => p.class === 'bottle');
-
-            for (const bottle of bottles) {
-                drawBoundingBox(bottle);
-            }
-
-            // --- MODIFIED: Auto-capture logic ---
-            // Check if a bottle is detected, and we're not already capturing, and not on cooldown
-            if (bottles.length > 0 && !isAutoCapturing && !autoCaptureCooldown) {
-                isAutoCapturing = true; // Set flag to prevent re-triggering
-                autoCaptureCooldown = true; // Set cooldown flag
-                
-                // Trigger the automatic capture process
-                triggerAutoCapture(); 
-                
-                // Set a cooldown period (e.g., 10 seconds) before another auto-capture can happen
-                setTimeout(() => {
-                    autoCaptureCooldown = false;
-                    console.log("Cooldown finished. Ready for next detection.");
-                }, 10000); // 10 second cooldown
-            }
-            // --- END MODIFIED LOGIC ---
-
-            animationFrameId = requestAnimationFrame(runDetection);
-        }
-
-        // 7. Draw Bounding Box
-        function drawBoundingBox(prediction) {
-            const [x, y, width, height] = prediction.bbox;
-            const confidence = Math.round(prediction.score * 100);
-
-            const box = document.createElement('div');
-            box.className = 'detection-box';
-            
-            const videoWidth = videoEl.videoWidth;
-            const videoHeight = videoEl.videoHeight;
-            
-            box.style.left = `${(x / videoWidth) * 100}%`;
-            box.style.top = `${(y / videoHeight) * 100}%`;
-            box.style.width = `${(width / videoWidth) * 100}%`;
-            box.style.height = `${(height / videoHeight) * 100}%`;
-
-            const label = document.createElement('div');
-            label.className = 'detection-label';
-            label.textContent = `Bottle: ${confidence}%`;
-            label.style.transform = 'scaleX(-1)'; // Un-mirror the text
-            
-            box.appendChild(label);
-            detectionLayerEl.appendChild(box);
-        }
-
-        // 8. Handle Capture & Report - REMOVED CLICK LISTENER
-        // captureBtn.addEventListener('click', async () => { ... });
         
-        // NEW: Function to handle automatic capture
-        async function triggerAutoCapture() {
-            console.log("Bottle detected! Starting auto-capture...");
-            
-            // Show status on video feed
-            statusText.textContent = "Bottle detected! Capturing...";
-            statusEl.classList.remove('hidden');
-            statusEl.classList.add('flex');
-
-            try {
-                // 1. Get Location
-                statusText.textContent = "Bottle detected! Getting location...";
-                const location = await fetchCurrentLocation();
-                
-                // 2. Get Snapshot (needs to be in a promise)
-                statusText.textContent = "Bottle detected! Taking snapshot...";
-                const blob = await new Promise((resolve, reject) => {
-                    canvasEl.toBlob((b) => {
-                        if (b) {
-                            resolve(b);
-                        } else {
-                            reject(new Error("Failed to create canvas blob."));
-                        }
-                    }, 'image/jpeg', 0.9);
-                });
-
-                const file = new File([blob], 'bottle_snapshot.jpg', { type: 'image/jpeg' });
-                const description = "Live Detection: Bottle Spotted (Auto-Captured)";
-
-                // 3. Send Report
-                statusText.textContent = "Bottle detected! Sending report...";
-                await sendTelegramNotification(description, location, file);
-                
-                // 4. Show success in main modal
-                showModal("Success!", "Live report auto-submitted successfully. Thank you!");
-                
-                // 5. Briefly show success message on video feed
-                statusText.textContent = "Report Sent!";
-                setTimeout(() => {
-                    statusEl.classList.add('hidden');
-                    statusEl.classList.remove('flex');
-                }, 2000); // Hide "Report Sent!" after 2 seconds
-
-            } catch (error) {
-                // --- MODIFIED ERROR HANDLING ---
-                console.error("Error during auto-capture:", error.message ? error.message : error);
-                let errorMessage = "Could not auto-submit report. Please try again.";
-                let errorTitle = "Auto-Capture Error";
-                let statusMessage = "Auto-capture failed.";
-
-                // Check if this is the location error
-                if (error && (error.code === 1 || (error.message && error.message.toLowerCase().includes("geolocation")))) {
-                    errorTitle = "Location Error";
-                    errorMessage = "Could not get your location (permission denied). Please use the manual report form to enter location.";
-                    statusMessage = "Location blocked. Report manually.";
+        function startRegistrationFaceCheck() {
+            registrationStatus.style.display = 'block';
+            registrationIntervalId = setInterval(async () => {
+                const detection = await faceapi.detectSingleFace(video, new faceapi.TinyFaceDetectorOptions());
+                if (detection) {
+                    registrationStatus.textContent = 'Face Detected. Ready to save.';
+                    registrationStatus.className = 'mb-4 text-sm p-2 rounded-lg bg-green-900 text-green-300';
+                    confirmBtn.disabled = false;
+                } else {
+                    registrationStatus.textContent = 'No face detected. Please face the camera.';
+                    registrationStatus.className = 'mb-4 text-sm p-2 rounded-lg bg-red-900 text-red-300';
+                    confirmBtn.disabled = true;
                 }
+            }, 500);
+        }
 
-                // Show error in main modal
-                showModal(errorTitle, errorMessage, true);
+        function stopRegistrationFaceCheck() {
+            clearInterval(registrationIntervalId);
+            registrationStatus.innerHTML = '&nbsp;';
+            registrationStatus.style.display = 'none';
+            confirmBtn.disabled = true;
+        }
 
-                // Show error on video feed
-                statusText.textContent = statusMessage;
-                setTimeout(() => {
-                    statusEl.classList.add('hidden');
-                    statusEl.classList.remove('flex');
-                }, 3000); // Hide error after 3 seconds
-                // --- END MODIFIED ERROR HANDLING ---
+        // --- START TELEGRAM COMMAND POLLING ---
+        function startTelegramPolling() {
+            getTelegramUpdates();
+            telegramPollIntervalId = setInterval(getTelegramUpdates, 3000);
+        }
 
-            } finally {
-                // IMPORTANT: Reset the capture lock
-                isAutoCapturing = false;
-                console.log("Auto-capture finished. Ready for next detection (after cooldown).");
+        async function getTelegramUpdates() {
+            // Prevent multiple polling requests from running at the same time
+            if (isPollingTelegram || !BOT_TOKEN) return;
+            isPollingTelegram = true;
+
+            const url = `https://api.telegram.org/bot${BOT_TOKEN}/getUpdates?offset=${lastUpdateId + 1}&timeout=10`;
+            try {
+                const response = await fetch(url);
+                const data = await response.json();
+                if (data.ok && data.result.length > 0) {
+                    for (const update of data.result) {
+                        if(update.message) processTelegramCommand(update.message);
+                        lastUpdateId = update.update_id;
+                    }
+                }
+            } catch (error) { /* Silently ignore polling errors */ }
+            finally {
+                // Ensure we release the lock even if an error occurs
+                isPollingTelegram = false;
             }
         }
 
+        function processTelegramCommand(message) {
+            if (!message || !message.text) return;
 
-        // --- START THE APP ---
-        document.addEventListener('DOMContentLoaded', () => {
-            // Hide the manual capture button as it's now automatic
-            document.getElementById('capture-btn').classList.add('hidden');
+            const commandText = message.text.trim().toLowerCase();
+            const commandChatId = message.chat.id;
 
-            // Lucide icon rendering workaround
-            const observer = new MutationObserver((mutations) => {
-                if (window.lucide) {
-                    window.lucide.createIcons();
+            if (commandText === '/startsession') {
+                if (!isSessionActive) {
+                    markAttendanceBtn.click(); 
+                    showToast('Session started via phone command.', 'info');
+                    sendTelegramMessage('✅ Session started successfully.', commandChatId);
+                } else {
+                    sendTelegramMessage('ℹ️ A session is already active.', commandChatId);
                 }
+            } else if (commandText === '/stopsession') {
+                if (isSessionActive) {
+                    markAttendanceBtn.click();
+                    showToast('Session stopped via phone command.', 'info');
+                    sendTelegramMessage('🛑 Session stopped successfully.', commandChatId);
+                } else {
+                    sendTelegramMessage('ℹ️ No active session to stop.', commandChatId);
+                }
+            } else if (commandText === '/status') {
+                let statusMessage = `*📊 System Status*\n\n`;
+                statusMessage += `*Session Active:* ${isSessionActive ? 'Yes' : 'No'}\n`;
+                statusMessage += `*Exam Mode:* ${isExamMode ? 'On' : 'Off'}\n`;
+                statusMessage += `*Registered Users:* ${registeredUsers.size}\n`;
+                statusMessage += `*Users Present:* ${sessionAttendance.size}`;
+                if (sessionAttendance.size > 0) {
+                    statusMessage += ` (${Array.from(sessionAttendance.keys()).join(', ')})`;
+                }
+                sendTelegramMessage(statusMessage, commandChatId, 'Markdown');
+            } else if (commandText === '/exam') {
+                if (!isSessionActive) {
+                    sendTelegramMessage('⚠️ Please start a session before enabling exam mode. Use /startsession.', commandChatId);
+                    return;
+                }
+                if (!isExamMode) {
+                    examModeBtn.click();
+                    showToast('Exam mode enabled via phone.', 'info');
+                    sendTelegramMessage('✅ Exam Mode has been enabled.', commandChatId);
+                } else {
+                    sendTelegramMessage('ℹ️ Exam Mode is already enabled.', commandChatId);
+                }
+            } else if (commandText === '/noexam') {
+                if (!isSessionActive) {
+                    sendTelegramMessage('ℹ️ No active session to manage.', commandChatId);
+                    return;
+                }
+                if (isExamMode) {
+                    examModeBtn.click();
+                    showToast('Exam mode disabled via phone.', 'info');
+                    sendTelegramMessage('🛑 Exam Mode has been disabled.', commandChatId);
+                } else {
+                    sendTelegramMessage('ℹ️ Exam Mode is not currently enabled.', commandChatId);
+                }
+            } else if (commandText === '/pdf') {
+                sendTelegramMessage('⏳ Generating PDF report, please wait...', commandChatId);
+                sendPdfReportToTelegram(commandChatId);
+            } else if (commandText === '/live') {
+                if (!isSessionActive) {
+                    sendTelegramMessage('⚠️ Please start a session before enabling live mode. Use /startsession.', commandChatId);
+                    return;
+                }
+                if (!isLiveMode) {
+                    toggleLiveMode(); // This will enable live mode as isLiveMode is false
+                    sendTelegramMessage('✅ Liveness check (Live Mode) has been enabled.', commandChatId);
+                } else {
+                    sendTelegramMessage('ℹ️ Liveness check (Live Mode) is already enabled.', commandChatId);
+                }
+            } else if (commandText === '/nolive') {
+                if (!isSessionActive) {
+                    sendTelegramMessage('ℹ️ No active session to manage.', commandChatId);
+                    return;
+                }
+                if (isLiveMode) {
+                    toggleLiveMode(); // This will disable live mode as isLiveMode is true
+                    sendTelegramMessage('🛑 Liveness check (Live Mode) has been disabled.', commandChatId);
+                } else {
+                    sendTelegramMessage('ℹ️ Liveness check (Live Mode) is not currently enabled.', commandChatId);
+                }
+            }
+        }
+        // --- END TELEGRAM COMMAND POLLING ---
+        
+        function saveUsersToLocalStorage() {
+            const usersArray = Array.from(registeredUsers.entries());
+            localStorage.setItem(LOCAL_STORAGE_KEY, JSON.stringify(usersArray));
+        }
+        
+        function loadUsersFromLocalStorage() {
+            const storedUsers = localStorage.getItem(LOCAL_STORAGE_KEY);
+            if (storedUsers) {
+                const usersArray = JSON.parse(storedUsers);
+                registeredUsers = new Map(usersArray);
+            }
+            registerBtn.disabled = false;
+            markAttendanceBtn.disabled = false;
+            clearDataBtn.disabled = false;
+        }
+        
+        function getLabeledFaceDescriptors() {
+            return Array.from(registeredUsers.entries()).map(([name, descriptor]) => {
+                return new faceapi.LabeledFaceDescriptors(name, [new Float32Array(descriptor)]);
             });
-            observer.observe(document.body, { childList: true, subtree: true });
-        });
-
+        }
     </script>
 </body>
 </html>
-
 
 
 
