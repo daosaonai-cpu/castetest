@@ -1,322 +1,453 @@
 <!DOCTYPE html>
-<html lang="en" class="h-full bg-gray-50">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Computer Hardware & Number Systems Quiz</title>
+    <title>Network Topology Quiz</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
+            -webkit-tap-highlight-color: transparent;
         }
-        /* Custom scrollbar for tutorial */
-        .tutorial-content::-webkit-scrollbar {
-            width: 6px;
+        .option-btn {
+            transition: all 0.2s ease;
         }
-        .tutorial-content::-webkit-scrollbar-track {
+        .option-btn:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        }
+        .option-btn:active:not(:disabled) {
+            transform: translateY(0);
+        }
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        /* Custom Scrollbar for review section */
+        ::-webkit-scrollbar {
+            width: 8px;
+        }
+        ::-webkit-scrollbar-track {
             background: #f1f1f1;
-            border-radius: 10px;
         }
-        .tutorial-content::-webkit-scrollbar-thumb {
-            background: #888;
-            border-radius: 10px;
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
         }
-        .tutorial-content::-webkit-scrollbar-thumb:hover {
-            background: #555;
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
         }
     </style>
 </head>
-<body class="h-full flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-    <div class="max-w-4xl w-full space-y-8 bg-white p-8 sm:p-10 rounded-2xl shadow-xl">
-        
-        <h1 class="text-3xl font-bold text-center text-gray-900">Computer Hardware & Number Systems</h1>
+<body class="min-h-screen flex items-center justify-center p-4">
 
-        <!-- Tutorial Section -->
-        <div id="tutorialSection">
-            <h2 class="text-2xl font-semibold text-gray-800 mb-4">Tutorial</h2>
-            <div class="prose max-w-none h-64 overflow-y-auto p-4 bg-gray-100 rounded-lg tutorial-content">
-                <h3>Part 1: Basic Computer Hardware</h3>
-                <p>Computer hardware refers to the physical components that make up a computer system. These are the parts you can see and touch. The main components work together to process data, store information, and interact with you, the user. The "brain" of the computer is the <strong>Central Processing Unit (CPU)</strong>. It executes instructions and performs calculations, handling all the main tasks. Think of it as the chef in a kitchen, following every step of a recipe. The CPU itself contains two main parts: the Arithmetic Logic Unit (ALU), which performs all math and logical operations (like addition, subtraction, and comparisons), and the Control Unit (CU), which directs the flow of data and tells the other parts of the computer what to do. For the computer to work quickly, it needs a "workbench" for its current tasks. This is the <strong>Random Access Memory (RAM)</strong>. RAM is volatile, meaning it holds data only while the computer is turned on. When you open a program or a file, it's loaded into RAM for fast access by the CPU. The more RAM you have, the more tasks you can juggle at once without slowing down. In contrast, <strong>Read-Only Memory (ROM)</strong> is non-volatile, meaning it keeps its information even when the power is off. ROM typically stores the computer's startup instructions, known as the BIOS or UEFI, which tell the computer how to boot up and load the operating system.</p>
-                <p>For long-term data storage, computers use <strong>storage devices</strong>. The two most common types are Hard Disk Drives (HDDs) and Solid-State Drives (SSDs). An <strong>HDD</strong> uses spinning magnetic disks (platters) to read and write data, similar to a record player. It offers large storage capacity at a low cost but is slower and more fragile. An <strong>SSD</strong> uses flash-memory chips, with no moving parts. This makes it much faster, more durable, and quieter, though typically more expensive. All these components are connected to the <strong>motherboard</strong>, which is the main circuit board. It acts as the central nervous system, allowing the CPU, RAM, storage, and other parts to communicate with each other through electrical pathways called buses. To interact with the computer, you use <strong>input devices</strong> to send data <em>in</em> (like a keyboard, mouse, or microphone) and <strong>output devices</strong> to get data <em>out</em> (like a monitor, printer, or speakers). Finally, <strong>ports</strong> (like USB, HDMI, or Ethernet) are the physical connection points on the outside of the computer case that allow you to plug in these various input, output, and storage devices.</p>
-                <h3>Part 2: Number Systems</h3>
-                <p>Computers don't understand words or human numbers the way we do. At their most basic level, they operate using a system of millions of tiny electronic switches that can be either "on" or "off." This two-state system is represented by the <strong>binary number system</strong>, or base-2. In binary, there are only two digits: 0 (representing "off") and 1 (representing "on"). Each single binary digit is called a <strong>bit</strong>. Eight bits grouped together are called a <strong>byte</strong>, which is the standard unit used to measure data size (like kilobytes, megabytes, etc.). While computers work in binary, these long strings of 1s and 0s are very difficult for humans to read. To make this easier, programmers often use the <strong>hexadecimal number system</strong>, or base-16. This system uses 16 digits: 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, and then the letters A, B, C, D, E, and F to represent the values 10, 11, 12, 13, 14, and 15, respectively. The reason hexadecimal is so useful is that one hexadecimal digit can represent a group of exactly four binary bits. For example, the binary value <code>1101</code> (which is 13 in decimal) is simply <code>D</code> in hexadecimal. This makes it a very compact and efficient way to represent binary data. Of course, the system we use every day is the <strong>decimal number system</strong>, or base-10, which uses ten digits (0-9). Understanding how to convert numbers between these three systems (Decimal, Binary, and Hexadecimal) is a fundamental skill in computing, as it helps bridge the gap between human-readable information and the on/off signals that computers actually process.</p>
+    <div class="w-full max-w-2xl bg-white rounded-2xl shadow-xl overflow-hidden relative" id="app-container">
+        
+        <!-- START SCREEN -->
+        <div id="start-screen" class="p-8 text-center fade-in">
+            <div class="w-20 h-20 bg-blue-100 rounded-full flex items-center justify-center mx-auto mb-6">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-10 w-10 text-blue-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                </svg>
             </div>
-            <button id="startQuizBtn" class="mt-6 w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-lg font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition duration-150 ease-in-out">
+            <h1 class="text-3xl font-bold text-gray-800 mb-2">Network Topology Quiz</h1>
+            <p class="text-gray-500 mb-8">Test your knowledge with 30 questions on network structures.</p>
+            
+            <div class="flex flex-col gap-3 max-w-xs mx-auto text-left text-sm text-gray-600 bg-gray-50 p-4 rounded-lg mb-8">
+                <div class="flex items-center gap-2">
+                    <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    <span>30 Questions</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    <span>Immediate Feedback</span>
+                </div>
+                <div class="flex items-center gap-2">
+                    <svg class="w-4 h-4 text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    <span>No Time Limit</span>
+                </div>
+            </div>
+
+            <button onclick="startQuiz()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg shadow-lg transform transition hover:scale-105 w-full sm:w-auto">
                 Start Quiz
             </button>
         </div>
 
-        <!-- Quiz Section -->
-        <div id="quizSection" class="hidden">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-2xl font-semibold text-gray-800">Quiz</h2>
-                <span id="questionCounter" class="text-lg font-medium text-gray-600"></span>
-            </div>
-            
-            <div id="questionContainer" class="space-y-6">
-                <p id="questionText" class="text-xl font-medium text-gray-900"></p>
-                <div id="answerOptions" class="space-y-4">
-                    <!-- Answer options will be dynamically inserted here -->
+        <!-- QUIZ SCREEN -->
+        <div id="quiz-screen" class="hidden flex flex-col h-[600px] sm:h-auto">
+            <!-- Header -->
+            <div class="bg-white border-b border-gray-100 p-4 sm:p-6 sticky top-0 z-10">
+                <div class="flex justify-between items-center mb-4">
+                    <span class="text-sm font-semibold text-gray-500">Question <span id="current-q-num">1</span>/30</span>
+                    <span class="text-sm font-bold text-blue-600 bg-blue-50 px-3 py-1 rounded-full">Score: <span id="current-score">0</span></span>
                 </div>
-                <p id="hintText" class="text-sm text-gray-500 italic hidden"></p>
+                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                    <div id="progress-bar" class="bg-blue-600 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+                </div>
             </div>
 
-            <div class="mt-8 flex justify-between">
-                <button id="hintBtn" class="py-2 px-4 border border-gray-300 rounded-md shadow-sm text-base font-medium text-gray-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                    Hint
-                </button>
-                <button id="nextBtn" class="py-2 px-6 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+            <!-- Content -->
+            <div class="flex-1 overflow-y-auto p-4 sm:p-8">
+                <h2 id="question-text" class="text-xl sm:text-2xl font-bold text-gray-800 mb-6 leading-relaxed">
+                    <!-- Question goes here -->
+                </h2>
+
+                <div id="options-container" class="space-y-3">
+                    <!-- Options go here -->
+                </div>
+            </div>
+
+            <!-- Footer -->
+            <div class="p-4 sm:p-6 border-t border-gray-100 bg-gray-50 flex justify-end">
+                <button id="next-btn" onclick="nextQuestion()" class="hidden bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded-lg shadow transition flex items-center gap-2">
                     Next
-                </button>
-                <button id="submitBtn" class="hidden py-2 px-6 border border-transparent rounded-md shadow-sm text-base font-medium text-white bg-green-600 hover:bg-green-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-green-500">
-                    Submit
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    </svg>
                 </button>
             </div>
         </div>
 
-        <!-- Results Section -->
-        <div id="resultsSection" class="hidden">
-            <h2 class="text-3xl font-bold text-center text-gray-900">Quiz Results</h2>
-            <p id="scoreText" class="text-2xl text-center font-semibold text-gray-700 my-6"></p>
+        <!-- RESULT SCREEN -->
+        <div id="result-screen" class="hidden p-8 text-center fade-in">
+            <div class="mb-6">
+                <div class="relative inline-block">
+                    <svg class="w-32 h-32 text-gray-200" viewBox="0 0 36 36">
+                        <path d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="currentColor" stroke-width="3" />
+                        <path id="score-circle" stroke-dasharray="0, 100" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" fill="none" stroke="#2563eb" stroke-width="3" />
+                    </svg>
+                    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2">
+                        <span id="final-score-percent" class="text-2xl font-bold text-gray-800">0%</span>
+                    </div>
+                </div>
+            </div>
             
-            <div id="reviewContainer" class="mt-8 space-y-6 max-h-96 overflow-y-auto p-4 bg-gray-50 rounded-lg">
-                <!-- Review content will be dynamically inserted here -->
+            <h2 class="text-3xl font-bold text-gray-800 mb-2">Quiz Completed!</h2>
+            <p class="text-gray-600 mb-8">You scored <span id="final-score" class="font-bold text-blue-600">0</span> out of 30</p>
+
+            <div class="grid grid-cols-2 gap-4 mb-8">
+                <div class="bg-green-50 p-4 rounded-lg">
+                    <div class="text-green-600 text-sm font-semibold uppercase">Correct</div>
+                    <div id="total-correct" class="text-2xl font-bold text-green-700">0</div>
+                </div>
+                <div class="bg-red-50 p-4 rounded-lg">
+                    <div class="text-red-600 text-sm font-semibold uppercase">Incorrect</div>
+                    <div id="total-wrong" class="text-2xl font-bold text-red-700">0</div>
+                </div>
             </div>
 
-            <button id="restartBtn" class="mt-8 w-full flex justify-center py-3 px-4 border border-transparent rounded-md shadow-sm text-lg font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                Try Again
+            <button onclick="restartQuiz()" class="bg-gray-800 hover:bg-gray-900 text-white font-semibold py-3 px-8 rounded-lg shadow-lg transition w-full">
+                Play Again
             </button>
         </div>
+
     </div>
 
     <script>
-        // --- Quiz Data ---
-        // This JSON data is parsed from your provided file.
-        const quizData = [
-            { "question": "What does CPU stand for?", "hint": "This component is often called the 'brain' of the computer.", "answerOptions": [ { "text": "Central Processing Unit", "isCorrect": true, "rationale": "This is the correct acronym, representing the 'brain' of the computer that executes instructions." }, { "text": "Computer Personal Unit", "isCorrect": false, "rationale": "While it is personal to the computer, this is not the correct term for the component." }, { "text": "Central Power Unit", "isCorrect": false, "rationale": "This might be confused with the Power Supply Unit (PSU), which provides power, but it's not the CPU." }, { "text": "Computer Processing Unit", "isCorrect": false, "rationale": "This is very close, but the standard and correct term is 'Central Processing Unit'." } ] },
-            { "question": "Which part of the CPU performs mathematical and logical operations?", "hint": "The name of this component literally describes what it does.", "answerOptions": [ { "text": "Control Unit (CU)", "isCorrect": false, "rationale": "The Control Unit directs the flow of operations, but it doesn't perform the calculations itself." }, { "text": "Arithmetic Logic Unit (ALU)", "isCorrect": true, "rationale": "The name 'Arithmetic Logic Unit' directly describes its function of performing calculations and comparisons." }, { "text": "Random Access Memory (RAM)", "isCorrect": false, "rationale": "RAM is a type of memory used for temporary storage, not for processing or calculations." }, { "text": "Register", "isCorrect": false, "rationale": "Registers are small, fast storage locations within the CPU, but the ALU is the component that performs the operations." } ] },
-            { "question": "What type of memory is volatile, meaning its contents are lost when the power is turned off?", "hint": "This is the main 'working' memory of the computer, used for currently running applications.", "answerOptions": [ { "text": "ROM (Read-Only Memory)", "isCorrect": false, "rationale": "ROM is non-volatile; it's designed to keep its data (like startup instructions) even when powered off." }, { "text": "SSD (Solid-State Drive)", "isCorrect": false, "rationale": "SSDs are non-volatile storage devices, designed to hold data permanently until erased." }, { "text": "HDD (Hard Disk Drive)", "isCorrect": false, "rationale": "HDDs are non-volatile storage devices that use magnetic platters to store data permanently." }, { "text": "RAM (Random Access Memory)", "isCorrect": true, "rationale": "RAM is the computer's temporary 'workbench' and requires power to maintain the data it holds." } ] },
-            { "question": "Which component stores the computer's startup instructions, known as the BIOS or UEFI?", "hint": "This type of memory is 'Read-Only' because these critical instructions shouldn't be easily changed.", "answerOptions": [ { "text": "RAM (Random Access Memory)", "isCorrect": false, "rationale": "RAM is volatile and empty when the computer first starts up." }, { "text": "CPU (Central Processing Unit)", "isCorrect": false, "rationale": "The CPU reads and executes the startup instructions, but it doesn't store them permanently." }, { "text": "ROM (Read-Only Memory)", "isCorrect": true, "rationale": "ROM is non-volatile and designed to hold permanent instructions needed to boot the computer." }, { "text": "SSD (Solid-State Drive)", "isCorrect": false, "rationale": "The operating system is stored on the SSD/HDD, but the most basic startup instructions are in ROM." } ] },
-            { "question": "What is the main difference between an HDD and an SSD?", "hint": "One of these storage types is much faster and more durable because it's more like a large USB drive.", "answerOptions": [ { "text": "HDDs are volatile, SSDs are non-volatile.", "isCorrect": false, "rationale": "Both HDDs and SSDs are non-volatile storage; they both store data permanently without power." }, { "text": "HDDs use flash memory, SSDs use magnetic disks.", "isCorrect": false, "rationale": "This is reversed. SSDs use flash memory, while HDDs use spinning magnetic disks." }, { "text": "HDDs have moving parts, while SSDs do not.", "isCorrect": true, "rationale": "HDDs use spinning platters and a read/write arm, whereas SSDs use electronic chips (flash memory)." }, { "text": "HDDs are faster than SSDs.", "isCorrect": false, "rationale": "This is incorrect. SSDs are significantly faster than HDDs because they have no moving parts." } ] },
-            { "question": "A keyboard is an example of what type of device?", "hint": "Are you sending data *to* the computer or receiving data *from* it when you use this item?", "answerOptions": [ { "text": "Input Device", "isCorrect": true, "rationale": "A keyboard sends data (your keystrokes) *into* the computer." }, { "text": "Output Device", "isCorrect": false, "rationale": "An output device receives data *from* the computer, like a monitor displaying an image." }, { "text": "Storage Device", "isCorrect": false, "rationale": "A storage device (like a hard drive) is used to save and hold data for long periods." }, { "text": "Processing Device", "isCorrect": false, "rationale": "A processing device (like the CPU) performs calculations and executes instructions." } ] },
-            { "question": "A monitor is an example of what type of device?", "hint": "Is the device showing you information *from* the computer?", "answerOptions": [ { "text": "Input Device", "isCorrect": false, "rationale": "An input device sends data *to* the computer (e.g., a mouse). A monitor displays data *from* the computer." }, { "text": "Output Device", "isCorrect": true, "rationale": "A monitor receives data (the visual signal) from the computer and displays it *out* to the user." }, { "text": "Storage Device", "isCorrect": false, "rationale": "A storage device holds files and data; a monitor only displays them." }, { "text": "Processing Device", "isCorrect": false, "rationale": "The CPU and GPU are processing devices; a monitor is for display." } ] },
-            { "question": "What is the main circuit board that connects all computer components?", "hint": "This component is like the 'mother' that holds all the other components.", "answerOptions": [ { "text": "CPU (Central Processing Unit)", "isCorrect": false, "rationale": "The CPU is a component that plugs *into* the main circuit board." }, { "text": "PSU (Power Supply Unit)", "isCorrect": false, "rationale": "The PSU supplies power to all components, but it doesn't connect them for data transfer." }, { "text": "Motherboard", "isCorrect": true, "rationale": "The motherboard acts as the central hub or 'nervous system' that all other parts plug into." }, { "text": "Sound Card", "isCorrect": false, "rationale": "A sound card is an expansion card that plugs into the motherboard; it is not the main board itself." } ] },
-            { "question": "Which of these is NOT an input device?", "hint": "Three of these send data *to* the computer. One of them produces a physical result *from* the computer's data.", "answerOptions": [ { "text": "Mouse", "isCorrect": false, "rationale": "A mouse sends movement and click data *into* the computer." }, { "text": "Keyboard", "isCorrect": false, "rationale": "A keyboard sends keystroke data *into* the computer." }, { "text": "Scanner", "isCorrect": false, "rationale": "A scanner converts a physical document into digital data and sends it *into* the computer." }, { "text": "Printer", "isCorrect": true, "rationale": "A printer takes digital data *from* the computer and creates a physical copy (output)." } ] },
-            { "question": "Which of these is NOT an output device?", "hint": "Three of these present information *to* you. One of them captures information *from* you.", "answerOptions": [ { "text": "Monitor", "isCorrect": false, "rationale": "A monitor displays visual information *from* the computer." }, { "text": "Speakers", "isCorrect": false, "rationale": "Speakers play audio data *from* the computer." }, { "text": "Microphone", "isCorrect": true, "rationale": "A microphone captures audio and sends it *into* the computer." }, { "text": "Projector", "isCorrect": false, "rationale": "A projector displays visual information *from* the computer onto a surface." } ] },
-            { "question": "What is the decimal number system also known as?", "hint": "Think about how many unique digits (0-9) are used in this system.", "answerOptions": [ { "text": "Base-2", "isCorrect": false, "rationale": "Base-2 is the binary number system, which uses only two digits (0 and 1)." }, { "text": "Base-10", "isCorrect": true, "rationale": "The decimal system uses ten digits (0, 1, 2, 3, 4, 5, 6, 7, 8, 9). 'Deci-' means ten." }, { "text": "Base-16", "isCorrect": false, "rationale": "Base-16 is the hexadecimal number system, which uses 16 symbols (0-9, A-F)." }, { "text": "Base-8", "isCorrect": false, "rationale": "Base-8 is the octal number system, which uses eight digits (0-7)." } ] },
-            { "question": "What is a single binary digit (a 0 or a 1) called?", "hint": "The name is a contraction of 'Binary Digit'.", "answerOptions": [ { "text": "Byte", "isCorrect": false, "rationale": "A byte is a group of 8 bits." }, { "text": "Bit", "isCorrect": true, "rationale": "This is the correct term, short for 'Binary Digit'." }, { "text": "Nibble", "isCorrect": false, "rationale": "A nibble is a group of 4 bits." }, { "text": "Word", "isCorrect": false, "rationale": "A 'word' is a larger unit of data, often 16, 32, or 64 bits, depending on the computer's architecture." } ] },
-            { "question": "How many bits are in one byte?", "hint": "This is a standard unit of data measurement in computing.", "answerOptions": [ { "text": "2", "isCorrect": false, "rationale": "2 is the number of digits in the binary system, not the number of bits in a byte." }, { "text": "4", "isCorrect": false, "rationale": "4 bits are known as a nibble." }, { "text": "8", "isCorrect": true, "rationale": "This is the standard definition of a byte." }, { "text": "16", "isCorrect": false, "rationale": "16 bits are often referred to as a 'word', but not a byte." } ] },
-            { "question": "What is the decimal value of the binary number 1011?", "hint": "Read from right to left, the place values are 1, 2, 4, 8. Add the values where there is a '1'.", "answerOptions": [ { "text": "5", "isCorrect": false, "rationale": "This might be from adding 1+0+1+1 (4) or a miscalculation. Remember place values: 8, 4, 2, 1." }, { "text": "11", "isCorrect": true, "rationale": "This is correct. (1 * 8) + (0 * 4) + (1 * 2) + (1 * 1) = 8 + 0 + 2 + 1 = 11." }, { "text": "13", "isCorrect": false, "rationale": "This would be 1101, not 1011. (1*8) + (1*4) + (0*2) + (1*1) = 13." }, { "text": "10", "isCorrect": false, "rationale": "This would be 1010. (1*8) + (0*4) + (1*2) + (0*1) = 10." } ] },
-            { "question": "What is the decimal value of the binary number 1001?", "hint": "The place values are (from right to left) 1, 2, 4, 8. Sum the values that have a '1'.", "answerOptions": [ { "text": "9", "isCorrect": true, "rationale": "This is correct. (1 * 8) + (0 * 4) + (0 * 2) + (1 * 1) = 8 + 0 + 0 + 1 = 9." }, { "text": "7", "isCorrect": false, "rationale": "7 in binary is 0111." }, { "text": "3", "isCorrect": false, "rationale": "3 in binary is 0011." }, { "text": "1001", "isCorrect": false, "rationale": "This is the binary number itself, not its decimal equivalent." } ] },
-            { "question": "What is the binary representation of the decimal number 10?", "hint": "Find the combination of 8, 4, 2, and 1 that adds up to 10.", "answerOptions": [ { "text": "1010", "isCorrect": true, "rationale": "This is correct. This represents (1 * 8) + (0 * 4) + (1 * 2) + (0 * 1) = 8 + 2 = 10." }, { "text": "1100", "isCorrect": false, "rationale": "This is (1 * 8) + (1 * 4) + (0 * 2) + (0 * 1) = 12." }, { "text": "1001", "isCorrect": false, "rationale": "This is (1 * 8) + (0 * 4) + (0 * 2) + (1 * 1) = 9." }, { "text": "0101", "isCorrect": false, "rationale": "This is (0 * 8) + (1 * 4) + (0 * 2) + (1 * 1) = 5." } ] },
-            { "question": "What is the binary representation of the decimal number 5?", "hint": "Which place values from 4, 2, and 1 do you need to add together to get 5?", "answerOptions": [ { "text": "101", "isCorrect": true, "rationale": "This is correct. This represents (1 * 4) + (0 * 2) + (1 * 1) = 4 + 1 = 5." }, { "text": "110", "isCorrect": false, "rationale": "This is (1 * 4) + (1 * 2) + (0 * 1) = 6." }, { "text": "011", "isCorrect": false, "rationale": "This is (0 * 4) + (1 * 2) + (1 * 1) = 3." }, { "text": "100", "isCorrect": false, "rationale": "This is (1 * 4) + (0 * 2) + (0 * 1) = 4." } ] },
-            { "question": "What number system is Base-16?", "hint": "This system uses the letters A-F in addition to the digits 0-9.", "answerOptions": [ { "text": "Decimal", "isCorrect": false, "rationale": "Decimal is Base-10 (using digits 0-9)." }, { "text": "Binary", "isCorrect": false, "rationale": "Binary is Base-2 (using digits 0-1)." }, { "text": "Octal", "isCorrect": false, "rationale": "Octal is Base-8 (using digits 0-7)." }, { "text": "Hexadecimal", "isCorrect": true, "rationale": "Hexadecimal is Base-16, using 16 symbols (0-9 and A-F). 'Hexa-' means 6 and 'deci-' means 10." } ] },
-            { "question": "In hexadecimal, what decimal value does the letter 'A' represent?", "hint": "Counting in hexadecimal goes ... 8, 9, A, B, C...", "answerOptions": [ { "text": "10", "isCorrect": true, "rationale": "Hexadecimal uses 0-9, and then A, B, C... to represent 10, 11, 12... 'A' is the first letter, so it represents 10." }, { "text": "1", "isCorrect": false, "rationale": "1 is represented by the digit '1'. 'A' is used after '9'." }, { "text": "15", "isCorrect": false, "rationale": "15 is represented by the letter 'F' in hexadecimal." }, { "text": "16", "isCorrect": false, "rationale": "16 is the base of the system, not a single digit. It would be represented as '10' in hexadecimal (1*16 + 0*1)." } ] },
-            { "question": "In hexadecimal, what decimal value does the letter 'F' represent?", "hint": "This is the highest value that can be represented by a single hexadecimal digit.", "answerOptions": [ { "text": "10", "isCorrect": false, "rationale": "10 is represented by the letter 'A'." }, { "text": "16", "isCorrect": false, "rationale": "16 is the base. The digits go from 0 up to (Base - 1)." }, { "text": "15", "isCorrect": true, "rationale": "This is correct. 'F' is the last single digit in the hexadecimal system, representing the value 15." }, { "text": "6", "isCorrect": false, "rationale": "6 is represented by the digit '6'." } ] },
-            { "question": "What is the decimal value of the hexadecimal number 1A?", "hint": "The place values (right to left) are 1s and 16s. Remember that 'A' is 10.", "answerOptions": [ { "text": "10", "isCorrect": false, "rationale": "'A' alone is 10, but this number also has a '1' in the 16s place." }, { "text": "11", "isCorrect": false, "rationale": "11 would be represented as 'B' in hexadecimal." }, { "text": "26", "isCorrect": true, "rationale": "This is correct. (1 * 16) + (A * 1) = (1 * 16) + (10 * 1) = 16 + 10 = 26." }, { "text": "32", "isCorrect": false, "rationale": "32 would be '20' in hexadecimal (2 * 16 + 0 * 1)." } ] },
-            { "question": "What is the decimal value of the hexadecimal number 2B?", "hint": "Multiply the '2' by 16 and add the value of 'B'. 'B' comes after 'A'.", "answerOptions": [ { "text": "211", "isCorrect": false, "rationale": "This would be if you read '2' and 'B' (11) as decimal digits, which is incorrect." }, { "text": "43", "isCorrect": true, "rationale": "This is correct. (2 * 16) + (B * 1) = (2 * 16) + (11 * 1) = 32 + 11 = 43." }, { "text": "13", "isCorrect": false, "rationale": "13 is represented as 'D' in hexadecimal." }, { "text": "34", "isCorrect": false, "rationale": "This might be from reversing the digits or a miscalculation. (2*16) is 32, and B is 11." } ] },
-            { "question": "What is the hexadecimal representation of the decimal number 15?", "hint": "This value is represented by the last letter used in the hexadecimal system.", "answerOptions": [ { "text": "15", "isCorrect": false, "rationale": "This is the decimal value. In hexadecimal, values 10-15 are represented by letters." }, { "text": "F", "isCorrect": true, "rationale": "This is correct. 'F' is the hexadecimal digit that represents the decimal value 15." }, { "text": "E", "isCorrect": false, "rationale": "'E' represents the decimal value 14." }, { "text": "10", "isCorrect": false, "rationale": "'10' in hexadecimal would be (1 * 16) + (0 * 1), which is 16 in decimal." } ] },
-            { "question": "What is the hexadecimal representation of the decimal number 30?", "hint": "How many times does 16 go into 30, and what is the remainder? The remainder will be a letter.", "answerOptions": [ { "text": "30", "isCorrect": false, "rationale": "This is the decimal representation." }, { "text": "2A", "isCorrect": false, "rationale": "This would be (2 * 16) + (10 * 1) = 32 + 10 = 42." }, { "text": "1E", "isCorrect": true, "rationale": "This is correct. 30 divided by 16 is 1 with a remainder of 14. 1 is '1', 14 is 'E'." }, { "text": "F0", "isCorrect": false, "rationale": "This would be (15 * 16) + (0 * 1) = 240." } ] },
-            { "question": "Which port is commonly used to connect monitors and displays, carrying digital video and audio?", "hint": "This port's acronym includes 'High-Definition' and 'Multimedia'.", "answerOptions": [ { "text": "USB (Universal Serial Bus)", "isCorrect": false, "rationale": "While some displays can connect via USB-C, the most common dedicated display port is HDMI or DisplayPort." }, { "text": "Ethernet (RJ45)", "isCorrect": false, "rationale": "Ethernet ports are used for wired network connections (internet)." }, { "text": "HDMI (High-Definition Multimedia Interface)", "isCorrect": true, "rationale": "This is a very common standard for connecting displays, TVs, and projectors, carrying both video and audio." }, { "text": "Audio Jack (3.5mm)", "isCorrect": false, "rationale": "This port is used for audio only (headphones or speakers), not video." } ] },
-            { "question": "What does RAM stand for?", "hint": "This type of memory allows the CPU to access any part of it directly, not just in sequence.", "answerOptions": [ { "text": "Read-Only Memory", "isCorrect": false, "rationale": "This is ROM. RAM is different because it can be both read from and written to easily." }, { "text": "Random Access Memory", "isCorrect": true, "rationale": "This is the correct acronym. 'Random Access' means any part of the memory can be accessed directly." }, { "text": "Real-time Access Memory", "isCorrect": false, "rationale": "While access is very fast (near real-time), this is not what the acronym stands for." }, { "text": "Read and Modify", "isCorrect": false, "rationale": "This describes a function of RAM (it can be read and modified), but it's not the correct name." } ] },
-            { "question": "The speed of a CPU is typically measured in...?", "hint": "This unit measures frequency, or cycles per second.", "answerOptions": [ { "text": "Gigabytes (GB)", "isCorrect": false, "rationale": "Gigabytes are a measure of storage capacity (like in RAM or an SSD)." }, { "text": "Gigahertz (GHz)", "isCorrect": true, "rationale": "This measures the clock speed, or how many cycles (instructions) the CPU can perform per second." }, { "text": "Watts (W)", "isCorrect": false, "rationale": "Watts measure power consumption, not processing speed." }, { "text": "Megabits per second (Mbps)", "isCorrect": false, "rationale": "Mbps is a measure of data transfer speed, typically used for internet connections." } ] },
-            { "question": "Which of these is a non-volatile storage device?", "hint": "Which of these devices is used to store your files, applications, and operating system permanently?", "answerOptions": [ { "text": "RAM", "isCorrect": false, "rationale": "RAM is volatile; it loses its data when the power is off." }, { "text": "CPU Cache", "isCorrect": false, "rationale": "CPU cache is a type of very fast, volatile memory inside the CPU." }, { "text": "SSD", "isCorrect": true, "rationale": "A Solid-State Drive is non-volatile, meaning it stores data permanently without power." }, { "text": "Registers", "isCorrect": false, "rationale": "Registers are small, volatile memory locations inside the CPU." } ] },
-            { "question": "What is the decimal number 8 in binary?", "hint": "You need to use the 8s place value in binary.", "answerOptions": [ { "text": "1000", "isCorrect": true, "rationale": "This is correct. This represents (1 * 8) + (0 * 4) + (0 * 2) + (0 * 1) = 8." }, { "text": "0100", "isCorrect": false, "rationale": "This represents (0 * 8) + (1 * 4) + (0 * 2) + (0 * 1) = 4." }, { "text": "1100", "isCorrect": false, "rationale": "This represents (1 * 8) + (1 * 4) + (0 * 2) + (0 * 1) = 12." }, { "text": "1001", "isCorrect": false, "rationale": "This represents (1 * 8) + (0 * 4) + (0 * 2) + (1 * 1) = 9." } ] },
-            { "question": "What is the decimal number 13 in binary?", "hint": "Which combination of 8, 4, 2, and 1 adds up to 13?", "answerOptions": [ { "text": "1011", "isCorrect": false, "rationale": "This is (1 * 8) + (0 * 4) + (1 * 2) + (1 * 1) = 8 + 2 + 1 = 11." }, { "text": "1110", "isCorrect": false, "rationale": "This is (1 * 8) + (1 * 4) + (1 * 2) + (0 * 1) = 8 + 4 + 2 = 14." }, { "text": "1101", "isCorrect": true, "rationale": "This is correct. This represents (1 * 8) + (1 * 4) + (0 * 2) + (1 * 1) = 8 + 4 + 1 = 13." }, { "text": "1001", "isCorrect": false, "rationale": "This is (1 * 8) + (0 * 4) + (0 * 2) + (1 * 1) = 9." } ] },
-            { "question": "What is the decimal value of the binary number 1111?", "hint": "This is the largest value you can represent with 4 bits. Add 8 + 4 + 2 + 1.", "answerOptions": [ { "text": "16", "isCorrect": false, "rationale": "16 would be 10000 in binary." }, { "text": "15", "isCorrect": true, "rationale": "This is correct. (1 * 8) + (1 * 4) + (1 * 2) + (1 * 1) = 8 + 4 + 2 + 1 = 15." }, { "text": "14", "isCorrect": false, "rationale": "14 would be 1110 in binary." }, { "text": "7", "isCorrect": false, "rationale": "7 would be 0111 in binary." } ] },
-            { "question": "What is the decimal value of the binary number 0110?", "hint": "Add the values for the 4s place and the 2s place.", "answerOptions": [ { "text": "5", "isCorrect": false, "rationale": "5 would be 0101 in binary." }, { "text": "6", "isCorrect": true, "rationale": "This is correct. (0 * 8) + (1 * 4) + (1 * 2) + (0 * 1) = 4 + 2 = 6." }, { "text": "12", "isCorrect": false, "rationale": "12 would be 1100 in binary." }, { "text": "3", "isCorrect": false, "rationale": "3 would be 0011 in binary." } ] },
-            { "question": "What is the binary number 1101 in hexadecimal?", "hint": "First, convert the 4-bit binary number 1101 to decimal. Then, find the corresponding hexadecimal letter.", "answerOptions": [ { "text": "B", "isCorrect": false, "rationale": "'B' is 11 in decimal, which is 1011 in binary." }, { "text": "C", "isCorrect": false, "rationale": "'C' is 12 in decimal. 1101 is (8 + 4 + 1) = 13 in decimal." }, { "text": "D", "isCorrect": true, "rationale": "This is correct. 1101 in binary is (8 + 4 + 1) = 13 in decimal. 'D' represents 13 in hexadecimal." }, { "text": "E", "isCorrect": false, "rationale": "'E' is 14 in decimal, which is 1110 in binary." } ] },
-            { "question": "What is the binary number 1010 in hexadecimal?", "hint": "Convert the binary number 1010 to decimal. What is the hexadecimal symbol for that decimal value?", "answerOptions": [ { "text": "A", "isCorrect": true, "rationale": "This is correct. 1010 in binary is (8 + 2) = 10 in decimal. 'A' represents 10 in hexadecimal." }, { "text": "B", "isCorrect": false, "rationale": "'B' is 11 in decimal, which is 1011 in binary." }, { "text": "C", "isCorrect": false, "rationale": "'C' is 12 in decimal, which is 1100 in binary." }, { "text": "10", "isCorrect": false, "rationale": "This is the decimal value, but it's represented by the letter 'A' in hexadecimal." } ] },
-            { "question": "What is the hexadecimal letter 'C' in 4-bit binary?", "hint": "The letter 'C' represents the decimal value 12. How do you make 12 using 8, 4, 2, and 1?", "answerOptions": [ { "text": "1010", "isCorrect": false, "rationale": "1010 is (8 + 2) = 10, which is 'A' in hexadecimal." }, { "text": "1011", "isCorrect": false, "rationale": "1011 is (8 + 2 + 1) = 11, which is 'B' in hexadecimal." }, { "text": "1100", "isCorrect": true, "rationale": "This is correct. 'C' is 12 in decimal, which is (8 + 4) in binary." }, { "text": "1101", "isCorrect": false, "rationale": "1101 is (8 + 4 + 1) = 13, which is 'D' in hexadecimal." } ] },
-            { "question": "What is the hexadecimal letter 'E' in 4-bit binary?", "hint": "'E' is the decimal value 14. Find the binary combination for 8 + 4 + 2.", "answerOptions": [ { "text": "1110", "isCorrect": true, "rationale": "This is correct. 'E' is 14 in decimal, which is (8 + 4 + 2) in binary." }, { "text": "1101", "isCorrect": false, "rationale": "1101 is (8 + 4 + 1) = 13, which is 'D' in hexadecimal." }, { "text": "1111", "isCorrect": false, "rationale": "1111 is (8 + 4 + 2 + 1) = 15, which is 'F' in hexadecimal." }, { "text": "1011", "isCorrect": false, "rationale": "1011 is (8 + 2 + 1) = 11, which is 'B' in hexadecimal." } ] },
-            { "question": "What is the decimal number 255 in hexadecimal?", "hint": "This is the largest value you can represent with 8 bits (1111 1111). What is this in hexadecimal?", "answerOptions": [ { "text": "FE", "isCorrect": false, "rationale": "'FE' would be (15 * 16) + (14 * 1) = 240 + 14 = 254." }, { "text": "FF", "isCorrect": true, "rationale": "This is correct. (15 * 16) + (15 * 1) = 240 + 15 = 255. This is the largest value for a two-digit hex number." }, { "text": "100", "isCorrect": false, "rationale": "'100' in hex would be (1 * 16^2) = 256 in decimal." }, { "text": "99", "isCorrect": false, "rationale": "'99' in hex would be (9 * 16) + (9 * 1) = 144 + 9 = 153." } ] },
-            { "question": "What is the decimal value of the hexadecimal number 100?", "hint": "The place values in hex, from right to left, are $16^0$, $16^1$, $16^2$, etc.", "answerOptions": [ { "text": "16", "isCorrect": false, "rationale": "16 is '10' in hexadecimal." }, { "text": "100", "isCorrect": false, "rationale": "This is the decimal value 100, which is '64' in hexadecimal." }, { "text": "256", "isCorrect": true, "rationale": "This is correct. The place values are 1s, 16s, and 256s (16*16). So, (1 * 256) + (0 * 16) + (0 * 1) = 256." }, { "text": "10", "isCorrect": false, "rationale": "10 is 'A' in hexadecimal." } ] },
-            { "question": "Which component is often called the 'backbone' of the computer, connecting everything?", "hint": "This component's name suggests it's the primary board everything else attaches to.", "answerOptions": [ { "text": "CPU", "isCorrect": false, "rationale": "The CPU is the 'brain', but it plugs into the 'backbone'." }, { "text": "Motherboard", "isCorrect": true, "rationale": "This is correct, as it provides the foundation and connections for all other components." }, { "text": "Power Supply", "isCorrect": false, "rationale": "The power supply provides 'life' (electricity), but not the data connections." }, { "text": "Hard Drive", "isCorrect": false, "rationale": "The hard drive is for storage; it's a component that connects to the main board." } ] },
-            { "question": "A USB port is an example of...?", "hint": "This is the physical socket you plug a flash drive or mouse cable into.", "answerOptions": [ { "text": "A processing unit", "isCorrect": false, "rationale": "A processing unit is the CPU. A USB port is for connection." }, { "text": "A storage device", "isCorrect": false, "rationale": "A USB flash drive is a storage device, but the *port* is the connector itself." }, { "text": "An interface/port", "isCorrect": true, "rationale": "This is correct. It's a physical interface used to connect peripheral devices to the computer." }, { "text": "A type of memory", "isCorrect": false, "rationale": "RAM and ROM are types of memory. A USB port is a physical connection point." } ] },
-            { "question": "What does a 'bus' in a computer do?", "hint": "Think of a city bus, which transports people from one place to another. A computer bus transports...", "answerOptions": [ { "text": "Powers the computer", "isCorrect": false, "rationale": "That is the job of the Power Supply Unit (PSU)." }, { "text": "Transfers data between components", "isCorrect": true, "rationale": "This is correct. A bus is a communication pathway on the motherboard for data and control signals." }, { "text": "Stores startup instructions", "isCorrect": false, "rationale": "That is the job of the ROM." }, { "text": "Performs calculations", "isCorrect": false, "rationale": "That is the job of the CPU's Arithmetic Logic Unit (ALU)." } ] },
-            { "question": "Which of these is a permanent, non-volatile storage technology?", "hint": "Which of these is used to store your operating system and files even when the computer is off?", "answerOptions": [ { "text": "RAM", "isCorrect": false, "rationale": "RAM is volatile; data is lost when power is off." }, { "text": "HDD", "isCorrect": true, "rationale": "A Hard Disk Drive stores data magnetically, which is permanent (non-volatile)." }, { "text": "CPU Cache", "isCorrect": false, "rationale": "CPU Cache is extremely fast but volatile memory." }, { "text": "ALU", "isCorrect": false, "rationale": "The ALU is a processing component within the CPU, not a storage device." } ] },
-            { "question": "How many unique digits does the Binary system use?", "hint": "The prefix 'bi-' gives a clue to the answer.", "answerOptions": [ { "text": "10", "isCorrect": false, "rationale": "10 digits (0-9) are used by the Decimal system." }, { "text": "16", "isCorrect": false, "rationale": "16 symbols (0-9, A-F) are used by the Hexadecimal system." }, { "text": "2", "isCorrect": true, "rationale": "This is correct. The binary system uses only two digits: 0 and 1. 'Bi-' means two." }, { "text": "8", "isCorrect": false, "rationale": "8 digits (0-7) are used by the Octal system." } ] },
-            { "question": "What is the decimal number 16 in hexadecimal?", "hint": "This number is the base of the hexadecimal system. How is the base value represented in any number system?", "answerOptions": [ { "text": "16", "isCorrect": false, "rationale": "This is the decimal representation. In hex, '16' would mean (1*16) + (6*1) = 22." }, { "text": "F", "isCorrect": false, "rationale": "'F' represents the decimal value 15." }, { "text": "G", "isCorrect": false, "rationale": "'G' is not a valid hexadecimal digit. The digits only go up to 'F'." }, { "text": "10", "isCorrect": true, "rationale": "This is correct. It represents (1 * 16) + (0 * 1) = 16." } ] },
-            { "question": "What is the decimal number 2 in binary?", "hint": "You need to use the 2s place value.", "answerOptions": [ { "text": "10", "isCorrect": true, "rationale": "This is correct. This represents (1 * 2) + (0 * 1) = 2." }, { "text": "11", "isCorrect": false, "rationale": "This represents (1 * 2) + (1 * 1) = 3." }, { "text": "01", "isCorrect": false, "rationale": "This represents (0 * 2) + (1 * 1) = 1." }, { "text": "100", "isCorrect": false, "rationale": "This represents (1 * 4) + (0 * 2) + (0 * 1) = 4." } ] },
-            { "question": "What is the decimal value of the binary number 1100?", "hint": "Sum the 8s place and the 4s place.", "answerOptions": [ { "text": "6", "isCorrect": false, "rationale": "6 would be 0110 in binary." }, { "text": "10", "isCorrect": false, "rationale": "10 would be 1010 in binary." }, { "text": "12", "isCorrect": true, "rationale": "This is correct. (1 * 8) + (1 * 4) + (0 * 2) + (0 * 1) = 8 + 4 = 12." }, { "text": "3", "isCorrect": false, "rationale": "3 would be 0011 in binary." } ] },
-            { "question": "What is the binary number 1111 1010 in hexadecimal?", "hint": "Break the 8-bit number into two 4-bit groups (1111 and 1010) and convert each group to its hex equivalent.", "answerOptions": [ { "text": "FA", "isCorrect": true, "rationale": "This is correct. '1111' is (8+4+2+1) = 15 = 'F'. '1010' is (8+2) = 10 = 'A'." }, { "text": "AF", "isCorrect": false, "rationale": "This reverses the two groups (nibbles). '1111' is the first group, '1010' is the second." }, { "text": "E9", "isCorrect": false, "rationale": "'E' is 1110 and '9' is 1001." }, { "text": "F9", "isCorrect": false, "rationale": "'F' is 1111, but '9' is 1001, not 1010." } ] },
-            { "question": "What is the hexadecimal number 3C in binary?", "hint": "Convert the '3' into 4-bit binary, and then convert the 'C' (which is 12) into 4-bit binary.", "answerOptions": [ { "text": "0011 1010", "isCorrect": false, "rationale": "'3' is 0011, but 'C' (12) is 1100, not 1010 ('A')." }, { "text": "0011 1100", "isCorrect": true, "rationale": "This is correct. '3' converts to '0011' and 'C' (which is 12) converts to '1100'." }, { "text": "0010 1101", "isCorrect": false, "rationale": "'3' is 0011, not 0010 ('2'). 'C' is 1100, not 1101 ('D')." }, { "text": "1100 0011", "isCorrect": false, "rationale": "This reverses the two digits. This would be 'C3' in hex." } ] },
-            { "question": "The component that provides power to all other components in the computer is the...?", "hint": "This component's name literally describes its function of supplying power.", "answerOptions": [ { "text": "CPU (Central Processing Unit)", "isCorrect": false, "rationale": "The CPU consumes power, it doesn't provide it to other components." }, { "text": "Motherboard", "isCorrect": false, "rationale": "The motherboard distributes power, but it receives it from another component." }, { "text": "PSU (Power Supply Unit)", "isCorrect": true, "rationale": "This is correct. The PSU converts AC power from the wall outlet into DC power used by the computer parts." }, { "text": "RAM (Random Access Memory)", "isCorrect": false, "rationale": "RAM is a type of memory that consumes power." } ] },
-            { "question": "What does 'ROM' stand for?", "hint": "The name of this memory type describes its primary limitation: you can't easily *write* to it.", "answerOptions": [ { "text": "Random Order Memory", "isCorrect": false, "rationale": "This is not a standard term. 'RAM' is Random Access." }, { "text": "Read-Only Memory", "isCorrect": true, "rationale": "This is correct. Its data is permanent and (typically) cannot be easily changed, only read from." }, { "text": "Rapid On-board Memory", "isCorrect": false, "rationale": "While it is on-board, this is not what the acronym stands for." }, { "text": "Redirect-Only Memory", "isCorrect": false, "rationale": "This is not a correct term. Its primary function is storage, not redirection." } ] }
+        const questions = [
+            {
+                q: "What is a network topology?",
+                options: ["Physical layout of network", "Software used", "Speed of internet", "Type of cable"],
+                answer: 0
+            },
+            {
+                q: "Which topology has only one central cable?",
+                options: ["Star", "Bus", "Ring", "Mesh"],
+                answer: 1
+            },
+            {
+                q: "In which topology all computers are connected to a central device?",
+                options: ["Bus", "Ring", "Star", "Hybrid"],
+                answer: 2
+            },
+            {
+                q: "Which topology forms a closed loop?",
+                options: ["Bus", "Star", "Ring", "Mesh"],
+                answer: 2
+            },
+            {
+                q: "Which topology is most reliable?",
+                options: ["Bus", "Ring", "Star", "Mesh"],
+                answer: 3
+            },
+            {
+                q: "Which topology is cheapest?",
+                options: ["Bus", "Ring", "Star", "Mesh"],
+                answer: 0
+            },
+            {
+                q: "Which topology is used in LAN?",
+                options: ["Star", "Mesh", "Hybrid", "Ring"],
+                answer: 0
+            },
+            {
+                q: "In star topology, if the central hub fails, what happens?",
+                options: ["Network works fine", "Only one computer fails", "Whole network fails", "Speed increases"],
+                answer: 2
+            },
+            {
+                q: "Which topology has point-to-point connections?",
+                options: ["Bus", "Ring", "Star", "Mesh"],
+                answer: 3
+            },
+            {
+                q: "Ring topology uses which direction of data flow?",
+                options: ["Both directions", "Only clockwise", "One direction", "Random"],
+                answer: 2
+            },
+            {
+                q: "Which topology is difficult to troubleshoot?",
+                options: ["Star", "Bus", "Ring", "Mesh"],
+                answer: 3
+            },
+            {
+                q: "Which topology uses terminators?",
+                options: ["Star", "Ring", "Bus", "Mesh"],
+                answer: 2
+            },
+            {
+                q: "What is hybrid topology?",
+                options: ["Single topology", "Combination of two or more topologies", "Only wireless", "Only wired"],
+                answer: 1
+            },
+            {
+                q: "Which topology is best for large networks?",
+                options: ["Bus", "Ring", "Star", "Mesh"],
+                answer: 3
+            },
+            {
+                q: "Which topology is easy to install?",
+                options: ["Bus", "Ring", "Star", "Mesh"],
+                answer: 2
+            },
+            {
+                q: "In ring topology, if one node fails what happens?",
+                options: ["Whole network fails", "Nothing happens", "Speed increases", "Only hub fails"],
+                answer: 0
+            },
+            {
+                q: "Which topology requires less cable?",
+                options: ["Star", "Bus", "Mesh", "Ring"],
+                answer: 1
+            },
+            {
+                q: "Which is not a type of topology?",
+                options: ["Bus", "Ring", "Tree", "Modem"],
+                answer: 3
+            },
+            {
+                q: "Which topology is used in telephone exchange?",
+                options: ["Bus", "Ring", "Star", "Mesh"],
+                answer: 2
+            },
+            {
+                q: "Which topology has high data redundancy?",
+                options: ["Bus", "Ring", "Star", "Mesh"],
+                answer: 3
+            },
+            {
+                q: "Which topology is most secure?",
+                options: ["Bus", "Ring", "Star", "Mesh"],
+                answer: 3
+            },
+            {
+                q: "Which topology uses token passing?",
+                options: ["Bus", "Ring", "Star", "Tree"],
+                answer: 1
+            },
+            {
+                q: "Which topology is flexible for expansion?",
+                options: ["Bus", "Ring", "Star", "Mesh"],
+                answer: 2
+            },
+            {
+                q: "Which device is mainly used in star topology?",
+                options: ["Hub", "Router", "Switch", "Bridge"],
+                answer: 0
+            },
+            {
+                q: "Which topology connects each node to every other node?",
+                options: ["Star", "Bus", "Mesh", "Ring"],
+                answer: 2
+            },
+            {
+                q: "Tree topology is a combination of which topologies?",
+                options: ["Bus and Star", "Ring and Mesh", "Star and Ring", "Bus and Ring"],
+                answer: 0
+            },
+            {
+                q: "Which topology is not suitable for large networks?",
+                options: ["Bus", "Star", "Mesh", "Tree"],
+                answer: 0
+            },
+            {
+                q: "Which topology has collision problem?",
+                options: ["Star", "Bus", "Mesh", "Ring"],
+                answer: 1
+            },
+            {
+                q: "Which topology is used in modern Ethernet networks?",
+                options: ["Bus", "Ring", "Star", "Mesh"],
+                answer: 2
+            },
+            {
+                q: "Which topology provides best fault tolerance?",
+                options: ["Bus", "Ring", "Star", "Mesh"],
+                answer: 3
+            }
         ];
 
-        // --- DOM Elements ---
-        const tutorialSection = document.getElementById('tutorialSection');
-        const quizSection = document.getElementById('quizSection');
-        const resultsSection = document.getElementById('resultsSection');
-        
-        const startQuizBtn = document.getElementById('startQuizBtn');
-        const hintBtn = document.getElementById('hintBtn');
-        const nextBtn = document.getElementById('nextBtn');
-        const submitBtn = document.getElementById('submitBtn');
-        const restartBtn = document.getElementById('restartBtn');
-        
-        const questionCounter = document.getElementById('questionCounter');
-        const questionText = document.getElementById('questionText');
-        const answerOptions = document.getElementById('answerOptions');
-        const hintText = document.getElementById('hintText');
-        
-        const scoreText = document.getElementById('scoreText');
-        const reviewContainer = document.getElementById('reviewContainer');
-
-        // --- Quiz State ---
-        let currentQuestionIndex = 0;
-        let userAnswers = new Array(quizData.length).fill(null);
+        let currentQuestion = 0;
         let score = 0;
+        let selectedOption = null;
 
-        // --- Functions ---
-        
+        const startScreen = document.getElementById('start-screen');
+        const quizScreen = document.getElementById('quiz-screen');
+        const resultScreen = document.getElementById('result-screen');
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const progressBar = document.getElementById('progress-bar');
+        const currentQNum = document.getElementById('current-q-num');
+        const currentScoreSpan = document.getElementById('current-score');
+        const nextBtn = document.getElementById('next-btn');
+
         function startQuiz() {
-            tutorialSection.classList.add('hidden');
-            resultsSection.classList.add('hidden');
-            quizSection.classList.remove('hidden');
-            
-            currentQuestionIndex = 0;
-            userAnswers.fill(null);
+            startScreen.classList.add('hidden');
+            quizScreen.classList.remove('hidden');
+            quizScreen.classList.add('fade-in');
+            currentQuestion = 0;
             score = 0;
-            reviewContainer.innerHTML = '';
-            
-            displayQuestion(currentQuestionIndex);
+            loadQuestion();
         }
 
-        function displayQuestion(index) {
-            const question = quizData[index];
-            questionText.textContent = question.question;
-            questionCounter.textContent = `Question ${index + 1} of ${quizData.length}`;
+        function loadQuestion() {
+            const q = questions[currentQuestion];
+            questionText.textContent = `${currentQuestion + 1}. ${q.q}`;
+            optionsContainer.innerHTML = '';
             
-            answerOptions.innerHTML = '';
-            hintText.classList.add('hidden'); // Hide hint by default
-            hintText.textContent = `Hint: ${question.hint}`;
+            // Update UI stats
+            currentQNum.textContent = currentQuestion + 1;
+            const progress = ((currentQuestion) / questions.length) * 100;
+            progressBar.style.width = `${progress}%`;
+            
+            nextBtn.classList.add('hidden');
+            selectedOption = null;
 
-            question.answerOptions.forEach((option, i) => {
-                const isChecked = userAnswers[index] === i;
+            q.options.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = `option-btn w-full text-left p-4 rounded-xl border-2 border-gray-100 bg-white hover:border-blue-200 hover:bg-blue-50 text-gray-700 font-medium flex items-center gap-3`;
                 
-                answerOptions.innerHTML += `
-                    <label for="option${i}" class="flex items-center p-4 border rounded-lg cursor-pointer ${isChecked ? 'bg-indigo-100 border-indigo-400' : 'bg-white border-gray-300'} hover:bg-gray-50 transition-colors">
-                        <input type="radio" id="option${i}" name="answer" value="${i}" class="h-4 w-4 text-indigo-600 border-gray-300 focus:ring-indigo-500" ${isChecked ? 'checked' : ''}>
-                        <span class="ml-3 text-base text-gray-800">${option.text}</span>
-                    </label>
-                `;
+                // Option Label (A, B, C, D)
+                const label = document.createElement('span');
+                label.className = "w-8 h-8 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center text-sm font-bold flex-shrink-0";
+                label.textContent = String.fromCharCode(65 + index);
+                
+                const text = document.createElement('span');
+                text.textContent = opt;
+                
+                btn.appendChild(label);
+                btn.appendChild(text);
+                
+                btn.onclick = () => selectOption(index, btn, q.answer);
+                optionsContainer.appendChild(btn);
             });
-
-            // Add event listeners to new radio buttons
-            document.getElementsByName('answer').forEach(radio => {
-                radio.addEventListener('change', (e) => {
-                    userAnswers[currentQuestionIndex] = parseInt(e.target.value);
-                    // Re-render to show selection
-                    displayQuestion(currentQuestionIndex);
-                });
-            });
-
-            // Update button visibility
-            if (currentQuestionIndex === quizData.length - 1) {
-                nextBtn.classList.add('hidden');
-                submitBtn.classList.remove('hidden');
-            } else {
-                nextBtn.classList.remove('hidden');
-                submitBtn.classList.add('hidden');
-            }
         }
 
-        function showHint() {
-            hintText.classList.toggle('hidden');
+        function selectOption(selectedIndex, btn, correctIndex) {
+            if (selectedOption !== null) return; // Prevent multiple clicks
+            selectedOption = selectedIndex;
+
+            const buttons = optionsContainer.getElementsByTagName('button');
+
+            if (selectedIndex === correctIndex) {
+                score++;
+                currentScoreSpan.textContent = score;
+                btn.classList.remove('border-gray-100', 'bg-white', 'hover:border-blue-200', 'hover:bg-blue-50');
+                btn.classList.add('border-green-500', 'bg-green-50', 'text-green-800');
+                btn.querySelector('span:first-child').classList.replace('bg-gray-100', 'bg-green-200');
+                btn.querySelector('span:first-child').classList.replace('text-gray-500', 'text-green-700');
+                
+                // Add Checkmark
+                const icon = document.createElement('div');
+                icon.innerHTML = `<svg class="w-6 h-6 text-green-500 ml-auto" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"/></svg>`;
+                btn.appendChild(icon);
+            } else {
+                btn.classList.remove('border-gray-100', 'bg-white', 'hover:border-blue-200', 'hover:bg-blue-50');
+                btn.classList.add('border-red-500', 'bg-red-50', 'text-red-800');
+                btn.querySelector('span:first-child').classList.replace('bg-gray-100', 'bg-red-200');
+                btn.querySelector('span:first-child').classList.replace('text-gray-500', 'text-red-700');
+
+                // Highlight Correct Answer
+                const correctBtn = buttons[correctIndex];
+                correctBtn.classList.remove('border-gray-100', 'bg-white');
+                correctBtn.classList.add('border-green-500', 'bg-green-50', 'text-green-800');
+                correctBtn.querySelector('span:first-child').classList.replace('bg-gray-100', 'bg-green-200');
+                correctBtn.querySelector('span:first-child').classList.replace('text-gray-500', 'text-green-700');
+            }
+
+            // Disable all buttons
+            for (let button of buttons) {
+                button.disabled = true;
+                button.classList.add('cursor-default');
+            }
+
+            // Show Next Button
+            nextBtn.classList.remove('hidden');
+            
+            // Auto scroll to bottom on mobile to show next button
+            if(window.innerWidth < 640) {
+                quizScreen.querySelector('.overflow-y-auto').scrollTop = quizScreen.querySelector('.overflow-y-auto').scrollHeight;
+            }
         }
 
         function nextQuestion() {
-            if (currentQuestionIndex < quizData.length - 1) {
-                currentQuestionIndex++;
-                displayQuestion(currentQuestionIndex);
+            if (currentQuestion < questions.length - 1) {
+                currentQuestion++;
+                loadQuestion();
+            } else {
+                showResults();
             }
         }
-        
-        function submitQuiz() {
-            // Calculate score
-            score = 0;
-            quizData.forEach((question, index) => {
-                const correctOptionIndex = question.answerOptions.findIndex(opt => opt.isCorrect);
-                if (userAnswers[index] === correctOptionIndex) {
-                    score++;
-                }
-            });
 
-            // Display score
-            scoreText.textContent = `You scored ${score} out of ${quizData.length}!`;
+        function showResults() {
+            quizScreen.classList.add('hidden');
+            resultScreen.classList.remove('hidden');
             
-            // Display review
-            displayReview();
+            const percentage = Math.round((score / questions.length) * 100);
+            document.getElementById('final-score').textContent = score;
+            document.getElementById('final-score-percent').textContent = `${percentage}%`;
+            document.getElementById('total-correct').textContent = score;
+            document.getElementById('total-wrong').textContent = questions.length - score;
             
-            // Show results section
-            quizSection.classList.add('hidden');
-            resultsSection.classList.remove('hidden');
+            // Animate Score Circle
+            const circle = document.getElementById('score-circle');
+            const circumference = 2 * Math.PI * 15.9155;
+            const offset = circumference - (percentage / 100) * circumference;
+            circle.style.strokeDasharray = `${circumference}, ${circumference}`;
+            circle.style.strokeDashoffset = circumference; // Start empty
+            
+            // Trigger animation
+            setTimeout(() => {
+                circle.style.transition = 'stroke-dashoffset 1s ease-out';
+                circle.style.strokeDashoffset = offset;
+            }, 100);
         }
 
-        function displayReview() {
-            reviewContainer.innerHTML = ''; // Clear previous review
-            
-            quizData.forEach((question, index) => {
-                const userAnswerIndex = userAnswers[index];
-                const correctOptionIndex = question.answerOptions.findIndex(opt => opt.isCorrect);
-                
-                let optionsHtml = '';
-                question.answerOptions.forEach((option, i) => {
-                    let optionClass = 'border-gray-300';
-                    let indicator = '';
-
-                    if (i === correctOptionIndex) {
-                        // This is the correct answer
-                        optionClass = 'border-green-500 bg-green-50';
-                        indicator = `<span class="text-green-600 font-bold ml-auto">(Correct)</span>`;
-                    }
-                    if (i === userAnswerIndex && i !== correctOptionIndex) {
-                        // This is the user's wrong answer
-                        optionClass = 'border-red-500 bg-red-50';
-                        indicator = `<span class="text-red-600 font-bold ml-auto">(Your Answer)</span>`;
-                    }
-                    if (i === userAnswerIndex && i === correctOptionIndex) {
-                        // This is the user's correct answer
-                        optionClass = 'border-green-500 bg-green-50';
-                        indicator = `<span class="text-green-600 font-bold ml-auto">(Correct & Your Answer)</span>`;
-                    }
-                    
-                    optionsHtml += `
-                        <div class="flex items-center p-3 border rounded-md ${optionClass}">
-                            <span class="text-gray-800">${option.text}</span>
-                            ${indicator}
-                        </div>
-                    `;
-                });
-
-                reviewContainer.innerHTML += `
-                    <div class="p-4 bg-white rounded-lg shadow-sm border border-gray-200">
-                        <p class="text-lg font-semibold text-gray-900 mb-3">${index + 1}. ${question.question}</p>
-                        <div class="space-y-2 mb-3">
-                            ${optionsHtml}
-                        </div>
-                        <p class="text-sm text-gray-700 p-3 bg-gray-100 rounded-md"><span class="font-semibold">Rationale:</span> ${question.answerOptions[correctOptionIndex].rationale}</p>
-                    </div>
-                `;
-            });
-        }
-        
         function restartQuiz() {
-            resultsSection.classList.add('hidden');
-            tutorialSection.classList.remove('hidden');
-            // State is reset at the beginning of startQuiz()
+            resultScreen.classList.add('hidden');
+            startScreen.classList.remove('hidden');
+            startScreen.classList.add('fade-in');
+            currentQuestion = 0;
+            score = 0;
+            currentScoreSpan.textContent = "0";
+            progressBar.style.width = "0%";
         }
-
-        // --- Event Listeners ---
-        startQuizBtn.addEventListener('click', startQuiz);
-        hintBtn.addEventListener('click', showHint);
-        nextBtn.addEventListener('click', nextQuestion);
-        submitBtn.addEventListener('click', submitQuiz);
-        restartBtn.addEventListener('click', restartQuiz);
-
     </script>
 </body>
 </html>
