@@ -3,309 +3,1082 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>C Programming FAQ & Concepts</title>
+    <title>NIELIT KOKRAJHAR EC AI Smart Class Env.</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.3/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils@0.6/control_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils@0.3/drawing_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4/hands.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
     <style>
-        :root {
-            --primary-color: #2c3e50;
-            --accent-color: #3498db;
-            --bg-color: #f4f7f6;
-            --code-bg: #282c34;
-            --code-text: #abb2bf;
-        }
-
+        /* Custom styles for the loader, layout, and new UI elements */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+        
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            line-height: 1.6;
-            color: #333;
-            background-color: var(--bg-color);
-            margin: 0;
-            padding: 20px;
+            font-family: 'Inter', sans-serif;
         }
-
-        .container {
-            max-width: 900px;
-            margin: 0 auto;
-            background: white;
-            padding: 40px;
-            border-radius: 8px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        .loader {
+            border: 8px solid #f3f3f3; /* Light grey */
+            border-top: 8px solid #3498db; /* Blue */
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
         }
-
-        h1 {
-            text-align: center;
-            color: var(--primary-color);
-            border-bottom: 3px solid var(--accent-color);
-            padding-bottom: 10px;
-            margin-bottom: 40px;
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
-
-        h2 {
-            color: var(--accent-color);
-            border-left: 5px solid var(--primary-color);
-            padding-left: 15px;
-            margin-top: 40px;
+        .input_video {
+            display: none;
         }
-
-        h3 {
-            color: var(--primary-color);
-            margin-top: 25px;
-        }
-
-        p, li {
-            font-size: 1.05rem;
-        }
-
-        ul {
-            margin-bottom: 20px;
-        }
-
-        pre {
-            background-color: var(--code-bg);
-            color: var(--code-text);
-            padding: 15px;
-            border-radius: 5px;
-            overflow-x: auto;
-            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-        }
-
-        code {
-            font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
-            background-color: #eee;
-            padding: 2px 5px;
-            border-radius: 3px;
-            color: #d63384;
-        }
-
-        pre code {
-            background-color: transparent;
-            color: inherit;
-            padding: 0;
-        }
-
-        .table-wrapper {
-            overflow-x: auto;
-        }
-
-        table {
+        #output_canvas {
             width: 100%;
-            border-collapse: collapse;
-            margin: 20px 0;
+            height: 100%;
+            object-fit: contain; /* Use contain to see the whole page */
         }
-
-        th, td {
-            border: 1px solid #ddd;
-            padding: 12px;
-            text-align: left;
+        .mirrored {
+            transform: scaleX(-1); /* Mirror effect */
         }
-
-        th {
-            background-color: var(--primary-color);
+        /* Style for disabled buttons */
+        .disabled-button {
+            background-color: #a0aec0; /* gray-500 */
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        /* Style for notifications */
+        #notification-container {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(34, 197, 94, 0.8); /* green-500 with opacity */
             color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            font-weight: bold;
         }
-
-        tr:nth-child(even) {
-            background-color: #f2f2f2;
+        #notification-container.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        /* Fullscreen style for the container */
+        #container.fullscreen-mode {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            border-radius: 0;
+            z-index: 50;
+            background-color: #111827; /* bg-gray-900 */
         }
     </style>
 </head>
-<body>
+<body class="bg-gray-900 text-white flex flex-col items-center justify-center min-h-screen p-4">
 
-<div class="container">
-    <h1>C Programming Concept Guide</h1>
+    <div class="w-full max-w-4xl mx-auto">
+        <h1 class="text-3xl md:text-4xl font-bold text-center mb-2 text-blue-400">NIELIT KOKRAJHAR EC AI Smart Class Env.</h1>
+        <p class="text-center text-gray-400 mb-6">BANAJIT BORO</p>
 
-    <section id="file-pointers">
-        <h2>1. File Pointers & Writing to Files</h2>
-        <h3>What is a File Pointer?</h3>
-        <p>A <strong>File Pointer</strong> is a pointer to a structure of type <code>FILE</code>. It points to information that defines various things about the file, including its name, status, and the current position of the stream. It acts as a handle that the program uses to keep track of the file being accessed.</p>
+        <div id="container" class="relative w-full aspect-video rounded-lg shadow-2xl bg-gray-800 flex items-center justify-center overflow-hidden">
+            <canvas id="output_canvas" class="absolute top-0 left-0"></canvas>
+            <video class="input_video" id="input_video" autoplay playsinline></video>
+            <div id="loading-indicator" class="absolute inset-0 flex flex-col items-center justify-center bg-gray-800 bg-opacity-75 rounded-lg z-10">
+                <div class="loader"></div>
+                <p class="mt-4 text-lg">Initializing Camera...</p>
+            </div>
+        </div>
         
-        <h3>C Program to Write to a File</h3>
-        <pre><code>#include &lt;stdio.h&gt;
-#include &lt;stdlib.h&gt;
-
-int main() {
-    FILE *fptr;
-
-    // Open file in write mode ("w")
-    // If file doesn't exist, it creates it.
-    fptr = fopen("example.txt", "w");
-
-    if (fptr == NULL) {
-        printf("Error opening file!\n");
-        exit(1);
-    }
-
-    // Write text to the file
-    fprintf(fptr, "Hello, this is a text written by a C program.\n");
-    fprintf(fptr, "File handling is useful.");
-
-    // Close the file to save data
-    fclose(fptr);
-
-    printf("Data written successfully.");
-    return 0;
-}</code></pre>
-    </section>
-
-    <section id="functions">
-        <h2>2. Functions: Advantages, Calls, and Definitions</h2>
-        <h3>Advantages of Using Functions</h3>
-        <ul>
-            <li><strong>Reusability:</strong> Write code once and use it multiple times.</li>
-            <li><strong>Modularity:</strong> Breaks down complex problems into smaller, manageable chunks.</li>
-            <li><strong>Maintainability:</strong> Debugging is easier because errors are localized to specific functions.</li>
-            <li><strong>Abstraction:</strong> Hides implementation details from the user (they only need to know what the function does, not how).</li>
-        </ul>
-
-        <h3>Function Definition vs. Function Call</h3>
-        <div class="table-wrapper">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Concept</th>
-                        <th>Explanation</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>Function Definition</strong></td>
-                        <td>This is the actual body of the function. It contains the code block that executes the task. It specifies the return type, name, parameters, and logic.<br><em>Example:</em> <code>int add(int a, int b) { return a + b; }</code></td>
-                    </tr>
-                    <tr>
-                        <td><strong>Function Call</strong></td>
-                        <td>This is the instruction that tells the compiler to execute the function at that specific point. It transfers control to the function definition.<br><em>Example:</em> <code>int sum = add(5, 10);</code></td>
-                    </tr>
-                </tbody>
-            </table>
+        <div class="mt-4 flex justify-center items-center flex-wrap gap-4">
+            <button id="clear-button" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors">
+                Clear All
+            </button>
+            <button id="fullscreen-button" class="hidden bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors">
+                Fullscreen
+            </button>
+            <button id="snapshot-button" class="bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors">
+                Send to phone
+            </button>
+            <input type="file" id="file-upload" class="hidden" accept="image/*,application/pdf">
+            <label for="file-upload" class="bg-pink-500 hover:bg-pink-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors cursor-pointer">
+                Upload File
+            </label>
+            <button id="prev-page-button" class="hidden bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors">Prev</button>
+            <span id="page-indicator" class="hidden text-lg"></span>
+            <button id="next-page-button" class="hidden bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors">Next</button>
         </div>
-    </section>
+    </div>
 
-    <section id="prototypes">
-        <h2>3. Function Prototypes</h2>
-        <h3>What is a Function Prototype?</h3>
-        <p>A function prototype is a declaration of a function that tells the compiler about the function's name, return type, and parameters before the function is actually defined.</p>
-        <p><strong>Syntax:</strong> <code>return_type function_name(type arg1, type arg2, ...);</code></p>
+    <div id="palette-menu" class="hidden fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gray-800 bg-opacity-50 backdrop-blur-sm text-white p-6 rounded-lg shadow-2xl z-[60] w-80">
+        <button id="close-palette-btn" class="absolute top-3 right-3 text-gray-400 hover:text-white text-2xl font-bold">&times;</button>
+        
+        <label for="thickness-slider" class="block text-sm font-medium mb-2">Thickness</label>
+        <input id="thickness-slider" type="range" min="2" max="30" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
 
-        <h3>Is it Mandatory?</h3>
-        <p><strong>No, it is not strictly mandatory, but it is highly recommended.</strong></p>
-        <p><strong>Justification:</strong></p>
-        <ul>
-            <li>If you define your function <em>before</em> the <code>main()</code> function (or before it is called), a prototype is not needed because the compiler already knows about it.</li>
-            <li>However, if you define the function <em>after</em> it is called, the compiler will raise a warning or error (implicit declaration) without a prototype. Prototypes ensure strict type checking on arguments.</li>
-        </ul>
-    </section>
-
-    <section id="pointers">
-        <h2>4. Pointers in C</h2>
-        <h3>What is a Pointer Variable?</h3>
-        <p>A pointer variable is a variable that stores the <strong>memory address</strong> of another variable rather than a value.</p>
-
-        <h3>Advantages of Using Pointers</h3>
-        <ul>
-            <li><strong>Dynamic Memory Allocation:</strong> Allows creating data structures (like linked lists, trees) that can grow or shrink during runtime using <code>malloc</code> and <code>calloc</code>.</li>
-            <li><strong>Efficient Handling of Arrays/Structures:</strong> Passing a pointer to a large structure or array is more efficient than passing the actual data by value (which requires copying).</li>
-            <li><strong>Hardware Access:</strong> Pointers allow direct access to memory locations, useful for systems programming.</li>
-            <li><strong>Return Multiple Values:</strong> Pointers allow functions to modify variables in the calling scope, effectively "returning" multiple results.</li>
-        </ul>
-
-        <h3>Relationship Between Arrays and Pointers</h3>
-        <p>There is a very close relationship between arrays and pointers in C:</p>
-        <ul>
-            <li>The <strong>name of an array</strong> acts as a constant pointer to the first element of the array.</li>
-            <li>If you have an array <code>int arr[5]</code>, then <code>arr</code> is equivalent to <code>&arr[0]</code>.</li>
-            <li>Array arithmetic and pointer arithmetic are equivalent: accessing <code>arr[i]</code> is internally converted by the compiler to <code>*(arr + i)</code>.</li>
-        </ul>
-    </section>
-
-    <section id="array-avg">
-        <h2>5. Program: Average of Array Elements</h2>
-        <pre><code>#include &lt;stdio.h&gt;
-
-// Function Definition
-float calculateAverage(int arr[], int n) {
-    int sum = 0;
-    for (int i = 0; i < n; i++) {
-        sum += arr[i];
-    }
-    return (float)sum / n; // Typecast to float for decimal precision
-}
-
-int main() {
-    int n;
-
-    printf("Enter number of elements: ");
-    scanf("%d", &n);
-
-    int numbers[n];
-    printf("Enter %d integers:\n", n);
-    for(int i = 0; i < n; i++) {
-        scanf("%d", &numbers[i]);
-    }
-
-    // Function Call
-    float avg = calculateAverage(numbers, n);
-
-    printf("The average is: %.2f\n", avg);
-
-    return 0;
-}</code></pre>
-    </section>
-
-    <section id="macros">
-        <h2>6. Macros vs. Functions</h2>
-        <h3>What is a Macro?</h3>
-        <p>A macro is a fragment of code that has been given a name. Whenever the name is used, it is replaced by the contents of the macro <strong>before compilation</strong> (during the pre-processing stage). Defined using <code>#define</code>.</p>
-
-        <h3>Difference Between Macro and Function</h3>
-        <div class="table-wrapper">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Feature</th>
-                        <th>Macro</th>
-                        <th>Function</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    <tr>
-                        <td><strong>Processing</strong></td>
-                        <td>Processed by the Preprocessor (text substitution).</td>
-                        <td>Processed by the Compiler and executed at runtime.</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Speed</strong></td>
-                        <td>Faster execution (no overhead of context switching).</td>
-                        <td>Slower than macros due to overhead of call/return.</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Code Size</strong></td>
-                        <td>Increases code size (code is expanded at every usage).</td>
-                        <td>Keeps code size smaller (code exists in one place).</td>
-                    </tr>
-                    <tr>
-                        <td><strong>Type Checking</strong></td>
-                        <td>No type checking.</td>
-                        <td>Strict type checking is performed.</td>
-                    </tr>
-                </tbody>
-            </table>
+        <label class="block text-sm font-medium mt-6 mb-2">Color</label>
+        <div class="flex flex-wrap gap-3 justify-center">
+            <button class="color-option-btn w-10 h-10 rounded-full border-2 border-transparent hover:opacity-80 focus:outline-none" data-color="#ef4444" style="background-color: #ef4444" title="Red"></button>
+            <button class="color-option-btn w-10 h-10 rounded-full border-2 border-transparent hover:opacity-80 focus:outline-none" data-color="#f97316" style="background-color: #f97316" title="Orange"></button>
+            <button class="color-option-btn w-10 h-10 rounded-full border-2 border-transparent hover:opacity-80 focus:outline-none" data-color="#eab308" style="background-color: #eab308" title="Yellow"></button>
+            <button class="color-option-btn w-10 h-10 rounded-full border-2 border-transparent hover:opacity-80 focus:outline-none" data-color="#22c55e" style="background-color: #22c55e" title="Green"></button>
+            <button class="color-option-btn w-10 h-10 rounded-full border-2 border-transparent hover:opacity-80 focus:outline-none" data-color="#3b82f6" style="background-color: #3b82f6" title="Blue"></button>
+            <button class="color-option-btn w-10 h-10 rounded-full border-2 border-transparent hover:opacity-80 focus:outline-none" data-color="#ec4899" style="background-color: #ec4899" title="Pink"></button>
+            <button class="color-option-btn w-10 h-10 rounded-full border-2 border-transparent hover:opacity-80 focus:outline-none" data-color="#ffffff" style="background-color: #ffffff" title="White"></button>
+            <button class="color-option-btn w-10 h-10 rounded-full border-2 border-gray-400 hover:opacity-80 focus:outline-none" data-color="#000000" style="background-color: #000000" title="Black"></button>
         </div>
-    </section>
+    </div>
 
-    <section id="void">
-        <h2>7. Understanding 'void'</h2>
-        <h3>What is void?</h3>
-        <p>The keyword <code>void</code> in C means "nothing" or "no type." It is an empty data type.</p>
+    <div id="notification-container"></div>
 
-        <h3>When is void used in a function?</h3>
-        <ol>
-            <li><strong>As a Return Type:</strong> When a function does not return a value to the calling function.<br>
-            <em>Example:</em> <code>void printHello() { printf("Hello"); }</code></li>
-            <li><strong>As an Argument List:</strong> When a function takes no parameters.<br>
-            <em>Example:</em> <code>int getRandomNumber(void);</code></li>
-        </ol>
-    </section>
+    <script type="module">
+        // Set the workerSrc for PDF.js
+        window.pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js`;
 
-</div>
+        // --- Get references to the HTML elements ---
+        const videoElement = document.getElementById('input_video');
+        const canvasElement = document.getElementById('output_canvas');
+        const canvasCtx = canvasElement.getContext('2d');
+        const loadingIndicator = document.getElementById('loading-indicator');
+        const clearButton = document.getElementById('clear-button');
+        const fileUploadInput = document.getElementById('file-upload');
+        const prevPageButton = document.getElementById('prev-page-button');
+        const nextPageButton = document.getElementById('next-page-button');
+        const pageIndicator = document.getElementById('page-indicator');
+        const notificationContainer = document.getElementById('notification-container');
+        const fullscreenButton = document.getElementById('fullscreen-button');
+        const container = document.getElementById('container');
+        const snapshotButton = document.getElementById('snapshot-button');
+        const paletteMenu = document.getElementById('palette-menu'); // NEW
 
+
+        // --- State Variables ---
+        let currentMode = 'idle'; // 'idle', 'drawing', 'erasing', 'moving'
+        let lastMode = 'idle';
+        let currentPath = [];
+        let allPaths = [];
+        let uploadedImage = null;
+        let pdfDoc = null;
+        let currentPageNum = 1;
+        let totalPages = 0;
+        let isFullscreen = false;
+        let isPaletteOpen = false; // NEW
+        let isShakaLocked = false; // NEW: To lock Shaka gestures
+        let isPaletteDraggingSlider = false; // NEW: To drag slider
+        let smoothedFingerTipPos = null; // For smoothing drawing
+        let showHandLandmarks = true; // NEW: Toggle for showing/hiding landmarks
+        
+        // --- State for moving individual drawings ---
+        let selectedPathIndex = -1; // Index of the path currently selected for moving
+        let moveStartPoint = null; // To track the start of a move gesture
+        let initialSelectedPathState = null; // To store the state of the selected path when a move starts
+        
+        // --- On-Canvas Button Control State ---
+        let lastButtonPressTime = 0;
+        const BUTTON_PRESS_COOLDOWN = 1500; // 1.5 second cooldown for gestures
+
+        // --- Configuration ---
+        let drawingColor = '#ec4899'; // Pink color - NOW A 'let'
+        let drawingLineWidth = 6; // NOW A 'let'
+        const cursorColor = '#f87171';
+        const cursorRadius = 5;
+        const smoothingFactor = 0.5; // Lower is smoother but has more lag.
+        const eraserRadius = 30; // The radius of the eraser circle
+        const eraserColor = 'rgba(255, 255, 255, 0.5)'; // Semi-transparent white
+
+
+        // --- UI Feedback Functions ---
+        function showNotification(message, duration = 2000) {
+            notificationContainer.textContent = message;
+            notificationContainer.classList.add('show');
+            setTimeout(() => {
+                notificationContainer.classList.remove('show');
+            }, duration);
+        }
+
+        // --- Snapshot Function ---
+        async function takeSnapshot() {
+            const phoneBotToken = '8261912175:AAHIHupCNGFNdXBsjkbHWQ5kJeGN075LRsw';
+            const phoneChatId = '1169779808';
+            
+            // --- IMPORTANT NOTE ON CORS ---
+            // The CORS proxy has been removed as requested.
+            // Direct requests from a web browser to the phone API will be blocked by the browser's
+            // Same-Origin Policy (CORS). This `fetch` call is expected to fail with a CORS error.
+            // For this functionality to work, the API request must be made from a server-side
+            // environment (like Node.js, Python, etc.) that is not subject to browser CORS restrictions.
+            const apiUrl = `https://api.telegram.org/bot${phoneBotToken}/sendPhoto`;
+            
+            showNotification('Sending to phone...');
+
+            // --- FIX FOR MIRRORED SNAPSHOT ---
+            // Create a temporary canvas to draw the mirrored image if needed
+            const tempCanvas = document.createElement('canvas');
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCanvas.width = canvasElement.width;
+            tempCanvas.height = canvasElement.height;
+
+            if (uploadedImage) {
+                // If we have an uploaded image, just draw the main canvas as-is
+                tempCtx.drawImage(canvasElement, 0, 0);
+            } else {
+                // If it's the live feed, we need to manually flip the snapshot
+                tempCtx.save();
+                tempCtx.scale(-1, 1); // Flip horizontally
+                tempCtx.drawImage(canvasElement, -tempCanvas.width, 0, tempCanvas.width, tempCanvas.height); // Draw, translating back
+                tempCtx.restore();
+            }
+            // --- END FIX ---
+
+            // Get the blob from the temporary canvas, not the main one
+            tempCanvas.toBlob(async (blob) => {
+                if (!blob) {
+                    showNotification('Error creating image data.');
+                    console.error('Canvas toBlob returned null');
+                    return;
+                }
+
+                const formData = new FormData();
+                formData.append('chat_id', phoneChatId);
+                formData.append('photo', blob, `snapshot-${new Date().toISOString()}.png`);
+                formData.append('caption', 'Snapshot from NIELIT Kokrajhar Smart Class Environment.');
+
+                try {
+                    console.log(`Attempting to send snapshot directly to: ${apiUrl}`);
+                    const response = await fetch(apiUrl, {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    console.log('phone API response status:', response.status, response.statusText);
+                    const result = await response.json();
+                    console.log('phone API response body:', result);
+
+
+                    if (result.ok) {
+                        showNotification('Snapshot sent to phone!');
+                    } else {
+                        console.error('phone API Error:', result.description || 'Unknown error');
+                        showNotification(`Error: ${result.description || 'Failed to send'}`);
+                    }
+                } catch (error) {
+                    // This catch block will likely execute with a CORS error.
+                    console.error('Fetch failed. This is expected to be due to browser CORS policy.', error);
+                    showNotification('Failed to send. Check console (CORS error expected).');
+                }
+            }, 'image/png');
+        }
+
+
+        // --- Fullscreen Toggle ---
+        function toggleFullscreen() {
+            isFullscreen = !isFullscreen;
+
+            container.classList.toggle('fullscreen-mode', isFullscreen);
+            
+            // Hide siblings of the container (title, controls, etc.)
+            const siblings = [...container.parentElement.children];
+            siblings.forEach(child => {
+                if (child.id !== 'container' && child.id !== 'palette-menu') { // Don't hide palette
+                    child.classList.toggle('hidden', isFullscreen);
+                }
+            });
+
+            if (isFullscreen) {
+                const exitButton = document.createElement('button');
+                exitButton.id = 'exit-fullscreen-btn';
+                exitButton.textContent = 'Exit Fullscreen (Esc)';
+                exitButton.className = 'fixed top-4 right-4 z-[100] bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-md';
+                exitButton.onclick = toggleFullscreen;
+                document.body.appendChild(exitButton);
+            } else {
+                const exitButton = document.getElementById('exit-fullscreen-btn');
+                if (exitButton) {
+                    exitButton.remove();
+                }
+                // Also close palette when exiting fullscreen
+                if (isPaletteOpen) {
+                    togglePalette();
+                }
+            }
+        }
+        
+        // --- Canvas Drawing Helper Functions ---
+        function drawPaths() {
+            canvasCtx.lineCap = 'round';
+            canvasCtx.lineJoin = 'round';
+
+            // Draw all completed paths
+            allPaths.forEach((path, index) => {
+                if (path.points.length < 2) return;
+                
+                canvasCtx.beginPath();
+                // If the path is selected for moving, draw a highlight effect
+                if (index === selectedPathIndex) {
+                    canvasCtx.strokeStyle = '#60a5fa'; // Light blue for highlight
+                    canvasCtx.lineWidth = path.width + 10;
+                    canvasCtx.globalAlpha = 0.5;
+                    canvasCtx.stroke();
+                    canvasCtx.globalAlpha = 1.0;
+                }
+                
+                // Draw the actual path
+                canvasCtx.strokeStyle = path.color;
+                canvasCtx.lineWidth = path.width;
+                canvasCtx.moveTo(path.points[0].x, path.points[0].y);
+                for (let i = 1; i < path.points.length; i++) {
+                    canvasCtx.lineTo(path.points[i].x, path.points[i].y);
+                }
+                canvasCtx.stroke();
+            });
+
+            // Draw the current path being drawn
+            if (currentPath.length > 1) {
+                canvasCtx.beginPath();
+                canvasCtx.strokeStyle = drawingColor;
+                canvasCtx.lineWidth = drawingLineWidth;
+                canvasCtx.moveTo(currentPath[0].x, currentPath[0].y);
+                for (let i = 1; i < currentPath.length; i++) {
+                    canvasCtx.lineTo(currentPath[i].x, currentPath[i].y);
+                }
+                canvasCtx.stroke();
+            }
+        }
+        
+        // Helper to draw rounded rectangles for on-canvas buttons
+        function drawRoundRect(ctx, x, y, width, height, radius) {
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + width - radius, y);
+            ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+            ctx.lineTo(x + width, y + height - radius);
+            ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+            ctx.lineTo(x + radius, y + height);
+            ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        // Helper to check if a point is near a path
+        function isPointNearPath(point, path, threshold) {
+            if (path.points.length < 2) return false;
+
+            for (let i = 0; i < path.points.length - 1; i++) {
+                const p1 = path.points[i];
+                const p2 = path.points[i + 1];
+
+                const l2 = (p2.x - p1.x) ** 2 + (p2.y - p1.y) ** 2;
+                if (l2 === 0) {
+                    if (Math.hypot(point.x - p1.x, point.y - p1.y) < threshold) return true;
+                    continue;
+                }
+                let t = ((point.x - p1.x) * (p2.x - p1.x) + (point.y - p1.y) * (p2.y - p1.y)) / l2;
+                t = Math.max(0, Math.min(1, t));
+                const closestPoint = {
+                    x: p1.x + t * (p2.x - p1.x),
+                    y: p1.y + t * (p2.y - p1.y)
+                };
+                if (Math.hypot(point.x - closestPoint.x, point.y - closestPoint.y) < threshold) {
+                    return true;
+                }
+            }
+            return false;
+        }
+
+        // --- Main Animation Loop ---
+        function onResults(results) {
+            if (loadingIndicator.style.display !== 'none') {
+                loadingIndicator.style.display = 'none';
+            }
+
+            // Toggle mirror effect based on content type
+            if (uploadedImage) {
+                // Don't mirror for PDF/Image
+                canvasElement.classList.remove('mirrored');
+            } else {
+                // Mirror for the live camera feed
+                canvasElement.classList.add('mirrored');
+            }
+
+            // Set canvas dimensions
+            canvasElement.width = isFullscreen ? window.innerWidth : videoElement.videoWidth;
+            canvasElement.height = isFullscreen ? window.innerHeight : videoElement.videoHeight;
+
+
+            canvasCtx.save();
+            canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+
+            // 1. Draw the background (camera feed or uploaded file)
+            if (uploadedImage) {
+                // For PDF/Image, draw normally
+                canvasCtx.drawImage(uploadedImage, 0, 0, canvasElement.width, canvasElement.height);
+            } else {
+                // For live feed, draw the raw (unmirrored) image from MediaPipe
+                canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+            }
+
+            // 2. Draw user-made paths
+            drawPaths();
+            
+            // 3. Handle hand detection and gestures
+            if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+                let handLandmarks = results.multiHandLandmarks[0];
+
+                // If viewing a PDF/image, we need to manually flip the hand coordinates
+                // because the canvas itself is not mirrored, but the camera input is.
+                if (uploadedImage) {
+                    handLandmarks = handLandmarks.map(landmark => {
+                        return { 
+                            ...landmark, 
+                            x: 1 - landmark.x 
+                        };
+                    });
+                }
+
+                handlePdfNavigation(handLandmarks);
+                
+                // MODIFIED: If palette is open, handle palette interaction
+                if (isPaletteOpen) {
+                    handlePaletteInteraction(handLandmarks);
+                }
+                
+                // Always handle drawing/erasing/moving gestures, even if palette is open
+                handleGestures(handLandmarks);
+
+                // --- MODIFICATION START: Show/Hide Landmarks ---
+                if (showHandLandmarks) {
+                    // Draw hand landmarks for visual feedback
+                    window.drawConnectors(canvasCtx, handLandmarks, window.HAND_CONNECTIONS, { color: '#34d399', lineWidth: 5 });
+                    
+                    // Change landmark color based on the current mode
+                    const landmarkColor =
+                        currentMode === 'drawing' ? '#ec4899' : // Pink when drawing
+                        currentMode === 'erasing' ? '#ffffff' : // White when erasing
+                        currentMode === 'moving' ? '#3b82f6' : // Blue when moving
+                        '#f87171'; // Red when idle
+                    window.drawLandmarks(canvasCtx, handLandmarks, { color: landmarkColor, lineWidth: 2 });
+                } else {
+                    // Hand landmarks are hidden, draw a pointer at the index tip
+                    const indexTip = handLandmarks[8];
+                    const cursorTarget = { x: indexTip.x * canvasElement.width, y: indexTip.y * canvasElement.height };
+
+                    // Use smoothing
+                    if (!smoothedFingerTipPos) {
+                        smoothedFingerTipPos = cursorTarget;
+                    } else {
+                        smoothedFingerTipPos.x = smoothedFingerTipPos.x * (1 - smoothingFactor) + cursorTarget.x * smoothingFactor;
+                        smoothedFingerTipPos.y = smoothedFingerTipPos.y * (1 - smoothingFactor) + cursorTarget.y * smoothingFactor;
+                    }
+
+                    canvasCtx.fillStyle = cursorColor; // Use the existing cursorColor
+                    canvasCtx.beginPath();
+                    canvasCtx.arc(smoothedFingerTipPos.x, smoothedFingerTipPos.y, cursorRadius, 0, 2 * Math.PI);
+                    canvasCtx.fill();
+                }
+                // --- MODIFICATION END ---
+
+            } else { // Hand not detected
+                if (currentMode === 'drawing') { // Finish any path if hand leaves screen
+                    if (currentPath.length > 1) {
+                        allPaths.push({ points: currentPath, color: drawingColor, width: drawingLineWidth });
+                    }
+                    currentPath = [];
+                }
+                currentMode = 'idle';
+                smoothedFingerTipPos = null; // Reset smoothing when hand is lost
+                selectedPathIndex = -1; // Deselect if hand is lost
+                isPaletteDraggingSlider = false; // NEW: Reset on hand loss
+            }
+            
+            canvasCtx.restore();
+        }
+        
+        function handlePdfNavigation(handLandmarks) {
+            if (!pdfDoc) return;
+            
+            const buttonWidth = 120;
+            const buttonHeight = 70;
+            const buttonPadding = 20;
+            const buttonRadius = 15;
+
+            // Position buttons at the top
+            const prevButtonRect = { x: buttonPadding, y: buttonPadding, width: buttonWidth, height: buttonHeight };
+            const nextButtonRect = { x: canvasElement.width - buttonWidth - buttonPadding, y: buttonPadding, width: buttonWidth, height: buttonHeight };
+            
+            const indexTip = handLandmarks[8];
+            const indexTipPos = { x: indexTip.x * canvasElement.width, y: indexTip.y * canvasElement.height };
+            const now = Date.now();
+            let prevButtonHover = false;
+            let nextButtonHover = false;
+            const cooldown = 1000; // Use a shorter cooldown for touch
+
+            // Check for Previous button touch
+            if (now - lastButtonPressTime > cooldown &&
+                indexTipPos.x > prevButtonRect.x && indexTipPos.x < prevButtonRect.x + prevButtonRect.width &&
+                indexTipPos.y > prevButtonRect.y && indexTipPos.y < prevButtonRect.y + prevButtonRect.height) {
+                prevButtonHover = true;
+                prevPageButton.click();
+                lastButtonPressTime = now;
+            }
+
+            // Check for Next button touch
+            if (now - lastButtonPressTime > cooldown &&
+                indexTipPos.x > nextButtonRect.x && indexTipPos.x < nextButtonRect.x + nextButtonRect.width &&
+                indexTipPos.y > nextButtonRect.y && indexTipPos.y < nextButtonRect.y + nextButtonRect.height) {
+                nextButtonHover = true;
+                nextPageButton.click();
+                lastButtonPressTime = now;
+            }
+            
+            // Draw the buttons
+            canvasCtx.font = 'bold 30px Inter';
+            canvasCtx.textAlign = 'center';
+            canvasCtx.textBaseline = 'middle';
+
+            // Previous Button
+            canvasCtx.fillStyle = prevButtonHover ? 'rgba(96, 165, 250, 0.8)' : 'rgba(96, 165, 250, 0.5)';
+            drawRoundRect(canvasCtx, prevButtonRect.x, prevButtonRect.y, prevButtonRect.width, prevButtonRect.height, buttonRadius);
+            canvasCtx.fillStyle = 'white';
+            canvasCtx.fillText('PREV', prevButtonRect.x + prevButtonRect.width / 2, prevButtonRect.y + prevButtonRect.height / 2);
+            
+            // Next Button
+            canvasCtx.fillStyle = nextButtonHover ? 'rgba(96, 165, 250, 0.8)' : 'rgba(96, 165, 250, 0.5)';
+            drawRoundRect(canvasCtx, nextButtonRect.x, nextButtonRect.y, nextButtonRect.width, nextButtonRect.height, buttonRadius);
+            canvasCtx.fillStyle = 'white';
+            canvasCtx.fillText('NEXT', nextButtonRect.x + nextButtonRect.width / 2, nextButtonRect.y + nextButtonRect.height / 2);
+        }
+
+        // NEW: Helper function to map canvas coords to viewport coords
+        function getViewportCoords(landmarkX, landmarkY, canvasElement) {
+            const canvasDisplayRect = canvasElement.getBoundingClientRect();
+            const canvasInternalWidth = canvasElement.width;
+            const canvasInternalHeight = canvasElement.height;
+
+            const internalAspect = canvasInternalWidth / canvasInternalHeight;
+            const displayAspect = canvasDisplayRect.width / canvasDisplayRect.height;
+
+            let scale = 1;
+            let offsetX = 0;
+            let offsetY = 0;
+
+            if (internalAspect > displayAspect) {
+                // Internal is wider, letterbox top/bottom
+                scale = canvasDisplayRect.width / canvasInternalWidth;
+                offsetY = (canvasDisplayRect.height - (canvasInternalHeight * scale)) / 2;
+            } else {
+                // Internal is taller, letterbox left/right
+                scale = canvasDisplayRect.height / canvasInternalHeight;
+                offsetX = (canvasDisplayRect.width - (canvasInternalWidth * scale)) / 2;
+            }
+
+            // Get canvas-space coordinate
+            const canvasX = landmarkX * canvasInternalWidth;
+            const canvasY = landmarkY * canvasInternalHeight;
+            
+            // Map to display-space coordinate (relative to canvas element)
+            const displayX = (canvasX * scale) + offsetX;
+            const displayY = (canvasY * scale) + offsetY;
+
+            // Map to viewport coordinate
+            const viewportX = canvasDisplayRect.left + displayX;
+            const viewportY = canvasDisplayRect.top + displayY;
+            
+            return { x: viewportX, y: viewportY };
+        }
+
+        // NEW: Handle pointing and selecting in the palette menu
+        function handlePaletteInteraction(handLandmarks) {
+            // Get landmarks
+            const indexTip = handLandmarks[8];
+            const indexPip = handLandmarks[6];
+            const middleTip = handLandmarks[12];
+            const middlePip = handLandmarks[10];
+            const ringTip = handLandmarks[16];
+            const ringPip = handLandmarks[14];
+            const pinkyTip = handLandmarks[20];
+            const pinkyPip = handLandmarks[18];
+
+            // Define gestures
+            const isIndexExtended = indexTip.y < indexPip.y;
+            const isMiddleExtended = middleTip.y < middlePip.y;
+            const isRingExtended = ringTip.y < ringPip.y;
+            const isPinkyExtended = pinkyTip.y < pinkyPip.y;
+
+            // "Point" gesture: Index finger extended, others curled
+            const isPointingGesture = isIndexExtended && !isMiddleExtended && !isRingExtended && !isPinkyExtended;
+
+            // Get DOM elements
+            const colorButtons = document.querySelectorAll('.color-option-btn');
+            const thicknessSlider = document.getElementById('thickness-slider');
+
+            // --- FIX FOR MIRRORING ---
+            // The palette menu is NOT mirrored, but the canvas IS mirrored when no image is loaded.
+            // We must flip the X coordinate in that case to match what the user sees.
+            // When an image IS loaded, the coordinates are ALREADY flipped in onResults, so we use them as-is.
+            let landmarkX = indexTip.x;
+            if (uploadedImage === null) {
+                // Live feed is mirrored via CSS, so flip the coordinate for palette interaction
+                landmarkX = 1.0 - indexTip.x; 
+            }
+            
+            // Get pointer position (using index tip)
+            const { x: pointX, y: pointY } = getViewportCoords(landmarkX, indexTip.y, canvasElement);
+
+            const now = Date.now();
+            
+            // Clear any old hover effects
+            colorButtons.forEach(btn => btn.classList.remove('ring-yellow-400')); // CHANGED: Only remove 'ring-yellow-400', leaving 'ring-4' and 'ring-black' intact.
+
+            if (isPointingGesture) {
+                const sliderRect = thicknessSlider.getBoundingClientRect();
+                // Check if pointing at the slider
+            const isHoveringSlider = pointX > sliderRect.left && pointX < sliderRect.right &&
+                                         pointY > sliderRect.top && pointY < sliderRect.bottom; // Removed Y padding
+
+            if (isPaletteDraggingSlider) {
+                // Continue dragging slider
+                    const percent = Math.max(0, Math.min(1, (pointX - sliderRect.left) / sliderRect.width));
+                    const min = parseFloat(thicknessSlider.min);
+                    const max = parseFloat(thicknessSlider.max);
+                    let newValue = min + (max - min) * percent;
+                    newValue = Math.round(newValue);
+                    thicknessSlider.value = newValue;
+                    thicknessSlider.dispatchEvent(new Event('input')); // Triggers listener to update width
+                
+                } else if (now - lastButtonPressTime > 500) { // Cooldown to prevent rapid clicks
+                    
+                    if (isHoveringSlider) {
+                        // Start dragging slider
+                        isPaletteDraggingSlider = true;
+                        lastButtonPressTime = now;
+                        // Also set value on first click
+                        const percent = Math.max(0, Math.min(1, (pointX - sliderRect.left) / sliderRect.width));
+                        const min = parseFloat(thicknessSlider.min);
+                        const max = parseFloat(thicknessSlider.max);
+                        let newValue = min + (max - min) * percent;
+                        newValue = Math.round(newValue);
+                        thicknessSlider.value = newValue;
+                        thicknessSlider.dispatchEvent(new Event('input'));
+
+                    } else {
+                        // Check for color button click
+                        for (const button of colorButtons) {
+                            const rect = button.getBoundingClientRect();
+                            if (pointX > rect.left && pointX < rect.right && pointY > rect.top && pointY < rect.bottom) {
+                                button.click();
+                                lastButtonPressTime = now;
+                                break; // Only click one
+                            }
+                        }
+                    }
+                }
+
+            } else {
+                // Not pointing, so not dragging
+                isPaletteDraggingSlider = false;
+            }
+        }
+
+        function handleGestures(handLandmarks) {
+            // Get references to all necessary landmarks
+            const thumbTip = handLandmarks[4];
+            const thumbIp = handLandmarks[3];
+            const indexTip = handLandmarks[8];
+            const indexPip = handLandmarks[6];
+            const middleTip = handLandmarks[12];
+            const middlePip = handLandmarks[10];
+            const ringTip = handLandmarks[16];
+            const ringPip = handLandmarks[14];
+            const pinkyTip = handLandmarks[20];
+            const pinkyPip = handLandmarks[18];
+
+            // --- PDF Navigation Gestures ---
+            // For fingers, "extended" means the tip is higher than the middle joint (PIP).
+            const isIndexExtended = indexTip.y < indexPip.y;
+            const isMiddleExtended = middleTip.y < middlePip.y;
+            const isRingExtended = ringTip.y < ringPip.y;
+            const isPinkyExtended = pinkyTip.y < pinkyPip.y;
+            
+            // For the thumb, check if it's extended away from the hand
+            const isThumbExtended = (uploadedImage) 
+                ? thumbTip.x < thumbIp.x // Non-mirrored view: extended thumb has smaller X
+                : thumbTip.x > thumbIp.x; // Mirrored view: extended thumb has larger X
+            
+            const now = Date.now();
+
+            // GESTURE DEFINITIONS
+            // Shaka Gesture: Thumb and pinky extended, other three fingers curled.
+            const isShakaGesture = isThumbExtended && !isIndexExtended && !isMiddleExtended && !isRingExtended && isPinkyExtended;
+
+            // MODIFIED: Added check for !isShakaLocked
+            if (pdfDoc && now - lastButtonPressTime > BUTTON_PRESS_COOLDOWN && !isShakaLocked) {
+                // Determine palm direction for Shaka gesture
+                const isPalmForwardForShaka = (uploadedImage) 
+                    ? thumbTip.x < pinkyTip.x // Non-mirrored
+                    : thumbTip.x > pinkyTip.x; // Mirrored
+
+                // NEXT page gesture: Shaka with palm forward
+                if (isShakaGesture && isPalmForwardForShaka) {
+                    nextPageButton.click();
+                    lastButtonPressTime = now;
+                    showNotification('Next Page (Shaka)');
+                    return; // Exit after handling gesture
+                }
+                
+                // PREVIOUS page gesture: Shaka with palm backward (Reverse Shaka)
+                if (isShakaGesture && !isPalmForwardForShaka) {
+                    prevPageButton.click();
+                    lastButtonPressTime = now;
+                    showNotification('Previous Page (Reverse Shaka)');
+                    return; // Exit after handling gesture
+                }
+            }
+            
+            // --- Snapshot Gesture (Vulcan Salute) ---
+            const isAllFingersUp = isIndexExtended && isMiddleExtended && isRingExtended && isPinkyExtended;
+            // The gap is measured on the x-axis, assuming a vertical hand
+            const isSplitFinger = Math.abs(middleTip.x - ringTip.x) > 0.07;
+            const areFingersPaired = Math.abs(indexTip.x - middleTip.x) < 0.06 && Math.abs(ringTip.x - pinkyTip.x) < 0.06;
+            const isVulcanSalute = isAllFingersUp && isSplitFinger && areFingersPaired;
+
+            if (isVulcanSalute && now - lastButtonPressTime > BUTTON_PRESS_COOLDOWN) {
+                takeSnapshot();
+                lastButtonPressTime = now;
+                // Notification is handled inside takeSnapshot
+                return; // Prioritize this gesture and exit to prevent accidental drawing
+            }
+
+            // --- Drawing and Interaction Gesture Definitions ---
+
+            // 1. Fist Gesture for Erasing
+            const isFist = !isIndexExtended && !isMiddleExtended && !isRingExtended && !isPinkyExtended;
+
+            // 2. Drawing Gesture: Index finger and thumb tips are very close
+            const drawGestureDistance = Math.hypot(indexTip.x - thumbTip.x, indexTip.y - thumbTip.y);
+            const isDrawingGesture = drawGestureDistance < 0.04;
+            
+            // 3. Move Gesture: Index and Middle finger extended, others curled
+            const isMoveGesture = isIndexExtended && isMiddleExtended && !isRingExtended && !isPinkyExtended;
+
+            // --- Action Implementation ---
+
+            if (isFist) {
+                currentMode = 'erasing';
+                selectedPathIndex = -1; // Deselect any path when erasing
+                if (lastMode === 'drawing' && currentPath.length > 0) {
+                    currentPath = [];
+                }
+
+                const palmCenterX = (handLandmarks[5].x + handLandmarks[9].x) / 2;
+                const palmCenterY = (handLandmarks[5].y + handLandmarks[9].y) / 2;
+                const eraserPos = {
+                    x: palmCenterX * canvasElement.width,
+                    y: palmCenterY * canvasElement.height
+                };
+
+                canvasCtx.fillStyle = eraserColor;
+                canvasCtx.beginPath();
+                canvasCtx.arc(eraserPos.x, eraserPos.y, eraserRadius, 0, 2 * Math.PI);
+                canvasCtx.fill();
+
+                allPaths = allPaths.filter(path =>
+                    !path.points.some(point =>
+                        Math.hypot(point.x - eraserPos.x, point.y - eraserPos.y) < eraserRadius
+                    )
+                );
+
+            } else if (isDrawingGesture && showHandLandmarks) { // MODIFIED: Disable drawing if landmarks are hidden
+                currentMode = 'drawing';
+                selectedPathIndex = -1; // Deselect any path when drawing
+                const fingerTipMidpoint = {
+                    x: ((indexTip.x + thumbTip.x) / 2) * canvasElement.width,
+                    y: ((indexTip.y + thumbTip.y) / 2) * canvasElement.height
+                };
+
+                if (!smoothedFingerTipPos || lastMode !== 'drawing') {
+                    smoothedFingerTipPos = fingerTipMidpoint;
+                } else {
+                    smoothedFingerTipPos.x = smoothedFingerTipPos.x * (1 - smoothingFactor) + fingerTipMidpoint.x * smoothingFactor;
+                    smoothedFingerTipPos.y = smoothedFingerTipPos.y * (1 - smoothingFactor) + fingerTipMidpoint.y * smoothingFactor;
+                }
+
+                if (lastMode !== 'drawing') {
+                    currentPath = [{...smoothedFingerTipPos}];
+                } else {
+                    currentPath.push({...smoothedFingerTipPos});
+                }
+            } else if (isMoveGesture) {
+                currentMode = 'moving';
+                const moveCenterPoint = {
+                    x: ((indexTip.x + middleTip.x) / 2) * canvasElement.width,
+                    y: ((indexTip.y + middleTip.y) / 2) * canvasElement.height
+                };
+
+                if (selectedPathIndex === -1) { // We are not moving a path yet, so try to select one
+                    for (let i = allPaths.length - 1; i >= 0; i--) {
+                        if (isPointNearPath(moveCenterPoint, allPaths[i], 30)) {
+                            selectedPathIndex = i;
+                            moveStartPoint = moveCenterPoint;
+                            initialSelectedPathState = JSON.parse(JSON.stringify(allPaths[i]));
+                            break;
+                        }
+                    }
+                } else { // A path is already selected, so we move it
+                    if (lastMode !== 'moving') {
+                        moveStartPoint = moveCenterPoint;
+                        initialSelectedPathState = JSON.parse(JSON.stringify(allPaths[selectedPathIndex]));
+                    } else {
+                        const deltaX = moveCenterPoint.x - moveStartPoint.x;
+                        const deltaY = moveCenterPoint.y - moveStartPoint.y;
+
+                        allPaths[selectedPathIndex] = {
+                            ...initialSelectedPathState,
+                            points: initialSelectedPathState.points.map(point => ({
+                                x: point.x + deltaX,
+                                y: point.y + deltaY
+                            }))
+                        };
+                    }
+                }
+
+            } else { // Idle mode
+                currentMode = 'idle';
+                if (lastMode === 'drawing') {
+                    if (currentPath.length > 1) {
+                        allPaths.push({ points: currentPath, color: drawingColor, width: drawingLineWidth });
+                    }
+                    currentPath = [];
+                } else if (lastMode === 'moving') {
+                    // Deselect the path when the gesture changes from 'move' to 'idle'
+                    selectedPathIndex = -1;
+                    moveStartPoint = null;
+                    initialSelectedPathState = null;
+                }
+
+                const cursorTarget = { x: indexTip.x * canvasElement.width, y: indexTip.y * canvasElement.height };
+                if (!smoothedFingerTipPos || lastMode !== 'idle') {
+                    smoothedFingerTipPos = cursorTarget;
+                } else {
+                    smoothedFingerTipPos.x = smoothedFingerTipPos.x * (1 - smoothingFactor) + cursorTarget.x * smoothingFactor;
+                    smoothedFingerTipPos.y = smoothedFingerTipPos.y * (1 - smoothingFactor) + cursorTarget.y * smoothingFactor;
+                }
+
+                // We only draw the 'idle' pointer if landmarks are visible.
+                // If landmarks are hidden, the main onResults loop is already drawing a pointer.
+                if (showHandLandmarks) {
+                    canvasCtx.fillStyle = cursorColor;
+                    canvasCtx.beginPath();
+                    canvasCtx.arc(smoothedFingerTipPos.x, smoothedFingerTipPos.y, cursorRadius, 0, 2 * Math.PI);
+                    canvasCtx.fill();
+                }
+            }
+            lastMode = currentMode;
+        }
+
+
+        // --- PDF Rendering ---
+        async function renderPdfPage(num) {
+            if (!pdfDoc || num < 1 || num > totalPages) return;
+            
+            try {
+                const page = await pdfDoc.getPage(num);
+                const viewport = page.getViewport({ scale: 2.0 });
+                const tempCanvas = document.createElement('canvas');
+                const tempCtx = tempCanvas.getContext('2d');
+                tempCanvas.height = viewport.height;
+                tempCanvas.width = viewport.width;
+
+                await page.render({ canvasContext: tempCtx, viewport: viewport }).promise;
+                
+                const img = new Image();
+                img.onload = () => {
+                    uploadedImage = img;
+                    allPaths = []; // Clear drawings for the new page
+                    currentPath = [];
+                };
+                img.src = tempCanvas.toDataURL();
+                pageIndicator.textContent = `Page ${num} of ${totalPages}`;
+                
+                // Update button states
+                prevPageButton.disabled = num <= 1;
+                nextPageButton.disabled = num >= totalPages;
+                prevPageButton.classList.toggle('disabled-button', num <= 1);
+                nextPageButton.classList.toggle('disabled-button', num >= totalPages);
+
+            } catch(error) {
+                console.error("Failed to render PDF page:", error);
+                showNotification("Failed to render PDF page.");
+            }
+        }
+
+        // --- Initialization and Event Listeners ---
+        const hands = new window.Hands({
+            locateFile: (file) => {
+                return `https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4/${file}`;
+            }
+        });
+        hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.7, minTrackingConfidence: 0.7 });
+        hands.onResults(onResults);
+        const camera = new window.Camera(videoElement, { onFrame: async () => { await hands.send({ image: videoElement }); }, width: 1280, height: 720 });
+        camera.start();
+
+        clearButton.addEventListener('click', () => {
+            if (isFullscreen) {
+                toggleFullscreen();
+            }
+            fullscreenButton.classList.add('hidden');
+            allPaths = [];
+            currentPath = [];
+            uploadedImage = null; // Also clear the uploaded image background
+            pdfDoc = null;
+            fileUploadInput.value = ''; // Reset file input
+            // Hide PDF controls
+            prevPageButton.classList.add('hidden');
+            nextPageButton.classList.add('hidden');
+            pageIndicator.classList.add('hidden');
+        });
+
+        snapshotButton.addEventListener('click', takeSnapshot);
+
+        fileUploadInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            fullscreenButton.classList.remove('hidden');
+
+            // Reset drawing and PDF state
+            allPaths = [];
+            currentPath = [];
+            pdfDoc = null;
+            uploadedImage = null;
+
+            if (file.type.startsWith('image/')) {
+                // Hide PDF controls
+                prevPageButton.classList.add('hidden');
+                nextPageButton.classList.add('hidden');
+                pageIndicator.classList.add('hidden');
+                
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => { uploadedImage = img; };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            } else if (file.type === 'application/pdf') {
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    try {
+                        const loadingTask = window.pdfjsLib.getDocument({ data: e.target.result });
+                        const pdf = await loadingTask.promise;
+                        pdfDoc = pdf;
+                        totalPages = pdf.numPages;
+                        currentPageNum = 1;
+                        await renderPdfPage(currentPageNum);
+                        // Show PDF controls
+                        prevPageButton.classList.remove('hidden');
+                        nextPageButton.classList.remove('hidden');
+                        pageIndicator.classList.remove('hidden');
+                    } catch (error) {
+                        console.error('Error loading PDF:', error);
+                        showNotification("Could not load the PDF file. It might be corrupted.");
+                    }
+                };
+                reader.readAsArrayBuffer(file);
+            } else {
+                showNotification("Unsupported file-type. Please upload an image or PDF.");
+            }
+        });
+
+        // --- NEW: Palette Menu Logic ---
+        const closePaletteButton = document.getElementById('close-palette-btn');
+        const colorButtons = document.querySelectorAll('.color-option-btn');
+        const thicknessSlider = document.getElementById('thickness-slider');
+
+        function togglePalette() {
+            isPaletteOpen = !isPaletteOpen;
+            paletteMenu.classList.toggle('hidden', !isPaletteOpen);
+        }
+
+        closePaletteButton.addEventListener('click', togglePalette);
+
+        colorButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                drawingColor = button.dataset.color;
+                // Update active state visual
+                colorButtons.forEach(btn => btn.classList.remove('ring-4', 'ring-black'));
+                button.classList.add('ring-4', 'ring-black');
+            });
+        });
+        
+        // Set initial active color on load
+        const defaultColorButton = document.querySelector(`.color-option-btn[data-color="${drawingColor}"]`);
+        if (defaultColorButton) {
+            defaultColorButton.classList.add('ring-4', 'ring-black');
+        }
+
+        thicknessSlider.addEventListener('input', (e) => {
+            drawingLineWidth = parseInt(e.target.value, 10);
+        });
+        
+        // Update slider's initial value to match config
+        thicknessSlider.value = drawingLineWidth;
+
+
+        fullscreenButton.addEventListener('click', toggleFullscreen);
+
+        // MODIFIED: Added 'p' and 'i' key listeners
+        document.addEventListener('keydown', (event) => {
+            if (event.key === "Escape") {
+                if (isFullscreen) {
+                    toggleFullscreen();
+                }
+                if (isPaletteOpen) {
+                    togglePalette();
+                }
+            }
+
+            // Toggle palette with 'p' or 'P'
+            if (event.key.toLowerCase() === 'p' && event.target.tagName !== 'INPUT') {
+                togglePalette();
+            }
+            
+            // --- MODIFICATION START: Toggle landmarks with 'i' or 'I' ---
+            if (event.key.toLowerCase() === 'i' && event.target.tagName !== 'INPUT') {
+                showHandLandmarks = !showHandLandmarks; // Toggle the setting
+                showNotification(showHandLandmarks ? 'Showing Hand Landmarks' : 'Hiding Hand Landmarks');
+            }
+            // --- MODIFICATION END ---
+
+            // NEW: Toggle Shaka gesture lock with 'o' or 'O'
+            if (event.key.toLowerCase() === 'o' && event.target.tagName !== 'INPUT') {
+                isShakaLocked = !isShakaLocked; // Toggle the lock
+                if (isShakaLocked) {
+                    showNotification('Page turn gestures LOCKED');
+                } else {
+                    showNotification('Page turn gestures UNLOCKED');
+                }
+            }
+        });
+
+        nextPageButton.addEventListener('click', () => {
+            if (currentPageNum >= totalPages) return;
+            currentPageNum++;
+            renderPdfPage(currentPageNum);
+        });
+
+        prevPageButton.addEventListener('click', () => {
+            if (currentPageNum <= 1) return;
+            currentPageNum--;
+            renderPdfPage(currentPageNum);
+        });
+    </script>
 </body>
 </html>
