@@ -3,372 +3,1233 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>JEE Main 2026 Physics - Smart Board Presentation</title>
+    <title>NIELIT KOKRAJHAR EC AI Smart Class Env.</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.3/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils@0.6/control_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils@0.3/drawing_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4/hands.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <!-- Three.js for 3D Cube -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     
-    <!-- PDF.js -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-    <!-- html2canvas for Snapshots -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-    
-    <script>
-        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
-    </script>
-
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Fira+Code:wght@400;500&display=swap');
+        /* Custom styles for the loader, layout, and new UI elements */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
         
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f0f2f5;
-            overflow: hidden;
-            margin: 0;
         }
-
-        .slide-container {
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
+        .loader {
+            border: 8px solid #f3f3f3; /* Light grey */
+            border-top: 8px solid #3498db; /* Blue */
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
         }
-
-        .content-area {
-            flex: 1;
-            display: flex;
-            gap: 24px;
-            padding: 24px;
-            overflow: hidden;
-            padding-bottom: 0; /* Maximize space */
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
-
-        .question-panel {
-            flex: 1;
-            background: #525659; /* Standard PDF viewer background color */
-            border-radius: 16px 16px 0 0; /* Rounded top only */
-            padding: 0;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
-            overflow: auto;
-            border: 1px solid #e1e4e8;
-            border-bottom: none;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            position: relative;
+        .input_video {
+            display: none;
         }
-
-        .solving-panel {
-            flex: 1.2;
-            background: #ffffff;
-            border-radius: 16px 16px 0 0; /* Rounded top only */
-            border: 3px dashed #cbd5e1;
-            border-bottom: none;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        #output_canvas {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* Use contain to see the whole page */
         }
-
-        .solving-panel::before {
-            content: "SMART BOARD SOLVING SPACE";
-            color: #94a3b8;
-            font-weight: 800;
-            letter-spacing: 0.1em;
-            font-size: 1.5rem;
-            opacity: 0.2;
-        }
-
-        /* PDF Canvas Styling */
-        #the-canvas {
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-            margin-top: 20px;
-            margin-bottom: 20px;
-        }
-
-        .file-upload-wrapper {
-            position: relative;
-            overflow: hidden;
-            display: inline-block;
-        }
-        
-        .file-upload-wrapper input[type=file] {
-            font-size: 100px;
+        /* New 3D Canvas style */
+        #three_canvas {
             position: absolute;
-            left: 0;
             top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* Let clicks pass through to buttons */
+            z-index: 20; /* Above the 2D canvas */
+        }
+        .mirrored {
+            transform: scaleX(-1); /* Mirror effect */
+        }
+        /* Style for disabled buttons */
+        .disabled-button {
+            background-color: #a0aec0; /* gray-500 */
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        /* Style for notifications */
+        #notification-container {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(34, 197, 94, 0.8); /* green-500 with opacity */
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            z-index: 1000;
             opacity: 0;
-            cursor: pointer;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            font-weight: bold;
         }
-
-        /* Flash animation for snapshot */
-        @keyframes flash {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
+        #notification-container.show {
+            opacity: 1;
+            visibility: visible;
         }
-        .flash-effect {
-            animation: flash 0.3s ease-out;
-        }
-        
-        /* Custom Scrollbar for dark theme pdf viewer */
-        .question-panel::-webkit-scrollbar {
-            width: 10px;
-            height: 10px;
-        }
-        .question-panel::-webkit-scrollbar-track {
-            background: #404040;
-        }
-        .question-panel::-webkit-scrollbar-thumb {
-            background: #707070;
-            border-radius: 5px;
+        /* Fullscreen style for the container */
+        #container.fullscreen-mode {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            border-radius: 0;
+            z-index: 50;
+            background-color: #111827; /* bg-gray-900 */
         }
     </style>
 </head>
-<body>
+<body class="bg-gray-900 text-white flex flex-col items-center justify-center min-h-screen p-4">
 
-<div class="slide-container">
-    <!-- Top Header with Compact Controls -->
-    <header class="bg-slate-900 text-white p-3 flex justify-between items-center shadow-md shrink-0 z-10">
-        <!-- Left: Navigation -->
-        <div class="flex items-center gap-2">
-            <button id="prev" class="bg-slate-700 hover:bg-slate-600 p-1.5 rounded disabled:opacity-30 disabled:hover:bg-slate-700 transition-colors" title="Previous Page">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m15 18-6-6 6-6"/></svg>
-            </button>
-            <div id="page-counter" class="font-mono text-sm bg-slate-800 px-3 py-1 rounded border border-slate-700 min-w-[80px] text-center">
-                -- / --
-            </div>
-            <button id="next" class="bg-slate-700 hover:bg-slate-600 p-1.5 rounded disabled:opacity-30 disabled:hover:bg-slate-700 transition-colors" title="Next Page">
-                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
-            </button>
-        </div>
+    <div class="w-full max-w-4xl mx-auto">
+        <h1 class="text-3xl md:text-4xl font-bold text-center mb-2 text-blue-400">NIELIT KOKRAJHAR EC AI Smart Class Env.</h1>
+        <p class="text-center text-gray-400 mb-6">BANAJIT BORO</p>
 
-        <!-- Center: Zoom Controls -->
-        <div class="flex items-center gap-1 bg-slate-800 rounded p-1 border border-slate-700">
-            <button id="zoom-out" class="p-1 hover:bg-slate-700 rounded text-slate-300 hover:text-white" title="Zoom Out">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
-            </button>
-            <span id="zoom-level" class="text-xs font-mono w-10 text-center text-slate-300">100%</span>
-            <button id="zoom-in" class="p-1 hover:bg-slate-700 rounded text-slate-300 hover:text-white" title="Zoom In">
-                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/><line x1="11" y1="8" x2="11" y2="14"/><line x1="8" y1="11" x2="14" y2="11"/></svg>
-            </button>
-        </div>
-
-        <!-- Right: Actions -->
-        <div class="flex items-center gap-4">
-            <span class="text-xs text-slate-500 font-medium hidden md:inline">Snapshot: <kbd class="font-mono bg-slate-800 px-1 rounded border border-slate-700 text-slate-300">P</kbd></span>
-            <div class="file-upload-wrapper">
-                <button class="bg-blue-600 hover:bg-blue-500 text-white px-3 py-1.5 rounded-lg text-xs font-bold transition-colors flex items-center gap-2 shadow-sm">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-                    Load PDF
-                </button>
-                <input type="file" id="pdf-upload" accept=".pdf" />
+        <div id="container" class="relative w-full aspect-video rounded-lg shadow-2xl bg-gray-800 flex items-center justify-center overflow-hidden">
+            <!-- 2D Drawing Canvas -->
+            <canvas id="output_canvas" class="absolute top-0 left-0 z-0"></canvas>
+            <!-- 3D Three.js Canvas -->
+            <canvas id="three_canvas" class="hidden"></canvas> 
+            
+            <video class="input_video" id="input_video" autoplay playsinline></video>
+            <div id="loading-indicator" class="absolute inset-0 flex flex-col items-center justify-center bg-gray-800 bg-opacity-75 rounded-lg z-10">
+                <div class="loader"></div>
+                <p class="mt-4 text-lg">Initializing Camera...</p>
             </div>
         </div>
-    </header>
-
-    <!-- Main Workspace -->
-    <div class="content-area" id="capture-area">
-        <div id="question-panel" class="question-panel">
-            <div id="empty-state" class="text-slate-400 text-center p-8 flex flex-col items-center mt-20">
-                <svg xmlns="http://www.w3.org/2000/svg" width="48" height="48" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" class="mb-4 opacity-50"><path d="M14.5 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7.5L14.5 2z"/><polyline points="14 2 14 8 20 8"/></svg>
-                <p>Upload a PDF file to begin</p>
-            </div>
-            <canvas id="the-canvas" class="hidden"></canvas>
-        </div>
-        <div class="solving-panel">
-            <!-- Empty for Smart Board interaction -->
+        
+        <div class="mt-4 flex justify-center items-center flex-wrap gap-4">
+            <button id="clear-button" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors">
+                Clear All
+            </button>
+            <button id="fullscreen-button" class="hidden bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors">
+                Fullscreen
+            </button>
+            <button id="snapshot-button" class="bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors">
+                Send to phone
+            </button>
+            <input type="file" id="file-upload" class="hidden" accept="image/*,application/pdf">
+            <label for="file-upload" class="bg-pink-500 hover:bg-pink-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors cursor-pointer">
+                Upload File
+            </label>
+            <button id="prev-page-button" class="hidden bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors">Prev</button>
+            <span id="page-indicator" class="hidden text-lg"></span>
+            <button id="next-page-button" class="hidden bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors">Next</button>
         </div>
     </div>
-</div>
 
-<script>
-    // PDF State
-    const state = {
-        pdf: null,
-        pageNum: 1,
-        pageRendering: false,
-        pageNumPending: null,
-        scale: 1.0,
-        canvas: document.getElementById('the-canvas'),
-        ctx: document.getElementById('the-canvas').getContext('2d'),
-        container: document.getElementById('question-panel')
-    };
-
-    /**
-     * Get page info from document, resize canvas accordingly, and render page.
-     */
-    function renderPage(num) {
-        state.pageRendering = true;
+    <div id="palette-menu" class="hidden fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gray-800 bg-opacity-50 backdrop-blur-sm text-white p-6 rounded-lg shadow-2xl z-[60] w-80">
+        <button id="close-palette-btn" class="absolute top-3 right-3 text-gray-400 hover:text-white text-2xl font-bold">&times;</button>
         
-        // Fetch page
-        state.pdf.getPage(num).then(function(page) {
+        <label for="thickness-slider" class="block text-sm font-medium mb-2">Thickness</label>
+        <input id="thickness-slider" type="range" min="2" max="30" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+
+        <label class="block text-sm font-medium mt-6 mb-2">Color</label>
+        <div class="flex flex-wrap gap-3 justify-center">
+            <button class="color-option-btn w-10 h-10 rounded-full border-2 border-transparent hover:opacity-80 focus:outline-none" data-color="#ef4444" style="background-color: #ef4444" title="Red"></button>
+            <button class="color-option-btn w-10 h-10 rounded-full border-2 border-transparent hover:opacity-80 focus:outline-none" data-color="#f97316" style="background-color: #f97316" title="Orange"></button>
+            <button class="color-option-btn w-10 h-10 rounded-full border-2 border-transparent hover:opacity-80 focus:outline-none" data-color="#eab308" style="background-color: #eab308" title="Yellow"></button>
+            <button class="color-option-btn w-10 h-10 rounded-full border-2 border-transparent hover:opacity-80 focus:outline-none" data-color="#22c55e" style="background-color: #22c55e" title="Green"></button>
+            <button class="color-option-btn w-10 h-10 rounded-full border-2 border-transparent hover:opacity-80 focus:outline-none" data-color="#3b82f6" style="background-color: #3b82f6" title="Blue"></button>
+            <button class="color-option-btn w-10 h-10 rounded-full border-2 border-transparent hover:opacity-80 focus:outline-none" data-color="#ec4899" style="background-color: #ec4899" title="Pink"></button>
+            <button class="color-option-btn w-10 h-10 rounded-full border-2 border-transparent hover:opacity-80 focus:outline-none" data-color="#ffffff" style="background-color: #ffffff" title="White"></button>
+            <button class="color-option-btn w-10 h-10 rounded-full border-2 border-gray-400 hover:opacity-80 focus:outline-none" data-color="#000000" style="background-color: #000000" title="Black"></button>
+        </div>
+    </div>
+
+    <div id="notification-container"></div>
+
+    <script type="module">
+        // Set the workerSrc for PDF.js
+        window.pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js`;
+
+        // --- Get references to the HTML elements ---
+        const videoElement = document.getElementById('input_video');
+        const canvasElement = document.getElementById('output_canvas');
+        const threeCanvasElement = document.getElementById('three_canvas');
+        const canvasCtx = canvasElement.getContext('2d');
+        const loadingIndicator = document.getElementById('loading-indicator');
+        const clearButton = document.getElementById('clear-button');
+        const fileUploadInput = document.getElementById('file-upload');
+        const prevPageButton = document.getElementById('prev-page-button');
+        const nextPageButton = document.getElementById('next-page-button');
+        const pageIndicator = document.getElementById('page-indicator');
+        const notificationContainer = document.getElementById('notification-container');
+        const fullscreenButton = document.getElementById('fullscreen-button');
+        const container = document.getElementById('container');
+        const snapshotButton = document.getElementById('snapshot-button');
+        const paletteMenu = document.getElementById('palette-menu');
+
+
+        // --- State Variables ---
+        let currentMode = 'idle'; // 'idle', 'drawing', 'erasing', 'moving'
+        let lastMode = 'idle';
+        let currentPath = [];
+        let allPaths = [];
+        let uploadedImage = null;
+        let pdfDoc = null;
+        let currentPageNum = 1;
+        let totalPages = 0;
+        let isFullscreen = false;
+        let isPaletteOpen = false;
+        let isShakaLocked = false;
+        let isPaletteDraggingSlider = false;
+        let smoothedFingerTipPos = null;
+        let showHandLandmarks = true;
+        
+        // --- State for moving individual drawings ---
+        let selectedPathIndex = -1;
+        let moveStartPoint = null;
+        let initialSelectedPathState = null;
+        
+        // --- On-Canvas Button Control State ---
+        let lastButtonPressTime = 0;
+        const BUTTON_PRESS_COOLDOWN = 1500;
+
+        // --- Configuration ---
+        let drawingColor = '#ec4899';
+        let drawingLineWidth = 6;
+        const cursorColor = '#f87171';
+        const cursorRadius = 5;
+        const smoothingFactor = 0.5;
+        const eraserRadius = 30;
+        const eraserColor = 'rgba(255, 255, 255, 0.5)';
+
+        // --- Three.js State ---
+        let isCubeMode = false;
+        let threeScene, threeCamera, threeRenderer, threeCube;
+        // Changed to arrays for multi-face support
+        let cubeContexts = []; 
+        let cubeTextures = [];
+        let raycaster = new THREE.Raycaster();
+        let lastCubeDrawPoint = null;
+        let lastCubeFaceIndex = -1;
+        let cubeRotationStart = null;
+        let cubeRotationInitial = { x: 0, y: 0 };
+
+
+        // --- Three.js Initialization ---
+        function initThreeJS() {
+            threeScene = new THREE.Scene();
             
-            // Calculate scale to fit width (with some padding)
-            // We default to fitting width if zoom hasn't been manually set crazy high
-            const containerWidth = state.container.clientWidth - 40; // 40px padding
-            const unscaledViewport = page.getViewport({scale: 1});
-            const fitScale = containerWidth / unscaledViewport.width;
+            // Camera setup
+            const aspect = canvasElement.width / canvasElement.height;
+            threeCamera = new THREE.PerspectiveCamera(50, aspect, 0.1, 100);
+            threeCamera.position.z = 5;
+
+            // Renderer setup
+            threeRenderer = new THREE.WebGLRenderer({ canvas: threeCanvasElement, alpha: true, antialias: true });
+            threeRenderer.setSize(canvasElement.width, canvasElement.height);
+            threeRenderer.setPixelRatio(window.devicePixelRatio);
+
+            // Lighting
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+            threeScene.add(ambientLight);
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+            directionalLight.position.set(2, 2, 5);
+            threeScene.add(directionalLight);
+
+            // Initialize materials and contexts for 6 faces
+            cubeContexts = [];
+            cubeTextures = [];
+            const materials = [];
+            // faceNames array is no longer needed for display, but index matching remains same logic
+
+            for (let i = 0; i < 6; i++) {
+                const canvas = document.createElement('canvas');
+                // Using 512x512 per face for performance balance
+                canvas.width = 512; 
+                canvas.height = 512;
+                const ctx = canvas.getContext('2d');
+                
+                // Fill with a light background
+                ctx.fillStyle = '#f0f0f0';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Add a border
+                ctx.lineWidth = 20;
+                ctx.strokeStyle = '#cccccc';
+                ctx.strokeRect(0, 0, canvas.width, canvas.height);
+                
+                const texture = new THREE.CanvasTexture(canvas);
+                
+                const material = new THREE.MeshStandardMaterial({ 
+                    map: texture,
+                    color: 0xffffff,
+                    roughness: 0.3,
+                    metalness: 0.1
+                });
+
+                cubeContexts.push(ctx);
+                cubeTextures.push(texture);
+                materials.push(material);
+            }
             
-            // If it's the first load or user hasn't zoomed manually much, auto-fit width
-            // Otherwise use current state.scale
-            const viewport = page.getViewport({scale: state.scale * fitScale}); // Use relative scale factor
+            // Create Cube with array of materials (one per face)
+            const geometry = new THREE.BoxGeometry(1.5, 1.5, 1.5);
+            threeCube = new THREE.Mesh(geometry, materials);
+            threeScene.add(threeCube);
+        }
 
-            state.canvas.height = viewport.height;
-            state.canvas.width = viewport.width;
+        // --- Toggle Cube Mode ---
+        function toggleCubeMode() {
+            isCubeMode = !isCubeMode;
+            if (isCubeMode) {
+                if (!threeScene) initThreeJS();
+                threeCanvasElement.classList.remove('hidden');
+                showNotification("3D Cube Mode: ON. Pinch to Write, Move to Rotate, Fist to Move.");
+            } else {
+                threeCanvasElement.classList.add('hidden');
+                showNotification("3D Cube Mode: OFF");
+            }
+        }
+        
+        function clearCubeTexture() {
+            // Clear all 6 faces
+            if (cubeContexts.length > 0) {
+                cubeContexts.forEach((ctx, i) => {
+                    ctx.fillStyle = '#f0f0f0';
+                    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+                    ctx.lineWidth = 20;
+                    ctx.strokeStyle = '#cccccc';
+                    ctx.strokeRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+                });
+                // Update all textures
+                cubeTextures.forEach(texture => texture.needsUpdate = true);
+            }
+        }
 
-            // Render PDF page into canvas context
-            const renderContext = {
-                canvasContext: state.ctx,
-                viewport: viewport
-            };
-            const renderTask = page.render(renderContext);
 
-            // Wait for render to finish
-            renderTask.promise.then(function() {
-                state.pageRendering = false;
-                if (state.pageNumPending !== null) {
-                    // New page rendering is pending
-                    renderPage(state.pageNumPending);
-                    state.pageNumPending = null;
+        // --- UI Feedback Functions ---
+        function showNotification(message, duration = 2000) {
+            notificationContainer.textContent = message;
+            notificationContainer.classList.add('show');
+            setTimeout(() => {
+                notificationContainer.classList.remove('show');
+            }, duration);
+        }
+
+        // --- Snapshot Function ---
+        async function takeSnapshot() {
+            const phoneBotToken = '8261912175:AAHIHupCNGFNdXBsjkbHWQ5kJeGN075LRsw';
+            const phoneChatId = '1169779808';
+            const apiUrl = `https://api.telegram.org/bot${phoneBotToken}/sendPhoto`;
+            
+            showNotification('Sending to phone...');
+
+            // Create a temporary canvas to draw the mirrored image if needed
+            const tempCanvas = document.createElement('canvas');
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCanvas.width = canvasElement.width;
+            tempCanvas.height = canvasElement.height;
+
+            if (uploadedImage) {
+                tempCtx.drawImage(canvasElement, 0, 0);
+            } else {
+                tempCtx.save();
+                tempCtx.scale(-1, 1);
+                tempCtx.drawImage(canvasElement, -tempCanvas.width, 0, tempCanvas.width, tempCanvas.height);
+                tempCtx.restore();
+            }
+            
+            // If cube mode is on, draw the 3D canvas on top (unmirrored, as 3D canvas is absolute)
+            if (isCubeMode) {
+                 tempCtx.drawImage(threeCanvasElement, 0, 0, tempCanvas.width, tempCanvas.height);
+            }
+
+            tempCanvas.toBlob(async (blob) => {
+                if (!blob) {
+                    showNotification('Error creating image data.');
+                    return;
+                }
+
+                const formData = new FormData();
+                formData.append('chat_id', phoneChatId);
+                formData.append('photo', blob, `snapshot-${new Date().toISOString()}.png`);
+                formData.append('caption', 'Snapshot from NIELIT Kokrajhar Smart Class Environment.');
+
+                try {
+                    const response = await fetch(apiUrl, { method: 'POST', body: formData });
+                    const result = await response.json();
+                    if (result.ok) {
+                        showNotification('Snapshot sent to phone!');
+                    } else {
+                        showNotification(`Error: ${result.description || 'Failed to send'}`);
+                    }
+                } catch (error) {
+                    showNotification('Failed to send. Check console (CORS error expected).');
+                }
+            }, 'image/png');
+        }
+
+
+        // --- Fullscreen Toggle ---
+        function toggleFullscreen() {
+            isFullscreen = !isFullscreen;
+            container.classList.toggle('fullscreen-mode', isFullscreen);
+            const siblings = [...container.parentElement.children];
+            siblings.forEach(child => {
+                if (child.id !== 'container' && child.id !== 'palette-menu') {
+                    child.classList.toggle('hidden', isFullscreen);
                 }
             });
-        });
 
-        // Update page counters
-        document.getElementById('page-counter').textContent = `${String(num).padStart(2, '0')} / ${state.pdf.numPages}`;
-        document.getElementById('zoom-level').textContent = Math.round(state.scale * 100) + "%";
-
-        // Update Button States
-        document.getElementById('prev').disabled = num <= 1;
-        document.getElementById('next').disabled = num >= state.pdf.numPages;
-    }
-
-    /**
-     * If another page rendering in progress, waits until the rendering is
-     * finised. Otherwise, executes rendering immediately.
-     */
-    function queueRenderPage(num) {
-        if (state.pageRendering) {
-            state.pageNumPending = num;
-        } else {
-            renderPage(num);
-        }
-    }
-
-    /**
-     * Displays previous page.
-     */
-    function onPrevPage() {
-        if (state.pageNum <= 1) {
-            return;
-        }
-        state.pageNum--;
-        queueRenderPage(state.pageNum);
-    }
-    document.getElementById('prev').addEventListener('click', onPrevPage);
-
-    /**
-     * Displays next page.
-     */
-    function onNextPage() {
-        if (state.pageNum >= state.pdf.numPages) {
-            return;
-        }
-        state.pageNum++;
-        queueRenderPage(state.pageNum);
-    }
-    document.getElementById('next').addEventListener('click', onNextPage);
-
-    /**
-     * Keyboard Navigation & Snapshot
-     */
-    document.addEventListener('keydown', (e) => {
-        if (e.key === "p" || e.key === "P") {
-            takeSnapshot();
-            return;
-        }
-
-        if (!state.pdf) return;
-        if (e.key === "ArrowRight") onNextPage();
-        if (e.key === "ArrowLeft") onPrevPage();
-    });
-
-    /**
-     * Snapshot Logic
-     */
-    function takeSnapshot() {
-        const captureElement = document.getElementById('capture-area');
-        
-        // Add flash effect for feedback
-        captureElement.classList.add('flash-effect');
-        setTimeout(() => captureElement.classList.remove('flash-effect'), 300);
-
-        html2canvas(captureElement, {
-            scale: 2, // High resolution
-            useCORS: true,
-            logging: false,
-            backgroundColor: '#f0f2f5',
-            ignoreElements: (element) => {
-                // Ignore scrollbars if possible or specific UI controls if needed
-                return false;
+            if (isFullscreen) {
+                const exitButton = document.createElement('button');
+                exitButton.id = 'exit-fullscreen-btn';
+                exitButton.textContent = 'Exit Fullscreen (Esc)';
+                exitButton.className = 'fixed top-4 right-4 z-[100] bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-md';
+                exitButton.onclick = toggleFullscreen;
+                document.body.appendChild(exitButton);
+            } else {
+                const exitButton = document.getElementById('exit-fullscreen-btn');
+                if (exitButton) exitButton.remove();
+                if (isPaletteOpen) togglePalette();
             }
-        }).then(canvas => {
-            // Create download link
-            const link = document.createElement('a');
-            const timestamp = new Date().toISOString().replace(/[:.]/g, '-').slice(0, 19);
-            link.download = `smart-board-snapshot-${timestamp}.png`;
-            link.href = canvas.toDataURL('image/png');
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        }).catch(err => {
-            console.error('Snapshot failed:', err);
-            alert('Failed to take snapshot.');
+            
+            // Resize Three.js renderer
+            if (threeRenderer) {
+                threeRenderer.setSize(window.innerWidth, window.innerHeight);
+                threeCamera.aspect = window.innerWidth / window.innerHeight;
+                threeCamera.updateProjectionMatrix();
+            }
+        }
+        
+        // --- Canvas Drawing Helper Functions ---
+        function drawPaths() {
+            canvasCtx.lineCap = 'round';
+            canvasCtx.lineJoin = 'round';
+
+            allPaths.forEach((path, index) => {
+                if (path.points.length < 2) return;
+                
+                canvasCtx.beginPath();
+                if (index === selectedPathIndex) {
+                    canvasCtx.strokeStyle = '#60a5fa';
+                    canvasCtx.lineWidth = path.width + 10;
+                    canvasCtx.globalAlpha = 0.5;
+                    canvasCtx.stroke();
+                    canvasCtx.globalAlpha = 1.0;
+                }
+                
+                canvasCtx.strokeStyle = path.color;
+                canvasCtx.lineWidth = path.width;
+                canvasCtx.moveTo(path.points[0].x, path.points[0].y);
+                for (let i = 1; i < path.points.length; i++) {
+                    canvasCtx.lineTo(path.points[i].x, path.points[i].y);
+                }
+                canvasCtx.stroke();
+            });
+
+            if (currentPath.length > 1) {
+                canvasCtx.beginPath();
+                canvasCtx.strokeStyle = drawingColor;
+                canvasCtx.lineWidth = drawingLineWidth;
+                canvasCtx.moveTo(currentPath[0].x, currentPath[0].y);
+                for (let i = 1; i < currentPath.length; i++) {
+                    canvasCtx.lineTo(currentPath[i].x, currentPath[i].y);
+                }
+                canvasCtx.stroke();
+            }
+        }
+        
+        function drawRoundRect(ctx, x, y, width, height, radius) {
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + width - radius, y);
+            ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+            ctx.lineTo(x + width, y + height - radius);
+            ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+            ctx.lineTo(x + radius, y + height);
+            ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        function isPointNearPath(point, path, threshold) {
+            if (path.points.length < 2) return false;
+            for (let i = 0; i < path.points.length - 1; i++) {
+                const p1 = path.points[i];
+                const p2 = path.points[i + 1];
+                const l2 = (p2.x - p1.x) ** 2 + (p2.y - p1.y) ** 2;
+                if (l2 === 0) {
+                    if (Math.hypot(point.x - p1.x, point.y - p1.y) < threshold) return true;
+                    continue;
+                }
+                let t = ((point.x - p1.x) * (p2.x - p1.x) + (point.y - p1.y) * (p2.y - p1.y)) / l2;
+                t = Math.max(0, Math.min(1, t));
+                const closestPoint = {
+                    x: p1.x + t * (p2.x - p1.x),
+                    y: p1.y + t * (p2.y - p1.y)
+                };
+                if (Math.hypot(point.x - closestPoint.x, point.y - closestPoint.y) < threshold) return true;
+            }
+            return false;
+        }
+
+        // --- Main Animation Loop ---
+        function onResults(results) {
+            if (loadingIndicator.style.display !== 'none') {
+                loadingIndicator.style.display = 'none';
+            }
+
+            if (uploadedImage) {
+                canvasElement.classList.remove('mirrored');
+            } else {
+                canvasElement.classList.add('mirrored');
+            }
+
+            canvasElement.width = isFullscreen ? window.innerWidth : videoElement.videoWidth;
+            canvasElement.height = isFullscreen ? window.innerHeight : videoElement.videoHeight;
+            
+            // Resize Three.js canvas if active
+            if (isCubeMode && threeRenderer) {
+                const threeCanvas = threeRenderer.domElement;
+                if (threeCanvas.width !== canvasElement.width || threeCanvas.height !== canvasElement.height) {
+                    threeRenderer.setSize(canvasElement.width, canvasElement.height);
+                    threeCamera.aspect = canvasElement.width / canvasElement.height;
+                    threeCamera.updateProjectionMatrix();
+                }
+            }
+
+
+            canvasCtx.save();
+            canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+
+            // 1. Draw Background
+            if (uploadedImage) {
+                canvasCtx.drawImage(uploadedImage, 0, 0, canvasElement.width, canvasElement.height);
+            } else {
+                canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+            }
+
+            // 2. Draw user-made paths (Only if NOT in Cube Mode or just overlay them?)
+            // We draw them behind the cube so it feels layered
+            drawPaths();
+            
+            // 3. Handle hand detection
+            if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+                let handLandmarks = results.multiHandLandmarks[0];
+
+                if (uploadedImage) {
+                    handLandmarks = handLandmarks.map(landmark => { return { ...landmark, x: 1 - landmark.x }; });
+                }
+
+                handlePdfNavigation(handLandmarks);
+                
+                if (isPaletteOpen) {
+                    handlePaletteInteraction(handLandmarks);
+                }
+                
+                if (isCubeMode) {
+                    handleCubeInteraction(handLandmarks);
+                } else {
+                    handleGestures(handLandmarks);
+                }
+
+                if (showHandLandmarks) {
+                    window.drawConnectors(canvasCtx, handLandmarks, window.HAND_CONNECTIONS, { color: '#34d399', lineWidth: 5 });
+                    
+                    const landmarkColor =
+                        currentMode === 'drawing' ? '#ec4899' :
+                        currentMode === 'erasing' ? '#ffffff' :
+                        currentMode === 'moving' ? '#3b82f6' :
+                        '#f87171';
+                    window.drawLandmarks(canvasCtx, handLandmarks, { color: landmarkColor, lineWidth: 2 });
+                } else {
+                    // Draw cursor if landmarks are hidden
+                    const indexTip = handLandmarks[8];
+                    const cursorTarget = { x: indexTip.x * canvasElement.width, y: indexTip.y * canvasElement.height };
+                    if (!smoothedFingerTipPos) {
+                        smoothedFingerTipPos = cursorTarget;
+                    } else {
+                        smoothedFingerTipPos.x = smoothedFingerTipPos.x * (1 - smoothingFactor) + cursorTarget.x * smoothingFactor;
+                        smoothedFingerTipPos.y = smoothedFingerTipPos.y * (1 - smoothingFactor) + cursorTarget.y * smoothingFactor;
+                    }
+                    canvasCtx.fillStyle = cursorColor;
+                    canvasCtx.beginPath();
+                    canvasCtx.arc(smoothedFingerTipPos.x, smoothedFingerTipPos.y, cursorRadius, 0, 2 * Math.PI);
+                    canvasCtx.fill();
+                }
+
+            } else {
+                // Hand lost
+                 if (!isCubeMode) {
+                     if (currentMode === 'drawing') {
+                        if (currentPath.length > 1) {
+                            allPaths.push({ points: currentPath, color: drawingColor, width: drawingLineWidth });
+                        }
+                        currentPath = [];
+                    }
+                    currentMode = 'idle';
+                    selectedPathIndex = -1;
+                 } else {
+                     lastCubeDrawPoint = null; // Reset writing on cube
+                     cubeRotationStart = null; // Stop rotation
+                 }
+                
+                smoothedFingerTipPos = null;
+                isPaletteDraggingSlider = false;
+            }
+            
+            canvasCtx.restore();
+
+            // Render Three.js Scene
+            if (isCubeMode && threeRenderer) {
+                threeCube.rotation.x += 0.002; // Slight auto rotation for 3D feel when idle?
+                threeCube.rotation.y += 0.002;
+                threeRenderer.render(threeScene, threeCamera);
+            }
+        }
+        
+        // --- 3D Cube Interaction Logic ---
+        function handleCubeInteraction(handLandmarks) {
+            const indexTip = handLandmarks[8];
+            const thumbTip = handLandmarks[4];
+            const middleTip = handLandmarks[12];
+            
+            // Calculate pinch for writing
+            const pinchDistance = Math.hypot(indexTip.x - thumbTip.x, indexTip.y - thumbTip.y);
+            const isPinching = pinchDistance < 0.04;
+
+            // Calculate gestures based on extension
+            const isIndexExtended = indexTip.y < handLandmarks[6].y;
+            const isMiddleExtended = middleTip.y < handLandmarks[10].y;
+            const isRingExtended = handLandmarks[16].y < handLandmarks[14].y;
+            const isPinkyExtended = handLandmarks[20].y < handLandmarks[18].y;
+            
+            // Gesture Definitions
+            const isMoveGesture = isIndexExtended && isMiddleExtended && !isRingExtended && !isPinkyExtended; // Peace Sign -> Rotate
+            const isFist = !isIndexExtended && !isMiddleExtended && !isRingExtended && !isPinkyExtended; // Fist -> Move Location
+
+            // 1. Raycasting Setup (for Writing)
+            let ndcX, ndcY;
+            
+            if (uploadedImage) {
+                 ndcX = (indexTip.x * 2) - 1;
+            } else {
+                ndcX = 1 - (indexTip.x * 2); 
+            }
+            
+            ndcY = -(indexTip.y * 2) + 1;
+
+            raycaster.setFromCamera(new THREE.Vector2(ndcX, ndcY), threeCamera);
+            const intersects = raycaster.intersectObject(threeCube);
+
+            // 2. Interaction Handling
+            
+            if (isFist) {
+                // MOVE LOCATION (Translation)
+                currentMode = 'moving_cube_location';
+                
+                // Calculate palm center
+                const palmX = (handLandmarks[0].x + handLandmarks[9].x) / 2;
+                const palmY = (handLandmarks[0].y + handLandmarks[9].y) / 2;
+                
+                // Convert Palm to NDC
+                let palmNdcX;
+                if (uploadedImage) {
+                    palmNdcX = (palmX * 2) - 1;
+                } else {
+                    palmNdcX = 1 - (palmX * 2);
+                }
+                const palmNdcY = -(palmY * 2) + 1;
+
+                // Project to 3D Plane at Z=0
+                // We assume the cube lives at Z=0. We unproject the palm vector.
+                const vector = new THREE.Vector3(palmNdcX, palmNdcY, 0.5);
+                vector.unproject(threeCamera);
+                const dir = vector.sub(threeCamera.position).normalize();
+                const distance = -threeCamera.position.z / dir.z; // Distance to Z=0 plane
+                const newPos = threeCamera.position.clone().add(dir.multiplyScalar(distance));
+                
+                threeCube.position.set(newPos.x, newPos.y, 0);
+                
+                lastCubeDrawPoint = null;
+                cubeRotationStart = null;
+
+            } else if (isMoveGesture) {
+                // ROTATE (Orientation)
+                currentMode = 'rotating_3d';
+                const currentPos = { x: indexTip.x, y: indexTip.y };
+                
+                if (!cubeRotationStart) {
+                    cubeRotationStart = currentPos;
+                    cubeRotationInitial = { x: threeCube.rotation.y, y: threeCube.rotation.x };
+                } else {
+                    const deltaX = (currentPos.x - cubeRotationStart.x) * 5;
+                    const deltaY = (currentPos.y - cubeRotationStart.y) * 5;
+
+                    threeCube.rotation.y = cubeRotationInitial.x + deltaX;
+                    threeCube.rotation.x = cubeRotationInitial.y + deltaY;
+                }
+                lastCubeDrawPoint = null;
+
+            } else if (isPinching && intersects.length > 0) {
+                // WRITE
+                currentMode = 'writing_3d';
+                const intersect = intersects[0];
+                const materialIndex = intersect.face.materialIndex;
+                const uv = intersect.uv;
+
+                if (materialIndex !== undefined && cubeContexts[materialIndex]) {
+                    const ctx = cubeContexts[materialIndex];
+                    const texture = cubeTextures[materialIndex];
+                    
+                    const canvasX = uv.x * ctx.canvas.width;
+                    const canvasY = (1 - uv.y) * ctx.canvas.height;
+
+                    // If we switch faces, reset the drawing stroke
+                    if (lastCubeFaceIndex !== materialIndex) {
+                        lastCubeDrawPoint = null;
+                    }
+                    lastCubeFaceIndex = materialIndex;
+
+                    ctx.lineWidth = drawingLineWidth * 2;
+                    ctx.lineCap = 'round';
+                    ctx.lineJoin = 'round';
+                    ctx.strokeStyle = drawingColor;
+
+                    if (lastCubeDrawPoint) {
+                        ctx.beginPath();
+                        ctx.moveTo(lastCubeDrawPoint.x, lastCubeDrawPoint.y);
+                        ctx.lineTo(canvasX, canvasY);
+                        ctx.stroke();
+                    }
+                    lastCubeDrawPoint = { x: canvasX, y: canvasY };
+                    texture.needsUpdate = true;
+                }
+                cubeRotationStart = null;
+                
+            } else {
+                // Idle
+                lastCubeDrawPoint = null;
+                cubeRotationStart = null;
+                lastCubeFaceIndex = -1;
+                if (currentMode.includes('3d')) currentMode = 'idle';
+            }
+        }
+
+
+        function handlePdfNavigation(handLandmarks) {
+            if (!pdfDoc) return;
+            
+            const buttonWidth = 120;
+            const buttonHeight = 70;
+            const buttonPadding = 20;
+            const buttonRadius = 15;
+
+            const prevButtonRect = { x: buttonPadding, y: buttonPadding, width: buttonWidth, height: buttonHeight };
+            const nextButtonRect = { x: canvasElement.width - buttonWidth - buttonPadding, y: buttonPadding, width: buttonWidth, height: buttonHeight };
+            
+            const indexTip = handLandmarks[8];
+            const indexTipPos = { x: indexTip.x * canvasElement.width, y: indexTip.y * canvasElement.height };
+            const now = Date.now();
+            let prevButtonHover = false;
+            let nextButtonHover = false;
+            const cooldown = 1000;
+
+            if (now - lastButtonPressTime > cooldown &&
+                indexTipPos.x > prevButtonRect.x && indexTipPos.x < prevButtonRect.x + prevButtonRect.width &&
+                indexTipPos.y > prevButtonRect.y && indexTipPos.y < prevButtonRect.y + prevButtonRect.height) {
+                prevButtonHover = true;
+                prevPageButton.click();
+                lastButtonPressTime = now;
+            }
+
+            if (now - lastButtonPressTime > cooldown &&
+                indexTipPos.x > nextButtonRect.x && indexTipPos.x < nextButtonRect.x + nextButtonRect.width &&
+                indexTipPos.y > nextButtonRect.y && indexTipPos.y < nextButtonRect.y + nextButtonRect.height) {
+                nextButtonHover = true;
+                nextPageButton.click();
+                lastButtonPressTime = now;
+            }
+            
+            canvasCtx.font = 'bold 30px Inter';
+            canvasCtx.textAlign = 'center';
+            canvasCtx.textBaseline = 'middle';
+
+            canvasCtx.fillStyle = prevButtonHover ? 'rgba(96, 165, 250, 0.8)' : 'rgba(96, 165, 250, 0.5)';
+            drawRoundRect(canvasCtx, prevButtonRect.x, prevButtonRect.y, prevButtonRect.width, prevButtonRect.height, buttonRadius);
+            canvasCtx.fillStyle = 'white';
+            canvasCtx.fillText('PREV', prevButtonRect.x + prevButtonRect.width / 2, prevButtonRect.y + prevButtonRect.height / 2);
+            
+            canvasCtx.fillStyle = nextButtonHover ? 'rgba(96, 165, 250, 0.8)' : 'rgba(96, 165, 250, 0.5)';
+            drawRoundRect(canvasCtx, nextButtonRect.x, nextButtonRect.y, nextButtonRect.width, nextButtonRect.height, buttonRadius);
+            canvasCtx.fillStyle = 'white';
+            canvasCtx.fillText('NEXT', nextButtonRect.x + nextButtonRect.width / 2, nextButtonRect.y + nextButtonRect.height / 2);
+        }
+
+        function getViewportCoords(landmarkX, landmarkY, canvasElement) {
+            const canvasDisplayRect = canvasElement.getBoundingClientRect();
+            const canvasInternalWidth = canvasElement.width;
+            const canvasInternalHeight = canvasElement.height;
+
+            const internalAspect = canvasInternalWidth / canvasInternalHeight;
+            const displayAspect = canvasDisplayRect.width / canvasDisplayRect.height;
+
+            let scale = 1;
+            let offsetX = 0;
+            let offsetY = 0;
+
+            if (internalAspect > displayAspect) {
+                scale = canvasDisplayRect.width / canvasInternalWidth;
+                offsetY = (canvasDisplayRect.height - (canvasInternalHeight * scale)) / 2;
+            } else {
+                scale = canvasDisplayRect.height / canvasInternalHeight;
+                offsetX = (canvasDisplayRect.width - (canvasInternalWidth * scale)) / 2;
+            }
+
+            const canvasX = landmarkX * canvasInternalWidth;
+            const canvasY = landmarkY * canvasInternalHeight;
+            const displayX = (canvasX * scale) + offsetX;
+            const displayY = (canvasY * scale) + offsetY;
+            const viewportX = canvasDisplayRect.left + displayX;
+            const viewportY = canvasDisplayRect.top + displayY;
+            
+            return { x: viewportX, y: viewportY };
+        }
+
+        function handlePaletteInteraction(handLandmarks) {
+            const indexTip = handLandmarks[8];
+            const indexPip = handLandmarks[6];
+            const middleTip = handLandmarks[12];
+            const middlePip = handLandmarks[10];
+            const ringTip = handLandmarks[16];
+            const ringPip = handLandmarks[14];
+            const pinkyTip = handLandmarks[20];
+            const pinkyPip = handLandmarks[18];
+
+            const isIndexExtended = indexTip.y < indexPip.y;
+            const isMiddleExtended = middleTip.y < middlePip.y;
+            const isRingExtended = ringTip.y < ringPip.y;
+            const isPinkyExtended = pinkyTip.y < pinkyPip.y;
+
+            const isPointingGesture = isIndexExtended && !isMiddleExtended && !isRingExtended && !isPinkyExtended;
+
+            const colorButtons = document.querySelectorAll('.color-option-btn');
+            const thicknessSlider = document.getElementById('thickness-slider');
+
+            let landmarkX = indexTip.x;
+            if (uploadedImage === null) {
+                landmarkX = 1.0 - indexTip.x; 
+            }
+            
+            const { x: pointX, y: pointY } = getViewportCoords(landmarkX, indexTip.y, canvasElement);
+            const now = Date.now();
+            
+            colorButtons.forEach(btn => btn.classList.remove('ring-yellow-400'));
+
+            if (isPointingGesture) {
+                const sliderRect = thicknessSlider.getBoundingClientRect();
+                const isHoveringSlider = pointX > sliderRect.left && pointX < sliderRect.right &&
+                                         pointY > sliderRect.top && pointY < sliderRect.bottom;
+
+            if (isPaletteDraggingSlider) {
+                    const percent = Math.max(0, Math.min(1, (pointX - sliderRect.left) / sliderRect.width));
+                    const min = parseFloat(thicknessSlider.min);
+                    const max = parseFloat(thicknessSlider.max);
+                    let newValue = min + (max - min) * percent;
+                    newValue = Math.round(newValue);
+                    thicknessSlider.value = newValue;
+                    thicknessSlider.dispatchEvent(new Event('input'));
+                
+                } else if (now - lastButtonPressTime > 500) {
+                    
+                    if (isHoveringSlider) {
+                        isPaletteDraggingSlider = true;
+                        lastButtonPressTime = now;
+                        const percent = Math.max(0, Math.min(1, (pointX - sliderRect.left) / sliderRect.width));
+                        const min = parseFloat(thicknessSlider.min);
+                        const max = parseFloat(thicknessSlider.max);
+                        let newValue = min + (max - min) * percent;
+                        newValue = Math.round(newValue);
+                        thicknessSlider.value = newValue;
+                        thicknessSlider.dispatchEvent(new Event('input'));
+
+                    } else {
+                        for (const button of colorButtons) {
+                            const rect = button.getBoundingClientRect();
+                            if (pointX > rect.left && pointX < rect.right && pointY > rect.top && pointY < rect.bottom) {
+                                button.click();
+                                lastButtonPressTime = now;
+                                break;
+                            }
+                        }
+                    }
+                }
+            } else {
+                isPaletteDraggingSlider = false;
+            }
+        }
+
+        function handleGestures(handLandmarks) {
+            const thumbTip = handLandmarks[4];
+            const thumbIp = handLandmarks[3];
+            const indexTip = handLandmarks[8];
+            const indexPip = handLandmarks[6];
+            const middleTip = handLandmarks[12];
+            const middlePip = handLandmarks[10];
+            const ringTip = handLandmarks[16];
+            const ringPip = handLandmarks[14];
+            const pinkyTip = handLandmarks[20];
+            const pinkyPip = handLandmarks[18];
+
+            const isIndexExtended = indexTip.y < indexPip.y;
+            const isMiddleExtended = middleTip.y < middlePip.y;
+            const isRingExtended = ringTip.y < ringPip.y;
+            const isPinkyExtended = pinkyTip.y < pinkyPip.y;
+            
+            const isThumbExtended = (uploadedImage) 
+                ? thumbTip.x < thumbIp.x
+                : thumbTip.x > thumbIp.x;
+            
+            const now = Date.now();
+            const isShakaGesture = isThumbExtended && !isIndexExtended && !isMiddleExtended && !isRingExtended && isPinkyExtended;
+
+            if (pdfDoc && now - lastButtonPressTime > BUTTON_PRESS_COOLDOWN && !isShakaLocked) {
+                const isPalmForwardForShaka = (uploadedImage) 
+                    ? thumbTip.x < pinkyTip.x
+                    : thumbTip.x > pinkyTip.x;
+
+                if (isShakaGesture && isPalmForwardForShaka) {
+                    nextPageButton.click();
+                    lastButtonPressTime = now;
+                    showNotification('Next Page (Shaka)');
+                    return;
+                }
+                
+                if (isShakaGesture && !isPalmForwardForShaka) {
+                    prevPageButton.click();
+                    lastButtonPressTime = now;
+                    showNotification('Previous Page (Reverse Shaka)');
+                    return;
+                }
+            }
+            
+            const isAllFingersUp = isIndexExtended && isMiddleExtended && isRingExtended && isPinkyExtended;
+            const isSplitFinger = Math.abs(middleTip.x - ringTip.x) > 0.07;
+            const areFingersPaired = Math.abs(indexTip.x - middleTip.x) < 0.06 && Math.abs(ringTip.x - pinkyTip.x) < 0.06;
+            const isVulcanSalute = isAllFingersUp && isSplitFinger && areFingersPaired;
+
+            if (isVulcanSalute && now - lastButtonPressTime > BUTTON_PRESS_COOLDOWN) {
+                takeSnapshot();
+                lastButtonPressTime = now;
+                return;
+            }
+
+            const isFist = !isIndexExtended && !isMiddleExtended && !isRingExtended && !isPinkyExtended;
+            const drawGestureDistance = Math.hypot(indexTip.x - thumbTip.x, indexTip.y - thumbTip.y);
+            const isDrawingGesture = drawGestureDistance < 0.04;
+            const isMoveGesture = isIndexExtended && isMiddleExtended && !isRingExtended && !isPinkyExtended;
+
+            if (isFist) {
+                currentMode = 'erasing';
+                selectedPathIndex = -1;
+                if (lastMode === 'drawing' && currentPath.length > 0) {
+                    currentPath = [];
+                }
+
+                const palmCenterX = (handLandmarks[5].x + handLandmarks[9].x) / 2;
+                const palmCenterY = (handLandmarks[5].y + handLandmarks[9].y) / 2;
+                const eraserPos = {
+                    x: palmCenterX * canvasElement.width,
+                    y: palmCenterY * canvasElement.height
+                };
+
+                canvasCtx.fillStyle = eraserColor;
+                canvasCtx.beginPath();
+                canvasCtx.arc(eraserPos.x, eraserPos.y, eraserRadius, 0, 2 * Math.PI);
+                canvasCtx.fill();
+
+                allPaths = allPaths.filter(path =>
+                    !path.points.some(point =>
+                        Math.hypot(point.x - eraserPos.x, point.y - eraserPos.y) < eraserRadius
+                    )
+                );
+
+            } else if (isDrawingGesture && showHandLandmarks) {
+                currentMode = 'drawing';
+                selectedPathIndex = -1;
+                const fingerTipMidpoint = {
+                    x: ((indexTip.x + thumbTip.x) / 2) * canvasElement.width,
+                    y: ((indexTip.y + thumbTip.y) / 2) * canvasElement.height
+                };
+
+                if (!smoothedFingerTipPos || lastMode !== 'drawing') {
+                    smoothedFingerTipPos = fingerTipMidpoint;
+                } else {
+                    smoothedFingerTipPos.x = smoothedFingerTipPos.x * (1 - smoothingFactor) + fingerTipMidpoint.x * smoothingFactor;
+                    smoothedFingerTipPos.y = smoothedFingerTipPos.y * (1 - smoothingFactor) + fingerTipMidpoint.y * smoothingFactor;
+                }
+
+                if (lastMode !== 'drawing') {
+                    currentPath = [{...smoothedFingerTipPos}];
+                } else {
+                    currentPath.push({...smoothedFingerTipPos});
+                }
+            } else if (isMoveGesture) {
+                currentMode = 'moving';
+                const moveCenterPoint = {
+                    x: ((indexTip.x + middleTip.x) / 2) * canvasElement.width,
+                    y: ((indexTip.y + middleTip.y) / 2) * canvasElement.height
+                };
+
+                if (selectedPathIndex === -1) {
+                    for (let i = allPaths.length - 1; i >= 0; i--) {
+                        if (isPointNearPath(moveCenterPoint, allPaths[i], 30)) {
+                            selectedPathIndex = i;
+                            moveStartPoint = moveCenterPoint;
+                            initialSelectedPathState = JSON.parse(JSON.stringify(allPaths[i]));
+                            break;
+                        }
+                    }
+                } else {
+                    if (lastMode !== 'moving') {
+                        moveStartPoint = moveCenterPoint;
+                        initialSelectedPathState = JSON.parse(JSON.stringify(allPaths[selectedPathIndex]));
+                    } else {
+                        const deltaX = moveCenterPoint.x - moveStartPoint.x;
+                        const deltaY = moveCenterPoint.y - moveStartPoint.y;
+
+                        allPaths[selectedPathIndex] = {
+                            ...initialSelectedPathState,
+                            points: initialSelectedPathState.points.map(point => ({
+                                x: point.x + deltaX,
+                                y: point.y + deltaY
+                            }))
+                        };
+                    }
+                }
+
+            } else {
+                currentMode = 'idle';
+                if (lastMode === 'drawing') {
+                    if (currentPath.length > 1) {
+                        allPaths.push({ points: currentPath, color: drawingColor, width: drawingLineWidth });
+                    }
+                    currentPath = [];
+                } else if (lastMode === 'moving') {
+                    selectedPathIndex = -1;
+                    moveStartPoint = null;
+                    initialSelectedPathState = null;
+                }
+
+                const cursorTarget = { x: indexTip.x * canvasElement.width, y: indexTip.y * canvasElement.height };
+                if (!smoothedFingerTipPos || lastMode !== 'idle') {
+                    smoothedFingerTipPos = cursorTarget;
+                } else {
+                    smoothedFingerTipPos.x = smoothedFingerTipPos.x * (1 - smoothingFactor) + cursorTarget.x * smoothingFactor;
+                    smoothedFingerTipPos.y = smoothedFingerTipPos.y * (1 - smoothingFactor) + cursorTarget.y * smoothingFactor;
+                }
+            }
+            lastMode = currentMode;
+        }
+
+
+        async function renderPdfPage(num) {
+            if (!pdfDoc || num < 1 || num > totalPages) return;
+            
+            try {
+                const page = await pdfDoc.getPage(num);
+                const viewport = page.getViewport({ scale: 2.0 });
+                const tempCanvas = document.createElement('canvas');
+                const tempCtx = tempCanvas.getContext('2d');
+                tempCanvas.height = viewport.height;
+                tempCanvas.width = viewport.width;
+
+                await page.render({ canvasContext: tempCtx, viewport: viewport }).promise;
+                
+                const img = new Image();
+                img.onload = () => {
+                    uploadedImage = img;
+                    allPaths = [];
+                    currentPath = [];
+                };
+                img.src = tempCanvas.toDataURL();
+                pageIndicator.textContent = `Page ${num} of ${totalPages}`;
+                
+                prevPageButton.disabled = num <= 1;
+                nextPageButton.disabled = num >= totalPages;
+                prevPageButton.classList.toggle('disabled-button', num <= 1);
+                nextPageButton.classList.toggle('disabled-button', num >= totalPages);
+
+            } catch(error) {
+                console.error("Failed to render PDF page:", error);
+                showNotification("Failed to render PDF page.");
+            }
+        }
+
+        // --- Initialization and Event Listeners ---
+        const hands = new window.Hands({
+            locateFile: (file) => {
+                return `https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4/${file}`;
+            }
         });
-    }
+        hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.7, minTrackingConfidence: 0.7 });
+        hands.onResults(onResults);
+        const camera = new window.Camera(videoElement, { onFrame: async () => { await hands.send({ image: videoElement }); }, width: 1280, height: 720 });
+        camera.start();
 
-    /**
-     * Zoom Controls
-     */
-    document.getElementById('zoom-in').addEventListener('click', () => {
-        if(!state.pdf) return;
-        state.scale += 0.2;
-        queueRenderPage(state.pageNum);
-    });
+        clearButton.addEventListener('click', () => {
+            if (isFullscreen) {
+                toggleFullscreen();
+            }
+            fullscreenButton.classList.add('hidden');
+            allPaths = [];
+            currentPath = [];
+            uploadedImage = null;
+            pdfDoc = null;
+            fileUploadInput.value = '';
+            prevPageButton.classList.add('hidden');
+            nextPageButton.classList.add('hidden');
+            pageIndicator.classList.add('hidden');
+            clearCubeTexture(); // Clear the cube too
+        });
 
-    document.getElementById('zoom-out').addEventListener('click', () => {
-        if(!state.pdf) return;
-        if (state.scale > 0.4) {
-            state.scale -= 0.2;
-            queueRenderPage(state.pageNum);
+        snapshotButton.addEventListener('click', takeSnapshot);
+
+        fileUploadInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
+
+            fullscreenButton.classList.remove('hidden');
+
+            allPaths = [];
+            currentPath = [];
+            pdfDoc = null;
+            uploadedImage = null;
+
+            if (file.type.startsWith('image/')) {
+                prevPageButton.classList.add('hidden');
+                nextPageButton.classList.add('hidden');
+                pageIndicator.classList.add('hidden');
+                
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => { uploadedImage = img; };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            } else if (file.type === 'application/pdf') {
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    try {
+                        const loadingTask = window.pdfjsLib.getDocument({ data: e.target.result });
+                        const pdf = await loadingTask.promise;
+                        pdfDoc = pdf;
+                        totalPages = pdf.numPages;
+                        currentPageNum = 1;
+                        await renderPdfPage(currentPageNum);
+                        prevPageButton.classList.remove('hidden');
+                        nextPageButton.classList.remove('hidden');
+                        pageIndicator.classList.remove('hidden');
+                    } catch (error) {
+                        console.error('Error loading PDF:', error);
+                        showNotification("Could not load the PDF file. It might be corrupted.");
+                    }
+                };
+                reader.readAsArrayBuffer(file);
+            } else {
+                showNotification("Unsupported file-type. Please upload an image or PDF.");
+            }
+        });
+
+        const closePaletteButton = document.getElementById('close-palette-btn');
+        const colorButtons = document.querySelectorAll('.color-option-btn');
+        const thicknessSlider = document.getElementById('thickness-slider');
+
+        function togglePalette() {
+            isPaletteOpen = !isPaletteOpen;
+            paletteMenu.classList.toggle('hidden', !isPaletteOpen);
         }
-    });
 
+        closePaletteButton.addEventListener('click', togglePalette);
 
-    /**
-     * File Upload Handling
-     */
-    document.getElementById('pdf-upload').addEventListener('change', function(e) {
-        const file = e.target.files[0];
-        if (file && file.type === "application/pdf") {
-            const fileReader = new FileReader();
-            fileReader.onload = function() {
-                const typedarray = new Uint8Array(this.result);
-
-                // Load PDF
-                pdfjsLib.getDocument(typedarray).promise.then(function(pdfDoc) {
-                    state.pdf = pdfDoc;
-                    state.pageNum = 1;
-                    
-                    // UI Updates
-                    document.getElementById('empty-state').classList.add('hidden');
-                    document.getElementById('the-canvas').classList.remove('hidden');
-                    
-                    renderPage(state.pageNum);
-                });
-            };
-            fileReader.readAsArrayBuffer(file);
+        colorButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                drawingColor = button.dataset.color;
+                colorButtons.forEach(btn => btn.classList.remove('ring-4', 'ring-black'));
+                button.classList.add('ring-4', 'ring-black');
+            });
+        });
+        
+        const defaultColorButton = document.querySelector(`.color-option-btn[data-color="${drawingColor}"]`);
+        if (defaultColorButton) {
+            defaultColorButton.classList.add('ring-4', 'ring-black');
         }
-    });
-</script>
 
+        thicknessSlider.addEventListener('input', (e) => {
+            drawingLineWidth = parseInt(e.target.value, 10);
+        });
+        
+        thicknessSlider.value = drawingLineWidth;
+
+
+        fullscreenButton.addEventListener('click', toggleFullscreen);
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === "Escape") {
+                if (isFullscreen) {
+                    toggleFullscreen();
+                }
+                if (isPaletteOpen) {
+                    togglePalette();
+                }
+            }
+
+            if (event.key.toLowerCase() === 'p' && event.target.tagName !== 'INPUT') {
+                togglePalette();
+            }
+            
+            if (event.key.toLowerCase() === 'i' && event.target.tagName !== 'INPUT') {
+                showHandLandmarks = !showHandLandmarks;
+                showNotification(showHandLandmarks ? 'Showing Hand Landmarks' : 'Hiding Hand Landmarks');
+            }
+
+            if (event.key.toLowerCase() === 'o' && event.target.tagName !== 'INPUT') {
+                isShakaLocked = !isShakaLocked;
+                if (isShakaLocked) {
+                    showNotification('Page turn gestures LOCKED');
+                } else {
+                    showNotification('Page turn gestures UNLOCKED');
+                }
+            }
+
+            // NEW: Toggle 3D Cube with 'U'
+            if (event.key.toLowerCase() === 'u' && event.target.tagName !== 'INPUT') {
+                toggleCubeMode();
+            }
+        });
+
+        nextPageButton.addEventListener('click', () => {
+            if (currentPageNum >= totalPages) return;
+            currentPageNum++;
+            renderPdfPage(currentPageNum);
+        });
+
+        prevPageButton.addEventListener('click', () => {
+            if (currentPageNum <= 1) return;
+            currentPageNum--;
+            renderPdfPage(currentPageNum);
+        });
+    </script>
 </body>
 </html>
