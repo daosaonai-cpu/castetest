@@ -1,1235 +1,658 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NIELIT KOKRAJHAR EC AI Smart Class Env.</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.3/camera_utils.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils@0.6/control_utils.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils@0.3/drawing_utils.js" crossorigin="anonymous"></script>
-    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4/hands.js" crossorigin="anonymous"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
-    <!-- Three.js for 3D Cube -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+import React, { useState, useRef, useMemo } from 'react';
+import { 
+  ChevronRight, 
+  ChevronLeft, 
+  BrainCircuit, 
+  LineChart, 
+  Target, 
+  Play, 
+  Trash2, 
+  Undo,
+  Info
+} from 'lucide-react';
+
+// --- MATH UTILS ---
+
+// Calculate Linear Regression (Ordinary Least Squares)
+const calculateRegressionLine = (points) => {
+  if (points.length < 2) return null;
+  let sumX = 0, sumY = 0, sumXY = 0, sumXX = 0;
+  const n = points.length;
+  points.forEach(p => {
+    sumX += p.x;
+    sumY += p.y;
+    sumXY += p.x * p.y;
+    sumXX += p.x * p.x;
+  });
+  const denominator = (n * sumXX - sumX * sumX);
+  if (denominator === 0) return null; 
+  const m = (n * sumXY - sumX * sumY) / denominator;
+  const c = (sumY - m * sumX) / n;
+  return { m, c };
+};
+
+// Calculate Euclidean Distance
+const distance = (p1, p2) => Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
+
+// --- INTERACTIVE COMPONENTS ---
+
+const LinearRegressionInteractive = () => {
+  const [points, setPoints] = useState([]);
+  const [showResiduals, setShowResiduals] = useState(false);
+  const svgRef = useRef(null);
+
+  const handleSvgClick = (e) => {
+    if (!svgRef.current) return;
+    const rect = svgRef.current.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 500;
+    const y = ((e.clientY - rect.top) / rect.height) * 400;
+    setPoints([...points, { x, y }]);
+  };
+
+  const line = calculateRegressionLine(points);
+
+  const getLineCoordinates = () => {
+    if (!line) return null;
+    // Calculate y for x=0 and x=500
+    const y1 = line.m * 0 + line.c;
+    const y2 = line.m * 500 + line.c;
+    return { x1: 0, y1, x2: 500, y2 };
+  };
+
+  const lineCoords = getLineCoordinates();
+
+  return (
+    <div className="flex flex-col h-full bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+      <div className="p-4 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
+        <div>
+          <h3 className="font-semibold text-slate-800 flex items-center gap-2">
+            <LineChart className="w-5 h-5 text-blue-500" />
+            Linear Regression Sandbox
+          </h3>
+          <p className="text-sm text-slate-500">Click on the grid to add data points.</p>
+        </div>
+        <div className="flex gap-2">
+          <button 
+            onClick={() => setShowResiduals(!showResiduals)}
+            className={`px-3 py-1.5 text-sm rounded-lg border font-medium transition-colors ${showResiduals ? 'bg-indigo-50 text-indigo-700 border-indigo-200' : 'bg-white text-slate-600 border-slate-300 hover:bg-slate-50'}`}
+          >
+            {showResiduals ? 'Hide Errors' : 'Show Errors'}
+          </button>
+          <button 
+            onClick={() => setPoints(points.slice(0, -1))}
+            disabled={points.length === 0}
+            className="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg disabled:opacity-50"
+            title="Undo"
+          >
+            <Undo className="w-4 h-4" />
+          </button>
+          <button 
+            onClick={() => setPoints([])}
+            disabled={points.length === 0}
+            className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg disabled:opacity-50"
+            title="Clear All"
+          >
+            <Trash2 className="w-4 h-4" />
+          </button>
+        </div>
+      </div>
+      
+      <div className="flex-1 relative cursor-crosshair bg-slate-50" style={{ backgroundImage: 'radial-gradient(#cbd5e1 1px, transparent 1px)', backgroundSize: '20px 20px' }}>
+        <svg 
+          ref={svgRef}
+          viewBox="0 0 500 400" 
+          className="w-full h-full"
+          onClick={handleSvgClick}
+        >
+          {/* Residuals (Error lines) */}
+          {showResiduals && line && points.map((p, i) => {
+            const predictedY = line.m * p.x + line.c;
+            return (
+              <line 
+                key={`res-${i}`} 
+                x1={p.x} 
+                y1={p.y} 
+                x2={p.x} 
+                y2={predictedY} 
+                stroke="#f43f5e" 
+                strokeWidth="2" 
+                strokeDasharray="4 4"
+                opacity="0.6"
+              />
+            );
+          })}
+
+          {/* Best Fit Line */}
+          {lineCoords && (
+            <line 
+              x1={lineCoords.x1} 
+              y1={lineCoords.y1} 
+              x2={lineCoords.x2} 
+              y2={lineCoords.y2} 
+              stroke="#3b82f6" 
+              strokeWidth="4" 
+              className="drop-shadow-md"
+            />
+          )}
+
+          {/* Data Points */}
+          {points.map((p, i) => (
+            <circle 
+              key={i} 
+              cx={p.x} 
+              cy={p.y} 
+              r="6" 
+              fill="#1e293b" 
+              stroke="white" 
+              strokeWidth="2"
+              className="drop-shadow-sm transition-all duration-300"
+            />
+          ))}
+        </svg>
+
+        {points.length === 0 && (
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <span className="text-slate-400 bg-white/80 px-4 py-2 rounded-full text-sm font-medium animate-pulse">
+              Click anywhere to start adding data points
+            </span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+const KNNInteractive = () => {
+  const [points, setPoints] = useState([]);
+  const [currentClass, setCurrentClass] = useState('A'); // 'A' or 'B'
+  const [kValue, setKValue] = useState(3);
+  const svgRef = useRef(null);
+
+  // Pre-calculate grid centers for the decision boundary map
+  const gridCells = useMemo(() => {
+    const cells = [];
+    const gridSize = 10; // Resolution of the grid (10x10 squares)
+    for (let x = 0; x < 500; x += gridSize) {
+      for (let y = 0; y < 400; y += gridSize) {
+        cells.push({ x: x + gridSize / 2, y: y + gridSize / 2, rx: x, ry: y, size: gridSize });
+      }
+    }
+    return cells;
+  }, []);
+
+  const handleSvgClick = (e) => {
+    if (!svgRef.current) return;
+    const rect = svgRef.current.getBoundingClientRect();
+    const x = ((e.clientX - rect.left) / rect.width) * 500;
+    const y = ((e.clientY - rect.top) / rect.height) * 400;
+    setPoints([...points, { x, y, cls: currentClass }]);
+  };
+
+  // Compute decision boundaries
+  const boundaryGrid = useMemo(() => {
+    if (points.length === 0) return [];
     
-    <style>
-        /* Custom styles for the loader, layout, and new UI elements */
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+    return gridCells.map(cell => {
+      // Find distances to all points
+      let distances = points.map(p => ({
+        dist: distance(cell, p),
+        cls: p.cls
+      }));
+      
+      // Sort by distance
+      distances.sort((a, b) => a.dist - b.dist);
+      
+      // Take top K
+      const nearest = distances.slice(0, kValue);
+      
+      // Vote
+      let countA = 0; let countB = 0;
+      nearest.forEach(n => {
+        if (n.cls === 'A') countA++;
+        else countB++;
+      });
+      
+      return {
+        ...cell,
+        predictedClass: countA > countB ? 'A' : (countB > countA ? 'B' : 'Tie')
+      };
+    });
+  }, [points, kValue, gridCells]);
+
+  return (
+    <div className="flex flex-col h-full bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
+      <div className="p-4 bg-slate-50 border-b border-slate-200 flex flex-wrap gap-4 justify-between items-center">
+        <div>
+          <h3 className="font-semibold text-slate-800 flex items-center gap-2">
+            <Target className="w-5 h-5 text-emerald-500" />
+            K-Nearest Neighbors (KNN)
+          </h3>
+          <p className="text-sm text-slate-500">Add points of different categories to see the boundary.</p>
+        </div>
         
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        .loader {
-            border: 8px solid #f3f3f3; /* Light grey */
-            border-top: 8px solid #3498db; /* Blue */
-            border-radius: 50%;
-            width: 60px;
-            height: 60px;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .input_video {
-            display: none;
-        }
-        #output_canvas {
-            width: 100%;
-            height: 100%;
-            object-fit: contain; /* Use contain to see the whole page */
-        }
-        /* New 3D Canvas style */
-        #three_canvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            pointer-events: none; /* Let clicks pass through to buttons */
-            z-index: 20; /* Above the 2D canvas */
-        }
-        .mirrored {
-            transform: scaleX(-1); /* Mirror effect */
-        }
-        /* Style for disabled buttons */
-        .disabled-button {
-            background-color: #a0aec0; /* gray-500 */
-            cursor: not-allowed;
-            opacity: 0.6;
-        }
-        /* Style for notifications */
-        #notification-container {
-            position: fixed;
-            bottom: 20px;
-            left: 50%;
-            transform: translateX(-50%);
-            background-color: rgba(34, 197, 94, 0.8); /* green-500 with opacity */
-            color: white;
-            padding: 1rem 1.5rem;
-            border-radius: 0.5rem;
-            z-index: 1000;
-            opacity: 0;
-            visibility: hidden;
-            transition: opacity 0.3s, visibility 0.3s;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-            font-weight: bold;
-        }
-        #notification-container.show {
-            opacity: 1;
-            visibility: visible;
-        }
-        /* Fullscreen style for the container */
-        #container.fullscreen-mode {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            border-radius: 0;
-            z-index: 50;
-            background-color: #111827; /* bg-gray-900 */
-        }
-    </style>
-</head>
-<body class="bg-gray-900 text-white flex flex-col items-center justify-center min-h-screen p-4">
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-lg border border-slate-200">
+            <span className="text-sm font-medium text-slate-600">Add:</span>
+            <button 
+              onClick={() => setCurrentClass('A')}
+              className={`w-6 h-6 rounded-full border-2 transition-transform ${currentClass === 'A' ? 'bg-orange-500 border-orange-700 scale-110' : 'bg-orange-300 border-transparent hover:scale-105'}`}
+              title="Class A (Orange)"
+            />
+            <button 
+              onClick={() => setCurrentClass('B')}
+              className={`w-6 h-6 rounded-full border-2 transition-transform ${currentClass === 'B' ? 'bg-purple-500 border-purple-700 scale-110' : 'bg-purple-300 border-transparent hover:scale-105'}`}
+              title="Class B (Purple)"
+            />
+          </div>
 
-    <div class="w-full max-w-4xl mx-auto">
-        <h1 class="text-3xl md:text-4xl font-bold text-center mb-2 text-blue-400">NIELIT KOKRAJHAR EC AI Smart Class Env.</h1>
-        <p class="text-center text-gray-400 mb-6">BANAJIT BORO</p>
+          <div className="flex items-center gap-2">
+            <label className="text-sm font-medium text-slate-600">K = {kValue}</label>
+            <input 
+              type="range" 
+              min="1" 
+              max="9" 
+              step="2" 
+              value={kValue} 
+              onChange={(e) => setKValue(parseInt(e.target.value))}
+              className="w-24 accent-emerald-500"
+            />
+          </div>
 
-        <div id="container" class="relative w-full aspect-video rounded-lg shadow-2xl bg-gray-800 flex items-center justify-center overflow-hidden">
-            <!-- 2D Drawing Canvas -->
-            <canvas id="output_canvas" class="absolute top-0 left-0 z-0"></canvas>
-            <!-- 3D Three.js Canvas -->
-            <canvas id="three_canvas" class="hidden"></canvas> 
+          <div className="flex gap-1">
+            <button 
+              onClick={() => setPoints(points.slice(0, -1))}
+              disabled={points.length === 0}
+              className="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg disabled:opacity-50"
+            >
+              <Undo className="w-4 h-4" />
+            </button>
+            <button 
+              onClick={() => setPoints([])}
+              disabled={points.length === 0}
+              className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg disabled:opacity-50"
+            >
+              <Trash2 className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      </div>
+      
+      <div className="flex-1 relative cursor-crosshair bg-slate-50">
+        <svg 
+          ref={svgRef}
+          viewBox="0 0 500 400" 
+          className="w-full h-full block"
+          onClick={handleSvgClick}
+        >
+          {/* Decision Boundary Background Map */}
+          {boundaryGrid.map((cell, i) => (
+            <rect 
+              key={`bg-${i}`}
+              x={cell.rx}
+              y={cell.ry}
+              width={cell.size}
+              height={cell.size}
+              fill={cell.predictedClass === 'A' ? '#ffedd5' : (cell.predictedClass === 'B' ? '#f3e8ff' : '#f8fafc')}
+              className="transition-colors duration-500"
+            />
+          ))}
+
+          {/* Data Points */}
+          {points.map((p, i) => (
+            <circle 
+              key={i} 
+              cx={p.x} 
+              cy={p.y} 
+              r="6" 
+              fill={p.cls === 'A' ? '#f97316' : '#a855f7'} 
+              stroke="white" 
+              strokeWidth="2"
+              className="drop-shadow-sm"
+            />
+          ))}
+        </svg>
+
+        {points.length === 0 && (
+          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
+            <span className="text-slate-400 bg-white/80 px-4 py-2 rounded-full text-sm font-medium animate-pulse">
+              Select a color above and click to map areas
+            </span>
+          </div>
+        )}
+      </div>
+    </div>
+  );
+};
+
+
+// --- SLIDE CONTENT ---
+
+const slides = [
+  {
+    id: 1,
+    title: "Welcome to Machine Learning",
+    subtitle: "Teaching computers to learn from experience.",
+    content: (
+      <div className="flex flex-col items-center justify-center h-full text-center space-y-6">
+        <div className="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center mb-4 shadow-inner">
+          <BrainCircuit className="w-12 h-12 text-blue-600" />
+        </div>
+        <h1 className="text-4xl md:text-5xl font-bold text-slate-800">Learn by Doing.</h1>
+        <p className="text-xl text-slate-600 max-w-2xl">
+          Today, we won't just look at math formulas. You are going to build, break, and interact with Machine Learning models in real-time.
+        </p>
+        <div className="grid grid-cols-2 gap-4 mt-8 w-full max-w-lg">
+          <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
+            <h4 className="font-semibold text-slate-700">Part 1: Regression</h4>
+            <p className="text-sm text-slate-500">Predicting numbers (e.g., house prices)</p>
+          </div>
+          <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
+            <h4 className="font-semibold text-slate-700">Part 2: Classification</h4>
+            <p className="text-sm text-slate-500">Sorting things (e.g., Cat or Dog?)</p>
+          </div>
+        </div>
+      </div>
+    )
+  },
+  {
+    id: 2,
+    title: "What is a Model?",
+    subtitle: "Finding patterns in the chaos.",
+    content: (
+      <div className="flex flex-col h-full justify-center space-y-6 max-w-4xl mx-auto">
+        <p className="text-lg text-slate-700">
+          Imagine a robot trying to catch a ball. It doesn't know the physics equations of gravity. Instead, you throw the ball 100 times. 
+        </p>
+        <div className="bg-blue-50 border-l-4 border-blue-500 p-6 rounded-r-xl">
+          <p className="text-blue-800 font-medium text-lg">
+            "Machine Learning is the study of computer algorithms that can improve automatically through experience and by the use of data."
+          </p>
+        </div>
+        <ul className="space-y-4 mt-6">
+          <li className="flex items-start gap-3 text-lg text-slate-700">
+            <div className="mt-1 bg-green-100 p-1 rounded-full"><Play className="w-4 h-4 text-green-600" /></div>
+            <strong>Data:</strong> The examples we give the computer (e.g., thousands of pictures of cats).
+          </li>
+          <li className="flex items-start gap-3 text-lg text-slate-700">
+            <div className="mt-1 bg-green-100 p-1 rounded-full"><Play className="w-4 h-4 text-green-600" /></div>
+            <strong>Model:</strong> The mathematical "brain" that tries to find the pattern.
+          </li>
+          <li className="flex items-start gap-3 text-lg text-slate-700">
+            <div className="mt-1 bg-green-100 p-1 rounded-full"><Play className="w-4 h-4 text-green-600" /></div>
+            <strong>Prediction:</strong> The model guessing the outcome for new data it has never seen.
+          </li>
+        </ul>
+      </div>
+    )
+  },
+  {
+    id: 3,
+    title: "Linear Regression: Drawing the Line",
+    subtitle: "Predicting a continuous value based on a trend.",
+    content: (
+      <div className="flex flex-col lg:flex-row gap-8 h-full">
+        <div className="flex-1 space-y-4 flex flex-col justify-center">
+          <p className="text-lg text-slate-700">
+            <strong>Goal:</strong> Find the line that best "fits" the data. 
+          </p>
+          <p className="text-slate-600">
+            Imagine the X-axis is <em>"Hours Studied"</em> and the Y-axis is <em>"Test Score"</em>. As you click on the graph, you are adding student records.
+          </p>
+          <div className="bg-slate-100 p-4 rounded-lg mt-4 text-sm text-slate-700 border border-slate-200">
+            <p className="font-semibold mb-2">Instructions:</p>
+            <ol className="list-decimal pl-5 space-y-1">
+              <li>Click to add 3 points in an upward trend. Watch the blue line.</li>
+              <li>Add a "rebel" point way off the trend (an outlier). See how it pulls the line?</li>
+              <li>Try toggling <strong>"Show Errors"</strong> to see how the model calculates its mistakes.</li>
+            </ol>
+          </div>
+        </div>
+        <div className="flex-[1.5] h-[400px] lg:h-full min-h-[400px]">
+          <LinearRegressionInteractive />
+        </div>
+      </div>
+    )
+  },
+  {
+    id: 4,
+    title: "Understanding Error (Loss)",
+    subtitle: "How does the computer know the line is 'good'?",
+    content: (
+      <div className="flex flex-col h-full justify-center space-y-6 max-w-4xl mx-auto">
+        <p className="text-lg text-slate-700">
+          The computer doesn't have eyes. It uses math to determine if a line is a good fit. It calculates the <strong>Error</strong> (or Loss).
+        </p>
+        <div className="bg-rose-50 p-6 rounded-xl border border-rose-100">
+          <h4 className="text-rose-800 font-bold mb-2 flex items-center gap-2">
+            <Info className="w-5 h-5" /> What are those red dashed lines?
+          </h4>
+          <p className="text-rose-900">
+            When you toggled "Show Errors" on the previous slide, you saw lines connecting your dots to the prediction line. These are called <strong>Residuals</strong>.
+          </p>
+        </div>
+        <div className="bg-slate-800 p-6 rounded-xl text-white font-mono text-sm shadow-lg">
+          <p className="text-green-400"># The computer's goal is to minimize this:</p>
+          <p className="mt-2">Total Error = sum( (Actual Point Y - Predicted Line Y)² )</p>
+          <p className="mt-4 text-slate-400">By shifting the line around mathematically, it finds the exact spot where this "Total Error" is as small as possible. This is called Ordinary Least Squares (OLS).</p>
+        </div>
+      </div>
+    )
+  },
+  {
+    id: 5,
+    title: "Classification: Sorting Data",
+    subtitle: "When the answer isn't a number, but a category.",
+    content: (
+      <div className="flex flex-col h-full justify-center space-y-6 max-w-4xl mx-auto">
+        <div className="flex items-center gap-4 mb-4">
+          <div className="w-16 h-16 bg-purple-100 rounded-2xl flex items-center justify-center transform rotate-6">
+            <span className="text-3xl">🐱</span>
+          </div>
+          <div className="text-2xl font-bold text-slate-400">VS</div>
+          <div className="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center transform -rotate-6">
+            <span className="text-3xl">🐶</span>
+          </div>
+        </div>
+        <p className="text-lg text-slate-700">
+          Regression predicts a continuous number. <strong>Classification</strong> predicts a label or category.
+        </p>
+        <p className="text-lg text-slate-700">
+          A very simple, yet powerful algorithm to do this is called <strong>K-Nearest Neighbors (KNN)</strong>. 
+        </p>
+        <div className="bg-emerald-50 p-6 rounded-xl border border-emerald-100 mt-4">
+          <h4 className="font-bold text-emerald-800 mb-2">The "Birds of a Feather" Rule:</h4>
+          <p className="text-emerald-900">
+            "If it walks like a duck, and quacks like a duck, and is surrounded by 3 other ducks... it's probably a duck."
+          </p>
+        </div>
+      </div>
+    )
+  },
+  {
+    id: 6,
+    title: "KNN: Drawing the Boundaries",
+    subtitle: "Voting based on the closest neighbors.",
+    content: (
+      <div className="flex flex-col lg:flex-row gap-8 h-full">
+        <div className="flex-1 flex flex-col justify-center space-y-4">
+          <p className="text-lg text-slate-700">
+            For any empty spot on the grid, the model asks: <em>"Who are my closest <strong>K</strong> neighbors?"</em>
+          </p>
+          <div className="bg-slate-100 p-4 rounded-lg mt-4 text-sm text-slate-700 border border-slate-200">
+            <p className="font-semibold mb-2">Try this out:</p>
+            <ol className="list-decimal pl-5 space-y-2">
+              <li>Make a cluster of Orange points on the left, and Purple on the right.</li>
+              <li>Notice the background color change—that's the <strong>Decision Boundary</strong>.</li>
+              <li>Add a Purple point directly inside the Orange cluster.</li>
+              <li><strong>Crucial:</strong> Change the K-slider. When K=1, boundaries are jagged and jump around outliers. When K=7, the boundary gets smoother and ignores outliers (voting wins).</li>
+            </ol>
+          </div>
+        </div>
+        <div className="flex-[1.5] h-[400px] lg:h-full min-h-[400px]">
+          <KNNInteractive />
+        </div>
+      </div>
+    )
+  },
+  {
+    id: 7,
+    title: "Class Complete!",
+    subtitle: "You've successfully trained your first interactive models.",
+    content: (
+      <div className="flex flex-col items-center justify-center h-full text-center space-y-6">
+        <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mb-4 shadow-inner">
+          <Target className="w-12 h-12 text-green-600" />
+        </div>
+        <h2 className="text-3xl font-bold text-slate-800">What we learned today:</h2>
+        <div className="text-left bg-slate-50 p-8 rounded-2xl border border-slate-200 max-w-2xl w-full shadow-sm mt-6">
+          <ul className="space-y-4">
+            <li className="flex items-start gap-3">
+              <span className="text-xl">📊</span>
+              <div>
+                <strong className="text-slate-800">Models learn from Data.</strong> 
+                <p className="text-slate-600 text-sm">Without data points, our canvas was blank. The more data, the clearer the pattern.</p>
+              </div>
+            </li>
+            <li className="flex items-start gap-3">
+              <span className="text-xl">📈</span>
+              <div>
+                <strong className="text-slate-800">Regression predicts trends.</strong> 
+                <p className="text-slate-600 text-sm">It minimizes the "error" distance between the line and the data points.</p>
+              </div>
+            </li>
+            <li className="flex items-start gap-3">
+              <span className="text-xl">🎨</span>
+              <div>
+                <strong className="text-slate-800">Classification creates boundaries.</strong> 
+                <p className="text-slate-600 text-sm">KNN uses distance and voting to separate different categories of data.</p>
+              </div>
+            </li>
+          </ul>
+        </div>
+      </div>
+    )
+  }
+];
+
+// --- MAIN APP COMPONENT ---
+
+export default function App() {
+  const [currentSlide, setCurrentSlide] = useState(0);
+
+  const nextSlide = () => setCurrentSlide(prev => Math.min(prev + 1, slides.length - 1));
+  const prevSlide = () => setCurrentSlide(prev => Math.max(prev - 1, 0));
+
+  const progressPercentage = ((currentSlide + 1) / slides.length) * 100;
+
+  return (
+    <div className="min-h-screen bg-slate-100 text-slate-900 font-sans flex flex-col selection:bg-blue-200">
+      
+      {/* Header / Navbar */}
+      <header className="bg-white border-b border-slate-200 h-16 flex items-center px-6 justify-between shrink-0 shadow-sm z-10 relative">
+        <div className="flex items-center gap-3">
+          <div className="bg-blue-600 p-1.5 rounded-lg">
+            <BrainCircuit className="w-6 h-6 text-white" />
+          </div>
+          <h1 className="font-bold text-xl tracking-tight text-slate-800 hidden sm:block">
+            ML Foundations 101
+          </h1>
+        </div>
+        <div className="flex items-center gap-4 text-sm font-medium text-slate-500">
+          <span className="hidden sm:inline">1 Hour 30 Min Class</span>
+          <div className="w-px h-6 bg-slate-300 hidden sm:block"></div>
+          <span className="bg-slate-100 px-3 py-1 rounded-full text-slate-700">
+            Slide {currentSlide + 1} of {slides.length}
+          </span>
+        </div>
+      </header>
+
+      {/* Progress Bar */}
+      <div className="w-full h-1 bg-slate-200 shrink-0">
+        <div 
+          className="h-full bg-blue-500 transition-all duration-500 ease-out" 
+          style={{ width: `${progressPercentage}%` }}
+        ></div>
+      </div>
+
+      {/* Main Content Area */}
+      <main className="flex-1 flex overflow-hidden">
+        
+        {/* Sidebar (Optional on mobile, visible on desktop) */}
+        <aside className="w-64 bg-slate-50 border-r border-slate-200 hidden md:flex flex-col shrink-0 overflow-y-auto">
+          <div className="p-4 uppercase text-xs font-bold tracking-wider text-slate-400">
+            Class Curriculum
+          </div>
+          <nav className="flex-1 px-2 space-y-1">
+            {slides.map((slide, idx) => (
+              <button
+                key={slide.id}
+                onClick={() => setCurrentSlide(idx)}
+                className={`w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition-colors flex items-start gap-3 ${
+                  idx === currentSlide 
+                    ? 'bg-blue-100 text-blue-700' 
+                    : 'text-slate-600 hover:bg-slate-200/50 hover:text-slate-900'
+                }`}
+              >
+                <div className={`mt-0.5 w-5 h-5 rounded-full flex items-center justify-center border text-[10px] shrink-0 ${
+                  idx === currentSlide ? 'bg-blue-500 border-blue-600 text-white' : 
+                  idx < currentSlide ? 'bg-slate-200 border-slate-300 text-slate-500' : 'bg-transparent border-slate-300 text-slate-400'
+                }`}>
+                  {idx + 1}
+                </div>
+                <span className="leading-tight">{slide.title}</span>
+              </button>
+            ))}
+          </nav>
+        </aside>
+
+        {/* Slide Presentation Area */}
+        <div className="flex-1 flex flex-col relative overflow-hidden bg-white">
+          <div className="flex-1 overflow-y-auto p-6 md:p-10 lg:p-14">
             
-            <video class="input_video" id="input_video" autoplay playsinline></video>
-            <div id="loading-indicator" class="absolute inset-0 flex flex-col items-center justify-center bg-gray-800 bg-opacity-75 rounded-lg z-10">
-                <div class="loader"></div>
-                <p class="mt-4 text-lg">Initializing Camera...</p>
+            <div className="max-w-6xl mx-auto h-full flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-500">
+              {/* Slide Header */}
+              <div className="mb-8 shrink-0">
+                <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">
+                  {slides[currentSlide].title}
+                </h2>
+                {slides[currentSlide].subtitle && (
+                  <p className="text-xl text-slate-500 mt-2 font-light">
+                    {slides[currentSlide].subtitle}
+                  </p>
+                )}
+              </div>
+
+              {/* Slide Dynamic Content */}
+              <div className="flex-1 min-h-[400px]">
+                {slides[currentSlide].content}
+              </div>
             </div>
+
+          </div>
+
+          {/* Footer Controls */}
+          <footer className="h-20 border-t border-slate-200 bg-white flex items-center justify-between px-6 md:px-10 shrink-0">
+            <button 
+              onClick={prevSlide}
+              disabled={currentSlide === 0}
+              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-slate-600 font-medium hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+            >
+              <ChevronLeft className="w-5 h-5" />
+              Previous
+            </button>
+            
+            <button 
+              onClick={nextSlide}
+              disabled={currentSlide === slides.length - 1}
+              className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-blue-600 text-white font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm transition-all hover:shadow hover:-translate-y-0.5 active:translate-y-0"
+            >
+              Next Step
+              <ChevronRight className="w-5 h-5" />
+            </button>
+          </footer>
         </div>
-        
-        <div class="mt-4 flex justify-center items-center flex-wrap gap-4">
-            <button id="clear-button" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors">
-                Clear All
-            </button>
-            <button id="fullscreen-button" class="hidden bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors">
-                Fullscreen
-            </button>
-            <button id="snapshot-button" class="bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors">
-                Send to phone
-            </button>
-            <input type="file" id="file-upload" class="hidden" accept="image/*,application/pdf">
-            <label for="file-upload" class="bg-pink-500 hover:bg-pink-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors cursor-pointer">
-                Upload File
-            </label>
-            <button id="prev-page-button" class="hidden bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors">Prev</button>
-            <span id="page-indicator" class="hidden text-lg"></span>
-            <button id="next-page-button" class="hidden bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors">Next</button>
-        </div>
+
+      </main>
     </div>
-
-    <div id="palette-menu" class="hidden fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gray-800 bg-opacity-50 backdrop-blur-sm text-white p-6 rounded-lg shadow-2xl z-[60] w-80">
-        <button id="close-palette-btn" class="absolute top-3 right-3 text-gray-400 hover:text-white text-2xl font-bold">&times;</button>
-        
-        <label for="thickness-slider" class="block text-sm font-medium mb-2">Thickness</label>
-        <input id="thickness-slider" type="range" min="2" max="30" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
-
-        <label class="block text-sm font-medium mt-6 mb-2">Color</label>
-        <div class="flex flex-wrap gap-3 justify-center">
-            <button class="color-option-btn w-10 h-10 rounded-full border-2 border-transparent hover:opacity-80 focus:outline-none" data-color="#ef4444" style="background-color: #ef4444" title="Red"></button>
-            <button class="color-option-btn w-10 h-10 rounded-full border-2 border-transparent hover:opacity-80 focus:outline-none" data-color="#f97316" style="background-color: #f97316" title="Orange"></button>
-            <button class="color-option-btn w-10 h-10 rounded-full border-2 border-transparent hover:opacity-80 focus:outline-none" data-color="#eab308" style="background-color: #eab308" title="Yellow"></button>
-            <button class="color-option-btn w-10 h-10 rounded-full border-2 border-transparent hover:opacity-80 focus:outline-none" data-color="#22c55e" style="background-color: #22c55e" title="Green"></button>
-            <button class="color-option-btn w-10 h-10 rounded-full border-2 border-transparent hover:opacity-80 focus:outline-none" data-color="#3b82f6" style="background-color: #3b82f6" title="Blue"></button>
-            <button class="color-option-btn w-10 h-10 rounded-full border-2 border-transparent hover:opacity-80 focus:outline-none" data-color="#ec4899" style="background-color: #ec4899" title="Pink"></button>
-            <button class="color-option-btn w-10 h-10 rounded-full border-2 border-transparent hover:opacity-80 focus:outline-none" data-color="#ffffff" style="background-color: #ffffff" title="White"></button>
-            <button class="color-option-btn w-10 h-10 rounded-full border-2 border-gray-400 hover:opacity-80 focus:outline-none" data-color="#000000" style="background-color: #000000" title="Black"></button>
-        </div>
-    </div>
-
-    <div id="notification-container"></div>
-
-    <script type="module">
-        // Set the workerSrc for PDF.js
-        window.pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js`;
-
-        // --- Get references to the HTML elements ---
-        const videoElement = document.getElementById('input_video');
-        const canvasElement = document.getElementById('output_canvas');
-        const threeCanvasElement = document.getElementById('three_canvas');
-        const canvasCtx = canvasElement.getContext('2d');
-        const loadingIndicator = document.getElementById('loading-indicator');
-        const clearButton = document.getElementById('clear-button');
-        const fileUploadInput = document.getElementById('file-upload');
-        const prevPageButton = document.getElementById('prev-page-button');
-        const nextPageButton = document.getElementById('next-page-button');
-        const pageIndicator = document.getElementById('page-indicator');
-        const notificationContainer = document.getElementById('notification-container');
-        const fullscreenButton = document.getElementById('fullscreen-button');
-        const container = document.getElementById('container');
-        const snapshotButton = document.getElementById('snapshot-button');
-        const paletteMenu = document.getElementById('palette-menu');
-
-
-        // --- State Variables ---
-        let currentMode = 'idle'; // 'idle', 'drawing', 'erasing', 'moving'
-        let lastMode = 'idle';
-        let currentPath = [];
-        let allPaths = [];
-        let uploadedImage = null;
-        let pdfDoc = null;
-        let currentPageNum = 1;
-        let totalPages = 0;
-        let isFullscreen = false;
-        let isPaletteOpen = false;
-        let isShakaLocked = false;
-        let isPaletteDraggingSlider = false;
-        let smoothedFingerTipPos = null;
-        let showHandLandmarks = true;
-        
-        // --- State for moving individual drawings ---
-        let selectedPathIndex = -1;
-        let moveStartPoint = null;
-        let initialSelectedPathState = null;
-        
-        // --- On-Canvas Button Control State ---
-        let lastButtonPressTime = 0;
-        const BUTTON_PRESS_COOLDOWN = 1500;
-
-        // --- Configuration ---
-        let drawingColor = '#ec4899';
-        let drawingLineWidth = 6;
-        const cursorColor = '#f87171';
-        const cursorRadius = 5;
-        const smoothingFactor = 0.5;
-        const eraserRadius = 30;
-        const eraserColor = 'rgba(255, 255, 255, 0.5)';
-
-        // --- Three.js State ---
-        let isCubeMode = false;
-        let threeScene, threeCamera, threeRenderer, threeCube;
-        // Changed to arrays for multi-face support
-        let cubeContexts = []; 
-        let cubeTextures = [];
-        let raycaster = new THREE.Raycaster();
-        let lastCubeDrawPoint = null;
-        let lastCubeFaceIndex = -1;
-        let cubeRotationStart = null;
-        let cubeRotationInitial = { x: 0, y: 0 };
-
-
-        // --- Three.js Initialization ---
-        function initThreeJS() {
-            threeScene = new THREE.Scene();
-            
-            // Camera setup
-            const aspect = canvasElement.width / canvasElement.height;
-            threeCamera = new THREE.PerspectiveCamera(50, aspect, 0.1, 100);
-            threeCamera.position.z = 5;
-
-            // Renderer setup
-            threeRenderer = new THREE.WebGLRenderer({ canvas: threeCanvasElement, alpha: true, antialias: true });
-            threeRenderer.setSize(canvasElement.width, canvasElement.height);
-            threeRenderer.setPixelRatio(window.devicePixelRatio);
-
-            // Lighting
-            const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
-            threeScene.add(ambientLight);
-            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
-            directionalLight.position.set(2, 2, 5);
-            threeScene.add(directionalLight);
-
-            // Initialize materials and contexts for 6 faces
-            cubeContexts = [];
-            cubeTextures = [];
-            const materials = [];
-            // faceNames array is no longer needed for display, but index matching remains same logic
-
-            for (let i = 0; i < 6; i++) {
-                const canvas = document.createElement('canvas');
-                // Using 512x512 per face for performance balance
-                canvas.width = 512; 
-                canvas.height = 512;
-                const ctx = canvas.getContext('2d');
-                
-                // Fill with a light background
-                ctx.fillStyle = '#f0f0f0';
-                ctx.fillRect(0, 0, canvas.width, canvas.height);
-                
-                // Add a border
-                ctx.lineWidth = 20;
-                ctx.strokeStyle = '#cccccc';
-                ctx.strokeRect(0, 0, canvas.width, canvas.height);
-                
-                const texture = new THREE.CanvasTexture(canvas);
-                
-                const material = new THREE.MeshStandardMaterial({ 
-                    map: texture,
-                    color: 0xffffff,
-                    roughness: 0.3,
-                    metalness: 0.1
-                });
-
-                cubeContexts.push(ctx);
-                cubeTextures.push(texture);
-                materials.push(material);
-            }
-            
-            // Create Cube with array of materials (one per face)
-            const geometry = new THREE.BoxGeometry(1.5, 1.5, 1.5);
-            threeCube = new THREE.Mesh(geometry, materials);
-            threeScene.add(threeCube);
-        }
-
-        // --- Toggle Cube Mode ---
-        function toggleCubeMode() {
-            isCubeMode = !isCubeMode;
-            if (isCubeMode) {
-                if (!threeScene) initThreeJS();
-                threeCanvasElement.classList.remove('hidden');
-                showNotification("3D Cube Mode: ON. Pinch to Write, Move to Rotate, Fist to Move.");
-            } else {
-                threeCanvasElement.classList.add('hidden');
-                showNotification("3D Cube Mode: OFF");
-            }
-        }
-        
-        function clearCubeTexture() {
-            // Clear all 6 faces
-            if (cubeContexts.length > 0) {
-                cubeContexts.forEach((ctx, i) => {
-                    ctx.fillStyle = '#f0f0f0';
-                    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-                    ctx.lineWidth = 20;
-                    ctx.strokeStyle = '#cccccc';
-                    ctx.strokeRect(0, 0, ctx.canvas.width, ctx.canvas.height);
-                });
-                // Update all textures
-                cubeTextures.forEach(texture => texture.needsUpdate = true);
-            }
-        }
-
-
-        // --- UI Feedback Functions ---
-        function showNotification(message, duration = 2000) {
-            notificationContainer.textContent = message;
-            notificationContainer.classList.add('show');
-            setTimeout(() => {
-                notificationContainer.classList.remove('show');
-            }, duration);
-        }
-
-        // --- Snapshot Function ---
-        async function takeSnapshot() {
-            const phoneBotToken = '8261912175:AAHIHupCNGFNdXBsjkbHWQ5kJeGN075LRsw';
-            const phoneChatId = '1169779808';
-            const apiUrl = `https://api.telegram.org/bot${phoneBotToken}/sendPhoto`;
-            
-            showNotification('Sending to phone...');
-
-            // Create a temporary canvas to draw the mirrored image if needed
-            const tempCanvas = document.createElement('canvas');
-            const tempCtx = tempCanvas.getContext('2d');
-            tempCanvas.width = canvasElement.width;
-            tempCanvas.height = canvasElement.height;
-
-            if (uploadedImage) {
-                tempCtx.drawImage(canvasElement, 0, 0);
-            } else {
-                tempCtx.save();
-                tempCtx.scale(-1, 1);
-                tempCtx.drawImage(canvasElement, -tempCanvas.width, 0, tempCanvas.width, tempCanvas.height);
-                tempCtx.restore();
-            }
-            
-            // If cube mode is on, draw the 3D canvas on top (unmirrored, as 3D canvas is absolute)
-            if (isCubeMode) {
-                 tempCtx.drawImage(threeCanvasElement, 0, 0, tempCanvas.width, tempCanvas.height);
-            }
-
-            tempCanvas.toBlob(async (blob) => {
-                if (!blob) {
-                    showNotification('Error creating image data.');
-                    return;
-                }
-
-                const formData = new FormData();
-                formData.append('chat_id', phoneChatId);
-                formData.append('photo', blob, `snapshot-${new Date().toISOString()}.png`);
-                formData.append('caption', 'Snapshot from NIELIT Kokrajhar Smart Class Environment.');
-
-                try {
-                    const response = await fetch(apiUrl, { method: 'POST', body: formData });
-                    const result = await response.json();
-                    if (result.ok) {
-                        showNotification('Snapshot sent to phone!');
-                    } else {
-                        showNotification(`Error: ${result.description || 'Failed to send'}`);
-                    }
-                } catch (error) {
-                    showNotification('Failed to send. Check console (CORS error expected).');
-                }
-            }, 'image/png');
-        }
-
-
-        // --- Fullscreen Toggle ---
-        function toggleFullscreen() {
-            isFullscreen = !isFullscreen;
-            container.classList.toggle('fullscreen-mode', isFullscreen);
-            const siblings = [...container.parentElement.children];
-            siblings.forEach(child => {
-                if (child.id !== 'container' && child.id !== 'palette-menu') {
-                    child.classList.toggle('hidden', isFullscreen);
-                }
-            });
-
-            if (isFullscreen) {
-                const exitButton = document.createElement('button');
-                exitButton.id = 'exit-fullscreen-btn';
-                exitButton.textContent = 'Exit Fullscreen (Esc)';
-                exitButton.className = 'fixed top-4 right-4 z-[100] bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-md';
-                exitButton.onclick = toggleFullscreen;
-                document.body.appendChild(exitButton);
-            } else {
-                const exitButton = document.getElementById('exit-fullscreen-btn');
-                if (exitButton) exitButton.remove();
-                if (isPaletteOpen) togglePalette();
-            }
-            
-            // Resize Three.js renderer
-            if (threeRenderer) {
-                threeRenderer.setSize(window.innerWidth, window.innerHeight);
-                threeCamera.aspect = window.innerWidth / window.innerHeight;
-                threeCamera.updateProjectionMatrix();
-            }
-        }
-        
-        // --- Canvas Drawing Helper Functions ---
-        function drawPaths() {
-            canvasCtx.lineCap = 'round';
-            canvasCtx.lineJoin = 'round';
-
-            allPaths.forEach((path, index) => {
-                if (path.points.length < 2) return;
-                
-                canvasCtx.beginPath();
-                if (index === selectedPathIndex) {
-                    canvasCtx.strokeStyle = '#60a5fa';
-                    canvasCtx.lineWidth = path.width + 10;
-                    canvasCtx.globalAlpha = 0.5;
-                    canvasCtx.stroke();
-                    canvasCtx.globalAlpha = 1.0;
-                }
-                
-                canvasCtx.strokeStyle = path.color;
-                canvasCtx.lineWidth = path.width;
-                canvasCtx.moveTo(path.points[0].x, path.points[0].y);
-                for (let i = 1; i < path.points.length; i++) {
-                    canvasCtx.lineTo(path.points[i].x, path.points[i].y);
-                }
-                canvasCtx.stroke();
-            });
-
-            if (currentPath.length > 1) {
-                canvasCtx.beginPath();
-                canvasCtx.strokeStyle = drawingColor;
-                canvasCtx.lineWidth = drawingLineWidth;
-                canvasCtx.moveTo(currentPath[0].x, currentPath[0].y);
-                for (let i = 1; i < currentPath.length; i++) {
-                    canvasCtx.lineTo(currentPath[i].x, currentPath[i].y);
-                }
-                canvasCtx.stroke();
-            }
-        }
-        
-        function drawRoundRect(ctx, x, y, width, height, radius) {
-            ctx.beginPath();
-            ctx.moveTo(x + radius, y);
-            ctx.lineTo(x + width - radius, y);
-            ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
-            ctx.lineTo(x + width, y + height - radius);
-            ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
-            ctx.lineTo(x + radius, y + height);
-            ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
-            ctx.lineTo(x, y + radius);
-            ctx.quadraticCurveTo(x, y, x + radius, y);
-            ctx.closePath();
-            ctx.fill();
-        }
-
-        function isPointNearPath(point, path, threshold) {
-            if (path.points.length < 2) return false;
-            for (let i = 0; i < path.points.length - 1; i++) {
-                const p1 = path.points[i];
-                const p2 = path.points[i + 1];
-                const l2 = (p2.x - p1.x) ** 2 + (p2.y - p1.y) ** 2;
-                if (l2 === 0) {
-                    if (Math.hypot(point.x - p1.x, point.y - p1.y) < threshold) return true;
-                    continue;
-                }
-                let t = ((point.x - p1.x) * (p2.x - p1.x) + (point.y - p1.y) * (p2.y - p1.y)) / l2;
-                t = Math.max(0, Math.min(1, t));
-                const closestPoint = {
-                    x: p1.x + t * (p2.x - p1.x),
-                    y: p1.y + t * (p2.y - p1.y)
-                };
-                if (Math.hypot(point.x - closestPoint.x, point.y - closestPoint.y) < threshold) return true;
-            }
-            return false;
-        }
-
-        // --- Main Animation Loop ---
-        function onResults(results) {
-            if (loadingIndicator.style.display !== 'none') {
-                loadingIndicator.style.display = 'none';
-            }
-
-            if (uploadedImage) {
-                canvasElement.classList.remove('mirrored');
-            } else {
-                canvasElement.classList.add('mirrored');
-            }
-
-            canvasElement.width = isFullscreen ? window.innerWidth : videoElement.videoWidth;
-            canvasElement.height = isFullscreen ? window.innerHeight : videoElement.videoHeight;
-            
-            // Resize Three.js canvas if active
-            if (isCubeMode && threeRenderer) {
-                const threeCanvas = threeRenderer.domElement;
-                if (threeCanvas.width !== canvasElement.width || threeCanvas.height !== canvasElement.height) {
-                    threeRenderer.setSize(canvasElement.width, canvasElement.height);
-                    threeCamera.aspect = canvasElement.width / canvasElement.height;
-                    threeCamera.updateProjectionMatrix();
-                }
-            }
-
-
-            canvasCtx.save();
-            canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
-
-            // 1. Draw Background
-            if (uploadedImage) {
-                canvasCtx.drawImage(uploadedImage, 0, 0, canvasElement.width, canvasElement.height);
-            } else {
-                canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
-            }
-
-            // 2. Draw user-made paths (Only if NOT in Cube Mode or just overlay them?)
-            // We draw them behind the cube so it feels layered
-            drawPaths();
-            
-            // 3. Handle hand detection
-            if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
-                let handLandmarks = results.multiHandLandmarks[0];
-
-                if (uploadedImage) {
-                    handLandmarks = handLandmarks.map(landmark => { return { ...landmark, x: 1 - landmark.x }; });
-                }
-
-                handlePdfNavigation(handLandmarks);
-                
-                if (isPaletteOpen) {
-                    handlePaletteInteraction(handLandmarks);
-                }
-                
-                if (isCubeMode) {
-                    handleCubeInteraction(handLandmarks);
-                } else {
-                    handleGestures(handLandmarks);
-                }
-
-                if (showHandLandmarks) {
-                    window.drawConnectors(canvasCtx, handLandmarks, window.HAND_CONNECTIONS, { color: '#34d399', lineWidth: 5 });
-                    
-                    const landmarkColor =
-                        currentMode === 'drawing' ? '#ec4899' :
-                        currentMode === 'erasing' ? '#ffffff' :
-                        currentMode === 'moving' ? '#3b82f6' :
-                        '#f87171';
-                    window.drawLandmarks(canvasCtx, handLandmarks, { color: landmarkColor, lineWidth: 2 });
-                } else {
-                    // Draw cursor if landmarks are hidden
-                    const indexTip = handLandmarks[8];
-                    const cursorTarget = { x: indexTip.x * canvasElement.width, y: indexTip.y * canvasElement.height };
-                    if (!smoothedFingerTipPos) {
-                        smoothedFingerTipPos = cursorTarget;
-                    } else {
-                        smoothedFingerTipPos.x = smoothedFingerTipPos.x * (1 - smoothingFactor) + cursorTarget.x * smoothingFactor;
-                        smoothedFingerTipPos.y = smoothedFingerTipPos.y * (1 - smoothingFactor) + cursorTarget.y * smoothingFactor;
-                    }
-                    canvasCtx.fillStyle = cursorColor;
-                    canvasCtx.beginPath();
-                    canvasCtx.arc(smoothedFingerTipPos.x, smoothedFingerTipPos.y, cursorRadius, 0, 2 * Math.PI);
-                    canvasCtx.fill();
-                }
-
-            } else {
-                // Hand lost
-                 if (!isCubeMode) {
-                     if (currentMode === 'drawing') {
-                        if (currentPath.length > 1) {
-                            allPaths.push({ points: currentPath, color: drawingColor, width: drawingLineWidth });
-                        }
-                        currentPath = [];
-                    }
-                    currentMode = 'idle';
-                    selectedPathIndex = -1;
-                 } else {
-                     lastCubeDrawPoint = null; // Reset writing on cube
-                     cubeRotationStart = null; // Stop rotation
-                 }
-                
-                smoothedFingerTipPos = null;
-                isPaletteDraggingSlider = false;
-            }
-            
-            canvasCtx.restore();
-
-            // Render Three.js Scene
-            if (isCubeMode && threeRenderer) {
-                threeCube.rotation.x += 0.002; // Slight auto rotation for 3D feel when idle?
-                threeCube.rotation.y += 0.002;
-                threeRenderer.render(threeScene, threeCamera);
-            }
-        }
-        
-        // --- 3D Cube Interaction Logic ---
-        function handleCubeInteraction(handLandmarks) {
-            const indexTip = handLandmarks[8];
-            const thumbTip = handLandmarks[4];
-            const middleTip = handLandmarks[12];
-            
-            // Calculate pinch for writing
-            const pinchDistance = Math.hypot(indexTip.x - thumbTip.x, indexTip.y - thumbTip.y);
-            const isPinching = pinchDistance < 0.04;
-
-            // Calculate gestures based on extension
-            const isIndexExtended = indexTip.y < handLandmarks[6].y;
-            const isMiddleExtended = middleTip.y < handLandmarks[10].y;
-            const isRingExtended = handLandmarks[16].y < handLandmarks[14].y;
-            const isPinkyExtended = handLandmarks[20].y < handLandmarks[18].y;
-            
-            // Gesture Definitions
-            const isMoveGesture = isIndexExtended && isMiddleExtended && !isRingExtended && !isPinkyExtended; // Peace Sign -> Rotate
-            const isFist = !isIndexExtended && !isMiddleExtended && !isRingExtended && !isPinkyExtended; // Fist -> Move Location
-
-            // 1. Raycasting Setup (for Writing)
-            let ndcX, ndcY;
-            
-            if (uploadedImage) {
-                 ndcX = (indexTip.x * 2) - 1;
-            } else {
-                ndcX = 1 - (indexTip.x * 2); 
-            }
-            
-            ndcY = -(indexTip.y * 2) + 1;
-
-            raycaster.setFromCamera(new THREE.Vector2(ndcX, ndcY), threeCamera);
-            const intersects = raycaster.intersectObject(threeCube);
-
-            // 2. Interaction Handling
-            
-            if (isFist) {
-                // MOVE LOCATION (Translation)
-                currentMode = 'moving_cube_location';
-                
-                // Calculate palm center
-                const palmX = (handLandmarks[0].x + handLandmarks[9].x) / 2;
-                const palmY = (handLandmarks[0].y + handLandmarks[9].y) / 2;
-                
-                // Convert Palm to NDC
-                let palmNdcX;
-                if (uploadedImage) {
-                    palmNdcX = (palmX * 2) - 1;
-                } else {
-                    palmNdcX = 1 - (palmX * 2);
-                }
-                const palmNdcY = -(palmY * 2) + 1;
-
-                // Project to 3D Plane at Z=0
-                // We assume the cube lives at Z=0. We unproject the palm vector.
-                const vector = new THREE.Vector3(palmNdcX, palmNdcY, 0.5);
-                vector.unproject(threeCamera);
-                const dir = vector.sub(threeCamera.position).normalize();
-                const distance = -threeCamera.position.z / dir.z; // Distance to Z=0 plane
-                const newPos = threeCamera.position.clone().add(dir.multiplyScalar(distance));
-                
-                threeCube.position.set(newPos.x, newPos.y, 0);
-                
-                lastCubeDrawPoint = null;
-                cubeRotationStart = null;
-
-            } else if (isMoveGesture) {
-                // ROTATE (Orientation)
-                currentMode = 'rotating_3d';
-                const currentPos = { x: indexTip.x, y: indexTip.y };
-                
-                if (!cubeRotationStart) {
-                    cubeRotationStart = currentPos;
-                    cubeRotationInitial = { x: threeCube.rotation.y, y: threeCube.rotation.x };
-                } else {
-                    const deltaX = (currentPos.x - cubeRotationStart.x) * 5;
-                    const deltaY = (currentPos.y - cubeRotationStart.y) * 5;
-
-                    threeCube.rotation.y = cubeRotationInitial.x + deltaX;
-                    threeCube.rotation.x = cubeRotationInitial.y + deltaY;
-                }
-                lastCubeDrawPoint = null;
-
-            } else if (isPinching && intersects.length > 0) {
-                // WRITE
-                currentMode = 'writing_3d';
-                const intersect = intersects[0];
-                const materialIndex = intersect.face.materialIndex;
-                const uv = intersect.uv;
-
-                if (materialIndex !== undefined && cubeContexts[materialIndex]) {
-                    const ctx = cubeContexts[materialIndex];
-                    const texture = cubeTextures[materialIndex];
-                    
-                    const canvasX = uv.x * ctx.canvas.width;
-                    const canvasY = (1 - uv.y) * ctx.canvas.height;
-
-                    // If we switch faces, reset the drawing stroke
-                    if (lastCubeFaceIndex !== materialIndex) {
-                        lastCubeDrawPoint = null;
-                    }
-                    lastCubeFaceIndex = materialIndex;
-
-                    ctx.lineWidth = drawingLineWidth * 2;
-                    ctx.lineCap = 'round';
-                    ctx.lineJoin = 'round';
-                    ctx.strokeStyle = drawingColor;
-
-                    if (lastCubeDrawPoint) {
-                        ctx.beginPath();
-                        ctx.moveTo(lastCubeDrawPoint.x, lastCubeDrawPoint.y);
-                        ctx.lineTo(canvasX, canvasY);
-                        ctx.stroke();
-                    }
-                    lastCubeDrawPoint = { x: canvasX, y: canvasY };
-                    texture.needsUpdate = true;
-                }
-                cubeRotationStart = null;
-                
-            } else {
-                // Idle
-                lastCubeDrawPoint = null;
-                cubeRotationStart = null;
-                lastCubeFaceIndex = -1;
-                if (currentMode.includes('3d')) currentMode = 'idle';
-            }
-        }
-
-
-        function handlePdfNavigation(handLandmarks) {
-            if (!pdfDoc) return;
-            
-            const buttonWidth = 120;
-            const buttonHeight = 70;
-            const buttonPadding = 20;
-            const buttonRadius = 15;
-
-            const prevButtonRect = { x: buttonPadding, y: buttonPadding, width: buttonWidth, height: buttonHeight };
-            const nextButtonRect = { x: canvasElement.width - buttonWidth - buttonPadding, y: buttonPadding, width: buttonWidth, height: buttonHeight };
-            
-            const indexTip = handLandmarks[8];
-            const indexTipPos = { x: indexTip.x * canvasElement.width, y: indexTip.y * canvasElement.height };
-            const now = Date.now();
-            let prevButtonHover = false;
-            let nextButtonHover = false;
-            const cooldown = 1000;
-
-            if (now - lastButtonPressTime > cooldown &&
-                indexTipPos.x > prevButtonRect.x && indexTipPos.x < prevButtonRect.x + prevButtonRect.width &&
-                indexTipPos.y > prevButtonRect.y && indexTipPos.y < prevButtonRect.y + prevButtonRect.height) {
-                prevButtonHover = true;
-                prevPageButton.click();
-                lastButtonPressTime = now;
-            }
-
-            if (now - lastButtonPressTime > cooldown &&
-                indexTipPos.x > nextButtonRect.x && indexTipPos.x < nextButtonRect.x + nextButtonRect.width &&
-                indexTipPos.y > nextButtonRect.y && indexTipPos.y < nextButtonRect.y + nextButtonRect.height) {
-                nextButtonHover = true;
-                nextPageButton.click();
-                lastButtonPressTime = now;
-            }
-            
-            canvasCtx.font = 'bold 30px Inter';
-            canvasCtx.textAlign = 'center';
-            canvasCtx.textBaseline = 'middle';
-
-            canvasCtx.fillStyle = prevButtonHover ? 'rgba(96, 165, 250, 0.8)' : 'rgba(96, 165, 250, 0.5)';
-            drawRoundRect(canvasCtx, prevButtonRect.x, prevButtonRect.y, prevButtonRect.width, prevButtonRect.height, buttonRadius);
-            canvasCtx.fillStyle = 'white';
-            canvasCtx.fillText('PREV', prevButtonRect.x + prevButtonRect.width / 2, prevButtonRect.y + prevButtonRect.height / 2);
-            
-            canvasCtx.fillStyle = nextButtonHover ? 'rgba(96, 165, 250, 0.8)' : 'rgba(96, 165, 250, 0.5)';
-            drawRoundRect(canvasCtx, nextButtonRect.x, nextButtonRect.y, nextButtonRect.width, nextButtonRect.height, buttonRadius);
-            canvasCtx.fillStyle = 'white';
-            canvasCtx.fillText('NEXT', nextButtonRect.x + nextButtonRect.width / 2, nextButtonRect.y + nextButtonRect.height / 2);
-        }
-
-        function getViewportCoords(landmarkX, landmarkY, canvasElement) {
-            const canvasDisplayRect = canvasElement.getBoundingClientRect();
-            const canvasInternalWidth = canvasElement.width;
-            const canvasInternalHeight = canvasElement.height;
-
-            const internalAspect = canvasInternalWidth / canvasInternalHeight;
-            const displayAspect = canvasDisplayRect.width / canvasDisplayRect.height;
-
-            let scale = 1;
-            let offsetX = 0;
-            let offsetY = 0;
-
-            if (internalAspect > displayAspect) {
-                scale = canvasDisplayRect.width / canvasInternalWidth;
-                offsetY = (canvasDisplayRect.height - (canvasInternalHeight * scale)) / 2;
-            } else {
-                scale = canvasDisplayRect.height / canvasInternalHeight;
-                offsetX = (canvasDisplayRect.width - (canvasInternalWidth * scale)) / 2;
-            }
-
-            const canvasX = landmarkX * canvasInternalWidth;
-            const canvasY = landmarkY * canvasInternalHeight;
-            const displayX = (canvasX * scale) + offsetX;
-            const displayY = (canvasY * scale) + offsetY;
-            const viewportX = canvasDisplayRect.left + displayX;
-            const viewportY = canvasDisplayRect.top + displayY;
-            
-            return { x: viewportX, y: viewportY };
-        }
-
-        function handlePaletteInteraction(handLandmarks) {
-            const indexTip = handLandmarks[8];
-            const indexPip = handLandmarks[6];
-            const middleTip = handLandmarks[12];
-            const middlePip = handLandmarks[10];
-            const ringTip = handLandmarks[16];
-            const ringPip = handLandmarks[14];
-            const pinkyTip = handLandmarks[20];
-            const pinkyPip = handLandmarks[18];
-
-            const isIndexExtended = indexTip.y < indexPip.y;
-            const isMiddleExtended = middleTip.y < middlePip.y;
-            const isRingExtended = ringTip.y < ringPip.y;
-            const isPinkyExtended = pinkyTip.y < pinkyPip.y;
-
-            const isPointingGesture = isIndexExtended && !isMiddleExtended && !isRingExtended && !isPinkyExtended;
-
-            const colorButtons = document.querySelectorAll('.color-option-btn');
-            const thicknessSlider = document.getElementById('thickness-slider');
-
-            let landmarkX = indexTip.x;
-            if (uploadedImage === null) {
-                landmarkX = 1.0 - indexTip.x; 
-            }
-            
-            const { x: pointX, y: pointY } = getViewportCoords(landmarkX, indexTip.y, canvasElement);
-            const now = Date.now();
-            
-            colorButtons.forEach(btn => btn.classList.remove('ring-yellow-400'));
-
-            if (isPointingGesture) {
-                const sliderRect = thicknessSlider.getBoundingClientRect();
-                const isHoveringSlider = pointX > sliderRect.left && pointX < sliderRect.right &&
-                                         pointY > sliderRect.top && pointY < sliderRect.bottom;
-
-            if (isPaletteDraggingSlider) {
-                    const percent = Math.max(0, Math.min(1, (pointX - sliderRect.left) / sliderRect.width));
-                    const min = parseFloat(thicknessSlider.min);
-                    const max = parseFloat(thicknessSlider.max);
-                    let newValue = min + (max - min) * percent;
-                    newValue = Math.round(newValue);
-                    thicknessSlider.value = newValue;
-                    thicknessSlider.dispatchEvent(new Event('input'));
-                
-                } else if (now - lastButtonPressTime > 500) {
-                    
-                    if (isHoveringSlider) {
-                        isPaletteDraggingSlider = true;
-                        lastButtonPressTime = now;
-                        const percent = Math.max(0, Math.min(1, (pointX - sliderRect.left) / sliderRect.width));
-                        const min = parseFloat(thicknessSlider.min);
-                        const max = parseFloat(thicknessSlider.max);
-                        let newValue = min + (max - min) * percent;
-                        newValue = Math.round(newValue);
-                        thicknessSlider.value = newValue;
-                        thicknessSlider.dispatchEvent(new Event('input'));
-
-                    } else {
-                        for (const button of colorButtons) {
-                            const rect = button.getBoundingClientRect();
-                            if (pointX > rect.left && pointX < rect.right && pointY > rect.top && pointY < rect.bottom) {
-                                button.click();
-                                lastButtonPressTime = now;
-                                break;
-                            }
-                        }
-                    }
-                }
-            } else {
-                isPaletteDraggingSlider = false;
-            }
-        }
-
-        function handleGestures(handLandmarks) {
-            const thumbTip = handLandmarks[4];
-            const thumbIp = handLandmarks[3];
-            const indexTip = handLandmarks[8];
-            const indexPip = handLandmarks[6];
-            const middleTip = handLandmarks[12];
-            const middlePip = handLandmarks[10];
-            const ringTip = handLandmarks[16];
-            const ringPip = handLandmarks[14];
-            const pinkyTip = handLandmarks[20];
-            const pinkyPip = handLandmarks[18];
-
-            const isIndexExtended = indexTip.y < indexPip.y;
-            const isMiddleExtended = middleTip.y < middlePip.y;
-            const isRingExtended = ringTip.y < ringPip.y;
-            const isPinkyExtended = pinkyTip.y < pinkyPip.y;
-            
-            const isThumbExtended = (uploadedImage) 
-                ? thumbTip.x < thumbIp.x
-                : thumbTip.x > thumbIp.x;
-            
-            const now = Date.now();
-            const isShakaGesture = isThumbExtended && !isIndexExtended && !isMiddleExtended && !isRingExtended && isPinkyExtended;
-
-            if (pdfDoc && now - lastButtonPressTime > BUTTON_PRESS_COOLDOWN && !isShakaLocked) {
-                const isPalmForwardForShaka = (uploadedImage) 
-                    ? thumbTip.x < pinkyTip.x
-                    : thumbTip.x > pinkyTip.x;
-
-                if (isShakaGesture && isPalmForwardForShaka) {
-                    nextPageButton.click();
-                    lastButtonPressTime = now;
-                    showNotification('Next Page (Shaka)');
-                    return;
-                }
-                
-                if (isShakaGesture && !isPalmForwardForShaka) {
-                    prevPageButton.click();
-                    lastButtonPressTime = now;
-                    showNotification('Previous Page (Reverse Shaka)');
-                    return;
-                }
-            }
-            
-            const isAllFingersUp = isIndexExtended && isMiddleExtended && isRingExtended && isPinkyExtended;
-            const isSplitFinger = Math.abs(middleTip.x - ringTip.x) > 0.07;
-            const areFingersPaired = Math.abs(indexTip.x - middleTip.x) < 0.06 && Math.abs(ringTip.x - pinkyTip.x) < 0.06;
-            const isVulcanSalute = isAllFingersUp && isSplitFinger && areFingersPaired;
-
-            if (isVulcanSalute && now - lastButtonPressTime > BUTTON_PRESS_COOLDOWN) {
-                takeSnapshot();
-                lastButtonPressTime = now;
-                return;
-            }
-
-            const isFist = !isIndexExtended && !isMiddleExtended && !isRingExtended && !isPinkyExtended;
-            const drawGestureDistance = Math.hypot(indexTip.x - thumbTip.x, indexTip.y - thumbTip.y);
-            const isDrawingGesture = drawGestureDistance < 0.04;
-            const isMoveGesture = isIndexExtended && isMiddleExtended && !isRingExtended && !isPinkyExtended;
-
-            if (isFist) {
-                currentMode = 'erasing';
-                selectedPathIndex = -1;
-                if (lastMode === 'drawing' && currentPath.length > 0) {
-                    currentPath = [];
-                }
-
-                const palmCenterX = (handLandmarks[5].x + handLandmarks[9].x) / 2;
-                const palmCenterY = (handLandmarks[5].y + handLandmarks[9].y) / 2;
-                const eraserPos = {
-                    x: palmCenterX * canvasElement.width,
-                    y: palmCenterY * canvasElement.height
-                };
-
-                canvasCtx.fillStyle = eraserColor;
-                canvasCtx.beginPath();
-                canvasCtx.arc(eraserPos.x, eraserPos.y, eraserRadius, 0, 2 * Math.PI);
-                canvasCtx.fill();
-
-                allPaths = allPaths.filter(path =>
-                    !path.points.some(point =>
-                        Math.hypot(point.x - eraserPos.x, point.y - eraserPos.y) < eraserRadius
-                    )
-                );
-
-            } else if (isDrawingGesture && showHandLandmarks) {
-                currentMode = 'drawing';
-                selectedPathIndex = -1;
-                const fingerTipMidpoint = {
-                    x: ((indexTip.x + thumbTip.x) / 2) * canvasElement.width,
-                    y: ((indexTip.y + thumbTip.y) / 2) * canvasElement.height
-                };
-
-                if (!smoothedFingerTipPos || lastMode !== 'drawing') {
-                    smoothedFingerTipPos = fingerTipMidpoint;
-                } else {
-                    smoothedFingerTipPos.x = smoothedFingerTipPos.x * (1 - smoothingFactor) + fingerTipMidpoint.x * smoothingFactor;
-                    smoothedFingerTipPos.y = smoothedFingerTipPos.y * (1 - smoothingFactor) + fingerTipMidpoint.y * smoothingFactor;
-                }
-
-                if (lastMode !== 'drawing') {
-                    currentPath = [{...smoothedFingerTipPos}];
-                } else {
-                    currentPath.push({...smoothedFingerTipPos});
-                }
-            } else if (isMoveGesture) {
-                currentMode = 'moving';
-                const moveCenterPoint = {
-                    x: ((indexTip.x + middleTip.x) / 2) * canvasElement.width,
-                    y: ((indexTip.y + middleTip.y) / 2) * canvasElement.height
-                };
-
-                if (selectedPathIndex === -1) {
-                    for (let i = allPaths.length - 1; i >= 0; i--) {
-                        if (isPointNearPath(moveCenterPoint, allPaths[i], 30)) {
-                            selectedPathIndex = i;
-                            moveStartPoint = moveCenterPoint;
-                            initialSelectedPathState = JSON.parse(JSON.stringify(allPaths[i]));
-                            break;
-                        }
-                    }
-                } else {
-                    if (lastMode !== 'moving') {
-                        moveStartPoint = moveCenterPoint;
-                        initialSelectedPathState = JSON.parse(JSON.stringify(allPaths[selectedPathIndex]));
-                    } else {
-                        const deltaX = moveCenterPoint.x - moveStartPoint.x;
-                        const deltaY = moveCenterPoint.y - moveStartPoint.y;
-
-                        allPaths[selectedPathIndex] = {
-                            ...initialSelectedPathState,
-                            points: initialSelectedPathState.points.map(point => ({
-                                x: point.x + deltaX,
-                                y: point.y + deltaY
-                            }))
-                        };
-                    }
-                }
-
-            } else {
-                currentMode = 'idle';
-                if (lastMode === 'drawing') {
-                    if (currentPath.length > 1) {
-                        allPaths.push({ points: currentPath, color: drawingColor, width: drawingLineWidth });
-                    }
-                    currentPath = [];
-                } else if (lastMode === 'moving') {
-                    selectedPathIndex = -1;
-                    moveStartPoint = null;
-                    initialSelectedPathState = null;
-                }
-
-                const cursorTarget = { x: indexTip.x * canvasElement.width, y: indexTip.y * canvasElement.height };
-                if (!smoothedFingerTipPos || lastMode !== 'idle') {
-                    smoothedFingerTipPos = cursorTarget;
-                } else {
-                    smoothedFingerTipPos.x = smoothedFingerTipPos.x * (1 - smoothingFactor) + cursorTarget.x * smoothingFactor;
-                    smoothedFingerTipPos.y = smoothedFingerTipPos.y * (1 - smoothingFactor) + cursorTarget.y * smoothingFactor;
-                }
-            }
-            lastMode = currentMode;
-        }
-
-
-        async function renderPdfPage(num) {
-            if (!pdfDoc || num < 1 || num > totalPages) return;
-            
-            try {
-                const page = await pdfDoc.getPage(num);
-                const viewport = page.getViewport({ scale: 2.0 });
-                const tempCanvas = document.createElement('canvas');
-                const tempCtx = tempCanvas.getContext('2d');
-                tempCanvas.height = viewport.height;
-                tempCanvas.width = viewport.width;
-
-                await page.render({ canvasContext: tempCtx, viewport: viewport }).promise;
-                
-                const img = new Image();
-                img.onload = () => {
-                    uploadedImage = img;
-                    allPaths = [];
-                    currentPath = [];
-                };
-                img.src = tempCanvas.toDataURL();
-                pageIndicator.textContent = `Page ${num} of ${totalPages}`;
-                
-                prevPageButton.disabled = num <= 1;
-                nextPageButton.disabled = num >= totalPages;
-                prevPageButton.classList.toggle('disabled-button', num <= 1);
-                nextPageButton.classList.toggle('disabled-button', num >= totalPages);
-
-            } catch(error) {
-                console.error("Failed to render PDF page:", error);
-                showNotification("Failed to render PDF page.");
-            }
-        }
-
-        // --- Initialization and Event Listeners ---
-        const hands = new window.Hands({
-            locateFile: (file) => {
-                return `https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4/${file}`;
-            }
-        });
-        hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.7, minTrackingConfidence: 0.7 });
-        hands.onResults(onResults);
-        const camera = new window.Camera(videoElement, { onFrame: async () => { await hands.send({ image: videoElement }); }, width: 1280, height: 720 });
-        camera.start();
-
-        clearButton.addEventListener('click', () => {
-            if (isFullscreen) {
-                toggleFullscreen();
-            }
-            fullscreenButton.classList.add('hidden');
-            allPaths = [];
-            currentPath = [];
-            uploadedImage = null;
-            pdfDoc = null;
-            fileUploadInput.value = '';
-            prevPageButton.classList.add('hidden');
-            nextPageButton.classList.add('hidden');
-            pageIndicator.classList.add('hidden');
-            clearCubeTexture(); // Clear the cube too
-        });
-
-        snapshotButton.addEventListener('click', takeSnapshot);
-
-        fileUploadInput.addEventListener('change', (event) => {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            fullscreenButton.classList.remove('hidden');
-
-            allPaths = [];
-            currentPath = [];
-            pdfDoc = null;
-            uploadedImage = null;
-
-            if (file.type.startsWith('image/')) {
-                prevPageButton.classList.add('hidden');
-                nextPageButton.classList.add('hidden');
-                pageIndicator.classList.add('hidden');
-                
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    const img = new Image();
-                    img.onload = () => { uploadedImage = img; };
-                    img.src = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            } else if (file.type === 'application/pdf') {
-                const reader = new FileReader();
-                reader.onload = async (e) => {
-                    try {
-                        const loadingTask = window.pdfjsLib.getDocument({ data: e.target.result });
-                        const pdf = await loadingTask.promise;
-                        pdfDoc = pdf;
-                        totalPages = pdf.numPages;
-                        currentPageNum = 1;
-                        await renderPdfPage(currentPageNum);
-                        prevPageButton.classList.remove('hidden');
-                        nextPageButton.classList.remove('hidden');
-                        pageIndicator.classList.remove('hidden');
-                    } catch (error) {
-                        console.error('Error loading PDF:', error);
-                        showNotification("Could not load the PDF file. It might be corrupted.");
-                    }
-                };
-                reader.readAsArrayBuffer(file);
-            } else {
-                showNotification("Unsupported file-type. Please upload an image or PDF.");
-            }
-        });
-
-        const closePaletteButton = document.getElementById('close-palette-btn');
-        const colorButtons = document.querySelectorAll('.color-option-btn');
-        const thicknessSlider = document.getElementById('thickness-slider');
-
-        function togglePalette() {
-            isPaletteOpen = !isPaletteOpen;
-            paletteMenu.classList.toggle('hidden', !isPaletteOpen);
-        }
-
-        closePaletteButton.addEventListener('click', togglePalette);
-
-        colorButtons.forEach(button => {
-            button.addEventListener('click', () => {
-                drawingColor = button.dataset.color;
-                colorButtons.forEach(btn => btn.classList.remove('ring-4', 'ring-black'));
-                button.classList.add('ring-4', 'ring-black');
-            });
-        });
-        
-        const defaultColorButton = document.querySelector(`.color-option-btn[data-color="${drawingColor}"]`);
-        if (defaultColorButton) {
-            defaultColorButton.classList.add('ring-4', 'ring-black');
-        }
-
-        thicknessSlider.addEventListener('input', (e) => {
-            drawingLineWidth = parseInt(e.target.value, 10);
-        });
-        
-        thicknessSlider.value = drawingLineWidth;
-
-
-        fullscreenButton.addEventListener('click', toggleFullscreen);
-
-        document.addEventListener('keydown', (event) => {
-            if (event.key === "Escape") {
-                if (isFullscreen) {
-                    toggleFullscreen();
-                }
-                if (isPaletteOpen) {
-                    togglePalette();
-                }
-            }
-
-            if (event.key.toLowerCase() === 'p' && event.target.tagName !== 'INPUT') {
-                togglePalette();
-            }
-            
-            if (event.key.toLowerCase() === 'i' && event.target.tagName !== 'INPUT') {
-                showHandLandmarks = !showHandLandmarks;
-                showNotification(showHandLandmarks ? 'Showing Hand Landmarks' : 'Hiding Hand Landmarks');
-            }
-
-            if (event.key.toLowerCase() === 'o' && event.target.tagName !== 'INPUT') {
-                isShakaLocked = !isShakaLocked;
-                if (isShakaLocked) {
-                    showNotification('Page turn gestures LOCKED');
-                } else {
-                    showNotification('Page turn gestures UNLOCKED');
-                }
-            }
-
-            // NEW: Toggle 3D Cube with 'U'
-            if (event.key.toLowerCase() === 'u' && event.target.tagName !== 'INPUT') {
-                toggleCubeMode();
-            }
-        });
-
-        nextPageButton.addEventListener('click', () => {
-            if (currentPageNum >= totalPages) return;
-            currentPageNum++;
-            renderPdfPage(currentPageNum);
-        });
-
-        prevPageButton.addEventListener('click', () => {
-            if (currentPageNum <= 1) return;
-            currentPageNum--;
-            renderPdfPage(currentPageNum);
-        });
-    </script>
-</body>
-</html>
+  );
+}
