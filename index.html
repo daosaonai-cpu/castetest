@@ -1,658 +1,731 @@
-import React, { useState, useRef, useMemo } from 'react';
-import { 
-  ChevronRight, 
-  ChevronLeft, 
-  BrainCircuit, 
-  LineChart, 
-  Target, 
-  Play, 
-  Trash2, 
-  Undo,
-  Info
-} from 'lucide-react';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Interactive Machine Learning Lab</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #0f172a;
+            color: #f8fafc;
+            overflow: hidden;
+            user-select: none;
+        }
 
-// --- MATH UTILS ---
+        canvas {
+            background-color: #1e293b;
+            border-radius: 0.75rem;
+            box-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.1);
+            cursor: crosshair;
+            touch-action: none;
+        }
 
-// Calculate Linear Regression (Ordinary Least Squares)
-const calculateRegressionLine = (points) => {
-  if (points.length < 2) return null;
-  let sumX = 0, sumY = 0, sumXY = 0, sumXX = 0;
-  const n = points.length;
-  points.forEach(p => {
-    sumX += p.x;
-    sumY += p.y;
-    sumXY += p.x * p.y;
-    sumXX += p.x * p.x;
-  });
-  const denominator = (n * sumXX - sumX * sumX);
-  if (denominator === 0) return null; 
-  const m = (n * sumXY - sumX * sumY) / denominator;
-  const c = (sumY - m * sumX) / n;
-  return { m, c };
-};
+        .slide-enter {
+            animation: fadeIn 0.5s ease-out forwards;
+        }
 
-// Calculate Euclidean Distance
-const distance = (p1, p2) => Math.sqrt(Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2));
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
 
-// --- INTERACTIVE COMPONENTS ---
+        /* Custom range slider */
+        input[type=range] {
+            -webkit-appearance: none;
+            width: 100%;
+            background: transparent;
+        }
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 20px;
+            width: 20px;
+            border-radius: 50%;
+            background: #3b82f6;
+            cursor: pointer;
+            margin-top: -8px;
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
+        }
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #475569;
+            border-radius: 2px;
+        }
+        input[type=range]:focus {
+            outline: none;
+        }
+        
+        .class-btn.active-0 { background-color: #3b82f6; border-color: #60a5fa; box-shadow: 0 0 15px rgba(59, 130, 246, 0.4); }
+        .class-btn.active-1 { background-color: #f97316; border-color: #fb923c; box-shadow: 0 0 15px rgba(249, 115, 22, 0.4); }
+        
+        /* Grid pattern for canvas background */
+        .canvas-container {
+            position: relative;
+        }
+        .canvas-grid {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                linear-gradient(to right, rgba(255,255,255,0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255,255,255,0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+            border-radius: 0.75rem;
+        }
+    </style>
+</head>
+<body class="h-screen flex flex-col">
 
-const LinearRegressionInteractive = () => {
-  const [points, setPoints] = useState([]);
-  const [showResiduals, setShowResiduals] = useState(false);
-  const svgRef = useRef(null);
-
-  const handleSvgClick = (e) => {
-    if (!svgRef.current) return;
-    const rect = svgRef.current.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * 500;
-    const y = ((e.clientY - rect.top) / rect.height) * 400;
-    setPoints([...points, { x, y }]);
-  };
-
-  const line = calculateRegressionLine(points);
-
-  const getLineCoordinates = () => {
-    if (!line) return null;
-    // Calculate y for x=0 and x=500
-    const y1 = line.m * 0 + line.c;
-    const y2 = line.m * 500 + line.c;
-    return { x1: 0, y1, x2: 500, y2 };
-  };
-
-  const lineCoords = getLineCoordinates();
-
-  return (
-    <div className="flex flex-col h-full bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-      <div className="p-4 bg-slate-50 border-b border-slate-200 flex justify-between items-center">
-        <div>
-          <h3 className="font-semibold text-slate-800 flex items-center gap-2">
-            <LineChart className="w-5 h-5 text-blue-500" />
-            Linear Regression Sandbox
-          </h3>
-          <p className="text-sm text-slate-500">Click on the grid to add data points.</p>
-        </div>
-        <div className="flex gap-2">
-          <button 
-            onClick={() => setShowResiduals(!showResiduals)}
-            className={`px-3 py-1.5 text-sm rounded-lg border font-medium transition-colors ${showResiduals ? 'bg-indigo-50 text-indigo-700 border-indigo-200' : 'bg-white text-slate-600 border-slate-300 hover:bg-slate-50'}`}
-          >
-            {showResiduals ? 'Hide Errors' : 'Show Errors'}
-          </button>
-          <button 
-            onClick={() => setPoints(points.slice(0, -1))}
-            disabled={points.length === 0}
-            className="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg disabled:opacity-50"
-            title="Undo"
-          >
-            <Undo className="w-4 h-4" />
-          </button>
-          <button 
-            onClick={() => setPoints([])}
-            disabled={points.length === 0}
-            className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg disabled:opacity-50"
-            title="Clear All"
-          >
-            <Trash2 className="w-4 h-4" />
-          </button>
-        </div>
-      </div>
-      
-      <div className="flex-1 relative cursor-crosshair bg-slate-50" style={{ backgroundImage: 'radial-gradient(#cbd5e1 1px, transparent 1px)', backgroundSize: '20px 20px' }}>
-        <svg 
-          ref={svgRef}
-          viewBox="0 0 500 400" 
-          className="w-full h-full"
-          onClick={handleSvgClick}
-        >
-          {/* Residuals (Error lines) */}
-          {showResiduals && line && points.map((p, i) => {
-            const predictedY = line.m * p.x + line.c;
-            return (
-              <line 
-                key={`res-${i}`} 
-                x1={p.x} 
-                y1={p.y} 
-                x2={p.x} 
-                y2={predictedY} 
-                stroke="#f43f5e" 
-                strokeWidth="2" 
-                strokeDasharray="4 4"
-                opacity="0.6"
-              />
-            );
-          })}
-
-          {/* Best Fit Line */}
-          {lineCoords && (
-            <line 
-              x1={lineCoords.x1} 
-              y1={lineCoords.y1} 
-              x2={lineCoords.x2} 
-              y2={lineCoords.y2} 
-              stroke="#3b82f6" 
-              strokeWidth="4" 
-              className="drop-shadow-md"
-            />
-          )}
-
-          {/* Data Points */}
-          {points.map((p, i) => (
-            <circle 
-              key={i} 
-              cx={p.x} 
-              cy={p.y} 
-              r="6" 
-              fill="#1e293b" 
-              stroke="white" 
-              strokeWidth="2"
-              className="drop-shadow-sm transition-all duration-300"
-            />
-          ))}
-        </svg>
-
-        {points.length === 0 && (
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <span className="text-slate-400 bg-white/80 px-4 py-2 rounded-full text-sm font-medium animate-pulse">
-              Click anywhere to start adding data points
-            </span>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
-
-const KNNInteractive = () => {
-  const [points, setPoints] = useState([]);
-  const [currentClass, setCurrentClass] = useState('A'); // 'A' or 'B'
-  const [kValue, setKValue] = useState(3);
-  const svgRef = useRef(null);
-
-  // Pre-calculate grid centers for the decision boundary map
-  const gridCells = useMemo(() => {
-    const cells = [];
-    const gridSize = 10; // Resolution of the grid (10x10 squares)
-    for (let x = 0; x < 500; x += gridSize) {
-      for (let y = 0; y < 400; y += gridSize) {
-        cells.push({ x: x + gridSize / 2, y: y + gridSize / 2, rx: x, ry: y, size: gridSize });
-      }
-    }
-    return cells;
-  }, []);
-
-  const handleSvgClick = (e) => {
-    if (!svgRef.current) return;
-    const rect = svgRef.current.getBoundingClientRect();
-    const x = ((e.clientX - rect.left) / rect.width) * 500;
-    const y = ((e.clientY - rect.top) / rect.height) * 400;
-    setPoints([...points, { x, y, cls: currentClass }]);
-  };
-
-  // Compute decision boundaries
-  const boundaryGrid = useMemo(() => {
-    if (points.length === 0) return [];
-    
-    return gridCells.map(cell => {
-      // Find distances to all points
-      let distances = points.map(p => ({
-        dist: distance(cell, p),
-        cls: p.cls
-      }));
-      
-      // Sort by distance
-      distances.sort((a, b) => a.dist - b.dist);
-      
-      // Take top K
-      const nearest = distances.slice(0, kValue);
-      
-      // Vote
-      let countA = 0; let countB = 0;
-      nearest.forEach(n => {
-        if (n.cls === 'A') countA++;
-        else countB++;
-      });
-      
-      return {
-        ...cell,
-        predictedClass: countA > countB ? 'A' : (countB > countA ? 'B' : 'Tie')
-      };
-    });
-  }, [points, kValue, gridCells]);
-
-  return (
-    <div className="flex flex-col h-full bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden">
-      <div className="p-4 bg-slate-50 border-b border-slate-200 flex flex-wrap gap-4 justify-between items-center">
-        <div>
-          <h3 className="font-semibold text-slate-800 flex items-center gap-2">
-            <Target className="w-5 h-5 text-emerald-500" />
-            K-Nearest Neighbors (KNN)
-          </h3>
-          <p className="text-sm text-slate-500">Add points of different categories to see the boundary.</p>
+    <!-- Header / Navigation -->
+    <header class="bg-slate-800 border-b border-slate-700 p-4 flex justify-between items-center shadow-md shrink-0">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center font-bold text-white shadow-lg">
+                ML
+            </div>
+            <h1 class="text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-400">
+                Interactive ML Lab
+            </h1>
         </div>
         
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2 bg-white px-3 py-1.5 rounded-lg border border-slate-200">
-            <span className="text-sm font-medium text-slate-600">Add:</span>
-            <button 
-              onClick={() => setCurrentClass('A')}
-              className={`w-6 h-6 rounded-full border-2 transition-transform ${currentClass === 'A' ? 'bg-orange-500 border-orange-700 scale-110' : 'bg-orange-300 border-transparent hover:scale-105'}`}
-              title="Class A (Orange)"
-            />
-            <button 
-              onClick={() => setCurrentClass('B')}
-              className={`w-6 h-6 rounded-full border-2 transition-transform ${currentClass === 'B' ? 'bg-purple-500 border-purple-700 scale-110' : 'bg-purple-300 border-transparent hover:scale-105'}`}
-              title="Class B (Purple)"
-            />
-          </div>
+        <div class="flex items-center gap-4">
+            <span id="slide-counter" class="text-slate-400 text-sm font-medium">Slide 1 / 6</span>
+            <div class="flex gap-2">
+                <button id="btn-prev" class="px-4 py-2 bg-slate-700 hover:bg-slate-600 rounded text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                    Prev
+                </button>
+                <button id="btn-next" class="px-4 py-2 bg-blue-600 hover:bg-blue-500 rounded text-sm font-medium shadow-lg shadow-blue-500/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2">
+                    Next
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </button>
+            </div>
+        </div>
+    </header>
 
-          <div className="flex items-center gap-2">
-            <label className="text-sm font-medium text-slate-600">K = {kValue}</label>
-            <input 
-              type="range" 
-              min="1" 
-              max="9" 
-              step="2" 
-              value={kValue} 
-              onChange={(e) => setKValue(parseInt(e.target.value))}
-              className="w-24 accent-emerald-500"
-            />
-          </div>
-
-          <div className="flex gap-1">
-            <button 
-              onClick={() => setPoints(points.slice(0, -1))}
-              disabled={points.length === 0}
-              className="p-2 text-slate-500 hover:text-slate-700 hover:bg-slate-100 rounded-lg disabled:opacity-50"
-            >
-              <Undo className="w-4 h-4" />
-            </button>
-            <button 
-              onClick={() => setPoints([])}
-              disabled={points.length === 0}
-              className="p-2 text-red-500 hover:text-red-700 hover:bg-red-50 rounded-lg disabled:opacity-50"
-            >
-              <Trash2 className="w-4 h-4" />
-            </button>
-          </div>
-        </div>
-      </div>
-      
-      <div className="flex-1 relative cursor-crosshair bg-slate-50">
-        <svg 
-          ref={svgRef}
-          viewBox="0 0 500 400" 
-          className="w-full h-full block"
-          onClick={handleSvgClick}
-        >
-          {/* Decision Boundary Background Map */}
-          {boundaryGrid.map((cell, i) => (
-            <rect 
-              key={`bg-${i}`}
-              x={cell.rx}
-              y={cell.ry}
-              width={cell.size}
-              height={cell.size}
-              fill={cell.predictedClass === 'A' ? '#ffedd5' : (cell.predictedClass === 'B' ? '#f3e8ff' : '#f8fafc')}
-              className="transition-colors duration-500"
-            />
-          ))}
-
-          {/* Data Points */}
-          {points.map((p, i) => (
-            <circle 
-              key={i} 
-              cx={p.x} 
-              cy={p.y} 
-              r="6" 
-              fill={p.cls === 'A' ? '#f97316' : '#a855f7'} 
-              stroke="white" 
-              strokeWidth="2"
-              className="drop-shadow-sm"
-            />
-          ))}
-        </svg>
-
-        {points.length === 0 && (
-          <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
-            <span className="text-slate-400 bg-white/80 px-4 py-2 rounded-full text-sm font-medium animate-pulse">
-              Select a color above and click to map areas
-            </span>
-          </div>
-        )}
-      </div>
-    </div>
-  );
-};
-
-
-// --- SLIDE CONTENT ---
-
-const slides = [
-  {
-    id: 1,
-    title: "Welcome to Machine Learning",
-    subtitle: "Teaching computers to learn from experience.",
-    content: (
-      <div className="flex flex-col items-center justify-center h-full text-center space-y-6">
-        <div className="w-24 h-24 bg-blue-100 rounded-full flex items-center justify-center mb-4 shadow-inner">
-          <BrainCircuit className="w-12 h-12 text-blue-600" />
-        </div>
-        <h1 className="text-4xl md:text-5xl font-bold text-slate-800">Learn by Doing.</h1>
-        <p className="text-xl text-slate-600 max-w-2xl">
-          Today, we won't just look at math formulas. You are going to build, break, and interact with Machine Learning models in real-time.
-        </p>
-        <div className="grid grid-cols-2 gap-4 mt-8 w-full max-w-lg">
-          <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
-            <h4 className="font-semibold text-slate-700">Part 1: Regression</h4>
-            <p className="text-sm text-slate-500">Predicting numbers (e.g., house prices)</p>
-          </div>
-          <div className="bg-slate-50 p-4 rounded-xl border border-slate-200">
-            <h4 className="font-semibold text-slate-700">Part 2: Classification</h4>
-            <p className="text-sm text-slate-500">Sorting things (e.g., Cat or Dog?)</p>
-          </div>
-        </div>
-      </div>
-    )
-  },
-  {
-    id: 2,
-    title: "What is a Model?",
-    subtitle: "Finding patterns in the chaos.",
-    content: (
-      <div className="flex flex-col h-full justify-center space-y-6 max-w-4xl mx-auto">
-        <p className="text-lg text-slate-700">
-          Imagine a robot trying to catch a ball. It doesn't know the physics equations of gravity. Instead, you throw the ball 100 times. 
-        </p>
-        <div className="bg-blue-50 border-l-4 border-blue-500 p-6 rounded-r-xl">
-          <p className="text-blue-800 font-medium text-lg">
-            "Machine Learning is the study of computer algorithms that can improve automatically through experience and by the use of data."
-          </p>
-        </div>
-        <ul className="space-y-4 mt-6">
-          <li className="flex items-start gap-3 text-lg text-slate-700">
-            <div className="mt-1 bg-green-100 p-1 rounded-full"><Play className="w-4 h-4 text-green-600" /></div>
-            <strong>Data:</strong> The examples we give the computer (e.g., thousands of pictures of cats).
-          </li>
-          <li className="flex items-start gap-3 text-lg text-slate-700">
-            <div className="mt-1 bg-green-100 p-1 rounded-full"><Play className="w-4 h-4 text-green-600" /></div>
-            <strong>Model:</strong> The mathematical "brain" that tries to find the pattern.
-          </li>
-          <li className="flex items-start gap-3 text-lg text-slate-700">
-            <div className="mt-1 bg-green-100 p-1 rounded-full"><Play className="w-4 h-4 text-green-600" /></div>
-            <strong>Prediction:</strong> The model guessing the outcome for new data it has never seen.
-          </li>
-        </ul>
-      </div>
-    )
-  },
-  {
-    id: 3,
-    title: "Linear Regression: Drawing the Line",
-    subtitle: "Predicting a continuous value based on a trend.",
-    content: (
-      <div className="flex flex-col lg:flex-row gap-8 h-full">
-        <div className="flex-1 space-y-4 flex flex-col justify-center">
-          <p className="text-lg text-slate-700">
-            <strong>Goal:</strong> Find the line that best "fits" the data. 
-          </p>
-          <p className="text-slate-600">
-            Imagine the X-axis is <em>"Hours Studied"</em> and the Y-axis is <em>"Test Score"</em>. As you click on the graph, you are adding student records.
-          </p>
-          <div className="bg-slate-100 p-4 rounded-lg mt-4 text-sm text-slate-700 border border-slate-200">
-            <p className="font-semibold mb-2">Instructions:</p>
-            <ol className="list-decimal pl-5 space-y-1">
-              <li>Click to add 3 points in an upward trend. Watch the blue line.</li>
-              <li>Add a "rebel" point way off the trend (an outlier). See how it pulls the line?</li>
-              <li>Try toggling <strong>"Show Errors"</strong> to see how the model calculates its mistakes.</li>
-            </ol>
-          </div>
-        </div>
-        <div className="flex-[1.5] h-[400px] lg:h-full min-h-[400px]">
-          <LinearRegressionInteractive />
-        </div>
-      </div>
-    )
-  },
-  {
-    id: 4,
-    title: "Understanding Error (Loss)",
-    subtitle: "How does the computer know the line is 'good'?",
-    content: (
-      <div className="flex flex-col h-full justify-center space-y-6 max-w-4xl mx-auto">
-        <p className="text-lg text-slate-700">
-          The computer doesn't have eyes. It uses math to determine if a line is a good fit. It calculates the <strong>Error</strong> (or Loss).
-        </p>
-        <div className="bg-rose-50 p-6 rounded-xl border border-rose-100">
-          <h4 className="text-rose-800 font-bold mb-2 flex items-center gap-2">
-            <Info className="w-5 h-5" /> What are those red dashed lines?
-          </h4>
-          <p className="text-rose-900">
-            When you toggled "Show Errors" on the previous slide, you saw lines connecting your dots to the prediction line. These are called <strong>Residuals</strong>.
-          </p>
-        </div>
-        <div className="bg-slate-800 p-6 rounded-xl text-white font-mono text-sm shadow-lg">
-          <p className="text-green-400"># The computer's goal is to minimize this:</p>
-          <p className="mt-2">Total Error = sum( (Actual Point Y - Predicted Line Y)² )</p>
-          <p className="mt-4 text-slate-400">By shifting the line around mathematically, it finds the exact spot where this "Total Error" is as small as possible. This is called Ordinary Least Squares (OLS).</p>
-        </div>
-      </div>
-    )
-  },
-  {
-    id: 5,
-    title: "Classification: Sorting Data",
-    subtitle: "When the answer isn't a number, but a category.",
-    content: (
-      <div className="flex flex-col h-full justify-center space-y-6 max-w-4xl mx-auto">
-        <div className="flex items-center gap-4 mb-4">
-          <div className="w-16 h-16 bg-purple-100 rounded-2xl flex items-center justify-center transform rotate-6">
-            <span className="text-3xl">🐱</span>
-          </div>
-          <div className="text-2xl font-bold text-slate-400">VS</div>
-          <div className="w-16 h-16 bg-orange-100 rounded-2xl flex items-center justify-center transform -rotate-6">
-            <span className="text-3xl">🐶</span>
-          </div>
-        </div>
-        <p className="text-lg text-slate-700">
-          Regression predicts a continuous number. <strong>Classification</strong> predicts a label or category.
-        </p>
-        <p className="text-lg text-slate-700">
-          A very simple, yet powerful algorithm to do this is called <strong>K-Nearest Neighbors (KNN)</strong>. 
-        </p>
-        <div className="bg-emerald-50 p-6 rounded-xl border border-emerald-100 mt-4">
-          <h4 className="font-bold text-emerald-800 mb-2">The "Birds of a Feather" Rule:</h4>
-          <p className="text-emerald-900">
-            "If it walks like a duck, and quacks like a duck, and is surrounded by 3 other ducks... it's probably a duck."
-          </p>
-        </div>
-      </div>
-    )
-  },
-  {
-    id: 6,
-    title: "KNN: Drawing the Boundaries",
-    subtitle: "Voting based on the closest neighbors.",
-    content: (
-      <div className="flex flex-col lg:flex-row gap-8 h-full">
-        <div className="flex-1 flex flex-col justify-center space-y-4">
-          <p className="text-lg text-slate-700">
-            For any empty spot on the grid, the model asks: <em>"Who are my closest <strong>K</strong> neighbors?"</em>
-          </p>
-          <div className="bg-slate-100 p-4 rounded-lg mt-4 text-sm text-slate-700 border border-slate-200">
-            <p className="font-semibold mb-2">Try this out:</p>
-            <ol className="list-decimal pl-5 space-y-2">
-              <li>Make a cluster of Orange points on the left, and Purple on the right.</li>
-              <li>Notice the background color change—that's the <strong>Decision Boundary</strong>.</li>
-              <li>Add a Purple point directly inside the Orange cluster.</li>
-              <li><strong>Crucial:</strong> Change the K-slider. When K=1, boundaries are jagged and jump around outliers. When K=7, the boundary gets smoother and ignores outliers (voting wins).</li>
-            </ol>
-          </div>
-        </div>
-        <div className="flex-[1.5] h-[400px] lg:h-full min-h-[400px]">
-          <KNNInteractive />
-        </div>
-      </div>
-    )
-  },
-  {
-    id: 7,
-    title: "Class Complete!",
-    subtitle: "You've successfully trained your first interactive models.",
-    content: (
-      <div className="flex flex-col items-center justify-center h-full text-center space-y-6">
-        <div className="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mb-4 shadow-inner">
-          <Target className="w-12 h-12 text-green-600" />
-        </div>
-        <h2 className="text-3xl font-bold text-slate-800">What we learned today:</h2>
-        <div className="text-left bg-slate-50 p-8 rounded-2xl border border-slate-200 max-w-2xl w-full shadow-sm mt-6">
-          <ul className="space-y-4">
-            <li className="flex items-start gap-3">
-              <span className="text-xl">📊</span>
-              <div>
-                <strong className="text-slate-800">Models learn from Data.</strong> 
-                <p className="text-slate-600 text-sm">Without data points, our canvas was blank. The more data, the clearer the pattern.</p>
-              </div>
-            </li>
-            <li className="flex items-start gap-3">
-              <span className="text-xl">📈</span>
-              <div>
-                <strong className="text-slate-800">Regression predicts trends.</strong> 
-                <p className="text-slate-600 text-sm">It minimizes the "error" distance between the line and the data points.</p>
-              </div>
-            </li>
-            <li className="flex items-start gap-3">
-              <span className="text-xl">🎨</span>
-              <div>
-                <strong className="text-slate-800">Classification creates boundaries.</strong> 
-                <p className="text-slate-600 text-sm">KNN uses distance and voting to separate different categories of data.</p>
-              </div>
-            </li>
-          </ul>
-        </div>
-      </div>
-    )
-  }
-];
-
-// --- MAIN APP COMPONENT ---
-
-export default function App() {
-  const [currentSlide, setCurrentSlide] = useState(0);
-
-  const nextSlide = () => setCurrentSlide(prev => Math.min(prev + 1, slides.length - 1));
-  const prevSlide = () => setCurrentSlide(prev => Math.max(prev - 1, 0));
-
-  const progressPercentage = ((currentSlide + 1) / slides.length) * 100;
-
-  return (
-    <div className="min-h-screen bg-slate-100 text-slate-900 font-sans flex flex-col selection:bg-blue-200">
-      
-      {/* Header / Navbar */}
-      <header className="bg-white border-b border-slate-200 h-16 flex items-center px-6 justify-between shrink-0 shadow-sm z-10 relative">
-        <div className="flex items-center gap-3">
-          <div className="bg-blue-600 p-1.5 rounded-lg">
-            <BrainCircuit className="w-6 h-6 text-white" />
-          </div>
-          <h1 className="font-bold text-xl tracking-tight text-slate-800 hidden sm:block">
-            ML Foundations 101
-          </h1>
-        </div>
-        <div className="flex items-center gap-4 text-sm font-medium text-slate-500">
-          <span className="hidden sm:inline">1 Hour 30 Min Class</span>
-          <div className="w-px h-6 bg-slate-300 hidden sm:block"></div>
-          <span className="bg-slate-100 px-3 py-1 rounded-full text-slate-700">
-            Slide {currentSlide + 1} of {slides.length}
-          </span>
-        </div>
-      </header>
-
-      {/* Progress Bar */}
-      <div className="w-full h-1 bg-slate-200 shrink-0">
-        <div 
-          className="h-full bg-blue-500 transition-all duration-500 ease-out" 
-          style={{ width: `${progressPercentage}%` }}
-        ></div>
-      </div>
-
-      {/* Main Content Area */}
-      <main className="flex-1 flex overflow-hidden">
+    <!-- Main Content Area -->
+    <main class="flex-1 flex overflow-hidden">
         
-        {/* Sidebar (Optional on mobile, visible on desktop) */}
-        <aside className="w-64 bg-slate-50 border-r border-slate-200 hidden md:flex flex-col shrink-0 overflow-y-auto">
-          <div className="p-4 uppercase text-xs font-bold tracking-wider text-slate-400">
-            Class Curriculum
-          </div>
-          <nav className="flex-1 px-2 space-y-1">
-            {slides.map((slide, idx) => (
-              <button
-                key={slide.id}
-                onClick={() => setCurrentSlide(idx)}
-                className={`w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition-colors flex items-start gap-3 ${
-                  idx === currentSlide 
-                    ? 'bg-blue-100 text-blue-700' 
-                    : 'text-slate-600 hover:bg-slate-200/50 hover:text-slate-900'
-                }`}
-              >
-                <div className={`mt-0.5 w-5 h-5 rounded-full flex items-center justify-center border text-[10px] shrink-0 ${
-                  idx === currentSlide ? 'bg-blue-500 border-blue-600 text-white' : 
-                  idx < currentSlide ? 'bg-slate-200 border-slate-300 text-slate-500' : 'bg-transparent border-slate-300 text-slate-400'
-                }`}>
-                  {idx + 1}
-                </div>
-                <span className="leading-tight">{slide.title}</span>
-              </button>
-            ))}
-          </nav>
-        </aside>
-
-        {/* Slide Presentation Area */}
-        <div className="flex-1 flex flex-col relative overflow-hidden bg-white">
-          <div className="flex-1 overflow-y-auto p-6 md:p-10 lg:p-14">
+        <!-- Left Panel: Educational Content -->
+        <div class="w-1/3 bg-slate-800/50 p-8 overflow-y-auto border-r border-slate-700 flex flex-col slide-enter" id="text-panel">
+            <span id="slide-label" class="text-blue-400 font-semibold tracking-wider text-xs uppercase mb-2">Introduction</span>
+            <h2 id="slide-title" class="text-3xl font-bold mb-4 text-white">Welcome to Machine Learning</h2>
             
-            <div className="max-w-6xl mx-auto h-full flex flex-col animate-in fade-in slide-in-from-bottom-4 duration-500">
-              {/* Slide Header */}
-              <div className="mb-8 shrink-0">
-                <h2 className="text-3xl md:text-4xl font-extrabold text-slate-900 tracking-tight">
-                  {slides[currentSlide].title}
-                </h2>
-                {slides[currentSlide].subtitle && (
-                  <p className="text-xl text-slate-500 mt-2 font-light">
-                    {slides[currentSlide].subtitle}
-                  </p>
-                )}
-              </div>
-
-              {/* Slide Dynamic Content */}
-              <div className="flex-1 min-h-[400px]">
-                {slides[currentSlide].content}
-              </div>
+            <div id="slide-content" class="text-slate-300 space-y-4 leading-relaxed flex-1">
+                <!-- Content injected via JS -->
             </div>
 
-          </div>
-
-          {/* Footer Controls */}
-          <footer className="h-20 border-t border-slate-200 bg-white flex items-center justify-between px-6 md:px-10 shrink-0">
-            <button 
-              onClick={prevSlide}
-              disabled={currentSlide === 0}
-              className="flex items-center gap-2 px-5 py-2.5 rounded-xl text-slate-600 font-medium hover:bg-slate-100 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
-            >
-              <ChevronLeft className="w-5 h-5" />
-              Previous
-            </button>
-            
-            <button 
-              onClick={nextSlide}
-              disabled={currentSlide === slides.length - 1}
-              className="flex items-center gap-2 px-6 py-2.5 rounded-xl bg-blue-600 text-white font-medium hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm transition-all hover:shadow hover:-translate-y-0.5 active:translate-y-0"
-            >
-              Next Step
-              <ChevronRight className="w-5 h-5" />
-            </button>
-          </footer>
+            <div id="class-activity" class="mt-8 p-4 bg-blue-900/20 border border-blue-500/30 rounded-lg">
+                <h4 class="text-blue-400 font-semibold text-sm mb-2 flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Class Activity
+                </h4>
+                <p id="activity-text" class="text-sm text-blue-100/80">
+                    Listen to the instructor's introduction.
+                </p>
+            </div>
         </div>
 
-      </main>
-    </div>
-  );
-}
+        <!-- Right Panel: Interactive Canvas -->
+        <div class="w-2/3 p-6 flex flex-col bg-slate-900">
+            
+            <!-- Controls Overlay (Dynamic based on slide) -->
+            <div id="canvas-controls" class="h-14 mb-4 flex items-center justify-between opacity-0 transition-opacity">
+                
+                <!-- Classification Tools -->
+                <div id="tool-classification" class="hidden flex gap-3 p-1 bg-slate-800 rounded-lg border border-slate-700">
+                    <button class="class-btn active-0 px-4 py-1.5 rounded-md text-sm font-medium border border-transparent transition-all" data-class="0">
+                        Class A (Blue)
+                    </button>
+                    <button class="class-btn px-4 py-1.5 rounded-md text-sm font-medium border border-transparent transition-all text-slate-400 hover:text-white" data-class="1">
+                        Class B (Orange)
+                    </button>
+                </div>
+
+                <!-- KNN Slider -->
+                <div id="tool-knn" class="hidden flex-1 max-w-md ml-4 flex items-center gap-4 bg-slate-800 py-2 px-4 rounded-lg border border-slate-700">
+                    <label class="text-sm font-medium text-slate-300 whitespace-nowrap">K Value: <span id="k-value-display" class="text-blue-400 font-bold">3</span></label>
+                    <input type="range" id="knn-slider" min="1" max="15" step="2" value="3">
+                    <span class="text-xs text-slate-500 w-24 text-right" id="k-status">Balanced</span>
+                </div>
+
+                <!-- Stats Display -->
+                <div id="stats-display" class="hidden flex items-center gap-4 px-4 py-2 bg-slate-800 rounded-lg border border-slate-700">
+                    <div class="text-sm">
+                        <span class="text-slate-400">Error (MSE):</span>
+                        <span id="mse-value" class="font-mono font-bold text-red-400 ml-1">0.00</span>
+                    </div>
+                </div>
+
+                <!-- Global Canvas Actions -->
+                <button id="btn-clear" class="ml-auto px-4 py-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded text-sm font-medium text-red-400 hover:text-red-300 transition-colors flex items-center gap-2">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    Clear Data
+                </button>
+            </div>
+
+            <!-- Canvas Container -->
+            <div class="flex-1 canvas-container w-full h-full" id="canvas-wrapper">
+                <div class="canvas-grid"></div>
+                <canvas id="ml-canvas" class="w-full h-full block"></canvas>
+                
+                <!-- Initial empty state overlay -->
+                <div id="canvas-overlay" class="absolute inset-0 flex items-center justify-center pointer-events-none">
+                    <div class="text-center bg-slate-900/80 p-6 rounded-xl backdrop-blur-sm border border-slate-700 shadow-2xl">
+                        <svg class="w-12 h-12 text-blue-500 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"></path></svg>
+                        <p class="text-lg font-medium text-white mb-1">Interactive Sandbox Area</p>
+                        <p class="text-slate-400 text-sm">Follow the instructions on the left to begin.</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <script>
+        /**
+         * Machine Learning Interactive Lab Logic
+         */
+
+        // --- Data & State Management ---
+        const state = {
+            currentSlide: 0,
+            points: [], // {x, y, class}
+            activeClass: 0, // 0 or 1
+            knnK: 3,
+            isDragging: false,
+            dragIndex: -1,
+            mode: 'none', // 'regression', 'classification', 'knn'
+        };
+
+        const slides = [
+            {
+                label: "Module 1",
+                title: "What is Machine Learning?",
+                content: `
+                    <p>Traditional programming requires humans to write explicit rules (code) that take data and produce answers.</p>
+                    <div class="bg-slate-700/30 p-4 rounded-lg border border-slate-600/50 my-2">
+                        <span class="text-blue-400 font-mono text-sm">Rules + Data = Answers</span>
+                    </div>
+                    <p><strong>Machine Learning</strong> flips this. We provide the computer with data and the correct answers, and the computer learns the rules.</p>
+                    <div class="bg-slate-700/30 p-4 rounded-lg border border-slate-600/50 my-2">
+                        <span class="text-green-400 font-mono text-sm">Answers + Data = Rules</span>
+                    </div>
+                    <p>Today, we will build an intuition for how algorithms discover these rules by visualizing them in real-time.</p>
+                `,
+                activity: "No interaction required. Prepare for the next slide where we will create our first model.",
+                mode: 'none',
+                setup: () => state.points = []
+            },
+            {
+                label: "Module 2",
+                title: "Linear Regression",
+                content: `
+                    <p>Imagine you want to predict house prices based on square footage. If we plot this data, we can draw a straight line through it to predict future prices.</p>
+                    <p>This is <strong>Linear Regression</strong>. The algorithm tries to find the "Line of Best Fit" that minimizes the distance between the line and all the data points.</p>
+                    <ul class="list-disc pl-5 text-sm space-y-2 text-slate-400 mt-4">
+                        <li>The algorithm calculates the error (Mean Squared Error).</li>
+                        <li>It adjusts the slope and position of the line to make this error as close to zero as possible.</li>
+                    </ul>
+                `,
+                activity: "Click on the grid to the right to add data points. Try creating a diagonal trend (e.g., bottom-left to top-right) and watch the model calculate the line of best fit instantly.",
+                mode: 'regression',
+                setup: () => state.points = []
+            },
+            {
+                label: "Module 3",
+                title: "The Impact of Outliers",
+                content: `
+                    <p>A model is only as good as its data. What happens when we have anomalies or "outliers"?</p>
+                    <p>Because Standard Linear Regression minimizes the <em>squared</em> error, data points that are very far away from the line are penalized heavily. The line will bend significantly to accommodate them.</p>
+                    <p>In the real world, cleaning data to remove these outliers is a massive part of a Data Scientist's job.</p>
+                `,
+                activity: "I've added a perfect straight line of points. Click and DRAG one of the points far away from the others. Watch how a single outlier drags the entire model down with it.",
+                mode: 'regression',
+                setup: (width, height) => {
+                    state.points = [];
+                    // Generate a nice diagonal line
+                    for(let i=1; i<=6; i++) {
+                        state.points.push({
+                            x: width * 0.15 * i,
+                            y: height - (height * 0.12 * i)
+                        });
+                    }
+                }
+            },
+            {
+                label: "Module 4",
+                title: "Classification",
+                content: `
+                    <p>Regression predicts continuous numbers (like price). <strong>Classification</strong> predicts categories (like "Spam" or "Not Spam").</p>
+                    <p>Instead of drawing a line <em>through</em> the data, classification algorithms draw a <strong>Decision Boundary</strong> to separate the groups.</p>
+                    <p>Any new data point that falls on one side of the boundary is classified as Blue; on the other side, Orange.</p>
+                `,
+                activity: "Add some Blue points (Class A) on one side of the canvas, and Orange points (Class B) on the other. Use the toggle buttons above the canvas to switch colors.",
+                mode: 'classification',
+                setup: () => state.points = []
+            },
+            {
+                label: "Module 5",
+                title: "Overfitting & K-Nearest Neighbors",
+                content: `
+                    <p>A popular classification algorithm is <strong>K-Nearest Neighbors (K-NN)</strong>. To classify a new point, it looks at its 'K' closest neighbors and takes a majority vote.</p>
+                    <p class="text-blue-300"><strong>The Bias-Variance Tradeoff:</strong></p>
+                    <ul class="list-disc pl-5 text-sm space-y-2 text-slate-400 mt-2">
+                        <li><strong>Low K (e.g., K=1):</strong> The boundary becomes highly jagged. It perfectly memorizes the training data, including noise. This is called <strong>Overfitting</strong>.</li>
+                        <li><strong>High K (e.g., K=15):</strong> The boundary becomes a smooth line. It might miss nuances. This is called <strong>Underfitting</strong>.</li>
+                    </ul>
+                `,
+                activity: "Create a complex cluster of blue and orange points. Then, drag the 'K Value' slider above the canvas. Notice how K=1 creates 'islands' around individual points, while higher K values smooth it out.",
+                mode: 'knn',
+                setup: (width, height) => {
+                    // Start with a cluster to save time
+                    state.points = [];
+                    // Blue top left
+                    for(let i=0; i<8; i++) state.points.push({x: width*0.3 + (Math.random()-0.5)*100, y: height*0.3 + (Math.random()-0.5)*100, class: 0});
+                    // Orange bottom right
+                    for(let i=0; i<8; i++) state.points.push({x: width*0.7 + (Math.random()-0.5)*100, y: height*0.7 + (Math.random()-0.5)*100, class: 1});
+                    // A noisy blue in orange territory
+                    state.points.push({x: width*0.65, y: height*0.65, class: 0});
+                    state.knnK = 1;
+                    document.getElementById('knn-slider').value = 1;
+                    updateKStatus();
+                }
+            },
+            {
+                label: "Module 6",
+                title: "Open Playground",
+                content: `
+                    <p>You've learned the fundamentals of how machines learn patterns from data:</p>
+                    <ol class="list-decimal pl-5 text-sm space-y-2 text-slate-300 mt-4 mb-4 font-medium">
+                        <li>Models use data to infer rules.</li>
+                        <li>Regression finds trends (lines).</li>
+                        <li>Classification separates categories (boundaries).</li>
+                        <li>Outliers skew results.</li>
+                        <li>Model complexity (like K) must be balanced to avoid Overfitting.</li>
+                    </ol>
+                    <p>This sandbox is open. Experiment with extreme data distributions and see how the K-NN algorithm behaves.</p>
+                `,
+                activity: "Class challenge: Try to create a 'bullseye' pattern (blue points in the center, orange surrounding them). What K value works best to generalize the boundary?",
+                mode: 'knn',
+                setup: () => state.points = []
+            }
+        ];
+
+        // --- DOM Elements ---
+        const canvas = document.getElementById('ml-canvas');
+        const ctx = canvas.getContext('2d');
+        const wrapper = document.getElementById('canvas-wrapper');
+        const overlay = document.getElementById('canvas-overlay');
+        
+        // Navigation
+        const btnPrev = document.getElementById('btn-prev');
+        const btnNext = document.getElementById('btn-next');
+        const slideCounter = document.getElementById('slide-counter');
+        
+        // Content
+        const slideLabel = document.getElementById('slide-label');
+        const slideTitle = document.getElementById('slide-title');
+        const slideContent = document.getElementById('slide-content');
+        const activityText = document.getElementById('activity-text');
+        const textPanel = document.getElementById('text-panel');
+        
+        // Tools
+        const controlsContainer = document.getElementById('canvas-controls');
+        const toolClassification = document.getElementById('tool-classification');
+        const toolKnn = document.getElementById('tool-knn');
+        const statsDisplay = document.getElementById('stats-display');
+        const btnClear = document.getElementById('btn-clear');
+        const classBtns = document.querySelectorAll('.class-btn');
+        const knnSlider = document.getElementById('knn-slider');
+        const kValueDisplay = document.getElementById('k-value-display');
+        const kStatus = document.getElementById('k-status');
+        const mseValue = document.getElementById('mse-value');
+
+        // --- Math & ML Logic ---
+
+        // Simple Ordinary Least Squares
+        function calculateLinearRegression(points) {
+            if (points.length < 2) return null;
+            let sumX = 0, sumY = 0, sumXY = 0, sumXX = 0;
+            let n = points.length;
+            
+            points.forEach(p => {
+                sumX += p.x;
+                sumY += p.y;
+                sumXY += p.x * p.y;
+                sumXX += p.x * p.x;
+            });
+            
+            let denominator = (n * sumXX - sumX * sumX);
+            if (denominator === 0) return { m: 0, b: sumY / n, mse: 0 }; // Vertical line case handling
+            
+            let m = (n * sumXY - sumX * sumY) / denominator;
+            let b = (sumY - m * sumX) / n;
+            
+            // Calculate MSE mapping to screen space just for relative visualization
+            let mse = 0;
+            points.forEach(p => {
+                let predictedY = m * p.x + b;
+                let error = p.y - predictedY;
+                // Normalize error scale slightly for UI
+                mse += (error * error) / 1000; 
+            });
+            mse = mse / n;
+
+            return { m, b, mse };
+        }
+
+        // K-Nearest Neighbors Classification
+        function getKNNClass(x, y, points, k) {
+            let distances = points.map(p => {
+                return {
+                    distSq: (p.x - x)**2 + (p.y - y)**2,
+                    class: p.class
+                };
+            });
+            
+            distances.sort((a, b) => a.distSq - b.distSq);
+            
+            let topK = distances.slice(0, k);
+            let counts = {0: 0, 1: 0};
+            topK.forEach(d => counts[d.class]++);
+            
+            return counts[0] > counts[1] ? 0 : 1;
+        }
+
+        // --- Canvas Rendering ---
+
+        function resizeCanvas() {
+            canvas.width = wrapper.clientWidth;
+            canvas.height = wrapper.clientHeight;
+            draw();
+        }
+
+        const colors = {
+            class0: { main: '#3b82f6', bg: 'rgba(59, 130, 246, 0.15)' }, // Blue
+            class1: { main: '#f97316', bg: 'rgba(249, 115, 22, 0.15)' }, // Orange
+            line: '#10b981', // Emerald
+            pointStroke: '#ffffff'
+        };
+
+        function draw() {
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (state.mode === 'none') {
+                overlay.style.opacity = '1';
+                return;
+            } else {
+                overlay.style.opacity = state.points.length === 0 ? '1' : '0';
+            }
+
+            // Draw Backgrounds (Decision Boundaries)
+            if ((state.mode === 'classification' || state.mode === 'knn') && state.points.length > 0) {
+                // Check if we have both classes
+                let has0 = state.points.some(p => p.class === 0);
+                let has1 = state.points.some(p => p.class === 1);
+                
+                if (has0 && has1) {
+                    drawDecisionBoundary();
+                }
+            }
+
+            // Draw Regression Line
+            if (state.mode === 'regression') {
+                const reg = calculateLinearRegression(state.points);
+                if (reg) {
+                    ctx.beginPath();
+                    // y = mx + b. Calculate y for x=0 and x=width
+                    let y1 = reg.m * 0 + reg.b;
+                    let y2 = reg.m * canvas.width + reg.b;
+                    
+                    ctx.moveTo(0, y1);
+                    ctx.lineTo(canvas.width, y2);
+                    ctx.strokeStyle = colors.line;
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+
+                    // Draw residual lines
+                    ctx.beginPath();
+                    ctx.setLineDash([5, 5]);
+                    ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+                    ctx.lineWidth = 1;
+                    state.points.forEach(p => {
+                        let predY = reg.m * p.x + reg.b;
+                        ctx.moveTo(p.x, p.y);
+                        ctx.lineTo(p.x, predY);
+                    });
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+
+                    // Update UI stats
+                    mseValue.textContent = reg.mse.toFixed(2);
+                } else {
+                    mseValue.textContent = "0.00";
+                }
+            }
+
+            // Draw Points
+            state.points.forEach((p, index) => {
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, index === state.dragIndex ? 8 : 6, 0, Math.PI * 2);
+                
+                if (state.mode === 'regression') {
+                    ctx.fillStyle = colors.class0.main;
+                } else {
+                    ctx.fillStyle = p.class === 0 ? colors.class0.main : colors.class1.main;
+                }
+                
+                ctx.fill();
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = colors.pointStroke;
+                ctx.stroke();
+
+                // Glow effect if dragging
+                if (index === state.dragIndex) {
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, 12, 0, Math.PI * 2);
+                    ctx.fillStyle = state.mode === 'regression' ? 'rgba(59, 130, 246, 0.3)' : (p.class === 0 ? 'rgba(59, 130, 246, 0.3)' : 'rgba(249, 115, 22, 0.3)');
+                    ctx.fill();
+                }
+            });
+        }
+
+        // Optimized rendering of the decision boundary using low-res blocks
+        function drawDecisionBoundary() {
+            const blockSize = 15; // Pixel size of evaluation blocks (tradeoff between quality/performance)
+            const cols = Math.ceil(canvas.width / blockSize);
+            const rows = Math.ceil(canvas.height / blockSize);
+            
+            // Limit K to max available points to avoid errors
+            const actualK = Math.min(state.knnK, state.points.length);
+
+            // Optimization: If K is large and points are many, drawing can lag. 
+            // The block size approach handles this well for JS.
+            ctx.globalAlpha = 0.6;
+
+            for (let i = 0; i < cols; i++) {
+                for (let j = 0; j < rows; j++) {
+                    let cx = i * blockSize + blockSize/2;
+                    let cy = j * blockSize + blockSize/2;
+                    
+                    let predictedClass = getKNNClass(cx, cy, state.points, actualK);
+                    
+                    ctx.fillStyle = predictedClass === 0 ? colors.class0.bg : colors.class1.bg;
+                    ctx.fillRect(i * blockSize, j * blockSize, blockSize, blockSize);
+                }
+            }
+            ctx.globalAlpha = 1.0;
+        }
+
+        // --- Interaction Logic ---
+
+        function getMousePos(evt) {
+            const rect = canvas.getBoundingClientRect();
+            return {
+                x: evt.clientX - rect.left,
+                y: evt.clientY - rect.top
+            };
+        }
+
+        canvas.addEventListener('mousedown', (e) => {
+            if (state.mode === 'none') return;
+            const pos = getMousePos(e);
+            
+            // Check if clicking near an existing point (for dragging)
+            let clickedExisting = false;
+            for (let i = state.points.length - 1; i >= 0; i--) {
+                const p = state.points[i];
+                const dist = Math.sqrt((p.x - pos.x)**2 + (p.y - pos.y)**2);
+                if (dist < 15) { // Hitbox radius
+                    state.isDragging = true;
+                    state.dragIndex = i;
+                    clickedExisting = true;
+                    break;
+                }
+            }
+
+            // If not dragging, add a new point
+            if (!clickedExisting) {
+                state.points.push({
+                    x: pos.x,
+                    y: pos.y,
+                    class: state.mode === 'regression' ? 0 : state.activeClass
+                });
+            }
+            
+            draw();
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (state.mode === 'none') return;
+            const pos = getMousePos(e);
+            
+            // Change cursor based on hover
+            let hover = false;
+            for (let p of state.points) {
+                if (Math.sqrt((p.x - pos.x)**2 + (p.y - pos.y)**2) < 15) {
+                    hover = true; break;
+                }
+            }
+            canvas.style.cursor = hover ? 'grab' : 'crosshair';
+
+            if (state.isDragging && state.dragIndex > -1) {
+                canvas.style.cursor = 'grabbing';
+                state.points[state.dragIndex].x = pos.x;
+                state.points[state.dragIndex].y = pos.y;
+                
+                // Fast redraw. For heavy KNN, we might need a debounce, but 15px blocks usually handle real-time fine.
+                requestAnimationFrame(draw);
+            }
+        });
+
+        window.addEventListener('mouseup', () => {
+            state.isDragging = false;
+            state.dragIndex = -1;
+            draw();
+        });
+
+        // Touch support for mobile/tablets
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const mouseEvent = new MouseEvent('mousedown', { clientX: touch.clientX, clientY: touch.clientY });
+            canvas.dispatchEvent(mouseEvent);
+        }, {passive: false});
+        
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const mouseEvent = new MouseEvent('mousemove', { clientX: touch.clientX, clientY: touch.clientY });
+            canvas.dispatchEvent(mouseEvent);
+        }, {passive: false});
+
+        canvas.addEventListener('touchend', (e) => {
+            window.dispatchEvent(new Event('mouseup'));
+        });
+
+
+        // --- UI & State Management ---
+
+        function updateSlideUI() {
+            const slide = slides[state.currentSlide];
+            
+            // Trigger animation
+            textPanel.classList.remove('slide-enter');
+            void textPanel.offsetWidth; // Trigger reflow
+            textPanel.classList.add('slide-enter');
+
+            slideLabel.textContent = slide.label;
+            slideTitle.textContent = slide.title;
+            slideContent.innerHTML = slide.content;
+            activityText.textContent = slide.activity;
+            slideCounter.textContent = `Slide ${state.currentSlide + 1} / ${slides.length}`;
+
+            btnPrev.disabled = state.currentSlide === 0;
+            btnNext.disabled = state.currentSlide === slides.length - 1;
+
+            // Change App Mode
+            state.mode = slide.mode;
+            
+            // Configure UI based on mode
+            controlsContainer.style.opacity = state.mode === 'none' ? '0' : '1';
+            controlsContainer.style.pointerEvents = state.mode === 'none' ? 'none' : 'auto';
+            
+            toolClassification.classList.add('hidden');
+            toolKnn.classList.add('hidden');
+            statsDisplay.classList.add('hidden');
+
+            if (state.mode === 'regression') {
+                statsDisplay.classList.remove('hidden');
+            } else if (state.mode === 'classification') {
+                toolClassification.classList.remove('hidden');
+                // Standard classification will just use K=1 for rigid boundaries in this simple mode
+                state.knnK = 1; 
+            } else if (state.mode === 'knn') {
+                toolClassification.classList.remove('hidden');
+                toolKnn.classList.remove('hidden');
+            }
+
+            // Run setup function for the slide (injecting initial points)
+            if (slide.setup) {
+                slide.setup(canvas.width, canvas.height);
+            }
+            
+            draw();
+        }
+
+        // Class toggle logic
+        classBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const cls = parseInt(e.target.dataset.class);
+                state.activeClass = cls;
+                
+                classBtns.forEach(b => {
+                    b.classList.remove('active-0', 'active-1', 'text-white');
+                    b.classList.add('text-slate-400', 'border-transparent');
+                });
+                
+                e.target.classList.remove('text-slate-400', 'border-transparent');
+                e.target.classList.add(`active-${cls}`, 'text-white');
+            });
+        });
+
+        // KNN Slider logic
+        function updateKStatus() {
+            const val = parseInt(knnSlider.value);
+            state.knnK = val;
+            kValueDisplay.textContent = val;
+            
+            if (val <= 3) {
+                kStatus.textContent = "High Variance (Overfit)";
+                kStatus.className = "text-xs w-36 text-right text-red-400";
+            } else if (val >= 11) {
+                kStatus.textContent = "High Bias (Underfit)";
+                kStatus.className = "text-xs w-36 text-right text-orange-400";
+            } else {
+                kStatus.textContent = "Balanced";
+                kStatus.className = "text-xs w-36 text-right text-green-400";
+            }
+            draw();
+        }
+
+        knnSlider.addEventListener('input', updateKStatus);
+
+        // Global Clear
+        btnClear.addEventListener('click', () => {
+            state.points = [];
+            draw();
+        });
+
+        // Slide Navigation
+        btnNext.addEventListener('click', () => {
+            if (state.currentSlide < slides.length - 1) {
+                state.currentSlide++;
+                updateSlideUI();
+            }
+        });
+
+        btnPrev.addEventListener('click', () => {
+            if (state.currentSlide > 0) {
+                state.currentSlide--;
+                updateSlideUI();
+            }
+        });
+
+        // Initialization
+        window.addEventListener('resize', resizeCanvas);
+        
+        // Initial setup sequence
+        setTimeout(() => {
+            resizeCanvas();
+            updateSlideUI();
+        }, 100); // Small delay to let container calculate dimensions
+
+    </script>
+</body>
+</html>
