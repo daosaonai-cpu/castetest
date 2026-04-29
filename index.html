@@ -3,54 +3,37 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>ML Prerequisites Notes</title>
+    <title>Interactive Machine Learning Lab</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;700&family=Inter:wght@300;400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap');
         
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #09090b; /* Zinc 950 */
-            color: #fafafa; /* Zinc 50 */
+            background-color: #0f172a;
+            color: #f8fafc;
+            overflow: hidden;
+            user-select: none;
         }
 
-        .font-mono {
-            font-family: 'JetBrains Mono', monospace;
-        }
-
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #52525b; }
-
-        .nav-btn {
-            transition: all 0.2s ease;
-            border-left: 3px solid transparent;
-        }
-        .nav-btn:hover { background-color: #27272a; }
-        .nav-btn.active {
-            background-color: #27272a;
-            border-left-color: #06b6d4; /* Cyan 500 */
-            color: #fff;
-        }
-
-        .note-card {
-            background-color: #18181b;
-            border: 1px solid #27272a;
+        canvas {
+            background-color: #1e293b;
             border-radius: 0.75rem;
-            padding: 1.5rem;
-            margin-bottom: 1.5rem;
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            box-shadow: inset 0 2px 4px 0 rgb(0 0 0 / 0.1);
+            cursor: crosshair;
+            touch-action: none;
         }
 
-        .gradient-text {
-            background-clip: text;
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
+        .slide-enter {
+            animation: fadeIn 0.5s ease-out forwards;
         }
-        
-        /* Interactive Slider styling */
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Custom range slider */
         input[type=range] {
             -webkit-appearance: none;
             width: 100%;
@@ -58,521 +41,692 @@
         }
         input[type=range]::-webkit-slider-thumb {
             -webkit-appearance: none;
-            height: 16px;
-            width: 16px;
+            height: 20px;
+            width: 20px;
             border-radius: 50%;
-            background: #d946ef; /* Magenta */
+            background: #3b82f6;
             cursor: pointer;
-            margin-top: -6px;
+            margin-top: -8px;
+            box-shadow: 0 0 10px rgba(59, 130, 246, 0.5);
         }
         input[type=range]::-webkit-slider-runnable-track {
             width: 100%;
             height: 4px;
             cursor: pointer;
-            background: #3f3f46;
+            background: #475569;
             border-radius: 2px;
+        }
+        input[type=range]:focus {
+            outline: none;
+        }
+        
+        .class-btn.active-0 { background-color: #3b82f6; border-color: #60a5fa; box-shadow: 0 0 15px rgba(59, 130, 246, 0.4); }
+        .class-btn.active-1 { background-color: #f97316; border-color: #fb923c; box-shadow: 0 0 15px rgba(249, 115, 22, 0.4); }
+        
+        /* Grid pattern for canvas background */
+        .canvas-container {
+            position: relative;
+        }
+        .canvas-grid {
+            position: absolute;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background-image: 
+                linear-gradient(to right, rgba(255,255,255,0.05) 1px, transparent 1px),
+                linear-gradient(to bottom, rgba(255,255,255,0.05) 1px, transparent 1px);
+            background-size: 40px 40px;
+            pointer-events: none;
+            border-radius: 0.75rem;
         }
     </style>
 </head>
-<body class="h-screen flex flex-col overflow-hidden selection:bg-cyan-500/30">
+<body class="h-screen flex flex-col">
 
-    <!-- Header -->
-    <header class="bg-zinc-900 border-b border-zinc-800 p-4 flex justify-between items-center shrink-0 z-10 shadow-md">
-        <div class="flex items-center gap-3">
-            <div class="w-10 h-10 rounded-lg bg-gradient-to-br from-indigo-500 to-cyan-500 flex items-center justify-center font-bold text-white shadow-lg shadow-cyan-500/20">
-                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+    <!-- Header / Navigation -->
+    <header class="bg-slate-800 border-b border-slate-700 p-3 md:p-4 flex flex-wrap justify-between items-center gap-2 shadow-md shrink-0">
+        <div class="flex items-center gap-2 md:gap-3">
+            <div class="w-6 h-6 md:w-8 md:h-8 rounded bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center font-bold text-white shadow-lg text-xs md:text-base">
+                ML
             </div>
-            <div>
-                <h1 class="text-xl font-bold text-zinc-100 tracking-tight">Pre-Flight Manual</h1>
-                <p class="text-xs text-cyan-400 font-mono mt-0.5">ML Concepts Prerequisites</p>
-            </div>
+            <h1 class="text-base md:text-xl font-bold bg-clip-text text-transparent bg-gradient-to-r from-blue-400 to-indigo-400 truncate">
+                Interactive ML Lab
+            </h1>
         </div>
-        <div class="hidden sm:flex text-sm text-zinc-400 font-medium">
-            Read before starting the 90-Minute Workbench
+        
+        <div class="flex items-center gap-2 md:gap-4 w-full sm:w-auto justify-between sm:justify-end mt-1 sm:mt-0">
+            <span id="slide-counter" class="text-slate-400 text-xs md:text-sm font-medium">Slide 1 / 6</span>
+            <div class="flex gap-2">
+                <button id="btn-prev" class="px-3 py-1.5 md:px-4 md:py-2 bg-slate-700 hover:bg-slate-600 rounded text-xs md:text-sm font-medium transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1 md:gap-2">
+                    <svg class="w-3 h-3 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                    Prev
+                </button>
+                <button id="btn-next" class="px-3 py-1.5 md:px-4 md:py-2 bg-blue-600 hover:bg-blue-500 rounded text-xs md:text-sm font-medium shadow-lg shadow-blue-500/20 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-1 md:gap-2">
+                    Next
+                    <svg class="w-3 h-3 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+                </button>
+            </div>
         </div>
     </header>
 
-    <!-- Main Container -->
-    <main class="flex-1 flex overflow-hidden w-full relative">
+    <!-- Main Content Area -->
+    <main class="flex-1 flex flex-col md:flex-row overflow-hidden">
         
-        <!-- Mobile Menu Toggle -->
-        <div class="md:hidden absolute top-4 left-4 z-20">
-            <select id="mobile-nav" class="bg-zinc-800 border border-zinc-700 text-white p-2 rounded shadow-lg outline-none focus:border-cyan-500 text-sm">
-                <option value="intro">1. Introduction</option>
-                <option value="math">2. Coordinate Geometry</option>
-                <option value="learning">3. Types of Learning</option>
-                <option value="fitting">4. Model Fitting</option>
-                <option value="eval">5. Evaluation Metrics</option>
-            </select>
+        <!-- Left Panel: Educational Content -->
+        <div class="w-full md:w-1/3 h-[45%] md:h-full bg-slate-800/50 p-4 md:p-8 overflow-y-auto border-b md:border-b-0 md:border-r border-slate-700 flex flex-col slide-enter shrink-0" id="text-panel">
+            <span id="slide-label" class="text-blue-400 font-semibold tracking-wider text-[10px] md:text-xs uppercase mb-1 md:mb-2">Introduction</span>
+            <h2 id="slide-title" class="text-xl md:text-3xl font-bold mb-3 md:mb-4 text-white">Welcome to Machine Learning</h2>
+            
+            <div id="slide-content" class="text-sm md:text-base text-slate-300 space-y-3 md:space-y-4 leading-relaxed flex-1">
+                <!-- Content injected via JS -->
+            </div>
+
+            <div id="class-activity" class="mt-4 md:mt-8 p-3 md:p-4 bg-blue-900/20 border border-blue-500/30 rounded-lg shrink-0">
+                <h4 class="text-blue-400 font-semibold text-xs md:text-sm mb-1 md:mb-2 flex items-center gap-2">
+                    <svg class="w-3 h-3 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                    Class Activity
+                </h4>
+                <p id="activity-text" class="text-xs md:text-sm text-blue-100/80">
+                    Listen to the instructor's introduction.
+                </p>
+            </div>
         </div>
 
-        <!-- Left Sidebar: Topics -->
-        <aside class="w-72 bg-zinc-900 border-r border-zinc-800 flex-col shrink-0 hidden md:flex shadow-xl z-10">
-            <div class="p-5 pb-2 text-xs font-bold text-zinc-500 uppercase tracking-wider">Notebooks</div>
-            <nav id="sidebar-nav" class="flex-1 flex flex-col py-2">
-                <!-- Injected via JS -->
-            </nav>
-            <div class="p-5 border-t border-zinc-800">
-                <div class="bg-zinc-800/50 p-4 rounded-lg border border-zinc-700/50">
-                    <p class="text-xs text-zinc-400 leading-relaxed text-center">
-                        Master these concepts to understand the mechanics behind KNN, K-Means, and Regression boundaries.
-                    </p>
+        <!-- Right Panel: Interactive Canvas -->
+        <div class="w-full md:w-2/3 flex-1 p-2 md:p-6 flex flex-col bg-slate-900 min-h-0">
+            
+            <!-- Controls Overlay (Dynamic based on slide) -->
+            <div id="canvas-controls" class="h-auto md:h-14 mb-2 md:mb-4 flex flex-wrap items-center gap-2 opacity-0 transition-opacity shrink-0">
+                
+                <!-- Classification Tools -->
+                <div id="tool-classification" class="hidden flex gap-1 md:gap-3 p-1 bg-slate-800 rounded-lg border border-slate-700">
+                    <button class="class-btn active-0 px-2 py-1 md:px-4 md:py-1.5 rounded-md text-xs md:text-sm font-medium border border-transparent transition-all whitespace-nowrap" data-class="0">
+                        Class A <span class="hidden md:inline">(Blue)</span>
+                    </button>
+                    <button class="class-btn px-2 py-1 md:px-4 md:py-1.5 rounded-md text-xs md:text-sm font-medium border border-transparent transition-all text-slate-400 hover:text-white whitespace-nowrap" data-class="1">
+                        Class B <span class="hidden md:inline">(Orange)</span>
+                    </button>
+                </div>
+
+                <!-- KNN Slider -->
+                <div id="tool-knn" class="hidden flex-1 min-w-[140px] flex items-center gap-2 md:gap-4 bg-slate-800 py-1.5 px-2 md:py-2 md:px-4 rounded-lg border border-slate-700">
+                    <label class="text-xs md:text-sm font-medium text-slate-300 whitespace-nowrap">K: <span id="k-value-display" class="text-blue-400 font-bold">3</span></label>
+                    <input type="range" id="knn-slider" min="1" max="15" step="2" value="3">
+                    <span class="hidden lg:inline text-xs text-slate-500 w-24 text-right" id="k-status">Balanced</span>
+                </div>
+
+                <!-- Stats Display -->
+                <div id="stats-display" class="hidden flex items-center gap-2 md:gap-4 px-2 py-1.5 md:px-4 md:py-2 bg-slate-800 rounded-lg border border-slate-700">
+                    <div class="text-xs md:text-sm">
+                        <span class="text-slate-400 hidden sm:inline">Error (MSE):</span>
+                        <span class="text-slate-400 inline sm:hidden">MSE:</span>
+                        <span id="mse-value" class="font-mono font-bold text-red-400 ml-1">0.00</span>
+                    </div>
+                </div>
+
+                <!-- Global Canvas Actions -->
+                <button id="btn-clear" class="ml-auto p-1.5 md:px-4 md:py-2 bg-slate-800 hover:bg-slate-700 border border-slate-600 rounded text-xs md:text-sm font-medium text-red-400 hover:text-red-300 transition-colors flex items-center gap-1 md:gap-2">
+                    <svg class="w-4 h-4 md:w-4 md:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path></svg>
+                    <span class="hidden sm:inline">Clear Data</span>
+                </button>
+            </div>
+
+            <!-- Canvas Container -->
+            <div class="flex-1 canvas-container w-full h-full min-h-0" id="canvas-wrapper">
+                <div class="canvas-grid"></div>
+                <canvas id="ml-canvas" class="w-full h-full block"></canvas>
+                
+                <!-- Initial empty state overlay -->
+                <div id="canvas-overlay" class="absolute inset-0 flex items-center justify-center pointer-events-none p-4">
+                    <div class="text-center bg-slate-900/80 p-4 md:p-6 rounded-xl backdrop-blur-sm border border-slate-700 shadow-2xl">
+                        <svg class="w-8 h-8 md:w-12 md:h-12 text-blue-500 mx-auto mb-2 md:mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"></path></svg>
+                        <p class="text-sm md:text-lg font-medium text-white mb-1">Interactive Sandbox Area</p>
+                        <p class="text-xs md:text-sm text-slate-400 hidden sm:block">Follow the instructions on the left to begin.</p>
+                    </div>
                 </div>
             </div>
-        </aside>
-
-        <!-- Right Content Area -->
-        <section class="flex-1 bg-[#09090b] overflow-y-auto relative scroll-smooth p-6 md:p-10 pt-16 md:pt-10" id="content-area">
-            <!-- Content injected via JS -->
-        </section>
-
+        </div>
     </main>
 
     <script>
-        const topics = [
+        /**
+         * Machine Learning Interactive Lab Logic
+         */
+
+        // --- Data & State Management ---
+        const state = {
+            currentSlide: 0,
+            points: [], // {x, y, class}
+            activeClass: 0, // 0 or 1
+            knnK: 3,
+            isDragging: false,
+            dragIndex: -1,
+            mode: 'none', // 'regression', 'classification', 'knn'
+        };
+
+        const slides = [
             {
-                id: 'intro',
-                title: '1. Introduction to ML',
-                icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />',
-                accent: 'text-white',
+                label: "Module 1",
+                title: "What is Machine Learning?",
                 content: `
-                    <div class="max-w-3xl mx-auto">
-                        <h2 class="text-3xl font-bold mb-2">Welcome to Machine Learning</h2>
-                        <p class="text-zinc-400 text-lg mb-8">Before we dive into the workbench experiments, let's establish a baseline vocabulary.</p>
-                        
-                        <div class="note-card">
-                            <h3 class="text-xl font-semibold mb-3 text-cyan-400">What is Machine Learning?</h3>
-                            <p class="text-zinc-300 leading-relaxed mb-4">
-                                Traditional programming requires you to write rules (code) and provide data to get answers. Machine Learning flips this: you provide the data and the answers, and the computer figures out the rules.
-                            </p>
-                            <div class="flex flex-col md:flex-row gap-4 mt-6">
-                                <div class="flex-1 bg-zinc-800/50 p-4 rounded border border-zinc-700">
-                                    <div class="text-xs font-mono text-zinc-500 mb-2">TRADITIONAL</div>
-                                    <div class="font-medium text-sm">Data + Rules = Answers</div>
-                                </div>
-                                <div class="flex-1 bg-cyan-900/20 p-4 rounded border border-cyan-800/50">
-                                    <div class="text-xs font-mono text-cyan-500 mb-2">MACHINE LEARNING</div>
-                                    <div class="font-medium text-sm">Data + Answers = Rules</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="note-card">
-                            <h3 class="text-xl font-semibold mb-3 text-white">Features and Labels</h3>
-                            <ul class="space-y-4 text-zinc-300 text-sm">
-                                <li class="flex items-start gap-3">
-                                    <div class="mt-1 bg-zinc-800 p-1.5 rounded text-cyan-400"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2"></path></svg></div>
-                                    <div>
-                                        <strong class="text-white block text-base mb-1">Features (Input / X)</strong>
-                                        The measurable properties of the data you are analyzing. E.g., The square footage, number of bedrooms, and zip code of a house.
-                                    </div>
-                                </li>
-                                <li class="flex items-start gap-3">
-                                    <div class="mt-1 bg-zinc-800 p-1.5 rounded text-magenta-400"><svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 7h.01M7 3h5c.512 0 1.024.195 1.414.586l7 7a2 2 0 010 2.828l-7 7a2 2 0 01-2.828 0l-7-7A1.994 1.994 0 013 12V7a4 4 0 014-4z"></path></svg></div>
-                                    <div>
-                                        <strong class="text-white block text-base mb-1">Labels (Output / Y)</strong>
-                                        The thing you are trying to predict. E.g., The final sale price of that house.
-                                    </div>
-                                </li>
-                            </ul>
-                        </div>
-
-                        <div class="note-card border-t-4 border-t-indigo-500">
-                            <h3 class="text-xl font-semibold mb-3 text-white">The ML Pipeline</h3>
-                            <p class="text-zinc-300 text-sm mb-4">Machine learning isn't just algorithms; it's a workflow. A typical data scientist spends 80% of their time on steps 1 and 2!</p>
-                            <div class="flex flex-col gap-2">
-                                <div class="bg-zinc-800/80 p-3 rounded flex items-center gap-3"><span class="bg-zinc-700 text-zinc-300 px-2 py-1 rounded text-xs font-mono">1</span> <span class="text-sm"><strong>Data Collection:</strong> Gathering raw data from databases, APIs, or files.</span></div>
-                                <div class="bg-zinc-800/80 p-3 rounded flex items-center gap-3"><span class="bg-zinc-700 text-zinc-300 px-2 py-1 rounded text-xs font-mono">2</span> <span class="text-sm"><strong>Preprocessing:</strong> Handling missing values, encoding text to numbers, and scaling.</span></div>
-                                <div class="bg-cyan-900/40 border border-cyan-800/50 p-3 rounded flex items-center gap-3"><span class="bg-cyan-800 text-cyan-200 px-2 py-1 rounded text-xs font-mono">3</span> <span class="text-sm"><strong>Training:</strong> Feeding the clean data into the algorithm to learn the pattern.</span></div>
-                                <div class="bg-magenta-900/40 border border-magenta-800/50 p-3 rounded flex items-center gap-3"><span class="bg-magenta-800 text-magenta-200 px-2 py-1 rounded text-xs font-mono">4</span> <span class="text-sm"><strong>Evaluation:</strong> Testing the model on data it has <em>never</em> seen before.</span></div>
-                                <div class="bg-zinc-800/80 p-3 rounded flex items-center gap-3"><span class="bg-zinc-700 text-zinc-300 px-2 py-1 rounded text-xs font-mono">5</span> <span class="text-sm"><strong>Inference:</strong> Deploying the model to make predictions in the real world.</span></div>
-                            </div>
-                        </div>
+                    <p>Traditional programming requires humans to write explicit rules (code) that take data and produce answers.</p>
+                    <div class="bg-slate-700/30 p-4 rounded-lg border border-slate-600/50 my-2">
+                        <span class="text-blue-400 font-mono text-sm">Rules + Data = Answers</span>
                     </div>
-                `
+                    <p><strong>Machine Learning</strong> flips this. We provide the computer with data and the correct answers, and the computer learns the rules.</p>
+                    <div class="bg-slate-700/30 p-4 rounded-lg border border-slate-600/50 my-2">
+                        <span class="text-green-400 font-mono text-sm">Answers + Data = Rules</span>
+                    </div>
+                    <p>Today, we will build an intuition for how algorithms discover these rules by visualizing them in real-time.</p>
+                `,
+                activity: "No interaction required. Prepare for the next slide where we will create our first model.",
+                mode: 'none',
+                setup: () => state.points = []
             },
             {
-                id: 'math',
-                title: '2. Coordinate Geometry',
-                icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5" />',
-                accent: 'text-magenta-400',
+                label: "Module 2",
+                title: "Linear Regression",
                 content: `
-                    <div class="max-w-3xl mx-auto">
-                        <h2 class="text-3xl font-bold mb-2">Distance & Geometry</h2>
-                        <p class="text-zinc-400 text-lg mb-8">Essential for understanding <span class="text-magenta-400 font-semibold">K-Nearest Neighbors (KNN)</span>.</p>
-
-                        <div class="note-card">
-                            <h3 class="text-xl font-semibold mb-3 text-white">Representing Data as Points</h3>
-                            <p class="text-zinc-300 text-sm leading-relaxed mb-4">
-                                In ML, we turn features into numbers. If a patient has Age=45 and Blood Pressure=120, we can plot this as a coordinate point <strong>(45, 120)</strong> on a graph. To find similar patients, we just measure the distance between points!
-                            </p>
-                        </div>
-
-                        <div class="note-card">
-                            <h3 class="text-xl font-semibold mb-4 text-magenta-400">Measuring Distance</h3>
-                            
-                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                                <div class="bg-zinc-800/40 p-5 rounded-lg border border-zinc-700">
-                                    <h4 class="font-bold text-white mb-2">Euclidean (L2)</h4>
-                                    <p class="text-xs text-zinc-400 mb-3">The "as the crow flies" straight line.</p>
-                                    <div class="font-mono text-xs text-magenta-300 bg-magenta-950/30 p-2 rounded text-center mb-4 border border-magenta-900/50">
-                                        √((x₂-x₁)² + (y₂-y₁)²)
-                                    </div>
-                                    <div class="w-full h-24 bg-zinc-900 rounded border border-zinc-700 relative overflow-hidden flex items-center justify-center">
-                                        <svg width="100" height="60" viewBox="0 0 100 60">
-                                            <circle cx="20" cy="40" r="4" fill="#d946ef"/>
-                                            <circle cx="80" cy="20" r="4" fill="#d946ef"/>
-                                            <line x1="20" y1="40" x2="80" y2="20" stroke="#d946ef" stroke-width="2" stroke-dasharray="4"/>
-                                        </svg>
-                                    </div>
-                                </div>
-                                
-                                <div class="bg-zinc-800/40 p-5 rounded-lg border border-zinc-700">
-                                    <h4 class="font-bold text-white mb-2">Manhattan (L1)</h4>
-                                    <p class="text-xs text-zinc-400 mb-3">The "city block" grid distance.</p>
-                                    <div class="font-mono text-xs text-cyan-300 bg-cyan-950/30 p-2 rounded text-center mb-4 border border-cyan-900/50">
-                                        |x₂-x₁| + |y₂-y₁|
-                                    </div>
-                                    <div class="w-full h-24 bg-zinc-900 rounded border border-zinc-700 relative overflow-hidden flex items-center justify-center">
-                                        <svg width="100" height="60" viewBox="0 0 100 60">
-                                            <circle cx="20" cy="40" r="4" fill="#06b6d4"/>
-                                            <circle cx="80" cy="20" r="4" fill="#06b6d4"/>
-                                            <polyline points="20,40 80,40 80,20" fill="none" stroke="#06b6d4" stroke-width="2" stroke-dasharray="4"/>
-                                        </svg>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <!-- Interactive Demo -->
-                        <div class="mt-6 p-5 bg-zinc-900 border border-zinc-700 rounded-lg shadow-inner">
-                            <div class="flex justify-between items-center mb-4">
-                                <h4 class="text-sm font-bold text-white uppercase tracking-wider">Interactive: Point B Position</h4>
-                            </div>
-                            <label class="text-xs text-zinc-400 block mb-2">Move Point B on the X-axis</label>
-                            <input type="range" id="math-slider" min="0" max="10" value="4">
-                            <div class="flex justify-between mt-4 text-sm font-mono bg-black p-3 rounded border border-zinc-800">
-                                <div><span class="text-zinc-500">Point A:</span> (0, 0)</div>
-                                <div><span class="text-zinc-500">Point B:</span> (<span id="math-x-val" class="text-white">4</span>, 3)</div>
-                            </div>
-                            <div class="flex justify-between mt-2 text-sm font-mono">
-                                <div class="text-magenta-400">Euclidean Dist: <span id="math-euc">5.0</span></div>
-                                <div class="text-cyan-400">Manhattan Dist: <span id="math-man">7</span></div>
-                            </div>
-                        </div>
-
-                        <div class="note-card mt-6 border-t-4 border-t-yellow-500">
-                            <h3 class="text-xl font-semibold mb-3 text-white">The Need for Scaling</h3>
-                            <p class="text-zinc-300 text-sm mb-3">
-                                Imagine measuring distance between two people using <strong>Age</strong> (0-100 years) and <strong>Income</strong> ($0-$200,000). Because Income numbers are thousands of times larger, the distance formula will completely ignore Age!
-                            </p>
-                            <div class="bg-zinc-800/80 p-4 rounded border border-zinc-700 text-sm text-zinc-300">
-                                <strong class="text-yellow-400 block mb-1">Feature Normalization / Standardization</strong> 
-                                Before calculating distance, Data Scientists mathematically squash all features to be on the same scale (e.g., between 0 and 1, or centered around 0 with a standard deviation of 1). This ensures every feature gets an equal vote.
-                            </div>
-                        </div>
-                    </div>
+                    <p>Imagine you want to predict house prices based on square footage. If we plot this data, we can draw a straight line through it to predict future prices.</p>
+                    <p>This is <strong>Linear Regression</strong>. The algorithm tries to find the "Line of Best Fit" that minimizes the distance between the line and all the data points.</p>
+                    <ul class="list-disc pl-5 text-sm space-y-2 text-slate-400 mt-4">
+                        <li>The algorithm calculates the error (Mean Squared Error).</li>
+                        <li>It adjusts the slope and position of the line to make this error as close to zero as possible.</li>
+                    </ul>
                 `,
-                onRender: () => {
-                    const slider = document.getElementById('math-slider');
-                    const xVal = document.getElementById('math-x-val');
-                    const euc = document.getElementById('math-euc');
-                    const man = document.getElementById('math-man');
-                    
-                    if(slider) {
-                        slider.addEventListener('input', (e) => {
-                            const x = parseInt(e.target.value);
-                            const y = 3; // Fixed Y for demo
-                            xVal.textContent = x;
-                            euc.textContent = Math.sqrt(x*x + y*y).toFixed(1);
-                            man.textContent = Math.abs(x) + Math.abs(y);
+                activity: "Click on the grid to the right to add data points. Try creating a diagonal trend (e.g., bottom-left to top-right) and watch the model calculate the line of best fit instantly.",
+                mode: 'regression',
+                setup: () => state.points = []
+            },
+            {
+                label: "Module 3",
+                title: "The Impact of Outliers",
+                content: `
+                    <p>A model is only as good as its data. What happens when we have anomalies or "outliers"?</p>
+                    <p>Because Standard Linear Regression minimizes the <em>squared</em> error, data points that are very far away from the line are penalized heavily. The line will bend significantly to accommodate them.</p>
+                    <p>In the real world, cleaning data to remove these outliers is a massive part of a Data Scientist's job.</p>
+                `,
+                activity: "I've added a perfect straight line of points. Click and DRAG one of the points far away from the others. Watch how a single outlier drags the entire model down with it.",
+                mode: 'regression',
+                setup: (width, height) => {
+                    state.points = [];
+                    // Generate a nice diagonal line
+                    for(let i=1; i<=6; i++) {
+                        state.points.push({
+                            x: width * 0.15 * i,
+                            y: height - (height * 0.12 * i)
                         });
                     }
                 }
             },
             {
-                id: 'learning',
-                title: '3. Types of Learning',
-                icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />',
-                accent: 'text-yellow-400',
+                label: "Module 4",
+                title: "Classification",
                 content: `
-                    <div class="max-w-3xl mx-auto">
-                        <h2 class="text-3xl font-bold mb-2">How Algorithms Learn</h2>
-                        <p class="text-zinc-400 text-lg mb-8">Understanding the difference prepares you for <span class="text-yellow-400 font-semibold">K-Means Clustering</span>.</p>
-
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
-                            <!-- Supervised -->
-                            <div class="note-card !mb-0 border-t-4 border-t-emerald-500 flex flex-col">
-                                <h3 class="text-xl font-bold mb-2 text-white">Supervised Learning</h3>
-                                <p class="text-sm text-zinc-400 mb-4 flex-1">The algorithm is trained on data that already has the "answers" (labels) attached.</p>
-                                
-                                <div class="bg-black/50 p-3 rounded mb-4">
-                                    <div class="text-xs text-zinc-500 uppercase tracking-wider mb-2">Sub-types</div>
-                                    <ul class="text-sm space-y-3">
-                                        <li><strong class="text-emerald-400 block">Classification:</strong> Predicting a distinct category. (e.g., Dog vs Cat, Spam vs Not Spam).</li>
-                                        <li><strong class="text-emerald-400 block">Regression:</strong> Predicting a continuous number. (e.g., Price of a house, Tomorrow's Temperature).</li>
-                                    </ul>
-                                </div>
-                                <div class="text-xs text-zinc-500 italic mt-auto">Think of it like a teacher grading your test and showing you the correct answers.</div>
-                            </div>
-
-                            <!-- Unsupervised -->
-                            <div class="note-card !mb-0 border-t-4 border-t-yellow-500 flex flex-col">
-                                <h3 class="text-xl font-bold mb-2 text-white">Unsupervised Learning</h3>
-                                <p class="text-sm text-zinc-400 mb-4 flex-1">The algorithm is given raw data with no labels. It must find hidden patterns on its own.</p>
-                                
-                                <div class="bg-black/50 p-3 rounded mb-4">
-                                    <div class="text-xs text-zinc-500 uppercase tracking-wider mb-2">Sub-types</div>
-                                    <ul class="text-sm space-y-3">
-                                        <li><strong class="text-yellow-400 block">Clustering:</strong> Grouping similar data points together (e.g., Customer Segmentation). <span class="text-xs text-zinc-400 italic block mt-1">-> This is what K-Means does!</span></li>
-                                        <li><strong class="text-yellow-400 block">Dimensionality Reduction:</strong> Compressing data while keeping its structure.</li>
-                                    </ul>
-                                </div>
-                                <div class="text-xs text-zinc-500 italic mt-auto">Think of it like sorting a giant pile of mixed Lego bricks into groups by color or shape without instructions.</div>
-                            </div>
-                        </div>
-
-                        <!-- Reinforcement Learning -->
-                        <div class="note-card border-t-4 border-t-indigo-500">
-                            <h3 class="text-xl font-bold mb-2 text-white">Reinforcement Learning</h3>
-                            <p class="text-sm text-zinc-300 mb-4">An agent learns to make decisions by performing actions in an environment to maximize a reward. There is no predefined data; the algorithm learns by trial and error.</p>
-                            <div class="flex gap-4 text-sm text-zinc-400 items-center">
-                                <div class="bg-zinc-800 p-2 rounded shrink-0">🤖 Agent</div>
-                                <div class="hidden sm:block text-indigo-400">→ acts in →</div>
-                                <div class="bg-zinc-800 p-2 rounded shrink-0">🌍 Environment</div>
-                                <div class="hidden sm:block text-indigo-400">→ receives →</div>
-                                <div class="bg-zinc-800 p-2 rounded shrink-0">🪙 Reward / Penalty</div>
-                            </div>
-                            <p class="text-xs text-zinc-500 italic mt-4">Used heavily in Robotics, self-driving cars, and game-playing AI (like AlphaGo).</p>
-                        </div>
-                    </div>
-                `
+                    <p>Regression predicts continuous numbers (like price). <strong>Classification</strong> predicts categories (like "Spam" or "Not Spam").</p>
+                    <p>Instead of drawing a line <em>through</em> the data, classification algorithms draw a <strong>Decision Boundary</strong> to separate the groups.</p>
+                    <p>Any new data point that falls on one side of the boundary is classified as Blue; on the other side, Orange.</p>
+                `,
+                activity: "Add some Blue points (Class A) on one side of the canvas, and Orange points (Class B) on the other. Use the toggle buttons above the canvas to switch colors.",
+                mode: 'classification',
+                setup: () => state.points = []
             },
             {
-                id: 'fitting',
-                title: '4. Model Fitting',
-                icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />',
-                accent: 'text-cyan-400',
+                label: "Module 5",
+                title: "Overfitting & K-Nearest Neighbors",
                 content: `
-                    <div class="max-w-3xl mx-auto">
-                        <h2 class="text-3xl font-bold mb-2">Finding the Pattern</h2>
-                        <p class="text-zinc-400 text-lg mb-8">Crucial for understanding <span class="text-cyan-400 font-semibold">Bias vs. Variance</span> & <span class="text-emerald-400 font-semibold">Decision Boundaries</span>.</p>
-
-                        <div class="note-card">
-                            <h3 class="text-xl font-semibold mb-3 text-white">Signal vs. Noise</h3>
-                            <p class="text-zinc-300 text-sm leading-relaxed mb-4">
-                                Real-world data is messy. <strong>Signal</strong> is the true underlying pattern. <strong>Noise</strong> is random variation or errors in the data. The goal of ML is to learn the signal and ignore the noise.
-                            </p>
-                        </div>
-
-                        <div class="note-card">
-                            <h3 class="text-xl font-semibold mb-4 text-cyan-400">The Goldilocks Problem</h3>
-                            
-                            <div class="space-y-6">
-                                <!-- Underfitting -->
-                                <div class="flex flex-col sm:flex-row gap-4 items-center">
-                                    <div class="w-32 h-20 bg-zinc-800 rounded-lg border border-zinc-700 flex items-center justify-center shrink-0">
-                                        <svg width="80" height="40" viewBox="0 0 80 40">
-                                            <!-- Data points forming a curve -->
-                                            <circle cx="10" cy="30" r="2" fill="#71717a"/>
-                                            <circle cx="30" cy="10" r="2" fill="#71717a"/>
-                                            <circle cx="50" cy="15" r="2" fill="#71717a"/>
-                                            <circle cx="70" cy="35" r="2" fill="#71717a"/>
-                                            <!-- Linear Line -->
-                                            <line x1="5" y1="20" x2="75" y2="20" stroke="#ef4444" stroke-width="2"/>
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <h4 class="font-bold text-red-400">1. Underfitting (High Bias)</h4>
-                                        <p class="text-xs text-zinc-400 mt-1">The model is too simple. It completely misses the pattern. Example: Trying to use a straight line to map a curved relationship.</p>
-                                    </div>
-                                </div>
-
-                                <!-- Good Fit -->
-                                <div class="flex flex-col sm:flex-row gap-4 items-center">
-                                    <div class="w-32 h-20 bg-zinc-800 rounded-lg border border-zinc-700 flex items-center justify-center shrink-0">
-                                        <svg width="80" height="40" viewBox="0 0 80 40">
-                                            <!-- Data points -->
-                                            <circle cx="10" cy="30" r="2" fill="#71717a"/>
-                                            <circle cx="30" cy="10" r="2" fill="#71717a"/>
-                                            <circle cx="50" cy="15" r="2" fill="#71717a"/>
-                                            <circle cx="70" cy="35" r="2" fill="#71717a"/>
-                                            <!-- Smooth Curve -->
-                                            <path d="M 5 35 Q 30 -5 50 15 T 75 40" fill="none" stroke="#10b981" stroke-width="2"/>
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <h4 class="font-bold text-emerald-400">2. Good Fit (Balanced)</h4>
-                                        <p class="text-xs text-zinc-400 mt-1">The model captures the general trend (signal) but ignores the minor random fluctuations (noise).</p>
-                                    </div>
-                                </div>
-
-                                <!-- Overfitting -->
-                                <div class="flex flex-col sm:flex-row gap-4 items-center">
-                                    <div class="w-32 h-20 bg-zinc-800 rounded-lg border border-zinc-700 flex items-center justify-center shrink-0">
-                                        <svg width="80" height="40" viewBox="0 0 80 40">
-                                            <!-- Data points -->
-                                            <circle cx="10" cy="30" r="2" fill="#71717a"/>
-                                            <circle cx="30" cy="10" r="2" fill="#71717a"/>
-                                            <circle cx="50" cy="15" r="2" fill="#71717a"/>
-                                            <circle cx="70" cy="35" r="2" fill="#71717a"/>
-                                            <!-- Jagged Line -->
-                                            <polyline points="5,35 10,30 20,25 30,10 40,20 50,15 60,30 70,35 75,25" fill="none" stroke="#d946ef" stroke-width="2"/>
-                                        </svg>
-                                    </div>
-                                    <div>
-                                        <h4 class="font-bold text-magenta-400">3. Overfitting (High Variance)</h4>
-                                        <p class="text-xs text-zinc-400 mt-1">The model is too complex. It memorizes the exact data points, including the noise. It will perform terribly on new, unseen data.</p>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="note-card border-t-4 border-t-emerald-500">
-                            <h3 class="text-xl font-semibold mb-3 text-white">How to Detect Overfitting: Data Splitting</h3>
-                            <p class="text-zinc-300 text-sm leading-relaxed mb-4">
-                                If an overfit model perfectly memorizes the data, it will score 100% accuracy. To catch this, we <strong>hide</strong> a portion of the data during training!
-                            </p>
-                            <div class="flex gap-1 h-10 w-full rounded overflow-hidden mb-3">
-                                <div class="bg-cyan-700 w-[70%] flex flex-col items-center justify-center text-xs text-white">
-                                    <strong class="font-bold">Training Set (70%)</strong>
-                                    <span class="text-[10px] opacity-70">Model learns from this</span>
-                                </div>
-                                <div class="bg-indigo-600 w-[15%] flex flex-col items-center justify-center text-xs text-white">
-                                    <strong class="font-bold">Validation</strong>
-                                    <span class="text-[10px] opacity-70">For tuning</span>
-                                </div>
-                                <div class="bg-magenta-600 w-[15%] flex flex-col items-center justify-center text-xs text-white">
-                                    <strong class="font-bold">Test Set</strong>
-                                    <span class="text-[10px] opacity-70">Final exam</span>
-                                </div>
-                            </div>
-                            <p class="text-xs text-zinc-400 mt-2 bg-zinc-800 p-3 rounded">
-                                <strong>Rule of Thumb:</strong> If your model is 98% accurate on the Training Set, but only 60% accurate on the Test Set, congratulations—you have <span class="text-magenta-400 font-bold">High Variance (Overfitting)</span>!
-                            </p>
-                        </div>
-                    </div>
-                `
+                    <p>A popular classification algorithm is <strong>K-Nearest Neighbors (K-NN)</strong>. To classify a new point, it looks at its 'K' closest neighbors and takes a majority vote.</p>
+                    <p class="text-blue-300"><strong>The Bias-Variance Tradeoff:</strong></p>
+                    <ul class="list-disc pl-5 text-sm space-y-2 text-slate-400 mt-2">
+                        <li><strong>Low K (e.g., K=1):</strong> The boundary becomes highly jagged. It perfectly memorizes the training data, including noise. This is called <strong>Overfitting</strong>.</li>
+                        <li><strong>High K (e.g., K=15):</strong> The boundary becomes a smooth line. It might miss nuances. This is called <strong>Underfitting</strong>.</li>
+                    </ul>
+                `,
+                activity: "Create a complex cluster of blue and orange points. Then, drag the 'K Value' slider above the canvas. Notice how K=1 creates 'islands' around individual points, while higher K values smooth it out.",
+                mode: 'knn',
+                setup: (width, height) => {
+                    // Start with a cluster to save time
+                    state.points = [];
+                    // Blue top left
+                    for(let i=0; i<8; i++) state.points.push({x: width*0.3 + (Math.random()-0.5)*100, y: height*0.3 + (Math.random()-0.5)*100, class: 0});
+                    // Orange bottom right
+                    for(let i=0; i<8; i++) state.points.push({x: width*0.7 + (Math.random()-0.5)*100, y: height*0.7 + (Math.random()-0.5)*100, class: 1});
+                    // A noisy blue in orange territory
+                    state.points.push({x: width*0.65, y: height*0.65, class: 0});
+                    state.knnK = 1;
+                    document.getElementById('knn-slider').value = 1;
+                    updateKStatus();
+                }
             },
             {
-                id: 'eval',
-                title: '5. Evaluation Metrics',
-                icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />',
-                accent: 'text-indigo-400',
+                label: "Module 6",
+                title: "Open Playground",
                 content: `
-                    <div class="max-w-3xl mx-auto">
-                        <h2 class="text-3xl font-bold mb-2">Measuring Success</h2>
-                        <p class="text-zinc-400 text-lg mb-8">How do we mathematically prove our model is good?</p>
-                        
-                        <div class="note-card border-t-4 border-t-emerald-500">
-                            <h3 class="text-xl font-bold mb-2 text-white">Classification Metrics</h3>
-                            <p class="text-sm text-zinc-300 mb-4">Accuracy (Total Correct / Total Predictions) isn't always reliable. Imagine predicting a rare disease that affects 1% of people. A model that just prints "Healthy" every time is 99% accurate, but completely useless!</p>
-                            
-                            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-5">
-                                <div class="bg-zinc-800/80 p-4 rounded border border-zinc-700">
-                                    <div class="text-emerald-400 font-bold mb-1 text-lg">Precision</div>
-                                    <div class="text-sm text-zinc-300 mb-2">"When it predicts Positive, how often is it right?"</div>
-                                    <div class="text-xs text-zinc-500">Crucial when <strong>False Positives</strong> are costly (e.g., Spam detection. You don't want a real email going to spam).</div>
-                                </div>
-                                <div class="bg-zinc-800/80 p-4 rounded border border-zinc-700">
-                                    <div class="text-cyan-400 font-bold mb-1 text-lg">Recall (Sensitivity)</div>
-                                    <div class="text-sm text-zinc-300 mb-2">"Out of all actual Positives, how many did we find?"</div>
-                                    <div class="text-xs text-zinc-500">Crucial when <strong>False Negatives</strong> are costly (e.g., Cancer detection. Better to false-alarm than to miss it).</div>
-                                </div>
-                            </div>
-                            <div class="bg-indigo-900/20 p-4 rounded border border-indigo-800/50 text-sm text-zinc-300 flex items-center gap-4">
-                                <div class="text-3xl">⚖️</div>
-                                <div>
-                                    <strong class="text-indigo-400 block text-base">The F1-Score</strong> 
-                                    The harmonic mean of Precision and Recall. It gives you a single metric to optimize when you want a balance between the two, especially on imbalanced datasets.
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="note-card border-t-4 border-t-yellow-500">
-                            <h3 class="text-xl font-bold mb-4 text-white">Regression Metrics</h3>
-                            <p class="text-sm text-zinc-300 mb-4">When predicting continuous numbers (like House Prices), we can't be exactly right. We measure how <em>far off</em> we are on average.</p>
-                            <ul class="space-y-4 text-sm text-zinc-300">
-                                <li class="bg-zinc-800/50 p-4 rounded border border-zinc-700">
-                                    <strong class="text-yellow-400 block mb-1 text-base">Mean Absolute Error (MAE)</strong>
-                                    The average of all absolute errors. Highly interpretable. <br>
-                                    <em class="text-zinc-500 text-xs">Example: "Our house price model has an MAE of $5,000. It is off by $5k on average."</em>
-                                </li>
-                                <li class="bg-zinc-800/50 p-4 rounded border border-zinc-700">
-                                    <strong class="text-yellow-400 block mb-1 text-base">Mean Squared Error (MSE)</strong>
-                                    Squares the errors before averaging them. Because it squares the errors, it <strong>heavily penalizes large outliers</strong>. <br>
-                                    <em class="text-zinc-500 text-xs">If being wrong by 10 is much worse than being wrong by 1 ten times, use MSE.</em>
-                                </li>
-                            </ul>
-                        </div>
-                        
-                        <div class="mt-8 bg-gradient-to-r from-cyan-900/40 to-blue-900/40 border border-cyan-800/50 p-6 rounded-xl text-center">
-                            <h3 class="text-white font-bold mb-2 text-xl">Ready for the Workbench?</h3>
-                            <p class="text-sm text-cyan-200 mb-6">You now have the mathematical and conceptual foundations required to experiment with algorithms like KNN and K-Means.</p>
-                            <button class="bg-cyan-600 hover:bg-cyan-500 text-white px-8 py-3 rounded-lg font-bold transition-all shadow-lg shadow-cyan-600/30 hover:scale-105">
-                                Launch 90-Minute Workbench
-                            </button>
-                        </div>
-                    </div>
-                `
+                    <p>You've learned the fundamentals of how machines learn patterns from data:</p>
+                    <ol class="list-decimal pl-5 text-sm space-y-2 text-slate-300 mt-4 mb-4 font-medium">
+                        <li>Models use data to infer rules.</li>
+                        <li>Regression finds trends (lines).</li>
+                        <li>Classification separates categories (boundaries).</li>
+                        <li>Outliers skew results.</li>
+                        <li>Model complexity (like K) must be balanced to avoid Overfitting.</li>
+                    </ol>
+                    <p>This sandbox is open. Experiment with extreme data distributions and see how the K-NN algorithm behaves.</p>
+                `,
+                activity: "Class challenge: Try to create a 'bullseye' pattern (blue points in the center, orange surrounding them). What K value works best to generalize the boundary?",
+                mode: 'knn',
+                setup: () => state.points = []
             }
         ];
 
-        let activeTopicId = topics[0].id;
+        // --- DOM Elements ---
+        const canvas = document.getElementById('ml-canvas');
+        const ctx = canvas.getContext('2d');
+        const wrapper = document.getElementById('canvas-wrapper');
+        const overlay = document.getElementById('canvas-overlay');
+        
+        // Navigation
+        const btnPrev = document.getElementById('btn-prev');
+        const btnNext = document.getElementById('btn-next');
+        const slideCounter = document.getElementById('slide-counter');
+        
+        // Content
+        const slideLabel = document.getElementById('slide-label');
+        const slideTitle = document.getElementById('slide-title');
+        const slideContent = document.getElementById('slide-content');
+        const activityText = document.getElementById('activity-text');
+        const textPanel = document.getElementById('text-panel');
+        
+        // Tools
+        const controlsContainer = document.getElementById('canvas-controls');
+        const toolClassification = document.getElementById('tool-classification');
+        const toolKnn = document.getElementById('tool-knn');
+        const statsDisplay = document.getElementById('stats-display');
+        const btnClear = document.getElementById('btn-clear');
+        const classBtns = document.querySelectorAll('.class-btn');
+        const knnSlider = document.getElementById('knn-slider');
+        const kValueDisplay = document.getElementById('k-value-display');
+        const kStatus = document.getElementById('k-status');
+        const mseValue = document.getElementById('mse-value');
 
-        // DOM Elements
-        const sidebarNav = document.getElementById('sidebar-nav');
-        const mobileNav = document.getElementById('mobile-nav');
-        const contentArea = document.getElementById('content-area');
+        // --- Math & ML Logic ---
 
-        function initApp() {
-            // Build Navigation
-            topics.forEach(topic => {
-                // Desktop
-                const btn = document.createElement('button');
-                btn.className = `nav-btn w-full text-left px-6 py-3.5 flex items-center gap-3 text-zinc-400 font-medium ${topic.id === activeTopicId ? 'active' : ''}`;
-                btn.innerHTML = `<svg class="w-5 h-5 opacity-70" fill="none" stroke="currentColor" viewBox="0 0 24 24">${topic.icon}</svg> ${topic.title}`;
-                btn.onclick = () => loadTopic(topic.id);
-                sidebarNav.appendChild(btn);
+        // Simple Ordinary Least Squares
+        function calculateLinearRegression(points) {
+            if (points.length < 2) return null;
+            let sumX = 0, sumY = 0, sumXY = 0, sumXX = 0;
+            let n = points.length;
+            
+            points.forEach(p => {
+                sumX += p.x;
+                sumY += p.y;
+                sumXY += p.x * p.y;
+                sumXX += p.x * p.x;
             });
+            
+            let denominator = (n * sumXX - sumX * sumX);
+            if (denominator === 0) return { m: 0, b: sumY / n, mse: 0 }; // Vertical line case handling
+            
+            let m = (n * sumXY - sumX * sumY) / denominator;
+            let b = (sumY - m * sumX) / n;
+            
+            // Calculate MSE mapping to screen space just for relative visualization
+            let mse = 0;
+            points.forEach(p => {
+                let predictedY = m * p.x + b;
+                let error = p.y - predictedY;
+                // Normalize error scale slightly for UI
+                mse += (error * error) / 1000; 
+            });
+            mse = mse / n;
 
-            // Mobile select listener
-            mobileNav.addEventListener('change', (e) => loadTopic(e.target.value));
-
-            // Load initial
-            loadTopic(activeTopicId);
+            return { m, b, mse };
         }
 
-        function loadTopic(id) {
-            activeTopicId = id;
-            const topic = topics.find(t => t.id === id);
-
-            // Update UI State
-            document.querySelectorAll('.nav-btn').forEach(btn => {
-                btn.classList.remove('active');
-                if(btn.textContent.includes(topic.title)) {
-                    btn.classList.add('active');
-                }
+        // K-Nearest Neighbors Classification
+        function getKNNClass(x, y, points, k) {
+            let distances = points.map(p => {
+                return {
+                    distSq: (p.x - x)**2 + (p.y - y)**2,
+                    class: p.class
+                };
             });
-            mobileNav.value = id;
+            
+            distances.sort((a, b) => a.distSq - b.distSq);
+            
+            let topK = distances.slice(0, k);
+            let counts = {0: 0, 1: 0};
+            topK.forEach(d => counts[d.class]++);
+            
+            return counts[0] > counts[1] ? 0 : 1;
+        }
 
-            // Render Content with a slight fade effect
-            contentArea.style.opacity = '0';
-            setTimeout(() => {
-                contentArea.innerHTML = topic.content;
-                contentArea.scrollTop = 0;
-                contentArea.style.transition = 'opacity 0.3s ease';
-                contentArea.style.opacity = '1';
+        // --- Canvas Rendering ---
+
+        function resizeCanvas() {
+            canvas.width = wrapper.clientWidth;
+            canvas.height = wrapper.clientHeight;
+            draw();
+        }
+
+        const colors = {
+            class0: { main: '#3b82f6', bg: 'rgba(59, 130, 246, 0.15)' }, // Blue
+            class1: { main: '#f97316', bg: 'rgba(249, 115, 22, 0.15)' }, // Orange
+            line: '#10b981', // Emerald
+            pointStroke: '#ffffff'
+        };
+
+        function draw() {
+            // Clear canvas
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+            if (state.mode === 'none') {
+                overlay.style.opacity = '1';
+                return;
+            } else {
+                overlay.style.opacity = state.points.length === 0 ? '1' : '0';
+            }
+
+            // Draw Backgrounds (Decision Boundaries)
+            if ((state.mode === 'classification' || state.mode === 'knn') && state.points.length > 0) {
+                // Check if we have both classes
+                let has0 = state.points.some(p => p.class === 0);
+                let has1 = state.points.some(p => p.class === 1);
                 
-                // Run topic-specific JS if it exists
-                if(topic.onRender) {
-                    topic.onRender();
+                if (has0 && has1) {
+                    drawDecisionBoundary();
                 }
-            }, 150);
+            }
+
+            // Draw Regression Line
+            if (state.mode === 'regression') {
+                const reg = calculateLinearRegression(state.points);
+                if (reg) {
+                    ctx.beginPath();
+                    // y = mx + b. Calculate y for x=0 and x=width
+                    let y1 = reg.m * 0 + reg.b;
+                    let y2 = reg.m * canvas.width + reg.b;
+                    
+                    ctx.moveTo(0, y1);
+                    ctx.lineTo(canvas.width, y2);
+                    ctx.strokeStyle = colors.line;
+                    ctx.lineWidth = 3;
+                    ctx.stroke();
+
+                    // Draw residual lines
+                    ctx.beginPath();
+                    ctx.setLineDash([5, 5]);
+                    ctx.strokeStyle = 'rgba(255,255,255,0.2)';
+                    ctx.lineWidth = 1;
+                    state.points.forEach(p => {
+                        let predY = reg.m * p.x + reg.b;
+                        ctx.moveTo(p.x, p.y);
+                        ctx.lineTo(p.x, predY);
+                    });
+                    ctx.stroke();
+                    ctx.setLineDash([]);
+
+                    // Update UI stats
+                    mseValue.textContent = reg.mse.toFixed(2);
+                } else {
+                    mseValue.textContent = "0.00";
+                }
+            }
+
+            // Draw Points
+            state.points.forEach((p, index) => {
+                ctx.beginPath();
+                ctx.arc(p.x, p.y, index === state.dragIndex ? 8 : 6, 0, Math.PI * 2);
+                
+                if (state.mode === 'regression') {
+                    ctx.fillStyle = colors.class0.main;
+                } else {
+                    ctx.fillStyle = p.class === 0 ? colors.class0.main : colors.class1.main;
+                }
+                
+                ctx.fill();
+                ctx.lineWidth = 2;
+                ctx.strokeStyle = colors.pointStroke;
+                ctx.stroke();
+
+                // Glow effect if dragging
+                if (index === state.dragIndex) {
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, 12, 0, Math.PI * 2);
+                    ctx.fillStyle = state.mode === 'regression' ? 'rgba(59, 130, 246, 0.3)' : (p.class === 0 ? 'rgba(59, 130, 246, 0.3)' : 'rgba(249, 115, 22, 0.3)');
+                    ctx.fill();
+                }
+            });
         }
 
-        // Initialize
-        initApp();
+        // Optimized rendering of the decision boundary using low-res blocks
+        function drawDecisionBoundary() {
+            const blockSize = 15; // Pixel size of evaluation blocks (tradeoff between quality/performance)
+            const cols = Math.ceil(canvas.width / blockSize);
+            const rows = Math.ceil(canvas.height / blockSize);
+            
+            // Limit K to max available points to avoid errors
+            const actualK = Math.min(state.knnK, state.points.length);
+
+            // Optimization: If K is large and points are many, drawing can lag. 
+            // The block size approach handles this well for JS.
+            ctx.globalAlpha = 0.6;
+
+            for (let i = 0; i < cols; i++) {
+                for (let j = 0; j < rows; j++) {
+                    let cx = i * blockSize + blockSize/2;
+                    let cy = j * blockSize + blockSize/2;
+                    
+                    let predictedClass = getKNNClass(cx, cy, state.points, actualK);
+                    
+                    ctx.fillStyle = predictedClass === 0 ? colors.class0.bg : colors.class1.bg;
+                    ctx.fillRect(i * blockSize, j * blockSize, blockSize, blockSize);
+                }
+            }
+            ctx.globalAlpha = 1.0;
+        }
+
+        // --- Interaction Logic ---
+
+        function getMousePos(evt) {
+            const rect = canvas.getBoundingClientRect();
+            return {
+                x: evt.clientX - rect.left,
+                y: evt.clientY - rect.top
+            };
+        }
+
+        canvas.addEventListener('mousedown', (e) => {
+            if (state.mode === 'none') return;
+            const pos = getMousePos(e);
+            
+            // Check if clicking near an existing point (for dragging)
+            let clickedExisting = false;
+            for (let i = state.points.length - 1; i >= 0; i--) {
+                const p = state.points[i];
+                const dist = Math.sqrt((p.x - pos.x)**2 + (p.y - pos.y)**2);
+                if (dist < 15) { // Hitbox radius
+                    state.isDragging = true;
+                    state.dragIndex = i;
+                    clickedExisting = true;
+                    break;
+                }
+            }
+
+            // If not dragging, add a new point
+            if (!clickedExisting) {
+                state.points.push({
+                    x: pos.x,
+                    y: pos.y,
+                    class: state.mode === 'regression' ? 0 : state.activeClass
+                });
+            }
+            
+            draw();
+        });
+
+        canvas.addEventListener('mousemove', (e) => {
+            if (state.mode === 'none') return;
+            const pos = getMousePos(e);
+            
+            // Change cursor based on hover
+            let hover = false;
+            for (let p of state.points) {
+                if (Math.sqrt((p.x - pos.x)**2 + (p.y - pos.y)**2) < 15) {
+                    hover = true; break;
+                }
+            }
+            canvas.style.cursor = hover ? 'grab' : 'crosshair';
+
+            if (state.isDragging && state.dragIndex > -1) {
+                canvas.style.cursor = 'grabbing';
+                state.points[state.dragIndex].x = pos.x;
+                state.points[state.dragIndex].y = pos.y;
+                
+                // Fast redraw. For heavy KNN, we might need a debounce, but 15px blocks usually handle real-time fine.
+                requestAnimationFrame(draw);
+            }
+        });
+
+        window.addEventListener('mouseup', () => {
+            state.isDragging = false;
+            state.dragIndex = -1;
+            draw();
+        });
+
+        // Touch support for mobile/tablets
+        canvas.addEventListener('touchstart', (e) => {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const mouseEvent = new MouseEvent('mousedown', { clientX: touch.clientX, clientY: touch.clientY });
+            canvas.dispatchEvent(mouseEvent);
+        }, {passive: false});
+        
+        canvas.addEventListener('touchmove', (e) => {
+            e.preventDefault();
+            const touch = e.touches[0];
+            const mouseEvent = new MouseEvent('mousemove', { clientX: touch.clientX, clientY: touch.clientY });
+            canvas.dispatchEvent(mouseEvent);
+        }, {passive: false});
+
+        canvas.addEventListener('touchend', (e) => {
+            window.dispatchEvent(new Event('mouseup'));
+        });
+
+
+        // --- UI & State Management ---
+
+        function updateSlideUI() {
+            const slide = slides[state.currentSlide];
+            
+            // Trigger animation
+            textPanel.classList.remove('slide-enter');
+            void textPanel.offsetWidth; // Trigger reflow
+            textPanel.classList.add('slide-enter');
+
+            slideLabel.textContent = slide.label;
+            slideTitle.textContent = slide.title;
+            slideContent.innerHTML = slide.content;
+            activityText.textContent = slide.activity;
+            slideCounter.textContent = `Slide ${state.currentSlide + 1} / ${slides.length}`;
+
+            btnPrev.disabled = state.currentSlide === 0;
+            btnNext.disabled = state.currentSlide === slides.length - 1;
+
+            // Change App Mode
+            state.mode = slide.mode;
+            
+            // Configure UI based on mode
+            controlsContainer.style.opacity = state.mode === 'none' ? '0' : '1';
+            controlsContainer.style.pointerEvents = state.mode === 'none' ? 'none' : 'auto';
+            
+            toolClassification.classList.add('hidden');
+            toolKnn.classList.add('hidden');
+            statsDisplay.classList.add('hidden');
+
+            if (state.mode === 'regression') {
+                statsDisplay.classList.remove('hidden');
+            } else if (state.mode === 'classification') {
+                toolClassification.classList.remove('hidden');
+                // Standard classification will just use K=1 for rigid boundaries in this simple mode
+                state.knnK = 1; 
+            } else if (state.mode === 'knn') {
+                toolClassification.classList.remove('hidden');
+                toolKnn.classList.remove('hidden');
+            }
+
+            // Run setup function for the slide (injecting initial points)
+            if (slide.setup) {
+                slide.setup(canvas.width, canvas.height);
+            }
+            
+            draw();
+        }
+
+        // Class toggle logic
+        classBtns.forEach(btn => {
+            btn.addEventListener('click', (e) => {
+                const cls = parseInt(e.target.dataset.class);
+                state.activeClass = cls;
+                
+                classBtns.forEach(b => {
+                    b.classList.remove('active-0', 'active-1', 'text-white');
+                    b.classList.add('text-slate-400', 'border-transparent');
+                });
+                
+                e.target.classList.remove('text-slate-400', 'border-transparent');
+                e.target.classList.add(`active-${cls}`, 'text-white');
+            });
+        });
+
+        // KNN Slider logic
+        function updateKStatus() {
+            const val = parseInt(knnSlider.value);
+            state.knnK = val;
+            kValueDisplay.textContent = val;
+            
+            if (val <= 3) {
+                kStatus.textContent = "High Variance (Overfit)";
+                kStatus.className = "text-xs w-36 text-right text-red-400";
+            } else if (val >= 11) {
+                kStatus.textContent = "High Bias (Underfit)";
+                kStatus.className = "text-xs w-36 text-right text-orange-400";
+            } else {
+                kStatus.textContent = "Balanced";
+                kStatus.className = "text-xs w-36 text-right text-green-400";
+            }
+            draw();
+        }
+
+        knnSlider.addEventListener('input', updateKStatus);
+
+        // Global Clear
+        btnClear.addEventListener('click', () => {
+            state.points = [];
+            draw();
+        });
+
+        // Slide Navigation
+        btnNext.addEventListener('click', () => {
+            if (state.currentSlide < slides.length - 1) {
+                state.currentSlide++;
+                updateSlideUI();
+            }
+        });
+
+        btnPrev.addEventListener('click', () => {
+            if (state.currentSlide > 0) {
+                state.currentSlide--;
+                updateSlideUI();
+            }
+        });
+
+        // Initialization
+        window.addEventListener('resize', resizeCanvas);
+        
+        // Initial setup sequence
+        setTimeout(() => {
+            resizeCanvas();
+            updateSlideUI();
+        }, 100); // Small delay to let container calculate dimensions
+
     </script>
 </body>
 </html>
