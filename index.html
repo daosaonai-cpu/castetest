@@ -10,10 +10,6 @@
         
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #09090b; /* Zinc 950 */
-            color: #fafafa;
-            overflow: hidden;
-            user-select: none;
         }
 
         .font-mono {
@@ -88,10 +84,10 @@
         }
     </style>
 </head>
-<body class="h-screen flex flex-col">
+<body class="min-h-screen md:h-screen flex flex-col bg-zinc-950 text-zinc-50 overflow-auto md:overflow-hidden select-none">
 
     <!-- Header -->
-    <header class="bg-zinc-900 border-b border-zinc-800 p-3 flex justify-between items-center shrink-0 z-10">
+    <header class="bg-zinc-900 border-b border-zinc-800 p-3 flex justify-between items-center shrink-0 z-10 sticky top-0 md:relative">
         <div class="flex items-center gap-3">
             <div class="w-8 h-8 rounded bg-gradient-to-br from-cyan-500 to-blue-600 flex items-center justify-center font-bold text-white shadow-lg shadow-cyan-500/20">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z"></path></svg>
@@ -104,7 +100,7 @@
     </header>
 
     <!-- Main App Container -->
-    <main class="flex-1 flex overflow-hidden">
+    <main class="flex-1 flex flex-col md:flex-row overflow-auto md:overflow-hidden w-full">
         
         <!-- Left Sidebar: Modules -->
         <aside class="w-64 bg-zinc-900 border-r border-zinc-800 flex flex-col shrink-0 hidden md:flex">
@@ -121,12 +117,12 @@
         </aside>
 
         <!-- Center: Interactive Canvas -->
-        <section class="flex-1 flex flex-col p-4 bg-black relative">
+        <section class="flex flex-col p-2 md:p-4 bg-black relative h-[60vh] md:h-auto md:flex-1 shrink-0 z-0">
             <!-- Mobile Nav Dropdown -->
-            <select id="mobile-nav" class="md:hidden w-full bg-zinc-900 border border-zinc-700 text-white p-2 rounded mb-4 font-medium outline-none focus:border-cyan-500"></select>
+            <select id="mobile-nav" class="md:hidden w-full bg-zinc-900 border border-zinc-700 text-white p-2 rounded mb-2 font-medium outline-none focus:border-cyan-500 shrink-0"></select>
 
             <!-- Dynamic Controls Bar -->
-            <div id="controls-bar" class="h-14 mb-4 flex items-center justify-between bg-zinc-900 border border-zinc-800 rounded-lg px-4 shrink-0 shadow-lg overflow-x-auto">
+            <div id="controls-bar" class="min-h-[3.5rem] py-2 mb-2 md:mb-4 flex flex-wrap items-center justify-between bg-zinc-900 border border-zinc-800 rounded-lg px-2 md:px-4 shrink-0 shadow-lg gap-2">
                 <!-- Injected via JS -->
             </div>
 
@@ -135,10 +131,12 @@
                 <div class="canvas-grid"></div>
                 <canvas id="main-canvas" class="w-full h-full block absolute inset-0"></canvas>
             </div>
+            
+            <div class="md:hidden text-center text-[10px] text-zinc-500 mt-2 shrink-0">Scroll outside canvas to view instructions &darr;</div>
         </section>
 
         <!-- Right Sidebar: Context & Tasks -->
-        <aside class="w-80 bg-zinc-900 border-l border-zinc-800 flex flex-col shrink-0 hidden lg:flex">
+        <aside class="w-full lg:w-80 bg-zinc-900 border-t md:border-t-0 md:border-l border-zinc-800 flex flex-col shrink-0 flex-1 md:flex-none">
             <!-- Tabs -->
             <div class="flex border-b border-zinc-800 shrink-0">
                 <button class="tab-btn active flex-1 py-3 text-sm font-medium text-zinc-400" data-tab="task">Activity Task</button>
@@ -192,13 +190,13 @@
                 title: '1. Bias vs. Variance',
                 icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z" />',
                 controls: `
-                    <div class="flex items-center gap-4 w-full">
-                        <button id="btn-gen-sine" class="px-3 py-1 bg-zinc-800 hover:bg-zinc-700 text-sm font-medium rounded transition">Generate Wave</button>
-                        <div class="h-6 w-px bg-zinc-700"></div>
-                        <div class="flex-1 flex items-center gap-3">
-                            <label class="text-sm font-medium text-zinc-400 whitespace-nowrap">Model Complexity:</label>
+                    <div class="flex flex-wrap items-center gap-2 md:gap-4 w-full">
+                        <button id="btn-gen-sine" class="px-3 py-1.5 md:py-1 bg-zinc-800 hover:bg-zinc-700 text-xs md:text-sm font-medium rounded transition">Generate Wave</button>
+                        <div class="hidden md:block h-6 w-px bg-zinc-700"></div>
+                        <div class="flex-1 flex items-center gap-2 md:gap-3 min-w-[200px]">
+                            <label class="text-xs md:text-sm font-medium text-zinc-400 whitespace-nowrap">Model Complexity:</label>
                             <input type="range" id="slider-complexity" min="1" max="100" value="50">
-                            <span id="val-complexity" class="font-mono text-cyan-400 w-24 text-right text-xs">Balanced</span>
+                            <span id="val-complexity" class="font-mono text-cyan-400 w-20 md:w-24 text-right text-[10px] md:text-xs">Balanced</span>
                         </div>
                     </div>
                 `,
@@ -239,17 +237,17 @@
                 title: '2. KNN & Distance Metrics',
                 icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5" />',
                 controls: `
-                    <div class="flex items-center gap-4 w-full">
-                        <button id="btn-gen-scatter" class="px-3 py-1 bg-zinc-800 hover:bg-zinc-700 text-sm font-medium rounded transition">Scatter Points</button>
-                        <div class="h-6 w-px bg-zinc-700"></div>
+                    <div class="flex flex-wrap items-center gap-2 md:gap-4 w-full">
+                        <button id="btn-gen-scatter" class="px-3 py-1.5 md:py-1 bg-zinc-800 hover:bg-zinc-700 text-xs md:text-sm font-medium rounded transition">Scatter Points</button>
+                        <div class="hidden md:block h-6 w-px bg-zinc-700"></div>
                         <div class="flex items-center gap-2">
-                            <label class="text-sm font-medium text-zinc-400">K = <span id="val-k" class="text-magenta-400 font-mono">3</span></label>
-                            <input type="range" id="slider-k" min="1" max="15" step="1" value="3" class="w-24">
+                            <label class="text-xs md:text-sm font-medium text-zinc-400">K = <span id="val-k" class="text-magenta-400 font-mono">3</span></label>
+                            <input type="range" id="slider-k" min="1" max="15" step="1" value="3" class="w-20 md:w-24">
                         </div>
-                        <div class="h-6 w-px bg-zinc-700"></div>
-                        <div class="flex bg-zinc-800 p-0.5 rounded">
-                            <button id="btn-metric-euc" class="px-3 py-1 text-xs font-medium rounded bg-zinc-700 text-white transition">Euclidean</button>
-                            <button id="btn-metric-man" class="px-3 py-1 text-xs font-medium rounded text-zinc-400 hover:text-white transition">Manhattan</button>
+                        <div class="hidden md:block h-6 w-px bg-zinc-700"></div>
+                        <div class="flex bg-zinc-800 p-0.5 rounded ml-auto md:ml-0">
+                            <button id="btn-metric-euc" class="px-3 py-1.5 md:py-1 text-[10px] md:text-xs font-medium rounded bg-zinc-700 text-white transition">Euclidean</button>
+                            <button id="btn-metric-man" class="px-3 py-1.5 md:py-1 text-[10px] md:text-xs font-medium rounded text-zinc-400 hover:text-white transition">Manhattan</button>
                         </div>
                     </div>
                 `,
@@ -291,15 +289,15 @@
                 title: '3. Unsupervised K-Means',
                 icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 002-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />',
                 controls: `
-                    <div class="flex items-center gap-3 w-full">
-                        <button id="btn-kmeans-points" class="px-3 py-1 bg-zinc-800 hover:bg-zinc-700 text-xs font-medium rounded transition">Add Random Group</button>
-                        <div class="flex items-center gap-2 bg-zinc-800 px-2 py-1 rounded">
-                            <label class="text-xs font-medium text-zinc-400">Clusters (K): <span id="val-kmeans-k" class="text-yellow-400 font-mono">3</span></label>
-                            <input type="range" id="slider-kmeans-k" min="2" max="5" step="1" value="3" class="w-16">
+                    <div class="flex flex-wrap items-center gap-2 md:gap-3 w-full">
+                        <button id="btn-kmeans-points" class="px-3 py-1.5 md:py-1 bg-zinc-800 hover:bg-zinc-700 text-[10px] md:text-xs font-medium rounded transition">Add Random Group</button>
+                        <div class="flex items-center gap-2 bg-zinc-800 px-2 py-1.5 md:py-1 rounded">
+                            <label class="text-[10px] md:text-xs font-medium text-zinc-400">Clusters (K): <span id="val-kmeans-k" class="text-yellow-400 font-mono">3</span></label>
+                            <input type="range" id="slider-kmeans-k" min="2" max="5" step="1" value="3" class="w-12 md:w-16">
                         </div>
-                        <div class="flex-1 flex justify-end gap-2">
-                            <button id="btn-kmeans-init" class="px-3 py-1 bg-yellow-900/30 text-yellow-400 border border-yellow-900/50 hover:bg-yellow-900/50 text-xs font-bold rounded transition">1. Init Centroids</button>
-                            <button id="btn-kmeans-step" class="px-3 py-1 bg-yellow-600 hover:bg-yellow-500 text-black text-xs font-bold rounded transition shadow shadow-yellow-600/20 disabled:opacity-50 disabled:cursor-not-allowed" disabled>2. Step algorithm</button>
+                        <div class="flex-1 flex flex-wrap justify-end gap-2 min-w-[180px]">
+                            <button id="btn-kmeans-init" class="px-2 md:px-3 py-1.5 md:py-1 bg-yellow-900/30 text-yellow-400 border border-yellow-900/50 hover:bg-yellow-900/50 text-[10px] md:text-xs font-bold rounded transition whitespace-nowrap">1. Init Centroids</button>
+                            <button id="btn-kmeans-step" class="px-2 md:px-3 py-1.5 md:py-1 bg-yellow-600 hover:bg-yellow-500 text-black text-[10px] md:text-xs font-bold rounded transition shadow shadow-yellow-600/20 disabled:opacity-50 disabled:cursor-not-allowed whitespace-nowrap" disabled>2. Step algorithm</button>
                         </div>
                     </div>
                 `,
@@ -350,17 +348,17 @@
                 title: '4. Decision Boundaries',
                 icon: '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 20l-5.447-2.724A1 1 0 013 16.382V5.618a1 1 0 011.447-.894L9 7m0 13l6-3m-6 3V7m6 10l4.553 2.276A1 1 0 0021 18.382V7.618a1 1 0 00-.553-.894L15 4m0 13V4m0 0L9 7" />',
                 controls: `
-                    <div class="flex items-center gap-4 w-full">
+                    <div class="flex flex-wrap items-center gap-2 md:gap-4 w-full">
                         <div class="flex bg-zinc-800 p-0.5 rounded items-center">
-                            <span class="text-xs text-zinc-500 px-2 font-medium">Draw:</span>
-                            <button id="btn-draw-class0" class="px-3 py-1 text-xs font-bold rounded bg-cyan-600 text-white transition shadow shadow-cyan-600/30">Class A</button>
-                            <button id="btn-draw-class1" class="px-3 py-1 text-xs font-bold rounded text-zinc-400 hover:text-white transition">Class B</button>
+                            <span class="text-[10px] md:text-xs text-zinc-500 px-1 md:px-2 font-medium">Draw:</span>
+                            <button id="btn-draw-class0" class="px-2 md:px-3 py-1.5 md:py-1 text-[10px] md:text-xs font-bold rounded bg-cyan-600 text-white transition shadow shadow-cyan-600/30">Class A</button>
+                            <button id="btn-draw-class1" class="px-2 md:px-3 py-1.5 md:py-1 text-[10px] md:text-xs font-bold rounded text-zinc-400 hover:text-white transition">Class B</button>
                         </div>
-                        <button id="btn-gen-rings" class="px-3 py-1 bg-zinc-800 hover:bg-zinc-700 text-xs font-medium rounded transition ml-auto">Gen: Concentric</button>
-                        <div class="h-6 w-px bg-zinc-700"></div>
-                        <div class="flex bg-zinc-800 p-0.5 rounded">
-                            <button id="btn-model-lin" class="px-3 py-1 text-xs font-medium rounded bg-emerald-600 text-white transition">Linear Model</button>
-                            <button id="btn-model-nonlin" class="px-3 py-1 text-xs font-medium rounded text-zinc-400 hover:text-white transition">Non-Linear (KNN)</button>
+                        <button id="btn-gen-rings" class="px-3 py-1.5 md:py-1 bg-zinc-800 hover:bg-zinc-700 text-[10px] md:text-xs font-medium rounded transition ml-auto md:ml-0">Gen: Concentric</button>
+                        <div class="hidden md:block h-6 w-px bg-zinc-700"></div>
+                        <div class="flex bg-zinc-800 p-0.5 rounded w-full md:w-auto mt-1 md:mt-0">
+                            <button id="btn-model-lin" class="flex-1 md:flex-none px-3 py-1.5 md:py-1 text-[10px] md:text-xs font-medium rounded bg-emerald-600 text-white transition">Linear Model</button>
+                            <button id="btn-model-nonlin" class="flex-1 md:flex-none px-3 py-1.5 md:py-1 text-[10px] md:text-xs font-medium rounded text-zinc-400 hover:text-white transition">Non-Linear (KNN)</button>
                         </div>
                     </div>
                 `,
