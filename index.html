@@ -3,304 +3,665 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>UI Aesthetic Evaluation</title>
+    <title>Linear Regression Workbench</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <style>
-        body {
-            font-family: 'Inter', sans-serif;
-        }
-        .drop-zone {
-            border: 2px dashed #cbd5e1;
-            transition: background-color 0.2s ease-in-out, border-color 0.2s ease-in-out;
-        }
-        .drop-zone.drag-over {
-            background-color: #e2e8f0;
-            border-color: #4f46e5;
-        }
-        .loader {
-            border: 4px solid #f3f4f6;
-            border-top: 4px solid #4f46e5;
-            border-radius: 50%;
-            width: 40px;
-            height: 40px;
-            animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        .score-circle {
-            width: 150px;
-            height: 150px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: conic-gradient(#4f46e5 var(--score-percent, 0%), #e2e8f0 0);
-            transition: --score-percent 1s ease-in-out;
-        }
-        @property --score-percent {
-            syntax: '<percentage>';
-            inherits: false;
-            initial-value: 0%;
-        }
-        .progress-bar {
-            background-color: #e5e7eb;
-            border-radius: 9999px;
-            height: 8px;
-            width: 100%;
-        }
-        .progress-bar-inner {
-            background-color: #4f46e5;
-            border-radius: 9999px;
-            height: 100%;
-            transition: width 1s ease-in-out;
-        }
-    </style>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body class="bg-slate-50 text-slate-800 flex items-center justify-center min-h-screen p-4">
+<body class="bg-slate-50 min-h-screen p-4 sm:p-8 font-sans">
+    <div class="max-w-7xl mx-auto">
+        <header class="mb-4 text-center sm:text-left">
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mb-2">Linear Regression <span class="text-blue-600">Workbench</span></h1>
+            <p class="text-slate-600 text-lg">Interactive exploration of predicting house prices based on size.</p>
+        </header>
 
-    <div class="w-full max-w-3xl mx-auto bg-white rounded-2xl shadow-lg p-6 md:p-8">
-        <div class="text-center mb-6">
-            <h1 class="text-3xl md:text-4xl font-bold text-slate-900">UI Aesthetic Evaluation</h1>
-            <p class="text-slate-500 mt-2">ST BONI.</p>
+        <!-- Smart Navigation Tabs -->
+        <div class="border-b border-gray-200 mb-6">
+            <nav class="-mb-px flex space-x-6 sm:space-x-8 overflow-x-auto" aria-label="Tabs">
+                <button onclick="switchTab('training')" id="tab-btn-training" class="tab-btn border-blue-500 text-blue-600 whitespace-nowrap py-4 px-1 border-b-2 font-bold text-sm sm:text-base flex items-center transition-colors">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
+                    1. Training Workspace
+                </button>
+                <button onclick="switchTab('data')" id="tab-btn-data" class="tab-btn border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm sm:text-base flex items-center transition-colors">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path></svg>
+                    2. Data & Metrics
+                </button>
+                <button onclick="switchTab('prediction')" id="tab-btn-prediction" class="tab-btn border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm sm:text-base flex items-center transition-colors">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+                    3. Application & Concept
+                </button>
+            </nav>
         </div>
 
-        <!-- Upload Area -->
-        <div id="uploadContainer">
-            <div id="dropZone" class="drop-zone relative w-full h-64 rounded-xl flex flex-col items-center justify-center text-center p-4 cursor-pointer hover:bg-slate-100">
-                <svg class="w-12 h-12 text-slate-400 mb-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
-                </svg>
-                <p class="font-semibold text-slate-700">Drag & drop your screenshot here</p>
-                <p class="text-sm text-slate-500 mt-1">or click to browse files</p>
-                <input type="file" id="fileInput" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" accept="image/png, image/jpeg, image/webp">
-            </div>
-        </div>
-
-        <!-- Image Preview and Analysis -->
-        <div id="analysisContainer" class="hidden">
-            <div class="mb-6">
-                <img id="imagePreview" src="#" alt="UI Screenshot Preview" class="w-full max-w-lg mx-auto rounded-lg shadow-md max-h-[50vh] object-contain">
-            </div>
-
-            <div class="text-center mb-6">
-                <button id="analyzeButton" class="bg-indigo-600 text-white font-bold py-3 px-8 rounded-lg hover:bg-indigo-700 transition-colors focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:ring-offset-2">
-                    Analyze Design
-                </button>
-                <button id="resetButton" class="bg-slate-200 text-slate-700 font-bold py-3 px-8 rounded-lg hover:bg-slate-300 transition-colors ml-4">
-                    Try Another
-                </button>
-            </div>
-
-            <!-- Results Section -->
-            <div id="resultsContainer" class="hidden p-6 bg-slate-100 rounded-xl">
-                <div id="loader" class="loader mx-auto"></div>
-                <div id="scoreDisplay" class="hidden">
-                    <div class="grid md:grid-cols-3 gap-6 items-center">
-                        <div class="md:col-span-1 text-center">
-                             <h2 class="text-2xl font-bold text-slate-900 mb-4">Overall Score</h2>
-                            <div class="score-circle mx-auto mb-4 shadow-inner bg-slate-200">
-                                <span id="overallScoreValue" class="text-5xl font-bold text-slate-800"></span>
+        <main class="min-h-[500px]">
+            
+            <!-- TAB 1: TRAINING WORKSPACE -->
+            <div id="tab-training" class="tab-content grid grid-cols-1 lg:grid-cols-12 gap-8 block animate-fade-in">
+                
+                <div class="lg:col-span-4 space-y-6">
+                    <!-- Model Parameters Control Panel -->
+                    <section class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 h-full">
+                        <h2 class="text-xl font-bold text-slate-800 mb-4 flex items-center">
+                            Model Parameters
+                        </h2>
+                        
+                        <!-- Weight Slider -->
+                        <div class="mb-6">
+                            <div class="flex justify-between mb-2">
+                                <label for="weightSlider" class="text-sm font-medium text-slate-700">Weight (Slope)</label>
+                                <span id="weightValue" class="text-sm font-bold text-blue-600">1.0</span>
                             </div>
+                            <input type="range" id="weightSlider" min="-5" max="10" step="0.1" value="1.0" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                            <p class="text-xs text-slate-500 mt-1">How much price increases per sq ft.</p>
                         </div>
-                        <div id="detailedScores" class="md:col-span-2 space-y-4">
-                            <!-- Detailed scores will be injected here -->
+
+                        <!-- Bias Slider -->
+                        <div class="mb-6">
+                            <div class="flex justify-between mb-2">
+                                <label for="biasSlider" class="text-sm font-medium text-slate-700">Bias (Intercept)</label>
+                                <span id="biasValue" class="text-sm font-bold text-blue-600">100</span>
+                            </div>
+                            <input type="range" id="biasSlider" min="-500" max="1000" step="10" value="100" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                            <p class="text-xs text-slate-500 mt-1">Base price before size is considered.</p>
+                        </div>
+
+                        <!-- Training Controls & Metrics -->
+                        <div class="mt-6 pt-6 border-t border-gray-100">
+                            <div class="flex justify-between items-center mb-4">
+                                <span class="text-sm font-medium text-slate-700">Current Error (MSE):</span>
+                                <span id="mseValue" class="font-mono font-bold text-red-500 bg-red-50 px-2 py-1 rounded">0.00</span>
+                            </div>
+                            
+                            <div class="flex space-x-3">
+                                <button id="trainBtn" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg shadow-sm transition-all flex justify-center items-center">
+                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                    Auto Train
+                                </button>
+                                <button id="resetBtn" class="bg-gray-200 hover:bg-gray-300 text-slate-700 font-semibold py-3 px-4 rounded-lg shadow-sm transition-all">
+                                    Reset
+                                </button>
+                            </div>
+                            <p id="trainingStatus" class="text-xs text-center text-slate-500 mt-3 h-4"></p>
+                        </div>
+                    </section>
+                </div>
+
+                <div class="lg:col-span-8">
+                    <section class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex flex-col h-[500px]">
+                        <div class="flex justify-between items-center mb-4">
+                            <h2 class="text-xl font-bold text-slate-800">Data Visualization</h2>
+                            <span class="text-xs font-medium bg-gray-100 text-gray-600 px-2 py-1 rounded-full">Scatter Plot</span>
+                        </div>
+                        <div class="flex-1 relative w-full h-full">
+                            <canvas id="regressionChart"></canvas>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <!-- TAB 2: DATA & METRICS -->
+            <div id="tab-data" class="tab-content grid grid-cols-1 lg:grid-cols-12 gap-8 hidden animate-fade-in">
+                
+                <div class="lg:col-span-5 space-y-6">
+                    <section class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                        <h2 class="text-xl font-bold text-slate-800 mb-6 flex items-center">
+                            Dataset Controls
+                        </h2>
+                        
+                        <!-- Data Points Slider -->
+                        <div class="mb-6">
+                            <div class="flex justify-between mb-2">
+                                <label for="dataCountSlider" class="text-sm font-medium text-slate-700">Number of Points</label>
+                                <span id="dataCountValue" class="text-sm font-bold text-purple-600">30</span>
+                            </div>
+                            <input type="range" id="dataCountSlider" min="5" max="150" step="1" value="30" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-purple-600">
+                        </div>
+
+                        <!-- Noise/Variance Slider -->
+                        <div class="mb-6">
+                            <div class="flex justify-between mb-2">
+                                <label for="noiseSlider" class="text-sm font-medium text-slate-700">Data Noise (Variance)</label>
+                                <span id="noiseValue" class="text-sm font-bold text-purple-600">Medium</span>
+                            </div>
+                            <input type="range" id="noiseSlider" min="0" max="8000" step="500" value="3000" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-purple-600">
+                        </div>
+                        
+                        <div class="pt-4 border-t border-gray-100">
+                            <button id="regenerateDataBtn" class="w-full bg-purple-100 hover:bg-purple-200 text-purple-700 font-semibold py-3 px-4 rounded-lg shadow-sm transition-all flex justify-center items-center">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                                Regenerate New Dataset
+                            </button>
+                        </div>
+                    </section>
+
+                    <!-- Dataset view table snippet -->
+                    <section class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
+                        <h3 class="text-md font-bold text-slate-800 mb-4">Sample Data (First 5 rows)</h3>
+                        <div class="overflow-hidden rounded-lg border border-gray-200">
+                            <table class="min-w-full text-sm text-left text-slate-600">
+                                <thead class="text-xs text-slate-700 uppercase bg-slate-50">
+                                    <tr><th class="px-4 py-3">Size (sq ft)</th><th class="px-4 py-3">Actual Price ($)</th></tr>
+                                </thead>
+                                <tbody id="dataTableBody" class="divide-y divide-gray-200">
+                                    <!-- Data rows injected via JS -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </section>
+                </div>
+
+                <div class="lg:col-span-7">
+                    <section class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex flex-col h-[500px]">
+                        <div class="flex justify-between items-center mb-2">
+                            <h2 class="text-xl font-bold text-slate-800 flex items-center">
+                                Training Progress (Loss Curve)
+                            </h2>
+                            <span class="text-xs font-medium bg-emerald-50 text-emerald-600 border border-emerald-200 px-2 py-1 rounded-full">MSE Tracking</span>
+                        </div>
+                        <p class="text-sm text-slate-500 mb-6">Visualizes how the Mean Squared Error drops as the auto-train algorithm finds the best fit.</p>
+                        <div class="flex-1 relative w-full h-full">
+                            <canvas id="lossChart"></canvas>
+                        </div>
+                    </section>
+                </div>
+            </div>
+
+            <!-- TAB 3: APPLICATION & CONCEPT -->
+            <div id="tab-prediction" class="tab-content max-w-4xl mx-auto space-y-8 hidden animate-fade-in">
+                
+                <!-- Educational Context Panel -->
+                <section class="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
+                    <h2 class="text-2xl font-bold text-slate-800 mb-4 flex items-center">
+                        <svg class="w-8 h-8 mr-3 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                        The Concept: Linear Regression
+                    </h2>
+                    <p class="text-base text-slate-600 mb-6 leading-relaxed">
+                        Linear regression is a foundational machine learning algorithm. It attempts to model the relationship between variables by fitting a linear equation to observed data. In this workbench, we act as a real estate agent trying to predict <strong class="text-slate-800">House Price (Y)</strong> based solely on the <strong class="text-slate-800">House Size (X)</strong>.
+                    </p>
+                    <div class="bg-blue-50 text-blue-900 p-6 rounded-lg font-mono text-center border border-blue-100">
+                        <span class="text-sm text-blue-700 block mb-2">The core equation being solved:</span>
+                        <span class="font-bold text-2xl md:text-3xl">Price = (Weight × Size) + Bias</span>
+                    </div>
+                </section>
+
+                <!-- Prediction Tool Panel -->
+                <section class="bg-gradient-to-br from-indigo-50 to-blue-50 rounded-xl shadow-lg border border-indigo-100 p-8">
+                    <h2 class="text-2xl font-bold text-indigo-900 mb-6 flex items-center">
+                        <svg class="w-8 h-8 mr-3 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                        Predict a House Price
+                    </h2>
+                    <p class="text-indigo-700 mb-6">Enter a custom house size below. This tool uses the current <strong>Weight</strong> and <strong>Bias</strong> from your trained model in the Workspace tab to generate an estimate.</p>
+                    
+                    <div class="bg-white p-6 rounded-xl shadow-inner border border-indigo-100/50 flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-8">
+                        <div class="w-full md:w-1/2">
+                            <label for="predictSize" class="block text-sm font-bold text-indigo-800 mb-2 uppercase tracking-wider">House Size (sq ft)</label>
+                            <input type="number" id="predictSize" value="2000" class="w-full px-5 py-4 text-xl border-2 border-indigo-200 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all">
+                        </div>
+                        <div class="hidden md:block text-indigo-300">
+                            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                        </div>
+                        <div class="w-full md:w-1/2 bg-indigo-600 rounded-xl p-6 text-center text-white transform transition-transform hover:scale-105">
+                            <p class="text-sm text-indigo-200 mb-1 uppercase tracking-wider font-bold">Estimated Market Value</p>
+                            <p id="predictionResult" class="text-4xl md:text-5xl font-black font-mono tracking-tight">$0</p>
                         </div>
                     </div>
-                     <div id="justification" class="mt-6 text-left text-slate-600 bg-white p-4 rounded-lg space-y-4"></div>
-                </div>
-                 <div id="errorDisplay" class="hidden text-red-600 bg-red-100 p-4 rounded-lg"></div>
+                </section>
             </div>
-        </div>
+
+        </main>
     </div>
 
+    <style>
+        /* Add a quick fade-in animation for smooth tab switching */
+        .animate-fade-in {
+            animation: fadeIn 0.3s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
+
     <script>
-        // DOM Element References
-        const dropZone = document.getElementById('dropZone');
-        const fileInput = document.getElementById('fileInput');
-        const uploadContainer = document.getElementById('uploadContainer');
-        const analysisContainer = document.getElementById('analysisContainer');
-        const imagePreview = document.getElementById('imagePreview');
-        const analyzeButton = document.getElementById('analyzeButton');
-        const resetButton = document.getElementById('resetButton');
-        const resultsContainer = document.getElementById('resultsContainer');
-        const loader = document.getElementById('loader');
-        const scoreDisplay = document.getElementById('scoreDisplay');
-        const overallScoreValue = document.getElementById('overallScoreValue');
-        const detailedScores = document.getElementById('detailedScores');
-        const justification = document.getElementById('justification');
-        const errorDisplay = document.getElementById('errorDisplay');
-        const scoreCircle = document.querySelector('.score-circle');
-
-        let imageBase64Data = null;
-
-        // --- Event Listeners ---
-        dropZone.addEventListener('click', () => fileInput.click());
-        dropZone.addEventListener('dragover', (e) => { e.preventDefault(); dropZone.classList.add('drag-over'); });
-        dropZone.addEventListener('dragleave', () => dropZone.classList.remove('drag-over'));
-        dropZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            dropZone.classList.remove('drag-over');
-            const files = e.dataTransfer.files;
-            if (files.length > 0) handleFile(files[0]);
-        });
-        fileInput.addEventListener('change', (e) => { if (e.target.files.length > 0) handleFile(e.target.files[0]); });
-        analyzeButton.addEventListener('click', () => {
-            if (imageBase64Data) getAestheticScore(imageBase64Data);
-            else showError("Please upload an image first.");
-        });
-        resetButton.addEventListener('click', resetApp);
-
-        // --- Core Functions ---
-        function handleFile(file) {
-            if (!file.type.startsWith('image/')) {
-                showError("Please upload a valid image file (PNG, JPG, etc.).");
-                return;
+        // --- 1. Data Generation ---
+        // We create a synthetic dataset of house sizes and prices.
+        // There is an underlying linear relationship, but we add noise.
+        let numDataPoints = 30;
+        const trueWeight = 3.5; // True slope
+        const trueBias = 500;   // True intercept
+        let noiseLevel = 3000;  // Default variance
+        
+        let houseData = [];
+        let chart; // Declare globally to avoid initialization errors
+        
+        function generateData() {
+            houseData = [];
+            // Generate random data points
+            for(let i = 0; i < numDataPoints; i++) {
+                // Size roughly between 500 and 4000 sq ft
+                const size = Math.floor(Math.random() * 3500) + 500; 
+                // Calculate true price and add dynamic noise
+                const noise = (Math.random() - 0.5) * noiseLevel; 
+                let price = (trueWeight * size) + trueBias + noise;
+                
+                // Ensure price isn't negative
+                price = Math.max(100, price); 
+                
+                houseData.push({ x: size, y: price });
             }
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                imageBase64Data = e.target.result.split(',')[1];
-                imagePreview.src = e.target.result;
-                uploadContainer.classList.add('hidden');
-                analysisContainer.classList.remove('hidden');
-                resultsContainer.classList.add('hidden');
-                scoreDisplay.classList.add('hidden');
-                errorDisplay.classList.add('hidden');
-            };
-            reader.onerror = () => showError("There was an error reading the file.");
-            reader.readAsDataURL(file);
-        }
 
-        function resetApp() {
-            uploadContainer.classList.remove('hidden');
-            analysisContainer.classList.add('hidden');
-            resultsContainer.classList.add('hidden');
-            fileInput.value = '';
-            imageBase64Data = null;
-            imagePreview.src = '#';
-        }
+            // Sort data by size (x) for cleaner potential line drawing later
+            houseData.sort((a, b) => a.x - b.x);
 
-        function showError(message) {
-            resultsContainer.classList.remove('hidden');
-            loader.classList.add('hidden');
-            scoreDisplay.classList.add('hidden');
-            errorDisplay.classList.remove('hidden');
-            errorDisplay.textContent = message;
-            console.error(message);
-        }
-
-        async function getAestheticScore(base64ImageData) {
-            resultsContainer.classList.remove('hidden');
-            loader.classList.remove('hidden');
-            scoreDisplay.classList.add('hidden');
-            errorDisplay.classList.add('hidden');
-            analyzeButton.disabled = true;
-            analyzeButton.classList.add('opacity-50', 'cursor-not-allowed');
-
-            const apiKey = "AIzaSyDTzl0bKtIIC2R0JHObTOSdNccpXTar2Gw"; // API key has been updated
-            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash-preview-05-20:generateContent?key=${apiKey}`;
-
-            const prompt = `You are a world-class UI/UX design expert. Analyze the following UI screenshot based on key design principles. Provide a score from 1 to 10 for each category and a brief, constructive justification for each score.
-            Respond ONLY with a valid JSON object in the following format:
-            {
-              "layout_composition": { "score": <number>, "justification": "<text>" },
-              "color_contrast": { "score": <number>, "justification": "<text>" },
-              "typography": { "score": <number>, "justification": "<text>" },
-              "clarity_simplicity": { "score": <number>, "justification": "<text>" }
-            }`;
-
-            const payload = {
-                contents: [{ parts: [{ text: prompt }, { inlineData: { mimeType: "image/png", data: base64ImageData } }] }],
-                generationConfig: { responseMimeType: "application/json" }
-            };
-
-            try {
-                const response = await fetch(apiUrl, {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify(payload)
+            // Populate sample data table
+            const tableBody = document.getElementById('dataTableBody');
+            if(tableBody) {
+                tableBody.innerHTML = '';
+                houseData.slice(0, 5).forEach(point => {
+                    const row = `<tr>
+                        <td class="px-4 py-2 border-b border-gray-50">${point.x}</td>
+                        <td class="px-4 py-2 border-b border-gray-50">$${Math.round(point.y).toLocaleString()}</td>
+                    </tr>`;
+                    tableBody.innerHTML += row;
                 });
-                if (!response.ok) throw new Error(`API request failed: ${response.statusText}`);
-                const result = await response.json();
-                if (result.candidates?.[0]?.content?.parts?.[0]) {
-                    const parsedJson = JSON.parse(result.candidates[0].content.parts[0].text);
-                    displayResults(parsedJson);
-                } else {
-                    throw new Error("Invalid response structure from API.");
-                }
-            } catch (error) {
-                console.error("Error during API call:", error);
-                showError("Sorry, the advanced analysis failed. Please try again.");
-            } finally {
-                loader.classList.add('hidden');
-                analyzeButton.disabled = false;
-                analyzeButton.classList.remove('opacity-50', 'cursor-not-allowed');
+            }
+
+            // If chart is already initialized, update it directly
+            if (chart && chart.data) {
+                chart.data.datasets[0].data = houseData;
+                chart.data.datasets[1].data = getLinePoints(modelWeight, modelBias);
+                chart.update();
+                updateUI(); // Recalculate MSE against new data
             }
         }
 
-        function displayResults(data) {
-            const categories = {
-                layout_composition: "Layout & Composition",
-                color_contrast: "Color & Contrast",
-                typography: "Typography",
-                clarity_simplicity: "Clarity & Simplicity"
-            };
+        // Run initially to populate the page
+        generateData();
 
-            let totalScore = 0;
-            let numCategories = 0;
-            detailedScores.innerHTML = '';
-            justification.innerHTML = '';
+        // --- 2. Model State ---
+        // These are the parameters we are trying to learn/adjust
+        let modelWeight = 1.0; 
+        let modelBias = 100.0;
+        
+        let lossHistory = [];
+        let iterationHistory = [];
+        let currentIteration = 0;
+        
+        // --- 3. DOM Elements ---
+        const weightSlider = document.getElementById('weightSlider');
+        const biasSlider = document.getElementById('biasSlider');
+        const weightValueDisplay = document.getElementById('weightValue');
+        const biasValueDisplay = document.getElementById('biasValue');
+        const mseDisplay = document.getElementById('mseValue');
+        const predictInput = document.getElementById('predictSize');
+        const predictionResult = document.getElementById('predictionResult');
+        const trainBtn = document.getElementById('trainBtn');
+        const resetBtn = document.getElementById('resetBtn');
+        const trainingStatus = document.getElementById('trainingStatus');
 
-            for (const key in data) {
-                if (data.hasOwnProperty(key) && categories[key]) {
-                    const item = data[key];
-                    totalScore += item.score;
-                    numCategories++;
-                    
-                    // Create detailed score progress bar
-                    const scorePercentage = (item.score / 10) * 100;
-                    const detailElement = document.createElement('div');
-                    detailElement.innerHTML = `
-                        <div class="flex justify-between items-center mb-1">
-                            <span class="font-semibold text-slate-700">${categories[key]}</span>
-                            <span class="font-bold text-slate-800">${item.score}/10</span>
-                        </div>
-                        <div class="progress-bar">
-                            <div class="progress-bar-inner" style="width: 0%;"></div>
-                        </div>
-                    `;
-                    detailedScores.appendChild(detailElement);
-                     // Animate progress bar after appending
-                    setTimeout(() => {
-                        detailElement.querySelector('.progress-bar-inner').style.width = `${scorePercentage}%`;
-                    }, 10);
+        // Graph & Data Controls DOM Elements
+        const dataCountSlider = document.getElementById('dataCountSlider');
+        const dataCountValue = document.getElementById('dataCountValue');
+        const noiseSlider = document.getElementById('noiseSlider');
+        const noiseValue = document.getElementById('noiseValue');
+        const regenerateDataBtn = document.getElementById('regenerateDataBtn');
 
+        // --- 4. Chart Setup ---
+        const ctx = document.getElementById('regressionChart').getContext('2d');
+        
+        // Function to calculate points for our regression line based on current min/max X
+        function getLinePoints(weight, bias) {
+            const minX = Math.min(...houseData.map(d => d.x));
+            const maxX = Math.max(...houseData.map(d => d.x));
+            // Extend line slightly beyond min/max points
+            const startX = Math.max(0, minX - 500); 
+            const endX = maxX + 500;
+            return [
+                { x: startX, y: (weight * startX) + bias },
+                { x: endX, y: (weight * endX) + bias }
+            ];
+        }
 
-                    // Create justification section
-                    const justificationElement = document.createElement('div');
-                    justificationElement.innerHTML = `
-                        <h3 class="font-bold text-lg text-slate-800">${categories[key]}</h3>
-                        <p class="text-slate-600">${item.justification}</p>
-                    `;
-                    justification.appendChild(justificationElement);
+        chart = new Chart(ctx, {
+            type: 'scatter',
+            data: {
+                datasets: [
+                    {
+                        label: 'Actual House Data',
+                        data: houseData,
+                        backgroundColor: 'rgba(59, 130, 246, 0.6)', // Tailwind blue-500
+                        borderColor: 'rgba(37, 99, 235, 1)',   // Tailwind blue-600
+                        pointRadius: 5,
+                        pointHoverRadius: 8
+                    },
+                    {
+                        label: 'Regression Line (Prediction)',
+                        data: getLinePoints(modelWeight, modelBias),
+                        type: 'line',
+                        borderColor: 'rgba(239, 68, 68, 1)', // Tailwind red-500
+                        borderWidth: 3,
+                        borderDash: [5, 5],
+                        fill: false,
+                        pointRadius: 0, // Hide points on the line
+                        tension: 0 // Straight line
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: {
+                    duration: 0 // Disable animation for smoother manual slider updates
+                },
+                scales: {
+                    x: {
+                        title: { display: true, text: 'House Size (sq ft)', font: {weight: 'bold'} }
+                    },
+                    y: {
+                        title: { display: true, text: 'Price ($)', font: {weight: 'bold'} },
+                        ticks: {
+                            callback: function(value, index, values) {
+                                return '$' + value.toLocaleString();
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                if(context.datasetIndex === 0) {
+                                    return `Size: ${context.parsed.x} sqft, Price: $${Math.round(context.parsed.y).toLocaleString()}`;
+                                }
+                                return null;
+                            }
+                        }
+                    }
                 }
+            }
+        });
+
+        const lossCtx = document.getElementById('lossChart').getContext('2d');
+        const lossChart = new Chart(lossCtx, {
+            type: 'line',
+            data: {
+                labels: iterationHistory,
+                datasets: [{
+                    label: 'Mean Squared Error (MSE)',
+                    data: lossHistory,
+                    borderColor: 'rgba(16, 185, 129, 1)', // Tailwind emerald-500
+                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
+                    borderWidth: 2,
+                    fill: true,
+                    pointRadius: 0, // Hide points for a smooth curve
+                    tension: 0.2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: {
+                    duration: 0 // Disable for fast real-time updates
+                },
+                scales: {
+                    x: {
+                        title: { display: true, text: 'Training Iterations (Time)', font: {size: 11} },
+                        ticks: { display: false }, // Hide x-axis numbers for cleaner look during rapid training
+                        grid: { display: false }
+                    },
+                    y: {
+                        title: { display: true, text: 'Error (MSE)', font: {size: 11} },
+                        beginAtZero: true,
+                        ticks: {
+                            callback: function(value) {
+                                return value > 1000000 ? (value / 1000000).toFixed(1) + 'M' : value;
+                            }
+                        }
+                    }
+                },
+                plugins: {
+                    legend: { display: false },
+                    tooltip: { enabled: false } // Disable tooltips for performance during animation
+                }
+            }
+        });
+
+        // --- 5. Math Functions ---
+        
+        // Predict a single value
+        function predict(x, weight, bias) {
+            return (weight * x) + bias;
+        }
+
+        // Calculate Mean Squared Error (Loss function)
+        // This tells us how wrong our current model is.
+        function calculateMSE(weight, bias) {
+            let sumError = 0;
+            for (let i = 0; i < numDataPoints; i++) {
+                const actualY = houseData[i].y;
+                const predictedY = predict(houseData[i].x, weight, bias);
+                const error = actualY - predictedY;
+                sumError += (error * error); // Square the error to penalize large mistakes and make it positive
+            }
+            return sumError / numDataPoints;
+        }
+
+        // --- 6. UI Update Functions ---
+        
+        function updateUI() {
+            // 1. Update text displays
+            weightValueDisplay.textContent = parseFloat(modelWeight).toFixed(2);
+            biasValueDisplay.textContent = parseFloat(modelBias).toFixed(0);
+            
+            // Ensure sliders match internal state (important during training)
+            weightSlider.value = modelWeight;
+            biasSlider.value = modelBias;
+
+            // 2. Calculate and display new Error (MSE)
+            const currentLoss = calculateMSE(modelWeight, modelBias);
+            // Format large numbers for readability
+            mseDisplay.textContent = currentLoss > 1000000 
+                ? (currentLoss / 1000000).toFixed(2) + 'M' 
+                : currentLoss.toFixed(0);
+
+            // Change color based on error (rudimentary visual feedback)
+            if (currentLoss < 1000000) {
+                mseDisplay.className = "font-mono font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded transition-colors";
+            } else {
+                mseDisplay.className = "font-mono font-bold text-red-500 bg-red-50 px-2 py-1 rounded transition-colors";
+            }
+
+            // 3. Update Chart Line
+            chart.data.datasets[1].data = getLinePoints(modelWeight, modelBias);
+            chart.update();
+
+            // 4. Update Prediction Output
+            updatePredictionOutput();
+        }
+
+        function updatePredictionOutput() {
+            const inputSize = parseFloat(predictInput.value);
+            if (!isNaN(inputSize)) {
+                const estPrice = predict(inputSize, modelWeight, modelBias);
+                // Prevent negative price display just in case
+                const displayPrice = Math.max(0, estPrice);
+                predictionResult.textContent = '$' + displayPrice.toLocaleString(undefined, { maximumFractionDigits: 0 });
+            } else {
+                predictionResult.textContent = 'Invalid Input';
+            }
+        }
+
+        // --- 7. Event Listeners ---
+        
+        // Manual interactions
+        weightSlider.addEventListener('input', (e) => {
+            modelWeight = parseFloat(e.target.value);
+            updateUI();
+        });
+
+        biasSlider.addEventListener('input', (e) => {
+            modelBias = parseFloat(e.target.value);
+            updateUI();
+        });
+
+        predictInput.addEventListener('input', updatePredictionOutput);
+
+        // Graph & Data Tweaking Listeners
+        dataCountSlider.addEventListener('input', (e) => {
+            numDataPoints = parseInt(e.target.value);
+            dataCountValue.textContent = numDataPoints;
+        });
+
+        noiseSlider.addEventListener('input', (e) => {
+            noiseLevel = parseInt(e.target.value);
+            
+            // Provide human-readable labels for the variance
+            let label = "Medium";
+            if (noiseLevel === 0) label = "Zero (Perfect Line)";
+            else if (noiseLevel <= 1000) label = "Low";
+            else if (noiseLevel > 6000) label = "Very High";
+            else if (noiseLevel > 4000) label = "High";
+            
+            noiseValue.textContent = label;
+        });
+
+        regenerateDataBtn.addEventListener('click', () => {
+            generateData();
+            // Automatically click the reset button to reset the trained model 
+            // since the underlying dataset has completely changed
+            resetBtn.click(); 
+        });
+
+        // Reset
+        resetBtn.addEventListener('click', () => {
+            modelWeight = 1.0;
+            modelBias = 100.0;
+            
+            lossHistory.length = 0;
+            iterationHistory.length = 0;
+            currentIteration = 0;
+            lossChart.update();
+            
+            trainingStatus.textContent = "Model reset.";
+            updateUI();
+        });
+
+        // --- 8. Gradient Descent (Training algorithm) ---
+        let trainingInterval = null;
+        let isTraining = false;
+
+        function trainStep() {
+            // Learning rates determine how big a step we take.
+            // Often need different rates for weight and bias because their scales differ drastically
+            // (Size is 1000s, bias is 100s). We normalize slightly for simplicity here, 
+            // but standardizing data is the real ML way.
+            const learningRateWeight = 0.0000001; // Very small because X (size) is large
+            const learningRateBias = 0.1;
+
+            let gradientWeight = 0;
+            let gradientBias = 0;
+
+            // Calculate gradients based on current error
+            for (let i = 0; i < numDataPoints; i++) {
+                const x = houseData[i].x;
+                const actualY = houseData[i].y;
+                const predictedY = predict(x, modelWeight, modelBias);
+                
+                // Partial derivative with respect to bias: -2 * (actual - predicted)
+                // Partial derivative with respect to weight: -2 * x * (actual - predicted)
+                // We drop the -2 constant as it gets absorbed into the learning rate
+                const error = predictedY - actualY; 
+                
+                gradientBias += error;
+                gradientWeight += error * x;
+            }
+
+            // Average the gradients
+            gradientBias /= numDataPoints;
+            gradientWeight /= numDataPoints;
+
+            // Update parameters: Move in the opposite direction of the gradient
+            modelBias -= (learningRateBias * gradientBias);
+            modelWeight -= (learningRateWeight * gradientWeight);
+            
+            // Constrain updates roughly within slider bounds to prevent wild UI behavior
+            modelWeight = Math.max(-5, Math.min(10, modelWeight));
+            modelBias = Math.max(-1000, Math.min(2000, modelBias));
+
+            currentIteration++;
+            const currentLoss = calculateMSE(modelWeight, modelBias);
+            
+            // Add new data points
+            iterationHistory.push(currentIteration);
+            lossHistory.push(currentLoss);
+            
+            // Keep graph from getting too crowded (max 200 points for performance)
+            if (iterationHistory.length > 200) {
+                iterationHistory.shift();
+                lossHistory.shift();
             }
             
-            if (numCategories > 0) {
-                const averageScore = (totalScore / numCategories).toFixed(1);
-                scoreDisplay.classList.remove('hidden');
-                overallScoreValue.textContent = averageScore;
-                
-                const overallPercentage = (averageScore / 10) * 100;
-                requestAnimationFrame(() => {
-                    scoreCircle.style.setProperty('--score-percent', `${overallPercentage}%`);
-                });
-            } else {
-                showError("The analysis result was incomplete. Please try again.");
-            }
+            lossChart.update();
+
+            updateUI();
         }
+
+        trainBtn.addEventListener('click', () => {
+            if (isTraining) {
+                // Stop training
+                clearInterval(trainingInterval);
+                isTraining = false;
+                trainBtn.innerHTML = `<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Auto Train`;
+                trainBtn.classList.remove('bg-red-600', 'hover:bg-red-700');
+                trainBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+                trainingStatus.textContent = "Training paused.";
+            } else {
+                // Start training
+                isTraining = true;
+                trainBtn.innerHTML = `<svg class="w-5 h-5 mr-2 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg> Stop Training`;
+                trainBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                trainBtn.classList.add('bg-red-600', 'hover:bg-red-700');
+                trainingStatus.textContent = "Finding the best line (Gradient Descent)...";
+                
+                // Run training steps quickly to animate
+                trainingInterval = setInterval(() => {
+                    trainStep();
+                }, 50); // 50ms per step
+            }
+        });
+
+        // --- 9. UI Tab Management ---
+        function switchTab(tabId) {
+            // 1. Hide all tab contents
+            document.querySelectorAll('.tab-content').forEach(el => {
+                el.classList.remove('block');
+                el.classList.add('hidden');
+            });
+            
+            // 2. Reset all tab buttons to default inactive state
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('border-blue-500', 'text-blue-600', 'font-bold');
+                el.classList.add('border-transparent', 'text-slate-500', 'font-medium');
+            });
+
+            // 3. Show the selected tab content
+            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
+            document.getElementById(`tab-${tabId}`).classList.add('block');
+            
+            // 4. Highlight the active tab button
+            const activeBtn = document.getElementById(`tab-btn-${tabId}`);
+            activeBtn.classList.remove('border-transparent', 'text-slate-500', 'font-medium');
+            activeBtn.classList.add('border-blue-500', 'text-blue-600', 'font-bold');
+
+            // 5. CRITICAL FIX: Chart.js sometimes fails to render canvas dimensions properly 
+            // when its parent container goes from display:none -> block.
+            // We force a resize/update when the tab becomes visible.
+            if (chart) chart.resize();
+            if (lossChart) lossChart.resize();
+        }
+
+        // Initial setup on load
+        updateUI();
+
     </script>
 </body>
 </html>
