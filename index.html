@@ -6,9 +6,17 @@
     <title>K-Means Clustering Workbench</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .animate-fade-in { animation: fadeIn 0.3s ease-in-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+    </style>
 </head>
 <body class="bg-slate-50 min-h-screen p-4 sm:p-8 font-sans text-slate-800">
     <div class="max-w-7xl mx-auto">
+        
         <header class="mb-4 text-center sm:text-left">
             <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mb-2">K-Means Clustering <span class="text-purple-600">Workbench</span></h1>
             <p class="text-slate-600 text-lg">Customer segmentation using machine learning.</p>
@@ -90,7 +98,7 @@
                             <h2 class="text-xl font-bold text-slate-800">Customer Segmentation Map</h2>
                             <span class="text-xs font-medium bg-purple-50 text-purple-700 px-3 py-1 rounded-full border border-purple-100">Income vs Spending</span>
                         </div>
-                        <p class="text-xs text-slate-500 mb-4 px-1">Large stars (<span class="text-xl leading-none">★</span>) represent cluster centroids. Points are colored by their assigned segment.</p>
+                        <p class="text-xs text-slate-500 mb-4 px-1">Large yellow stars (<span class="text-xl leading-none text-yellow-500">★</span>) represent cluster centroids. Points are colored by their assigned segment.</p>
                         <div class="flex-1 relative w-full h-full">
                             <canvas id="clusterChart"></canvas>
                         </div>
@@ -217,14 +225,6 @@
         </main>
     </div>
 
-    <style>
-        .animate-fade-in { animation: fadeIn 0.3s ease-in-out; }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(5px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-    </style>
-
     <script>
         // --- 1. Colors & Constants ---
         // Distinct colors for different clusters (up to 10)
@@ -325,11 +325,15 @@
 
         function initializeCentroids() {
             centroids = [];
-            // Randomly select K data points as initial centroids (Forgy method)
-            const shuffled = [...customers].sort(() => 0.5 - Math.random());
-            for(let i=0; i<k; i++) {
-                if (shuffled[i]) {
-                    centroids.push({ x: shuffled[i].x, y: shuffled[i].y });
+            
+            // Randomly select K unique data points as initial centroids 
+            // (Using Set ensures we never accidentally pick the exact same index twice)
+            const usedIndices = new Set();
+            while (centroids.length < k && centroids.length < customers.length) {
+                const idx = Math.floor(Math.random() * customers.length);
+                if (!usedIndices.has(idx)) {
+                    usedIndices.add(idx);
+                    centroids.push({ x: customers[idx].x, y: customers[idx].y });
                 }
             }
             
@@ -407,22 +411,26 @@
                             // Dynamic coloring based on cluster assignment
                             backgroundColor: (context) => {
                                 const pt = context.raw;
-                                if (!pt || pt.cluster === -1) return unassignedColor;
+                                if (!pt || pt.cluster === -1 || pt.cluster === undefined) return unassignedColor;
                                 return clusterColors[pt.cluster % clusterColors.length];
                             },
                             borderColor: 'transparent',
                             pointRadius: 6,
-                            pointHoverRadius: 8
+                            pointHoverRadius: 8,
+                            order: 1 // DRAW CUSTOMERS UNDERNEATH CENTROIDS
                         },
                         {
                             label: 'Centroids',
                             data: centroids,
-                            backgroundColor: 'rgba(30, 41, 59, 1)', // Slate-800
-                            borderColor: 'rgba(255, 255, 255, 0.8)',
-                            borderWidth: 2,
+                            backgroundColor: '#FFEA00', // Highly visible Bright Yellow Fill
+                            borderColor: '#1E293B',     // Dark outline to contrast against light points
+                            borderWidth: 3,
                             pointStyle: 'star',
-                            pointRadius: 15,
-                            pointHoverRadius: 20
+                            radius: 16,                 // Specify radius directly
+                            pointRadius: 16,
+                            hoverRadius: 22,
+                            pointHoverRadius: 22,
+                            order: 0 // DRAW CENTROIDS ON TOP
                         }
                     ]
                 },
@@ -484,13 +492,14 @@
         }
 
         function updateCharts() {
-            // Update pointers
-            mainChart.data.datasets[0].data = customers;
-            mainChart.data.datasets[1].data = centroids;
+            // MAP the arrays into completely new objects! 
+            // This forces Chart.js to completely bypass its parsing cache and accurately redraw the updated centroid positions and point colors every frame.
+            mainChart.data.datasets[0].data = customers.map(c => ({...c}));
+            mainChart.data.datasets[1].data = centroids.map(c => ({...c}));
             mainChart.update();
 
-            lossChart.data.labels = iterationHistory;
-            lossChart.data.datasets[0].data = lossHistory;
+            lossChart.data.labels = [...iterationHistory];
+            lossChart.data.datasets[0].data = [...lossHistory];
             lossChart.update();
         }
 
