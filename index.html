@@ -3,96 +3,96 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Linear Regression Workbench</title>
+    <title>K-Means Clustering Workbench</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
-<body class="bg-slate-50 min-h-screen p-4 sm:p-8 font-sans">
+<body class="bg-slate-50 min-h-screen p-4 sm:p-8 font-sans text-slate-800">
     <div class="max-w-7xl mx-auto">
         <header class="mb-4 text-center sm:text-left">
-            <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mb-2">Linear Regression <span class="text-blue-600">Workbench</span></h1>
-            <p class="text-slate-600 text-lg">Interactive exploration of predicting house prices based on size.</p>
+            <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mb-2">K-Means Clustering <span class="text-purple-600">Workbench</span></h1>
+            <p class="text-slate-600 text-lg">Customer segmentation using machine learning.</p>
         </header>
 
         <!-- Smart Navigation Tabs -->
         <div class="border-b border-gray-200 mb-6">
             <nav class="-mb-px flex space-x-6 sm:space-x-8 overflow-x-auto" aria-label="Tabs">
-                <button onclick="switchTab('training')" id="tab-btn-training" class="tab-btn border-blue-500 text-blue-600 whitespace-nowrap py-4 px-1 border-b-2 font-bold text-sm sm:text-base flex items-center transition-colors">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4"></path></svg>
-                    1. Training Workspace
+                <button onclick="switchTab('workspace')" id="tab-btn-workspace" class="tab-btn border-purple-500 text-purple-600 whitespace-nowrap py-4 px-1 border-b-2 font-bold text-sm sm:text-base flex items-center transition-colors">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5"></path></svg>
+                    1. Segmentation Workspace
                 </button>
                 <button onclick="switchTab('data')" id="tab-btn-data" class="tab-btn border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm sm:text-base flex items-center transition-colors">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 12l3-3 3 3 4-4M8 21l4-4 4 4M3 4h18M4 4h16v12a1 1 0 01-1 1H5a1 1 0 01-1-1V4z"></path></svg>
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
                     2. Data & Metrics
                 </button>
-                <button onclick="switchTab('prediction')" id="tab-btn-prediction" class="tab-btn border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm sm:text-base flex items-center transition-colors">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+                <button onclick="switchTab('application')" id="tab-btn-application" class="tab-btn border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm sm:text-base flex items-center transition-colors">
+                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
                     3. Application & Concept
                 </button>
             </nav>
         </div>
 
         <main class="min-h-[500px]">
-            
-            <!-- TAB 1: TRAINING WORKSPACE -->
-            <div id="tab-training" class="tab-content grid grid-cols-1 lg:grid-cols-12 gap-8 block animate-fade-in">
+            <!-- TAB 1: WORKSPACE -->
+            <div id="tab-workspace" class="tab-content grid grid-cols-1 lg:grid-cols-12 gap-8 block animate-fade-in">
                 
                 <div class="lg:col-span-4 space-y-6">
-                    <!-- Model Parameters Control Panel -->
-                    <section class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 h-full">
+                    <!-- Algorithm Parameters Control Panel -->
+                    <section class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 h-full flex flex-col">
                         <h2 class="text-xl font-bold text-slate-800 mb-4 flex items-center">
-                            Model Parameters
+                            Algorithm Settings
                         </h2>
                         
-                        <!-- Weight Slider -->
+                        <!-- K Slider -->
                         <div class="mb-6">
                             <div class="flex justify-between mb-2">
-                                <label for="weightSlider" class="text-sm font-medium text-slate-700">Weight (Slope)</label>
-                                <span id="weightValue" class="text-sm font-bold text-blue-600">1.0</span>
+                                <label for="kSlider" class="text-sm font-medium text-slate-700">Number of Clusters (K)</label>
+                                <span id="kValue" class="text-lg font-black text-purple-600 bg-purple-50 px-2 rounded">3</span>
                             </div>
-                            <input type="range" id="weightSlider" min="-5" max="10" step="0.1" value="1.0" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
-                            <p class="text-xs text-slate-500 mt-1">How much price increases per sq ft.</p>
+                            <input type="range" id="kSlider" min="1" max="7" step="1" value="3" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-purple-600">
+                            <p class="text-xs text-slate-500 mt-2 leading-relaxed">How many distinct customer segments the algorithm should try to find.</p>
                         </div>
 
-                        <!-- Bias Slider -->
-                        <div class="mb-6">
-                            <div class="flex justify-between mb-2">
-                                <label for="biasSlider" class="text-sm font-medium text-slate-700">Bias (Intercept)</label>
-                                <span id="biasValue" class="text-sm font-bold text-blue-600">100</span>
+                        <!-- Current State Info -->
+                        <div class="bg-slate-50 p-4 rounded-lg border border-slate-100 mb-6">
+                            <div class="flex justify-between items-center mb-2">
+                                <span class="text-sm font-medium text-slate-600">Current Iteration:</span>
+                                <span id="iterationValue" class="font-mono font-bold text-slate-800">0</span>
                             </div>
-                            <input type="range" id="biasSlider" min="-500" max="1000" step="10" value="100" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
-                            <p class="text-xs text-slate-500 mt-1">Base price before size is considered.</p>
+                            <div class="flex justify-between items-center">
+                                <span class="text-sm font-medium text-slate-600" title="Within-Cluster Sum of Squares">Inertia (Error):</span>
+                                <span id="inertiaValue" class="font-mono font-bold text-orange-600">---</span>
+                            </div>
                         </div>
 
-                        <!-- Training Controls & Metrics -->
-                        <div class="mt-6 pt-6 border-t border-gray-100">
-                            <div class="flex justify-between items-center mb-4">
-                                <span class="text-sm font-medium text-slate-700">Current Error (MSE):</span>
-                                <span id="mseValue" class="font-mono font-bold text-red-500 bg-red-50 px-2 py-1 rounded">0.00</span>
-                            </div>
-                            
-                            <div class="flex space-x-3">
-                                <button id="trainBtn" class="flex-1 bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-4 rounded-lg shadow-sm transition-all flex justify-center items-center">
-                                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                    Auto Train
+                        <!-- Training Controls -->
+                        <div class="mt-auto pt-6 border-t border-gray-100">
+                            <div class="grid grid-cols-2 gap-3 mb-3">
+                                <button id="stepBtn" class="bg-white border-2 border-purple-600 text-purple-600 hover:bg-purple-50 font-semibold py-2 px-4 rounded-lg shadow-sm transition-all flex justify-center items-center">
+                                    Step (+1)
                                 </button>
-                                <button id="resetBtn" class="bg-gray-200 hover:bg-gray-300 text-slate-700 font-semibold py-3 px-4 rounded-lg shadow-sm transition-all">
+                                <button id="resetBtn" class="bg-gray-100 hover:bg-gray-200 text-slate-700 font-semibold py-2 px-4 rounded-lg shadow-sm transition-all">
                                     Reset
                                 </button>
                             </div>
-                            <p id="trainingStatus" class="text-xs text-center text-slate-500 mt-3 h-4"></p>
+                            <button id="trainBtn" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-4 rounded-lg shadow-sm transition-all flex justify-center items-center">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                Auto Cluster to End
+                            </button>
+                            <p id="trainingStatus" class="text-xs text-center text-slate-500 mt-3 h-4 font-medium"></p>
                         </div>
                     </section>
                 </div>
 
                 <div class="lg:col-span-8">
-                    <section class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex flex-col h-[500px]">
-                        <div class="flex justify-between items-center mb-4">
-                            <h2 class="text-xl font-bold text-slate-800">Data Visualization</h2>
-                            <span class="text-xs font-medium bg-gray-100 text-gray-600 px-2 py-1 rounded-full">Scatter Plot</span>
+                    <section class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex flex-col h-[550px]">
+                        <div class="flex justify-between items-center mb-2">
+                            <h2 class="text-xl font-bold text-slate-800">Customer Segmentation Map</h2>
+                            <span class="text-xs font-medium bg-purple-50 text-purple-700 px-3 py-1 rounded-full border border-purple-100">Income vs Spending</span>
                         </div>
+                        <p class="text-xs text-slate-500 mb-4 px-1">Large stars (<span class="text-xl leading-none">★</span>) represent cluster centroids. Points are colored by their assigned segment.</p>
                         <div class="flex-1 relative w-full h-full">
-                            <canvas id="regressionChart"></canvas>
+                            <canvas id="clusterChart"></canvas>
                         </div>
                     </section>
                 </div>
@@ -103,48 +103,43 @@
                 
                 <div class="lg:col-span-5 space-y-6">
                     <section class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                        <h2 class="text-xl font-bold text-slate-800 mb-6 flex items-center">
-                            Dataset Controls
+                        <h2 class="text-xl font-bold text-slate-800 mb-6">
+                            Dataset Generator
                         </h2>
                         
                         <!-- Data Points Slider -->
-                        <div class="mb-6">
+                        <div class="mb-5">
                             <div class="flex justify-between mb-2">
-                                <label for="dataCountSlider" class="text-sm font-medium text-slate-700">Number of Points</label>
-                                <span id="dataCountValue" class="text-sm font-bold text-purple-600">30</span>
+                                <label for="dataCountSlider" class="text-sm font-medium text-slate-700">Total Customers</label>
+                                <span id="dataCountValue" class="text-sm font-bold text-blue-600">200</span>
                             </div>
-                            <input type="range" id="dataCountSlider" min="5" max="150" step="1" value="30" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-purple-600">
+                            <input type="range" id="dataCountSlider" min="50" max="500" step="10" value="200" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                        </div>
+
+                        <!-- True Clusters Slider -->
+                        <div class="mb-5">
+                            <div class="flex justify-between mb-2">
+                                <label for="trueClusterSlider" class="text-sm font-medium text-slate-700">Hidden 'True' Groups</label>
+                                <span id="trueClusterValue" class="text-sm font-bold text-blue-600">4</span>
+                            </div>
+                            <input type="range" id="trueClusterSlider" min="1" max="6" step="1" value="4" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
+                            <p class="text-xs text-slate-500 mt-1">How many distinct blobs of data to generate behind the scenes.</p>
                         </div>
 
                         <!-- Noise/Variance Slider -->
                         <div class="mb-6">
                             <div class="flex justify-between mb-2">
-                                <label for="noiseSlider" class="text-sm font-medium text-slate-700">Data Noise (Variance)</label>
-                                <span id="noiseValue" class="text-sm font-bold text-purple-600">Medium</span>
+                                <label for="noiseSlider" class="text-sm font-medium text-slate-700">Customer Variance (Spread)</label>
+                                <span id="noiseValue" class="text-sm font-bold text-blue-600">Medium</span>
                             </div>
-                            <input type="range" id="noiseSlider" min="0" max="8000" step="500" value="3000" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-purple-600">
+                            <input type="range" id="noiseSlider" min="5" max="30" step="1" value="15" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
                         </div>
                         
                         <div class="pt-4 border-t border-gray-100">
-                            <button id="regenerateDataBtn" class="w-full bg-purple-100 hover:bg-purple-200 text-purple-700 font-semibold py-3 px-4 rounded-lg shadow-sm transition-all flex justify-center items-center">
-                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                                Regenerate New Dataset
+                            <button id="regenerateDataBtn" class="w-full bg-blue-50 hover:bg-blue-100 text-blue-700 font-semibold py-3 px-4 rounded-lg shadow-sm border border-blue-200 transition-all flex justify-center items-center">
+                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                                Generate New Customers
                             </button>
-                        </div>
-                    </section>
-
-                    <!-- Dataset view table snippet -->
-                    <section class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                        <h3 class="text-md font-bold text-slate-800 mb-4">Sample Data (First 5 rows)</h3>
-                        <div class="overflow-hidden rounded-lg border border-gray-200">
-                            <table class="min-w-full text-sm text-left text-slate-600">
-                                <thead class="text-xs text-slate-700 uppercase bg-slate-50">
-                                    <tr><th class="px-4 py-3">Size (sq ft)</th><th class="px-4 py-3">Actual Price ($)</th></tr>
-                                </thead>
-                                <tbody id="dataTableBody" class="divide-y divide-gray-200">
-                                    <!-- Data rows injected via JS -->
-                                </tbody>
-                            </table>
                         </div>
                     </section>
                 </div>
@@ -152,58 +147,70 @@
                 <div class="lg:col-span-7">
                     <section class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex flex-col h-[500px]">
                         <div class="flex justify-between items-center mb-2">
-                            <h2 class="text-xl font-bold text-slate-800 flex items-center">
-                                Training Progress (Loss Curve)
-                            </h2>
-                            <span class="text-xs font-medium bg-emerald-50 text-emerald-600 border border-emerald-200 px-2 py-1 rounded-full">MSE Tracking</span>
+                            <h2 class="text-xl font-bold text-slate-800">Convergence Curve</h2>
+                            <span class="text-xs font-medium bg-orange-50 text-orange-600 border border-orange-200 px-2 py-1 rounded-full">Inertia Tracker</span>
                         </div>
-                        <p class="text-sm text-slate-500 mb-6">Visualizes how the Mean Squared Error drops as the auto-train algorithm finds the best fit.</p>
-                        <div class="flex-1 relative w-full h-full">
+                        <p class="text-sm text-slate-500 mb-4">Inertia measures how tightly grouped the clusters are. The algorithm stops when this value stops dropping.</p>
+                        <div class="flex-1 relative w-full h-full bg-slate-50 rounded-lg p-2 border border-slate-100">
                             <canvas id="lossChart"></canvas>
                         </div>
                     </section>
                 </div>
             </div>
 
-            <!-- TAB 3: APPLICATION & CONCEPT -->
-            <div id="tab-prediction" class="tab-content max-w-4xl mx-auto space-y-8 hidden animate-fade-in">
+            <!-- TAB 3: APPLICATION -->
+            <div id="tab-application" class="tab-content max-w-4xl mx-auto space-y-8 hidden animate-fade-in">
                 
-                <!-- Educational Context Panel -->
                 <section class="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
                     <h2 class="text-2xl font-bold text-slate-800 mb-4 flex items-center">
-                        <svg class="w-8 h-8 mr-3 text-blue-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                        The Concept: Linear Regression
+                        <svg class="w-8 h-8 mr-3 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+                        The Concept: K-Means Clustering
                     </h2>
                     <p class="text-base text-slate-600 mb-6 leading-relaxed">
-                        Linear regression is a foundational machine learning algorithm. It attempts to model the relationship between variables by fitting a linear equation to observed data. In this workbench, we act as a real estate agent trying to predict <strong class="text-slate-800">House Price (Y)</strong> based solely on the <strong class="text-slate-800">House Size (X)</strong>.
+                        Unlike Linear Regression, K-Means is an <strong>Unsupervised Learning</strong> algorithm. We don't give it "answers" (like predicting a price). Instead, we give it raw data and ask it to find underlying patterns or groups. 
                     </p>
-                    <div class="bg-blue-50 text-blue-900 p-6 rounded-lg font-mono text-center border border-blue-100">
-                        <span class="text-sm text-blue-700 block mb-2">The core equation being solved:</span>
-                        <span class="font-bold text-2xl md:text-3xl">Price = (Weight × Size) + Bias</span>
+                    <div class="grid md:grid-cols-3 gap-4 mb-6">
+                        <div class="bg-slate-50 p-4 rounded-lg border border-slate-100">
+                            <h4 class="font-bold text-slate-700 mb-1">1. Initialize</h4>
+                            <p class="text-sm text-slate-600">Pick 'K' random points to be the starting center points (centroids) for our segments.</p>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-lg border border-slate-100">
+                            <h4 class="font-bold text-slate-700 mb-1">2. Assign</h4>
+                            <p class="text-sm text-slate-600">Calculate the distance from every customer to every centroid. Assign the customer to the closest one.</p>
+                        </div>
+                        <div class="bg-slate-50 p-4 rounded-lg border border-slate-100">
+                            <h4 class="font-bold text-slate-700 mb-1">3. Update</h4>
+                            <p class="text-sm text-slate-600">Move the centroid to the exact average (mean) location of all the customers assigned to it. Repeat!</p>
+                        </div>
                     </div>
                 </section>
 
-                <!-- Prediction Tool Panel -->
-                <section class="bg-gradient-to-br from-indigo-50 to-blue-50 rounded-xl shadow-lg border border-indigo-100 p-8">
-                    <h2 class="text-2xl font-bold text-indigo-900 mb-6 flex items-center">
-                        <svg class="w-8 h-8 mr-3 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
-                        Predict a House Price
+                <section class="bg-gradient-to-br from-fuchsia-50 to-purple-50 rounded-xl shadow-lg border border-fuchsia-100 p-8">
+                    <h2 class="text-2xl font-bold text-purple-900 mb-6 flex items-center">
+                        Segment a New Customer
                     </h2>
-                    <p class="text-indigo-700 mb-6">Enter a custom house size below. This tool uses the current <strong>Weight</strong> and <strong>Bias</strong> from your trained model in the Workspace tab to generate an estimate.</p>
+                    <p class="text-purple-700 mb-6">Enter details for a new customer. Based on your <strong>currently trained models</strong> in the workspace, we will assign them to the appropriate segment.</p>
                     
-                    <div class="bg-white p-6 rounded-xl shadow-inner border border-indigo-100/50 flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-8">
-                        <div class="w-full md:w-1/2">
-                            <label for="predictSize" class="block text-sm font-bold text-indigo-800 mb-2 uppercase tracking-wider">House Size (sq ft)</label>
-                            <input type="number" id="predictSize" value="2000" class="w-full px-5 py-4 text-xl border-2 border-indigo-200 rounded-xl focus:ring-4 focus:ring-indigo-500/20 focus:border-indigo-500 outline-none transition-all">
+                    <div class="bg-white p-6 rounded-xl shadow-inner border border-purple-100/50 flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6">
+                        <div class="w-full md:w-1/3">
+                            <label for="predictIncome" class="block text-xs font-bold text-purple-800 mb-2 uppercase tracking-wider">Annual Income ($k)</label>
+                            <input type="number" id="predictIncome" value="60" min="15" max="150" class="w-full px-4 py-3 text-lg border-2 border-purple-200 rounded-xl focus:ring-4 focus:ring-purple-500/20 outline-none transition-all">
                         </div>
-                        <div class="hidden md:block text-indigo-300">
-                            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                        <div class="w-full md:w-1/3">
+                            <label for="predictScore" class="block text-xs font-bold text-purple-800 mb-2 uppercase tracking-wider">Spending Score (1-100)</label>
+                            <input type="number" id="predictScore" value="50" min="1" max="100" class="w-full px-4 py-3 text-lg border-2 border-purple-200 rounded-xl focus:ring-4 focus:ring-purple-500/20 outline-none transition-all">
                         </div>
-                        <div class="w-full md:w-1/2 bg-indigo-600 rounded-xl p-6 text-center text-white transform transition-transform hover:scale-105">
-                            <p class="text-sm text-indigo-200 mb-1 uppercase tracking-wider font-bold">Estimated Market Value</p>
-                            <p id="predictionResult" class="text-4xl md:text-5xl font-black font-mono tracking-tight">$0</p>
+                        
+                        <div class="hidden md:flex items-center text-purple-300 px-2">
+                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                        </div>
+
+                        <div class="w-full md:w-1/3 bg-purple-600 rounded-xl p-5 text-center text-white">
+                            <p class="text-xs text-purple-200 mb-1 uppercase tracking-wider font-bold">Assigned Profile</p>
+                            <p id="predictionResult" class="text-2xl font-black tracking-tight">Segment ?</p>
                         </div>
                     </div>
+                    <p id="predictError" class="text-sm text-red-500 mt-4 text-center hidden font-medium">Please train the model first by clicking "Auto Cluster" in the Workspace tab.</p>
                 </section>
             </div>
 
@@ -211,10 +218,7 @@
     </div>
 
     <style>
-        /* Add a quick fade-in animation for smooth tab switching */
-        .animate-fade-in {
-            animation: fadeIn 0.3s ease-in-out;
-        }
+        .animate-fade-in { animation: fadeIn 0.3s ease-in-out; }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(5px); }
             to { opacity: 1; transform: translateY(0); }
@@ -222,445 +226,449 @@
     </style>
 
     <script>
-        // --- 1. Data Generation ---
-        // We create a synthetic dataset of house sizes and prices.
-        // There is an underlying linear relationship, but we add noise.
-        let numDataPoints = 30;
-        const trueWeight = 3.5; // True slope
-        const trueBias = 500;   // True intercept
-        let noiseLevel = 3000;  // Default variance
-        
-        let houseData = [];
-        let chart; // Declare globally to avoid initialization errors
-        
-        function generateData() {
-            houseData = [];
-            // Generate random data points
-            for(let i = 0; i < numDataPoints; i++) {
-                // Size roughly between 500 and 4000 sq ft
-                const size = Math.floor(Math.random() * 3500) + 500; 
-                // Calculate true price and add dynamic noise
-                const noise = (Math.random() - 0.5) * noiseLevel; 
-                let price = (trueWeight * size) + trueBias + noise;
-                
-                // Ensure price isn't negative
-                price = Math.max(100, price); 
-                
-                houseData.push({ x: size, y: price });
-            }
+        // --- 1. Colors & Constants ---
+        // Distinct colors for different clusters (up to 10)
+        const clusterColors = [
+            'rgba(239, 68, 68, 0.7)',   // Red
+            'rgba(59, 130, 246, 0.7)',  // Blue
+            'rgba(16, 185, 129, 0.7)',  // Emerald
+            'rgba(245, 158, 11, 0.7)',  // Amber
+            'rgba(139, 92, 246, 0.7)',  // Violet
+            'rgba(236, 72, 153, 0.7)',  // Pink
+            'rgba(20, 184, 166, 0.7)',  // Teal
+            'rgba(99, 102, 241, 0.7)',  // Indigo
+            'rgba(168, 162, 158, 0.7)'  // Stone
+        ];
+        const unassignedColor = 'rgba(203, 213, 225, 0.8)'; // Slate-300
 
-            // Sort data by size (x) for cleaner potential line drawing later
-            houseData.sort((a, b) => a.x - b.x);
-
-            // Populate sample data table
-            const tableBody = document.getElementById('dataTableBody');
-            if(tableBody) {
-                tableBody.innerHTML = '';
-                houseData.slice(0, 5).forEach(point => {
-                    const row = `<tr>
-                        <td class="px-4 py-2 border-b border-gray-50">${point.x}</td>
-                        <td class="px-4 py-2 border-b border-gray-50">$${Math.round(point.y).toLocaleString()}</td>
-                    </tr>`;
-                    tableBody.innerHTML += row;
-                });
-            }
-
-            // If chart is already initialized, update it directly
-            if (chart && chart.data) {
-                chart.data.datasets[0].data = houseData;
-                chart.data.datasets[1].data = getLinePoints(modelWeight, modelBias);
-                chart.update();
-                updateUI(); // Recalculate MSE against new data
-            }
-        }
-
-        // Run initially to populate the page
-        generateData();
-
-        // --- 2. Model State ---
-        // These are the parameters we are trying to learn/adjust
-        let modelWeight = 1.0; 
-        let modelBias = 100.0;
+        // --- 2. State Variables ---
+        let customers = []; // {x: income, y: score, cluster: index}
+        let centroids = []; // {x, y}
+        let k = 3;
+        let iteration = 0;
+        let isModelTrained = false;
         
         let lossHistory = [];
         let iterationHistory = [];
-        let currentIteration = 0;
         
+        // Data generation settings
+        let numDataPoints = 200;
+        let numTrueClusters = 4;
+        let dataSpread = 15;
+
+        // Chart instances
+        let mainChart;
+        let lossChart;
+
         // --- 3. DOM Elements ---
-        const weightSlider = document.getElementById('weightSlider');
-        const biasSlider = document.getElementById('biasSlider');
-        const weightValueDisplay = document.getElementById('weightValue');
-        const biasValueDisplay = document.getElementById('biasValue');
-        const mseDisplay = document.getElementById('mseValue');
-        const predictInput = document.getElementById('predictSize');
-        const predictionResult = document.getElementById('predictionResult');
-        const trainBtn = document.getElementById('trainBtn');
+        const kSlider = document.getElementById('kSlider');
+        const kValueDisplay = document.getElementById('kValue');
+        const stepBtn = document.getElementById('stepBtn');
         const resetBtn = document.getElementById('resetBtn');
-        const trainingStatus = document.getElementById('trainingStatus');
+        const trainBtn = document.getElementById('trainBtn');
+        const statusDisplay = document.getElementById('trainingStatus');
+        const iterationDisplay = document.getElementById('iterationValue');
+        const inertiaDisplay = document.getElementById('inertiaValue');
 
-        // Graph & Data Controls DOM Elements
         const dataCountSlider = document.getElementById('dataCountSlider');
-        const dataCountValue = document.getElementById('dataCountValue');
+        const trueClusterSlider = document.getElementById('trueClusterSlider');
         const noiseSlider = document.getElementById('noiseSlider');
-        const noiseValue = document.getElementById('noiseValue');
-        const regenerateDataBtn = document.getElementById('regenerateDataBtn');
+        const regenerateBtn = document.getElementById('regenerateDataBtn');
 
-        // --- 4. Chart Setup ---
-        const ctx = document.getElementById('regressionChart').getContext('2d');
-        
-        // Function to calculate points for our regression line based on current min/max X
-        function getLinePoints(weight, bias) {
-            const minX = Math.min(...houseData.map(d => d.x));
-            const maxX = Math.max(...houseData.map(d => d.x));
-            // Extend line slightly beyond min/max points
-            const startX = Math.max(0, minX - 500); 
-            const endX = maxX + 500;
-            return [
-                { x: startX, y: (weight * startX) + bias },
-                { x: endX, y: (weight * endX) + bias }
-            ];
+        const inputIncome = document.getElementById('predictIncome');
+        const inputScore = document.getElementById('predictScore');
+        const predictionOutput = document.getElementById('predictionResult');
+        const predictError = document.getElementById('predictError');
+
+        // --- 4. Core Logic: Data Generation ---
+        function generateData() {
+            customers = [];
+            const trueCenters = [];
+            
+            // 1. Create hidden "true" centers for the blobs
+            for(let i = 0; i < numTrueClusters; i++) {
+                trueCenters.push({
+                    x: Math.floor(Math.random() * 100) + 30, // Income 30-130k
+                    y: Math.floor(Math.random() * 80) + 10   // Score 10-90
+                });
+            }
+
+            // 2. Generate points around those centers using normal-ish distribution
+            for(let i = 0; i < numDataPoints; i++) {
+                const targetCenter = trueCenters[i % numTrueClusters];
+                
+                // Box-Muller transform for rough Gaussian distribution
+                const u1 = Math.random();
+                const u2 = Math.random();
+                const z0 = Math.sqrt(-2.0 * Math.log(u1)) * Math.cos(2.0 * Math.PI * u2);
+                const z1 = Math.sqrt(-2.0 * Math.log(u1)) * Math.sin(2.0 * Math.PI * u2);
+
+                let x = Math.round(targetCenter.x + z0 * dataSpread);
+                let y = Math.round(targetCenter.y + z1 * dataSpread);
+
+                // Bound values to realistic ranges
+                x = Math.max(15, Math.min(150, x));
+                y = Math.max(1, Math.min(100, y));
+
+                customers.push({ x: x, y: y, cluster: -1 }); // -1 means unassigned
+            }
+
+            resetAlgorithm();
         }
 
-        chart = new Chart(ctx, {
-            type: 'scatter',
-            data: {
-                datasets: [
-                    {
-                        label: 'Actual House Data',
-                        data: houseData,
-                        backgroundColor: 'rgba(59, 130, 246, 0.6)', // Tailwind blue-500
-                        borderColor: 'rgba(37, 99, 235, 1)',   // Tailwind blue-600
-                        pointRadius: 5,
-                        pointHoverRadius: 8
-                    },
-                    {
-                        label: 'Regression Line (Prediction)',
-                        data: getLinePoints(modelWeight, modelBias),
-                        type: 'line',
-                        borderColor: 'rgba(239, 68, 68, 1)', // Tailwind red-500
-                        borderWidth: 3,
-                        borderDash: [5, 5],
-                        fill: false,
-                        pointRadius: 0, // Hide points on the line
-                        tension: 0 // Straight line
+        // --- 5. Core Logic: K-Means Algorithm ---
+        
+        // Helper: Euclidean distance squared
+        function getDistSq(p1, p2) {
+            return Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2);
+        }
+
+        function initializeCentroids() {
+            centroids = [];
+            // Randomly select K data points as initial centroids (Forgy method)
+            const shuffled = [...customers].sort(() => 0.5 - Math.random());
+            for(let i=0; i<k; i++) {
+                if (shuffled[i]) {
+                    centroids.push({ x: shuffled[i].x, y: shuffled[i].y });
+                }
+            }
+            
+            // Reset all customers to unassigned
+            customers.forEach(c => c.cluster = -1);
+            iteration = 0;
+            isModelTrained = false;
+        }
+
+        function assignClusters() {
+            let changed = false;
+            customers.forEach(customer => {
+                let minDist = Infinity;
+                let closestIndex = -1;
+
+                centroids.forEach((centroid, i) => {
+                    const dist = getDistSq(customer, centroid);
+                    if (dist < minDist) {
+                        minDist = dist;
+                        closestIndex = i;
                     }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                animation: {
-                    duration: 0 // Disable animation for smoother manual slider updates
-                },
-                scales: {
-                    x: {
-                        title: { display: true, text: 'House Size (sq ft)', font: {weight: 'bold'} }
-                    },
-                    y: {
-                        title: { display: true, text: 'Price ($)', font: {weight: 'bold'} },
-                        ticks: {
-                            callback: function(value, index, values) {
-                                return '$' + value.toLocaleString();
-                            }
+                });
+
+                if (customer.cluster !== closestIndex) {
+                    customer.cluster = closestIndex;
+                    changed = true;
+                }
+            });
+            return changed; // Returns true if any point changed clusters
+        }
+
+        function updateCentroids() {
+            let moved = false;
+            centroids.forEach((centroid, i) => {
+                const assignedPoints = customers.filter(c => c.cluster === i);
+                if (assignedPoints.length === 0) return; // Edge case: empty cluster
+
+                const sumX = assignedPoints.reduce((sum, p) => sum + p.x, 0);
+                const sumY = assignedPoints.reduce((sum, p) => sum + p.y, 0);
+                
+                const newX = sumX / assignedPoints.length;
+                const newY = sumY / assignedPoints.length;
+
+                // Check if centroid moved significantly
+                if (Math.abs(centroid.x - newX) > 0.01 || Math.abs(centroid.y - newY) > 0.01) {
+                    moved = true;
+                }
+
+                centroid.x = newX;
+                centroid.y = newY;
+            });
+            return moved;
+        }
+
+        function calculateInertia() {
+            let totalInertia = 0;
+            customers.forEach(customer => {
+                if (customer.cluster !== -1 && centroids[customer.cluster]) {
+                    totalInertia += getDistSq(customer, centroids[customer.cluster]);
+                }
+            });
+            return totalInertia;
+        }
+
+        // --- 6. Chart Setup ---
+        function initCharts() {
+            const ctxMain = document.getElementById('clusterChart').getContext('2d');
+            mainChart = new Chart(ctxMain, {
+                type: 'scatter',
+                data: {
+                    datasets: [
+                        {
+                            label: 'Customers',
+                            data: customers,
+                            // Dynamic coloring based on cluster assignment
+                            backgroundColor: (context) => {
+                                const pt = context.raw;
+                                if (!pt || pt.cluster === -1) return unassignedColor;
+                                return clusterColors[pt.cluster % clusterColors.length];
+                            },
+                            borderColor: 'transparent',
+                            pointRadius: 6,
+                            pointHoverRadius: 8
+                        },
+                        {
+                            label: 'Centroids',
+                            data: centroids,
+                            backgroundColor: 'rgba(30, 41, 59, 1)', // Slate-800
+                            borderColor: 'rgba(255, 255, 255, 0.8)',
+                            borderWidth: 2,
+                            pointStyle: 'star',
+                            pointRadius: 15,
+                            pointHoverRadius: 20
                         }
-                    }
+                    ]
                 },
-                plugins: {
-                    tooltip: {
-                        callbacks: {
-                            label: function(context) {
-                                if(context.datasetIndex === 0) {
-                                    return `Size: ${context.parsed.x} sqft, Price: $${Math.round(context.parsed.y).toLocaleString()}`;
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    animation: { duration: 300, easing: 'easeOutQuart' }, // Smooth movement
+                    scales: {
+                        x: { 
+                            title: { display: true, text: 'Annual Income (k$)', font: {weight: 'bold'} },
+                            min: 0, max: 160
+                        },
+                        y: { 
+                            title: { display: true, text: 'Spending Score (1-100)', font: {weight: 'bold'} },
+                            min: 0, max: 110
+                        }
+                    },
+                    plugins: {
+                        legend: { display: false },
+                        tooltip: {
+                            callbacks: {
+                                label: (ctx) => {
+                                    if (ctx.datasetIndex === 1) return `Centroid ${ctx.dataIndex + 1}`;
+                                    let cl = ctx.raw.cluster === -1 ? 'None' : ctx.raw.cluster + 1;
+                                    return `Income: $${ctx.raw.x}k, Score: ${ctx.raw.y} | Segment: ${cl}`;
                                 }
-                                return null;
                             }
                         }
                     }
                 }
-            }
-        });
+            });
 
-        const lossCtx = document.getElementById('lossChart').getContext('2d');
-        const lossChart = new Chart(lossCtx, {
-            type: 'line',
-            data: {
-                labels: iterationHistory,
-                datasets: [{
-                    label: 'Mean Squared Error (MSE)',
-                    data: lossHistory,
-                    borderColor: 'rgba(16, 185, 129, 1)', // Tailwind emerald-500
-                    backgroundColor: 'rgba(16, 185, 129, 0.1)',
-                    borderWidth: 2,
-                    fill: true,
-                    pointRadius: 0, // Hide points for a smooth curve
-                    tension: 0.2
-                }]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                animation: {
-                    duration: 0 // Disable for fast real-time updates
+            const ctxLoss = document.getElementById('lossChart').getContext('2d');
+            lossChart = new Chart(ctxLoss, {
+                type: 'line',
+                data: {
+                    labels: iterationHistory,
+                    datasets: [{
+                        label: 'Inertia',
+                        data: lossHistory,
+                        borderColor: 'rgba(249, 115, 22, 1)', // Orange-500
+                        backgroundColor: 'rgba(249, 115, 22, 0.1)',
+                        borderWidth: 3,
+                        fill: true,
+                        tension: 0.1,
+                        pointRadius: 4
+                    }]
                 },
-                scales: {
-                    x: {
-                        title: { display: true, text: 'Training Iterations (Time)', font: {size: 11} },
-                        ticks: { display: false }, // Hide x-axis numbers for cleaner look during rapid training
-                        grid: { display: false }
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    scales: {
+                        x: { title: { display: true, text: 'Algorithm Iteration' }, ticks:{stepSize:1} },
+                        y: { title: { display: true, text: 'Inertia (Sum of Sq Dist)' }, beginAtZero: true }
                     },
-                    y: {
-                        title: { display: true, text: 'Error (MSE)', font: {size: 11} },
-                        beginAtZero: true,
-                        ticks: {
-                            callback: function(value) {
-                                return value > 1000000 ? (value / 1000000).toFixed(1) + 'M' : value;
-                            }
-                        }
-                    }
-                },
-                plugins: {
-                    legend: { display: false },
-                    tooltip: { enabled: false } // Disable tooltips for performance during animation
+                    plugins: { legend: { display: false } }
                 }
-            }
-        });
-
-        // --- 5. Math Functions ---
-        
-        // Predict a single value
-        function predict(x, weight, bias) {
-            return (weight * x) + bias;
+            });
         }
 
-        // Calculate Mean Squared Error (Loss function)
-        // This tells us how wrong our current model is.
-        function calculateMSE(weight, bias) {
-            let sumError = 0;
-            for (let i = 0; i < numDataPoints; i++) {
-                const actualY = houseData[i].y;
-                const predictedY = predict(houseData[i].x, weight, bias);
-                const error = actualY - predictedY;
-                sumError += (error * error); // Square the error to penalize large mistakes and make it positive
-            }
-            return sumError / numDataPoints;
-        }
+        function updateCharts() {
+            // Update pointers
+            mainChart.data.datasets[0].data = customers;
+            mainChart.data.datasets[1].data = centroids;
+            mainChart.update();
 
-        // --- 6. UI Update Functions ---
-        
-        function updateUI() {
-            // 1. Update text displays
-            weightValueDisplay.textContent = parseFloat(modelWeight).toFixed(2);
-            biasValueDisplay.textContent = parseFloat(modelBias).toFixed(0);
-            
-            // Ensure sliders match internal state (important during training)
-            weightSlider.value = modelWeight;
-            biasSlider.value = modelBias;
-
-            // 2. Calculate and display new Error (MSE)
-            const currentLoss = calculateMSE(modelWeight, modelBias);
-            // Format large numbers for readability
-            mseDisplay.textContent = currentLoss > 1000000 
-                ? (currentLoss / 1000000).toFixed(2) + 'M' 
-                : currentLoss.toFixed(0);
-
-            // Change color based on error (rudimentary visual feedback)
-            if (currentLoss < 1000000) {
-                mseDisplay.className = "font-mono font-bold text-emerald-600 bg-emerald-50 px-2 py-1 rounded transition-colors";
-            } else {
-                mseDisplay.className = "font-mono font-bold text-red-500 bg-red-50 px-2 py-1 rounded transition-colors";
-            }
-
-            // 3. Update Chart Line
-            chart.data.datasets[1].data = getLinePoints(modelWeight, modelBias);
-            chart.update();
-
-            // 4. Update Prediction Output
-            updatePredictionOutput();
-        }
-
-        function updatePredictionOutput() {
-            const inputSize = parseFloat(predictInput.value);
-            if (!isNaN(inputSize)) {
-                const estPrice = predict(inputSize, modelWeight, modelBias);
-                // Prevent negative price display just in case
-                const displayPrice = Math.max(0, estPrice);
-                predictionResult.textContent = '$' + displayPrice.toLocaleString(undefined, { maximumFractionDigits: 0 });
-            } else {
-                predictionResult.textContent = 'Invalid Input';
-            }
-        }
-
-        // --- 7. Event Listeners ---
-        
-        // Manual interactions
-        weightSlider.addEventListener('input', (e) => {
-            modelWeight = parseFloat(e.target.value);
-            updateUI();
-        });
-
-        biasSlider.addEventListener('input', (e) => {
-            modelBias = parseFloat(e.target.value);
-            updateUI();
-        });
-
-        predictInput.addEventListener('input', updatePredictionOutput);
-
-        // Graph & Data Tweaking Listeners
-        dataCountSlider.addEventListener('input', (e) => {
-            numDataPoints = parseInt(e.target.value);
-            dataCountValue.textContent = numDataPoints;
-        });
-
-        noiseSlider.addEventListener('input', (e) => {
-            noiseLevel = parseInt(e.target.value);
-            
-            // Provide human-readable labels for the variance
-            let label = "Medium";
-            if (noiseLevel === 0) label = "Zero (Perfect Line)";
-            else if (noiseLevel <= 1000) label = "Low";
-            else if (noiseLevel > 6000) label = "Very High";
-            else if (noiseLevel > 4000) label = "High";
-            
-            noiseValue.textContent = label;
-        });
-
-        regenerateDataBtn.addEventListener('click', () => {
-            generateData();
-            // Automatically click the reset button to reset the trained model 
-            // since the underlying dataset has completely changed
-            resetBtn.click(); 
-        });
-
-        // Reset
-        resetBtn.addEventListener('click', () => {
-            modelWeight = 1.0;
-            modelBias = 100.0;
-            
-            lossHistory.length = 0;
-            iterationHistory.length = 0;
-            currentIteration = 0;
+            lossChart.data.labels = iterationHistory;
+            lossChart.data.datasets[0].data = lossHistory;
             lossChart.update();
-            
-            trainingStatus.textContent = "Model reset.";
-            updateUI();
-        });
-
-        // --- 8. Gradient Descent (Training algorithm) ---
-        let trainingInterval = null;
-        let isTraining = false;
-
-        function trainStep() {
-            // Learning rates determine how big a step we take.
-            // Often need different rates for weight and bias because their scales differ drastically
-            // (Size is 1000s, bias is 100s). We normalize slightly for simplicity here, 
-            // but standardizing data is the real ML way.
-            const learningRateWeight = 0.0000001; // Very small because X (size) is large
-            const learningRateBias = 0.1;
-
-            let gradientWeight = 0;
-            let gradientBias = 0;
-
-            // Calculate gradients based on current error
-            for (let i = 0; i < numDataPoints; i++) {
-                const x = houseData[i].x;
-                const actualY = houseData[i].y;
-                const predictedY = predict(x, modelWeight, modelBias);
-                
-                // Partial derivative with respect to bias: -2 * (actual - predicted)
-                // Partial derivative with respect to weight: -2 * x * (actual - predicted)
-                // We drop the -2 constant as it gets absorbed into the learning rate
-                const error = predictedY - actualY; 
-                
-                gradientBias += error;
-                gradientWeight += error * x;
-            }
-
-            // Average the gradients
-            gradientBias /= numDataPoints;
-            gradientWeight /= numDataPoints;
-
-            // Update parameters: Move in the opposite direction of the gradient
-            modelBias -= (learningRateBias * gradientBias);
-            modelWeight -= (learningRateWeight * gradientWeight);
-            
-            // Constrain updates roughly within slider bounds to prevent wild UI behavior
-            modelWeight = Math.max(-5, Math.min(10, modelWeight));
-            modelBias = Math.max(-1000, Math.min(2000, modelBias));
-
-            currentIteration++;
-            const currentLoss = calculateMSE(modelWeight, modelBias);
-            
-            // Add new data points
-            iterationHistory.push(currentIteration);
-            lossHistory.push(currentLoss);
-            
-            // Keep graph from getting too crowded (max 200 points for performance)
-            if (iterationHistory.length > 200) {
-                iterationHistory.shift();
-                lossHistory.shift();
-            }
-            
-            lossChart.update();
-
-            updateUI();
         }
 
+        // --- 7. UI Controls & Training Loop ---
+        function resetAlgorithm() {
+            initializeCentroids();
+            lossHistory = [];
+            iterationHistory = [];
+            
+            iterationDisplay.textContent = iteration;
+            inertiaDisplay.textContent = "---";
+            statusDisplay.textContent = "Initialized. Ready to assign points.";
+            statusDisplay.className = "text-xs text-center text-slate-500 mt-3 h-4 font-medium";
+            
+            updateCharts();
+            predictNewCustomer(); // update prediction tab if it was showing a result
+        }
+
+        function doAlgorithmStep() {
+            if (isModelTrained) return false;
+
+            // Phase 1 of step: Assignment
+            const assignmentsChanged = assignClusters();
+            
+            // Phase 2 of step: Update Centroid positions
+            const centroidsMoved = updateCentroids();
+
+            iteration++;
+            const currentInertia = calculateInertia();
+            
+            iterationHistory.push(iteration);
+            lossHistory.push(currentInertia);
+
+            // Update UI
+            iterationDisplay.textContent = iteration;
+            inertiaDisplay.textContent = Math.round(currentInertia).toLocaleString();
+            updateCharts();
+
+            // Check Convergence
+            if (!assignmentsChanged && !centroidsMoved) {
+                isModelTrained = true;
+                statusDisplay.textContent = "✓ Converged! Centroids stabilized.";
+                statusDisplay.className = "text-xs text-center text-emerald-600 mt-3 h-4 font-bold";
+                predictNewCustomer();
+                return false; // tell loop to stop
+            } else {
+                statusDisplay.textContent = "Updating clusters...";
+                statusDisplay.className = "text-xs text-center text-blue-600 mt-3 h-4 font-medium";
+                return true; // tell loop to continue
+            }
+        }
+
+        // Event Listeners for Workspace
+        kSlider.addEventListener('input', (e) => {
+            k = parseInt(e.target.value);
+            kValueDisplay.textContent = k;
+            resetAlgorithm(); // Changing K requires a full reset
+        });
+
+        stepBtn.addEventListener('click', () => {
+            if(!isModelTrained) doAlgorithmStep();
+        });
+
+        resetBtn.addEventListener('click', resetAlgorithm);
+
+        let autoTrainInterval = null;
         trainBtn.addEventListener('click', () => {
-            if (isTraining) {
-                // Stop training
-                clearInterval(trainingInterval);
-                isTraining = false;
-                trainBtn.innerHTML = `<svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg> Auto Train`;
-                trainBtn.classList.remove('bg-red-600', 'hover:bg-red-700');
-                trainBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
-                trainingStatus.textContent = "Training paused.";
-            } else {
-                // Start training
-                isTraining = true;
-                trainBtn.innerHTML = `<svg class="w-5 h-5 mr-2 animate-spin" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg> Stop Training`;
-                trainBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
-                trainBtn.classList.add('bg-red-600', 'hover:bg-red-700');
-                trainingStatus.textContent = "Finding the best line (Gradient Descent)...";
-                
-                // Run training steps quickly to animate
-                trainingInterval = setInterval(() => {
-                    trainStep();
-                }, 50); // 50ms per step
+            if (isModelTrained) {
+                resetAlgorithm(); // If already done, reset before auto-running again
             }
+            
+            // Disable buttons during run
+            trainBtn.disabled = true;
+            stepBtn.disabled = true;
+            
+            autoTrainInterval = setInterval(() => {
+                const shouldContinue = doAlgorithmStep();
+                if (!shouldContinue) {
+                    clearInterval(autoTrainInterval);
+                    trainBtn.disabled = false;
+                    stepBtn.disabled = false;
+                }
+            }, 600); // 600ms delay so user can visually see the centroids moving
         });
 
-        // --- 9. UI Tab Management ---
-        function switchTab(tabId) {
-            // 1. Hide all tab contents
-            document.querySelectorAll('.tab-content').forEach(el => {
-                el.classList.remove('block');
-                el.classList.add('hidden');
-            });
+        // Event Listeners for Data Tab
+        dataCountSlider.addEventListener('input', (e) => {
+            document.getElementById('dataCountValue').textContent = e.target.value;
+        });
+        trueClusterSlider.addEventListener('input', (e) => {
+            document.getElementById('trueClusterValue').textContent = e.target.value;
+        });
+        noiseSlider.addEventListener('input', (e) => {
+            const val = parseInt(e.target.value);
+            let label = "Medium";
+            if(val < 10) label = "Tight";
+            if(val > 22) label = "Very Messy";
+            document.getElementById('noiseValue').textContent = label;
+        });
+
+        regenerateBtn.addEventListener('click', () => {
+            numDataPoints = parseInt(dataCountSlider.value);
+            numTrueClusters = parseInt(trueClusterSlider.value);
+            dataSpread = parseInt(noiseSlider.value);
+            generateData();
+        });
+
+        // --- 8. Prediction Application ---
+        function predictNewCustomer() {
+            if (!isModelTrained) {
+                predictionOutput.textContent = "Segment ?";
+                predictionOutput.className = "text-2xl font-black tracking-tight text-white opacity-50";
+                predictError.classList.remove('hidden');
+                return;
+            }
+
+            predictError.classList.add('hidden');
+            const inc = parseFloat(inputIncome.value);
+            const score = parseFloat(inputScore.value);
             
-            // 2. Reset all tab buttons to default inactive state
-            document.querySelectorAll('.tab-btn').forEach(el => {
-                el.classList.remove('border-blue-500', 'text-blue-600', 'font-bold');
-                el.classList.add('border-transparent', 'text-slate-500', 'font-medium');
+            if (isNaN(inc) || isNaN(score)) return;
+
+            const customer = { x: inc, y: score };
+            let minDist = Infinity;
+            let assignedCluster = 0;
+
+            centroids.forEach((centroid, i) => {
+                const dist = getDistSq(customer, centroid);
+                if (dist < minDist) {
+                    minDist = dist;
+                    assignedCluster = i;
+                }
             });
 
-            // 3. Show the selected tab content
+            predictionOutput.textContent = `Segment ${assignedCluster + 1}`;
+            predictionOutput.className = "text-3xl font-black tracking-tight text-white drop-shadow-md";
+            
+            // Color the result box slightly to match cluster color if possible
+            const resultBox = predictionOutput.parentElement;
+            const color = clusterColors[assignedCluster % clusterColors.length];
+            resultBox.style.backgroundColor = color.replace('0.7', '1'); // Make solid
+        }
+
+        inputIncome.addEventListener('input', predictNewCustomer);
+        inputScore.addEventListener('input', predictNewCustomer);
+
+        // --- 9. Tab Management ---
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden', 'block'));
+            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('block'));
+            document.querySelectorAll('.tab-content').forEach(el => {
+                if(el.id !== `tab-${tabId}`) el.classList.add('hidden');
+            });
+            
             document.getElementById(`tab-${tabId}`).classList.remove('hidden');
             document.getElementById(`tab-${tabId}`).classList.add('block');
             
-            // 4. Highlight the active tab button
+            // Reset active states
+            document.querySelectorAll('.tab-btn').forEach(el => {
+                el.classList.remove('border-purple-500', 'text-purple-600', 'font-bold');
+                el.classList.add('border-transparent', 'text-slate-500', 'font-medium');
+            });
+
+            // Set active state
             const activeBtn = document.getElementById(`tab-btn-${tabId}`);
             activeBtn.classList.remove('border-transparent', 'text-slate-500', 'font-medium');
-            activeBtn.classList.add('border-blue-500', 'text-blue-600', 'font-bold');
+            activeBtn.classList.add('border-purple-500', 'text-purple-600', 'font-bold');
 
-            // 5. CRITICAL FIX: Chart.js sometimes fails to render canvas dimensions properly 
-            // when its parent container goes from display:none -> block.
-            // We force a resize/update when the tab becomes visible.
-            if (chart) chart.resize();
-            if (lossChart) lossChart.resize();
+            // Force chart resize fixes visibility bugs
+            if(mainChart) mainChart.resize();
+            if(lossChart) lossChart.resize();
         }
 
-        // Initial setup on load
-        updateUI();
+        // --- 10. Initialization ---
+        window.onload = () => {
+            initCharts();
+            generateData(); // Generates data and resets algorithm
+        };
 
     </script>
 </body>
