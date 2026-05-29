@@ -3,682 +3,371 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>K-Means Clustering Workbench</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <title>PMKVY Complete MCQ Web App</title>
     <style>
-        .animate-fade-in { animation: fadeIn 0.3s ease-in-out; }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(5px); }
-            to { opacity: 1; transform: translateY(0); }
+        :root {
+            --primary-color: #2b6cb0;
+            --bg-color: #edf2f7;
+            --text-color: #2d3748;
+            --card-bg: #ffffff;
+            --hover-bg: #ebf8ff;
+        }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
+        }
+        .quiz-container {
+            background-color: var(--card-bg);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            width: 100%;
+            max-width: 700px;
+            padding: 40px;
+            box-sizing: border-box;
+        }
+        .quiz-header {
+            text-align: center;
+            margin-bottom: 25px;
+            border-bottom: 2px solid var(--bg-color);
+            padding-bottom: 15px;
+        }
+        .quiz-header h1 {
+            margin: 0;
+            font-size: 26px;
+            color: var(--primary-color);
+        }
+        .question {
+            font-size: 19px;
+            font-weight: 600;
+            margin-bottom: 20px;
+            line-height: 1.4;
+        }
+        .options {
+            list-style-type: none;
+            padding: 0;
+        }
+        .options li {
+            margin-bottom: 12px;
+        }
+        .options label {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            background-color: #f8fafc;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            font-size: 16px;
+        }
+        .options label:hover {
+            background-color: var(--hover-bg);
+            border-color: #90cdf4;
+        }
+        .options input[type="radio"] {
+            margin-right: 15px;
+            transform: scale(1.2);
+            cursor: pointer;
+        }
+        .btn {
+            background-color: var(--primary-color);
+            color: white;
+            border: none;
+            padding: 14px 20px;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 18px;
+            font-weight: bold;
+            width: 100%;
+            margin-top: 25px;
+            transition: background-color 0.3s;
+        }
+        .btn:hover {
+            background-color: #2c5282;
+        }
+        .btn:disabled {
+            background-color: #a0aec0;
+            cursor: not-allowed;
+        }
+        .result {
+            text-align: center;
+            font-size: 22px;
+            display: none;
+        }
+        .score-display {
+            font-size: 15px;
+            color: #718096;
+            text-align: right;
+            margin-bottom: 15px;
+            font-weight: bold;
+        }
+        .correct-ans {
+            color: #38a169;
+            font-weight: bold;
+            margin-top: 15px;
+            padding: 10px;
+            background: #f0fff4;
+            border-radius: 5px;
+            display: none;
+        }
+        .wrong-ans {
+            color: #e53e3e;
+            font-weight: bold;
+            margin-top: 15px;
+            padding: 10px;
+            background: #fff5f5;
+            border-radius: 5px;
+            display: none;
+        }
+        code {
+            background-color: #edf2f7;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-family: monospace;
+            color: #c53030;
         }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen p-4 sm:p-8 font-sans text-slate-800">
-    <div class="max-w-7xl mx-auto">
-        
-        <header class="mb-4 text-center sm:text-left">
-            <h1 class="text-3xl sm:text-4xl font-extrabold text-slate-900 tracking-tight mb-2">K-Means Clustering <span class="text-purple-600">Workbench</span></h1>
-            <p class="text-slate-600 text-lg">Customer segmentation using machine learning.</p>
-        </header>
+<body>
 
-        <!-- Smart Navigation Tabs -->
-        <div class="border-b border-gray-200 mb-6">
-            <nav class="-mb-px flex space-x-6 sm:space-x-8 overflow-x-auto" aria-label="Tabs">
-                <button onclick="switchTab('workspace')" id="tab-btn-workspace" class="tab-btn border-purple-500 text-purple-600 whitespace-nowrap py-4 px-1 border-b-2 font-bold text-sm sm:text-base flex items-center transition-colors">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 10l-2 1m0 0l-2-1m2 1v2.5M20 7l-2 1m2-1l-2-1m2 1v2.5M14 4l-2-1-2 1M4 7l2-1M4 7l2 1M4 7v2.5M12 21l-2-1m2 1l2-1m-2 1v-2.5M6 18l-2-1v-2.5M18 18l2-1v-2.5"></path></svg>
-                    1. Segmentation Workspace
-                </button>
-                <button onclick="switchTab('data')" id="tab-btn-data" class="tab-btn border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm sm:text-base flex items-center transition-colors">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path></svg>
-                    2. Data & Metrics
-                </button>
-                <button onclick="switchTab('application')" id="tab-btn-application" class="tab-btn border-transparent text-slate-500 hover:text-slate-700 hover:border-slate-300 whitespace-nowrap py-4 px-1 border-b-2 font-medium text-sm sm:text-base flex items-center transition-colors">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path></svg>
-                    3. Application & Concept
-                </button>
-            </nav>
-        </div>
-
-        <main class="min-h-[500px]">
-            <!-- TAB 1: WORKSPACE -->
-            <div id="tab-workspace" class="tab-content grid grid-cols-1 lg:grid-cols-12 gap-8 block animate-fade-in">
-                
-                <div class="lg:col-span-4 space-y-6">
-                    <!-- Algorithm Parameters Control Panel -->
-                    <section class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 h-full flex flex-col">
-                        <h2 class="text-xl font-bold text-slate-800 mb-4 flex items-center">
-                            Algorithm Settings
-                        </h2>
-                        
-                        <!-- K Slider -->
-                        <div class="mb-6">
-                            <div class="flex justify-between mb-2">
-                                <label for="kSlider" class="text-sm font-medium text-slate-700">Number of Clusters (K)</label>
-                                <span id="kValue" class="text-lg font-black text-purple-600 bg-purple-50 px-2 rounded">3</span>
-                            </div>
-                            <input type="range" id="kSlider" min="1" max="7" step="1" value="3" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-purple-600">
-                            <p class="text-xs text-slate-500 mt-2 leading-relaxed">How many distinct customer segments the algorithm should try to find.</p>
-                        </div>
-
-                        <!-- Current State Info -->
-                        <div class="bg-slate-50 p-4 rounded-lg border border-slate-100 mb-6">
-                            <div class="flex justify-between items-center mb-2">
-                                <span class="text-sm font-medium text-slate-600">Current Iteration:</span>
-                                <span id="iterationValue" class="font-mono font-bold text-slate-800">0</span>
-                            </div>
-                            <div class="flex justify-between items-center">
-                                <span class="text-sm font-medium text-slate-600" title="Within-Cluster Sum of Squares">Inertia (Error):</span>
-                                <span id="inertiaValue" class="font-mono font-bold text-orange-600">---</span>
-                            </div>
-                        </div>
-
-                        <!-- Training Controls -->
-                        <div class="mt-auto pt-6 border-t border-gray-100">
-                            <div class="grid grid-cols-2 gap-3 mb-3">
-                                <button id="stepBtn" class="bg-white border-2 border-purple-600 text-purple-600 hover:bg-purple-50 font-semibold py-2 px-4 rounded-lg shadow-sm transition-all flex justify-center items-center">
-                                    Step (+1)
-                                </button>
-                                <button id="resetBtn" class="bg-gray-100 hover:bg-gray-200 text-slate-700 font-semibold py-2 px-4 rounded-lg shadow-sm transition-all">
-                                    Reset
-                                </button>
-                            </div>
-                            <button id="trainBtn" class="w-full bg-purple-600 hover:bg-purple-700 text-white font-semibold py-3 px-4 rounded-lg shadow-sm transition-all flex justify-center items-center">
-                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
-                                Auto Cluster to End
-                            </button>
-                            <p id="trainingStatus" class="text-xs text-center text-slate-500 mt-3 h-4 font-medium"></p>
-                        </div>
-                    </section>
-                </div>
-
-                <div class="lg:col-span-8">
-                    <section class="bg-white rounded-xl shadow-sm border border-gray-100 p-4 flex flex-col h-[550px]">
-                        <div class="flex justify-between items-center mb-2">
-                            <h2 class="text-xl font-bold text-slate-800">Customer Segmentation Map</h2>
-                            <span class="text-xs font-medium bg-purple-50 text-purple-700 px-3 py-1 rounded-full border border-purple-100">Income vs Spending</span>
-                        </div>
-                        <p class="text-xs text-slate-500 mb-4 px-1">Large yellow stars (<span class="text-xl leading-none text-yellow-500">★</span>) represent cluster centroids. Points are colored by their assigned segment.</p>
-                        <div class="flex-1 relative w-full h-full">
-                            <canvas id="clusterChart"></canvas>
-                        </div>
-                    </section>
-                </div>
-            </div>
-
-            <!-- TAB 2: DATA & METRICS -->
-            <div id="tab-data" class="tab-content grid grid-cols-1 lg:grid-cols-12 gap-8 hidden animate-fade-in">
-                
-                <div class="lg:col-span-5 space-y-6">
-                    <section class="bg-white rounded-xl shadow-sm border border-gray-100 p-6">
-                        <h2 class="text-xl font-bold text-slate-800 mb-6">
-                            Dataset Generator
-                        </h2>
-                        
-                        <!-- Data Points Slider -->
-                        <div class="mb-5">
-                            <div class="flex justify-between mb-2">
-                                <label for="dataCountSlider" class="text-sm font-medium text-slate-700">Total Customers</label>
-                                <span id="dataCountValue" class="text-sm font-bold text-blue-600">200</span>
-                            </div>
-                            <input type="range" id="dataCountSlider" min="50" max="500" step="10" value="200" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
-                        </div>
-
-                        <!-- True Clusters Slider -->
-                        <div class="mb-5">
-                            <div class="flex justify-between mb-2">
-                                <label for="trueClusterSlider" class="text-sm font-medium text-slate-700">Hidden 'True' Groups</label>
-                                <span id="trueClusterValue" class="text-sm font-bold text-blue-600">4</span>
-                            </div>
-                            <input type="range" id="trueClusterSlider" min="1" max="6" step="1" value="4" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
-                            <p class="text-xs text-slate-500 mt-1">How many distinct blobs of data to generate behind the scenes.</p>
-                        </div>
-
-                        <!-- Noise/Variance Slider -->
-                        <div class="mb-6">
-                            <div class="flex justify-between mb-2">
-                                <label for="noiseSlider" class="text-sm font-medium text-slate-700">Customer Variance (Spread)</label>
-                                <span id="noiseValue" class="text-sm font-bold text-blue-600">Medium</span>
-                            </div>
-                            <input type="range" id="noiseSlider" min="5" max="30" step="1" value="15" class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer accent-blue-600">
-                        </div>
-                        
-                        <div class="pt-4 border-t border-gray-100">
-                            <button id="regenerateDataBtn" class="w-full bg-blue-50 hover:bg-blue-100 text-blue-700 font-semibold py-3 px-4 rounded-lg shadow-sm border border-blue-200 transition-all flex justify-center items-center">
-                                <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                                Generate New Customers
-                            </button>
-                        </div>
-                    </section>
-                </div>
-
-                <div class="lg:col-span-7">
-                    <section class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 flex flex-col h-[500px]">
-                        <div class="flex justify-between items-center mb-2">
-                            <h2 class="text-xl font-bold text-slate-800">Convergence Curve</h2>
-                            <span class="text-xs font-medium bg-orange-50 text-orange-600 border border-orange-200 px-2 py-1 rounded-full">Inertia Tracker</span>
-                        </div>
-                        <p class="text-sm text-slate-500 mb-4">Inertia measures how tightly grouped the clusters are. The algorithm stops when this value stops dropping.</p>
-                        <div class="flex-1 relative w-full h-full bg-slate-50 rounded-lg p-2 border border-slate-100">
-                            <canvas id="lossChart"></canvas>
-                        </div>
-                    </section>
-                </div>
-            </div>
-
-            <!-- TAB 3: APPLICATION -->
-            <div id="tab-application" class="tab-content max-w-4xl mx-auto space-y-8 hidden animate-fade-in">
-                
-                <section class="bg-white rounded-xl shadow-sm border border-gray-100 p-8">
-                    <h2 class="text-2xl font-bold text-slate-800 mb-4 flex items-center">
-                        <svg class="w-8 h-8 mr-3 text-purple-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
-                        The Concept: K-Means Clustering
-                    </h2>
-                    <p class="text-base text-slate-600 mb-6 leading-relaxed">
-                        Unlike Linear Regression, K-Means is an <strong>Unsupervised Learning</strong> algorithm. We don't give it "answers" (like predicting a price). Instead, we give it raw data and ask it to find underlying patterns or groups. 
-                    </p>
-                    <div class="grid md:grid-cols-3 gap-4 mb-6">
-                        <div class="bg-slate-50 p-4 rounded-lg border border-slate-100">
-                            <h4 class="font-bold text-slate-700 mb-1">1. Initialize</h4>
-                            <p class="text-sm text-slate-600">Pick 'K' random points to be the starting center points (centroids) for our segments.</p>
-                        </div>
-                        <div class="bg-slate-50 p-4 rounded-lg border border-slate-100">
-                            <h4 class="font-bold text-slate-700 mb-1">2. Assign</h4>
-                            <p class="text-sm text-slate-600">Calculate the distance from every customer to every centroid. Assign the customer to the closest one.</p>
-                        </div>
-                        <div class="bg-slate-50 p-4 rounded-lg border border-slate-100">
-                            <h4 class="font-bold text-slate-700 mb-1">3. Update</h4>
-                            <p class="text-sm text-slate-600">Move the centroid to the exact average (mean) location of all the customers assigned to it. Repeat!</p>
-                        </div>
-                    </div>
-                </section>
-
-                <section class="bg-gradient-to-br from-fuchsia-50 to-purple-50 rounded-xl shadow-lg border border-fuchsia-100 p-8">
-                    <h2 class="text-2xl font-bold text-purple-900 mb-6 flex items-center">
-                        Segment a New Customer
-                    </h2>
-                    <p class="text-purple-700 mb-6">Enter details for a new customer. Based on your <strong>currently trained models</strong> in the workspace, we will assign them to the appropriate segment.</p>
-                    
-                    <div class="bg-white p-6 rounded-xl shadow-inner border border-purple-100/50 flex flex-col md:flex-row items-center space-y-4 md:space-y-0 md:space-x-6">
-                        <div class="w-full md:w-1/3">
-                            <label for="predictIncome" class="block text-xs font-bold text-purple-800 mb-2 uppercase tracking-wider">Annual Income ($k)</label>
-                            <input type="number" id="predictIncome" value="60" min="15" max="150" class="w-full px-4 py-3 text-lg border-2 border-purple-200 rounded-xl focus:ring-4 focus:ring-purple-500/20 outline-none transition-all">
-                        </div>
-                        <div class="w-full md:w-1/3">
-                            <label for="predictScore" class="block text-xs font-bold text-purple-800 mb-2 uppercase tracking-wider">Spending Score (1-100)</label>
-                            <input type="number" id="predictScore" value="50" min="1" max="100" class="w-full px-4 py-3 text-lg border-2 border-purple-200 rounded-xl focus:ring-4 focus:ring-purple-500/20 outline-none transition-all">
-                        </div>
-                        
-                        <div class="hidden md:flex items-center text-purple-300 px-2">
-                            <svg class="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                        </div>
-
-                        <div class="w-full md:w-1/3 bg-purple-600 rounded-xl p-5 text-center text-white">
-                            <p class="text-xs text-purple-200 mb-1 uppercase tracking-wider font-bold">Assigned Profile</p>
-                            <p id="predictionResult" class="text-2xl font-black tracking-tight">Segment ?</p>
-                        </div>
-                    </div>
-                    <p id="predictError" class="text-sm text-red-500 mt-4 text-center hidden font-medium">Please train the model first by clicking "Auto Cluster" in the Workspace tab.</p>
-                </section>
-            </div>
-
-        </main>
+<div class="quiz-container">
+    <div class="quiz-header">
+        <h1>PMKVY Full Assessment</h1>
+    </div>
+    <div class="score-display" id="score-display">Question 1 of 100</div>
+    
+    <div id="quiz-block">
+        <div class="question" id="question-text">Loading question...</div>
+        <ul class="options" id="options-list">
+            </ul>
+        <div id="feedback-correct" class="correct-ans">Correct!</div>
+        <div id="feedback-wrong" class="wrong-ans"></div>
+        <button class="btn" id="submit-btn" disabled>Submit Answer</button>
+        <button class="btn" id="next-btn" style="display: none;">Next Question</button>
     </div>
 
-    <script>
-        // --- 1. Colors & Constants ---
-        // Distinct colors for different clusters (up to 10)
-        const clusterColors = [
-            'rgba(239, 68, 68, 0.7)',   // Red
-            'rgba(59, 130, 246, 0.7)',  // Blue
-            'rgba(16, 185, 129, 0.7)',  // Emerald
-            'rgba(245, 158, 11, 0.7)',  // Amber
-            'rgba(139, 92, 246, 0.7)',  // Violet
-            'rgba(236, 72, 153, 0.7)',  // Pink
-            'rgba(20, 184, 166, 0.7)',  // Teal
-            'rgba(99, 102, 241, 0.7)',  // Indigo
-            'rgba(168, 162, 158, 0.7)'  // Stone
-        ];
-        const unassignedColor = 'rgba(203, 213, 225, 0.8)'; // Slate-300
+    <div class="result" id="result-block">
+        <h2>Quiz Completed!</h2>
+        <p>You scored <span id="score" style="color: var(--primary-color); font-weight: bold; font-size: 28px;"></span> out of <span id="total"></span>.</p>
+        <button class="btn" onclick="location.reload()">Restart Quiz</button>
+    </div>
+</div>
 
-        // --- 2. State Variables ---
-        let customers = []; // {x: income, y: score, cluster: index}
-        let centroids = []; // {x, y}
-        let k = 3;
-        let iteration = 0;
-        let isModelTrained = false;
+<script>
+    const quizData = [
+        { q: "1. What is the primary input to AI systems?", o: ["Feelings", "Data", "Emotions", "Light"], a: "Data" },
+        { q: "2. AI that creates new content is called...", o: ["Analytical AI", "Generative AI", "Passive AI", "Filter AI"], a: "Generative AI" },
+        { q: "3. Which function is used to fill NA/NaN values?", o: ["fillna()", "replace()", "dropna()", "isna()"], a: "fillna()" },
+        { q: "4. What is a 2D array in NumPy?", o: ["String matrix", "Table of zeros", "Matrix of values", "Loop"], a: "Matrix of values" },
+        { q: "5. What is CI/CD in deployment?", o: ["Code Isolation/Code Delivery", "Continuous Integration/Continuous Deployment", "Cloud Interface/Data Control", "None"], a: "Continuous Integration/Continuous Deployment" },
+        { q: "6. Which file is used to define the environment for a Docker container?", o: ["requirements.txt", "Dockerfile", "config.json", "app.py"], a: "Dockerfile" },
+        { q: "7. What is a common challenge in deploying ML models?", o: ["High training accuracy", "Model versioning and monitoring", "Using large datasets", "Writing Python code"], a: "Model versioning and monitoring" },
+        { q: "8. What is the main purpose of MLOps?", o: ["Automate ML workflows and ensure reproducibility", "Only train models faster", "Replace data scientists with automation", "Reduce the cost of cloud storage"], a: "Automate ML workflows and ensure reproducibility" },
+        { q: "9. What is AI model deployment?", o: ["Model training", "Making a model available for use", "Model evaluation", "Model compression"], a: "Making a model available for use" },
+        { q: "10. What is the purpose of model.predict()?", o: ["Create model", "Test speed", "Make predictions", "Visualize model"], a: "Make predictions" },
+        { q: "11. What is model serialization?", o: ["Converting model to a string", "Saving model state", "Encrypting model", "Compressing files"], a: "Saving model state" },
+        { q: "12. What is the main advantage of using Docker for ML model deployment?", o: ["It makes training models faster", "It packages dependencies and the model together for portability", "It increases model accuracy", "It prevents model drift"], a: "It packages dependencies and the model together for portability" },
+        { q: "13. What is a benefit of model deployment?", o: ["Manual prediction", "High cost", "Real-time usage", "Re-training only"], a: "Real-time usage" },
+        { q: "14. What does an API do in deployment?", o: ["Stores data", "Trains models", "Provides access to model", "Cleans datasets"], a: "Provides access to model" },
+        { q: "15. Which Python library is used to save models?", o: ["matplotlib", "joblib", "sklearn", "keras"], a: "joblib" },
+        { q: "16. Which library helps monitor deployed models?", o: ["pandas", "matplotlib", "Prometheus", "seaborn"], a: "Prometheus" },
+        { q: "17. What is inference?", o: ["Model training", "Prediction from a trained model", "Building a UI", "Data cleaning"], a: "Prediction from a trained model" },
+        { q: "18. Kubernetes is used to...", o: ["Train models", "Scale and manage containers", "Create APIs", "Write Python code"], a: "Scale and manage containers" },
+        { q: "19. Flask is used for...", o: ["Building websites", "Training models", "Creating APIs", "Visualizing data"], a: "Creating APIs" },
+        { q: "20. What is a container?", o: ["Virtual machine", "Self-contained unit with app and dependencies", "Data bucket", "Code editor"], a: "Self-contained unit with app and dependencies" },
+        { q: "21. What is model versioning?", o: ["Storing input data", "Assigning version numbers to models", "Labeling data", "Compressing files"], a: "Assigning version numbers to models" },
+        { q: "22. Model drift means...", o: ["Model stops working", "Model predictions degrade over time", "Data is lost", "Network fails"], a: "Model predictions degrade over time" },
+        { q: "23. Model input/output format should be...", o: ["Complex", "Human-readable only", "Clearly defined and structured", "Always encrypted"], a: "Clearly defined and structured" },
+        { q: "24. Why is Docker used in deployment?", o: ["Data labeling", "Packaging applications", "Visualizing output", "Writing APIs"], a: "Packaging applications" },
+        { q: "25. What does pip install -r requirements.txt do?", o: ["Uninstalls packages", "Lists packages", "Installs dependencies", "Creates environment"], a: "Installs dependencies" },
+        { q: "26. What does scalability mean?", o: ["Decreasing accuracy", "Supporting more users/data", "Shrinking model", "Slowing down response"], a: "Supporting more users/data" },
+        { q: "27. Which step comes after training a model?", o: ["Deployment", "Data collection", "Preprocessing", "Labeling"], a: "Deployment" },
+        { q: "28. What does latency mean in deployment?", o: ["Size of model", "Time delay in response", "Model accuracy", "Data variance"], a: "Time delay in response" },
+        { q: "29. What type of images does a grayscale conversion produce?", o: ["Color images", "Black and white images", "3D images", "Animated images"], a: "Black and white images" },
+        { q: "30. What is image segmentation?", o: ["Cropping images", "Splitting images into parts", "Combining images", "Encrypting images"], a: "Splitting images into parts" },
+        { q: "31. Pooling layer in CNN is for...", o: ["Increasing size", "Reducing computation", "Sorting data", "Predicting values"], a: "Reducing computation" },
+        { q: "32. Image classification involves...", o: ["Editing photos", "Tagging objects", "Assigning category labels", "Rotating images"], a: "Assigning category labels" },
+        { q: "33. YOLO stands for...", o: ["You Only Learn Once", "You Only Look Once", "Your Object Label Output", "None"], a: "You Only Look Once" },
+        { q: "34. Which model is commonly used in object detection?", o: ["YOLO", "RNN", "LSTM", "BERT"], a: "YOLO" },
+        { q: "35. Which model type is best for detecting moving objects?", o: ["Static NN", "Temporal CNN", "Object tracking models", "None"], a: "Object tracking models" },
+        { q: "36. What is image thresholding?", o: ["Highlighting image", "Cropping parts", "Separating object from background", "Rotating image"], a: "Separating object from background" },
+        { q: "37. Real-time detection needs...", o: ["Preprocessing only", "High frame rates", "Delayed response", "Static images"], a: "High frame rates" },
+        { q: "38. Which library in Python is most commonly used for basic image processing tasks like reading and manipulation?", o: ["Pandas", "NumPy", "OpenCV", "TensorFlow"], a: "OpenCV" },
+        { q: "39. What does a camera provide to CV systems?", o: ["Audio", "Text", "Image data", "Logic"], a: "Image data" },
+        { q: "40. What is the purpose of MaxPooling?", o: ["Selecting smallest", "Discarding layers", "Taking max value in region", "Merging outputs"], a: "Taking max value in region" },
+        { q: "41. Which layer detects features in CNN?", o: ["Output", "Pooling", "Convolutional", "Dropout"], a: "Convolutional" },
+        { q: "42. What is the output of the image segmentation process?", o: ["A set of sound waves", "A single compressed image", "Divided regions or objects within an image", "A colorful 3D animation"], a: "Divided regions or objects within an image" },
+        { q: "43. Semantic segmentation assigns labels to...", o: ["Whole image", "Each pixel", "Bounding box", "Image corner"], a: "Each pixel" },
+        { q: "44. What is the role of cv2.imshow()?", o: ["Show array", "Display image", "Analyze video", "Apply filter"], a: "Display image" },
+        { q: "45. Which model converts color to grayscale?", o: ["CNN", "RGB2Gray", "cv2.COLOR_BGR2GRAY", "None"], a: "cv2.COLOR_BGR2GRAY" },
+        { q: "46. What does cv2.imread() do?", o: ["Saves image", "Reads image", "Detects objects", "Converts image"], a: "Reads image" },
+        { q: "47. Which is a limitation of RNNs?", o: ["Speed", "Memory", "Context loss", "Vision"], a: "Context loss" },
+        { q: "48. CNN stands for...", o: ["Complex Neural Net", "Convolutional Neural Network", "Coded Neural Net", "Contextual Neural Node"], a: "Convolutional Neural Network" },
+        { q: "49. LSTM is designed to...", o: ["Store audio", "Ignore input", "Handle long-term dependencies", "Speed up networks"], a: "Handle long-term dependencies" },
+        { q: "50. A layer between input and output is called...", o: ["Output layer", "Input layer", "Hidden layer", "Passive layer"], a: "Hidden layer" },
+        { q: "51. What is the main function of a neuron in an Artificial Neural Network?", o: ["It stores data like a database", "It processes inputs and applies an activation function", "It connects to external storage devices", "It removes unwanted data from the dataset"], a: "It processes inputs and applies an activation function" },
+        { q: "52. RNN is best for...", o: ["Static images", "Sequential data", "Sorting", "Visual data"], a: "Sequential data" },
+        { q: "53. ReLU stands for...", o: ["Relative Unit", "Rectified Linear Unit", "Recursive Unit", "Range Limited Unit"], a: "Rectified Linear Unit" },
+        { q: "54. Overfitting happens when...", o: ["Model is too simple", "Model memorizes data", "Model generalizes well", "Data is random"], a: "Model memorizes data" },
+        { q: "55. What is max pooling?", o: ["Choosing minimum", "Choosing maximum", "Ignoring values", "Averaging"], a: "Choosing maximum" },
+        { q: "56. Which deep learning model is best for images?", o: ["RNN", "CNN", "SVM", "Naive Bayes"], a: "CNN" },
+        { q: "57. Which loss function is used in regression?", o: ["Cross-entropy", "Hinge loss", "MSE", "Log loss"], a: "MSE" },
+        { q: "58. The basic unit of a neural network is...", o: ["Neuron", "Cell", "Bit", "Algorithm"], a: "Neuron" },
+        { q: "59. Cosine similarity is used to...", o: ["Convert text", "Vectorize text", "Compare text similarity", "Parse input"], a: "Compare text similarity" },
+        { q: "60. Which library is popular in NLP?", o: ["TensorFlow", "OpenCV", "spaCy", "NumPy"], a: "spaCy" },
+        { q: "61. Word2Vec converts...", o: ["Sentences to graphs", "Words to vectors", "Sentences to labels", "Text to symbols"], a: "Words to vectors" },
+        { q: "62. Which task is NOT NLP?", o: ["Text classification", "Speech recognition", "Object detection", "Question answering"], a: "Object detection" },
+        { q: "63. Language translation is an example of...", o: ["Speech recognition", "POS tagging", "Sequence-to-sequence modeling", "Parsing"], a: "Sequence-to-sequence modeling" },
+        { q: "64. Which of the following is NOT an application of NLP?", o: ["Spam email detection", "Chatbots and virtual assistants", "Image classification", "Sentiment analysis"], a: "Image classification" },
+        { q: "65. Which is NOT a use of NLP?", o: ["Translation", "Summarization", "Face detection", "Chatbots"], a: "Face detection" },
+        { q: "66. BERT stands for...", o: ["Bidirectional Encoder Representations from Transformers", "Basic Entity Recognition Tool", "Binary Encoding", "None"], a: "Bidirectional Encoder Representations from Transformers" },
+        { q: "67. Bag of Words (BoW) is...", o: ["NLP model", "Compression tool", "Text representation", "Dictionary"], a: "Text representation" },
+        { q: "68. Pre-trained NLP model?", o: ["AlexNet", "ResNet", "BERT", "YOLO"], a: "BERT" },
+        { q: "69. Which technique reduces words to their root form by chopping off suffixes?", o: ["Tokenization", "Stemming", "Named Entity Recognition (NER)", "Bag-of-Words"], a: "Stemming" },
+        { q: "70. Lemmatization returns...", o: ["Root with meaning", "Letters", "Random text", "Stop words"], a: "Root with meaning" },
+        { q: "71. POS tagging identifies...", o: ["Parts of software", "Positions", "Parts of speech", "Parsing symbols"], a: "Parts of speech" },
+        { q: "72. Stemming is used to...", o: ["Translate text", "Remove characters", "Reduce words to root", "Build models"], a: "Reduce words to root" },
+        { q: "73. Which transformer model was developed by Google?", o: ["GPT", "BERT", "RoBERTa", "T5"], a: "BERT" },
+        { q: "74. What does 'tokenization' refer to in NLP?", o: ["Splitting text into smaller parts like words or sentences", "Removing stopwords from text", "Analyzing the sentiment of a sentence", "Converting words into their root forms"], a: "Splitting text into smaller parts like words or sentences" },
+        { q: "75. Which library is commonly used for NLP tasks in Python?", o: ["NumPy", "Matplotlib", "NLTK", "Pandas"], a: "NLTK" },
+        { q: "76. Which of the following is an example of lemmatization?", o: ["\"running\" -> \"run\"", "\"cats\" -> \"cat\"", "\"better\" -> \"good\"", "All of the above"], a: "All of the above" },
+        { q: "77. Text preprocessing is important for...", o: ["Adding complexity", "Improving readability", "Better model accuracy", "Encryption"], a: "Better model accuracy" },
+        { q: "78. RNNs are suitable for...", o: ["Independent data", "Sequential text data", "Visual data", "Static data"], a: "Sequential text data" },
+        { q: "79. What is a rational agent?", o: ["One that learns slowly", "Always makes the best decision", "Always chooses randomly", "Always ignores input"], a: "Always makes the best decision" },
+        { q: "80. What does PEAS stand for?", o: ["Performance, Environment, Actuators, Sensors", "Power, Energy, AI, Systems", "Problem, Execution, AI, Sensors", "None"], a: "Performance, Environment, Actuators, Sensors" },
+        { q: "81. Example of an intelligent agent?", o: ["Fan", "Toaster", "Thermostat", "Table"], a: "Thermostat" },
+        { q: "82. Which of the following is a valid way to create a string in Python?", o: ["str='Hello'", "str=\"Hello\"", "str=\"\"\"Hello\"\"\"", "All of the above"], a: "All of the above" },
+        { q: "83. What is Pandas used for?", o: ["File I/O", "GUI", "Data analysis", "Web hosting"], a: "Data analysis" },
+        { q: "84. What is the use of plt.scatter()?", o: ["Bar chart", "Histogram", "Pie chart", "Scatter plot"], a: "Scatter plot" },
+        { q: "85. Which method returns all the keys of a dictionary?", o: ["keys()", "values()", "items()", "getkeys()"], a: "keys()" },
+        { q: "86. What does df.isnull() return?", o: ["Boolean DataFrame", "Null values", "Non-null values", "Row index"], a: "Boolean DataFrame" },
+        { q: "87. What does df.head() do in Pandas?", o: ["Removes headers", "Returns first rows", "Sorts data", "Deletes rows"], a: "Returns first rows" },
+        { q: "88. Which method is used to remove all items from a dictionary?", o: ["clear()", "delete()", "remove()", "pop()"], a: "clear()" },
+        { q: "89. df[df['Age'] > 25] is used for...?", o: ["Deleting", "Adding", "Filtering", "Grouping"], a: "Filtering" },
+        { q: "90. What is the output of len((7, 2, 3, 4))?", o: ["3", "4", "Error", "5"], a: "4" },
+        { q: "91. Which method adds an element to the end of a list?", o: ["insert()", "append()", "add()", "push()"], a: "append()" },
+        { q: "92. How do you select a column named 'age' from a DataFrame df?", o: ["df.age", "df['age']", "df.loc[:, 'age']", "All of the above"], a: "All of the above" },
+        { q: "93. Which library is used for numerical computations?", o: ["TensorFlow", "NumPy", "Django", "Matplotlib"], a: "NumPy" },
+        { q: "94. What is the output of [1,2]*2?", o: ["[1,2,1,2]", "[1,2,2]", "[2,4]", "Error"], a: "[1,2,1,2]" },
+        { q: "95. In open('file.txt', 'r'), what does 'r' stand for?", o: ["Read", "Run", "Remove", "Rename"], a: "Read" },
+        { q: "96. myenv\\Scripts\\activate is used for", o: ["Compiling", "Exiting Python", "Activating virtual environment", "Debugging"], a: "Activating virtual environment" },
+        { q: "97. What is a virtual environment?", o: ["Python version", "Isolated workspace", "UI tool", "Database"], a: "Isolated workspace" },
+        { q: "98. What does the len() function return when applied to a string?", o: ["Number of words", "Number of vowels", "Number of characters", "Memory size"], a: "Number of characters" },
+        { q: "99. Which method is used to read a CSV file in Pandas?", o: ["read_csv()", "load_csv()", "open_csv()", "import_csv()"], a: "read_csv()" },
+        { q: "100. What will be the output of 'Hello'* 2?", o: ["Hello Hello", "HelloHello", "Hello2", "Error"], a: "HelloHello" }
+    ];
+
+    let currentQuestionIndex = 0;
+    let score = 0;
+
+    const questionEl = document.getElementById("question-text");
+    const optionsEl = document.getElementById("options-list");
+    const submitBtn = document.getElementById("submit-btn");
+    const nextBtn = document.getElementById("next-btn");
+    const scoreDisplay = document.getElementById("score-display");
+    const quizBlock = document.getElementById("quiz-block");
+    const resultBlock = document.getElementById("result-block");
+    const feedbackCorrect = document.getElementById("feedback-correct");
+    const feedbackWrong = document.getElementById("feedback-wrong");
+
+    function loadQuestion() {
+        submitBtn.disabled = true;
+        submitBtn.style.display = "block";
+        nextBtn.style.display = "none";
+        feedbackCorrect.style.display = "none";
+        feedbackWrong.style.display = "none";
+        optionsEl.innerHTML = "";
         
-        let lossHistory = [];
-        let iterationHistory = [];
+        const currentData = quizData[currentQuestionIndex];
+        questionEl.innerHTML = currentData.q.replace(/`([^`]+)`/g, '<code>$1</code>');
+        scoreDisplay.innerText = `Question ${currentQuestionIndex + 1} of ${quizData.length}`;
+
+        currentData.o.forEach((option, index) => {
+            const li = document.createElement("li");
+            const label = document.createElement("label");
+            const radio = document.createElement("input");
+            
+            radio.type = "radio";
+            radio.name = "answer";
+            radio.value = option;
+            radio.id = `opt-${index}`;
+            radio.addEventListener("change", () => submitBtn.disabled = false);
+
+            label.htmlFor = `opt-${index}`;
+            label.appendChild(radio);
+            label.appendChild(document.createTextNode(option));
+            li.appendChild(label);
+            optionsEl.appendChild(li);
+        });
+    }
+
+    function getSelectedAnswer() {
+        const answers = document.querySelectorAll('input[name="answer"]');
+        for (const answer of answers) {
+            if (answer.checked) {
+                return answer;
+            }
+        }
+        return null;
+    }
+
+    submitBtn.addEventListener("click", () => {
+        const selectedRadio = getSelectedAnswer();
+        if (!selectedRadio) return;
+
+        const answer = selectedRadio.value;
+        const currentData = quizData[currentQuestionIndex];
         
-        // Data generation settings
-        let numDataPoints = 200;
-        let numTrueClusters = 4;
-        let dataSpread = 15;
+        // Disable all inputs after submitting
+        document.querySelectorAll('input[name="answer"]').forEach(input => input.disabled = true);
+        submitBtn.style.display = "none";
+        nextBtn.style.display = "block";
 
-        // Chart instances
-        let mainChart;
-        let lossChart;
-
-        // --- 3. DOM Elements ---
-        const kSlider = document.getElementById('kSlider');
-        const kValueDisplay = document.getElementById('kValue');
-        const stepBtn = document.getElementById('stepBtn');
-        const resetBtn = document.getElementById('resetBtn');
-        const trainBtn = document.getElementById('trainBtn');
-        const statusDisplay = document.getElementById('trainingStatus');
-        const iterationDisplay = document.getElementById('iterationValue');
-        const inertiaDisplay = document.getElementById('inertiaValue');
-
-        const dataCountSlider = document.getElementById('dataCountSlider');
-        const trueClusterSlider = document.getElementById('trueClusterSlider');
-        const noiseSlider = document.getElementById('noiseSlider');
-        const regenerateBtn = document.getElementById('regenerateDataBtn');
-
-        const inputIncome = document.getElementById('predictIncome');
-        const inputScore = document.getElementById('predictScore');
-        const predictionOutput = document.getElementById('predictionResult');
-        const predictError = document.getElementById('predictError');
-
-        // --- 4. Core Logic: Data Generation ---
-        function generateData() {
-            customers = [];
-            const trueCenters = [];
+        if (answer === currentData.a) {
+            score++;
+            selectedRadio.parentElement.style.borderColor = "#38a169";
+            selectedRadio.parentElement.style.backgroundColor = "#f0fff4";
+            feedbackCorrect.style.display = "block";
+        } else {
+            selectedRadio.parentElement.style.borderColor = "#e53e3e";
+            selectedRadio.parentElement.style.backgroundColor = "#fff5f5";
+            feedbackWrong.innerText = `Incorrect! The correct answer is: ${currentData.a}`;
+            feedbackWrong.style.display = "block";
             
-            // 1. Create hidden "true" centers for the blobs
-            for(let i = 0; i < numTrueClusters; i++) {
-                trueCenters.push({
-                    x: Math.floor(Math.random() * 100) + 30, // Income 30-130k
-                    y: Math.floor(Math.random() * 80) + 10   // Score 10-90
-                });
-            }
-
-            // 2. Generate points around those centers using normal-ish distribution
-            for(let i = 0; i < numDataPoints; i++) {
-                const targetCenter = trueCenters[i % numTrueClusters];
-                
-                // Box-Muller transform for rough Gaussian distribution
-                const u1 = Math.random();
-                const u2 = Math.random();
-                const z0 = Math.sqrt(-2.0 * Math.log(u1)) * Math.cos(2.0 * Math.PI * u2);
-                const z1 = Math.sqrt(-2.0 * Math.log(u1)) * Math.sin(2.0 * Math.PI * u2);
-
-                let x = Math.round(targetCenter.x + z0 * dataSpread);
-                let y = Math.round(targetCenter.y + z1 * dataSpread);
-
-                // Bound values to realistic ranges
-                x = Math.max(15, Math.min(150, x));
-                y = Math.max(1, Math.min(100, y));
-
-                customers.push({ x: x, y: y, cluster: -1 }); // -1 means unassigned
-            }
-
-            resetAlgorithm();
-        }
-
-        // --- 5. Core Logic: K-Means Algorithm ---
-        
-        // Helper: Euclidean distance squared
-        function getDistSq(p1, p2) {
-            return Math.pow(p1.x - p2.x, 2) + Math.pow(p1.y - p2.y, 2);
-        }
-
-        function initializeCentroids() {
-            centroids = [];
-            
-            // Randomly select K unique data points as initial centroids 
-            // (Using Set ensures we never accidentally pick the exact same index twice)
-            const usedIndices = new Set();
-            while (centroids.length < k && centroids.length < customers.length) {
-                const idx = Math.floor(Math.random() * customers.length);
-                if (!usedIndices.has(idx)) {
-                    usedIndices.add(idx);
-                    centroids.push({ x: customers[idx].x, y: customers[idx].y });
-                }
-            }
-            
-            // Reset all customers to unassigned
-            customers.forEach(c => c.cluster = -1);
-            iteration = 0;
-            isModelTrained = false;
-        }
-
-        function assignClusters() {
-            let changed = false;
-            customers.forEach(customer => {
-                let minDist = Infinity;
-                let closestIndex = -1;
-
-                centroids.forEach((centroid, i) => {
-                    const dist = getDistSq(customer, centroid);
-                    if (dist < minDist) {
-                        minDist = dist;
-                        closestIndex = i;
-                    }
-                });
-
-                if (customer.cluster !== closestIndex) {
-                    customer.cluster = closestIndex;
-                    changed = true;
-                }
-            });
-            return changed; // Returns true if any point changed clusters
-        }
-
-        function updateCentroids() {
-            let moved = false;
-            centroids.forEach((centroid, i) => {
-                const assignedPoints = customers.filter(c => c.cluster === i);
-                if (assignedPoints.length === 0) return; // Edge case: empty cluster
-
-                const sumX = assignedPoints.reduce((sum, p) => sum + p.x, 0);
-                const sumY = assignedPoints.reduce((sum, p) => sum + p.y, 0);
-                
-                const newX = sumX / assignedPoints.length;
-                const newY = sumY / assignedPoints.length;
-
-                // Check if centroid moved significantly
-                if (Math.abs(centroid.x - newX) > 0.01 || Math.abs(centroid.y - newY) > 0.01) {
-                    moved = true;
-                }
-
-                centroid.x = newX;
-                centroid.y = newY;
-            });
-            return moved;
-        }
-
-        function calculateInertia() {
-            let totalInertia = 0;
-            customers.forEach(customer => {
-                if (customer.cluster !== -1 && centroids[customer.cluster]) {
-                    totalInertia += getDistSq(customer, centroids[customer.cluster]);
-                }
-            });
-            return totalInertia;
-        }
-
-        // --- 6. Chart Setup ---
-        function initCharts() {
-            const ctxMain = document.getElementById('clusterChart').getContext('2d');
-            mainChart = new Chart(ctxMain, {
-                type: 'scatter',
-                data: {
-                    datasets: [
-                        {
-                            label: 'Customers',
-                            data: customers,
-                            // Dynamic coloring based on cluster assignment
-                            backgroundColor: (context) => {
-                                const pt = context.raw;
-                                if (!pt || pt.cluster === -1 || pt.cluster === undefined) return unassignedColor;
-                                return clusterColors[pt.cluster % clusterColors.length];
-                            },
-                            borderColor: 'transparent',
-                            pointRadius: 6,
-                            pointHoverRadius: 8,
-                            order: 1 // DRAW CUSTOMERS UNDERNEATH CENTROIDS
-                        },
-                        {
-                            label: 'Centroids',
-                            data: centroids,
-                            backgroundColor: '#FFEA00', // Highly visible Bright Yellow Fill
-                            borderColor: '#1E293B',     // Dark outline to contrast against light points
-                            borderWidth: 3,
-                            pointStyle: 'star',
-                            radius: 16,                 // Specify radius directly
-                            pointRadius: 16,
-                            hoverRadius: 22,
-                            pointHoverRadius: 22,
-                            order: 0 // DRAW CENTROIDS ON TOP
-                        }
-                    ]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    animation: { duration: 300, easing: 'easeOutQuart' }, // Smooth movement
-                    scales: {
-                        x: { 
-                            title: { display: true, text: 'Annual Income (k$)', font: {weight: 'bold'} },
-                            min: 0, max: 160
-                        },
-                        y: { 
-                            title: { display: true, text: 'Spending Score (1-100)', font: {weight: 'bold'} },
-                            min: 0, max: 110
-                        }
-                    },
-                    plugins: {
-                        legend: { display: false },
-                        tooltip: {
-                            callbacks: {
-                                label: (ctx) => {
-                                    if (ctx.datasetIndex === 1) return `Centroid ${ctx.dataIndex + 1}`;
-                                    let cl = ctx.raw.cluster === -1 ? 'None' : ctx.raw.cluster + 1;
-                                    return `Income: $${ctx.raw.x}k, Score: ${ctx.raw.y} | Segment: ${cl}`;
-                                }
-                            }
-                        }
-                    }
-                }
-            });
-
-            const ctxLoss = document.getElementById('lossChart').getContext('2d');
-            lossChart = new Chart(ctxLoss, {
-                type: 'line',
-                data: {
-                    labels: iterationHistory,
-                    datasets: [{
-                        label: 'Inertia',
-                        data: lossHistory,
-                        borderColor: 'rgba(249, 115, 22, 1)', // Orange-500
-                        backgroundColor: 'rgba(249, 115, 22, 0.1)',
-                        borderWidth: 3,
-                        fill: true,
-                        tension: 0.1,
-                        pointRadius: 4
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    scales: {
-                        x: { title: { display: true, text: 'Algorithm Iteration' }, ticks:{stepSize:1} },
-                        y: { title: { display: true, text: 'Inertia (Sum of Sq Dist)' }, beginAtZero: true }
-                    },
-                    plugins: { legend: { display: false } }
+            // Highlight the correct one
+            document.querySelectorAll('input[name="answer"]').forEach(input => {
+                if (input.value === currentData.a) {
+                    input.parentElement.style.borderColor = "#38a169";
+                    input.parentElement.style.borderWidth = "3px";
                 }
             });
         }
+    });
 
-        function updateCharts() {
-            // MAP the arrays into completely new objects! 
-            // This forces Chart.js to completely bypass its parsing cache and accurately redraw the updated centroid positions and point colors every frame.
-            mainChart.data.datasets[0].data = customers.map(c => ({...c}));
-            mainChart.data.datasets[1].data = centroids.map(c => ({...c}));
-            mainChart.update();
-
-            lossChart.data.labels = [...iterationHistory];
-            lossChart.data.datasets[0].data = [...lossHistory];
-            lossChart.update();
+    nextBtn.addEventListener("click", () => {
+        currentQuestionIndex++;
+        if (currentQuestionIndex < quizData.length) {
+            loadQuestion();
+        } else {
+            quizBlock.style.display = "none";
+            scoreDisplay.style.display = "none";
+            resultBlock.style.display = "block";
+            document.getElementById("score").innerText = score;
+            document.getElementById("total").innerText = quizData.length;
         }
+    });
 
-        // --- 7. UI Controls & Training Loop ---
-        function resetAlgorithm() {
-            initializeCentroids();
-            lossHistory = [];
-            iterationHistory = [];
-            
-            iterationDisplay.textContent = iteration;
-            inertiaDisplay.textContent = "---";
-            statusDisplay.textContent = "Initialized. Ready to assign points.";
-            statusDisplay.className = "text-xs text-center text-slate-500 mt-3 h-4 font-medium";
-            
-            updateCharts();
-            predictNewCustomer(); // update prediction tab if it was showing a result
-        }
+    // Start
+    loadQuestion();
+</script>
 
-        function doAlgorithmStep() {
-            if (isModelTrained) return false;
-
-            // Phase 1 of step: Assignment
-            const assignmentsChanged = assignClusters();
-            
-            // Phase 2 of step: Update Centroid positions
-            const centroidsMoved = updateCentroids();
-
-            iteration++;
-            const currentInertia = calculateInertia();
-            
-            iterationHistory.push(iteration);
-            lossHistory.push(currentInertia);
-
-            // Update UI
-            iterationDisplay.textContent = iteration;
-            inertiaDisplay.textContent = Math.round(currentInertia).toLocaleString();
-            updateCharts();
-
-            // Check Convergence
-            if (!assignmentsChanged && !centroidsMoved) {
-                isModelTrained = true;
-                statusDisplay.textContent = "✓ Converged! Centroids stabilized.";
-                statusDisplay.className = "text-xs text-center text-emerald-600 mt-3 h-4 font-bold";
-                predictNewCustomer();
-                return false; // tell loop to stop
-            } else {
-                statusDisplay.textContent = "Updating clusters...";
-                statusDisplay.className = "text-xs text-center text-blue-600 mt-3 h-4 font-medium";
-                return true; // tell loop to continue
-            }
-        }
-
-        // Event Listeners for Workspace
-        kSlider.addEventListener('input', (e) => {
-            k = parseInt(e.target.value);
-            kValueDisplay.textContent = k;
-            resetAlgorithm(); // Changing K requires a full reset
-        });
-
-        stepBtn.addEventListener('click', () => {
-            if(!isModelTrained) doAlgorithmStep();
-        });
-
-        resetBtn.addEventListener('click', resetAlgorithm);
-
-        let autoTrainInterval = null;
-        trainBtn.addEventListener('click', () => {
-            if (isModelTrained) {
-                resetAlgorithm(); // If already done, reset before auto-running again
-            }
-            
-            // Disable buttons during run
-            trainBtn.disabled = true;
-            stepBtn.disabled = true;
-            
-            autoTrainInterval = setInterval(() => {
-                const shouldContinue = doAlgorithmStep();
-                if (!shouldContinue) {
-                    clearInterval(autoTrainInterval);
-                    trainBtn.disabled = false;
-                    stepBtn.disabled = false;
-                }
-            }, 600); // 600ms delay so user can visually see the centroids moving
-        });
-
-        // Event Listeners for Data Tab
-        dataCountSlider.addEventListener('input', (e) => {
-            document.getElementById('dataCountValue').textContent = e.target.value;
-        });
-        trueClusterSlider.addEventListener('input', (e) => {
-            document.getElementById('trueClusterValue').textContent = e.target.value;
-        });
-        noiseSlider.addEventListener('input', (e) => {
-            const val = parseInt(e.target.value);
-            let label = "Medium";
-            if(val < 10) label = "Tight";
-            if(val > 22) label = "Very Messy";
-            document.getElementById('noiseValue').textContent = label;
-        });
-
-        regenerateBtn.addEventListener('click', () => {
-            numDataPoints = parseInt(dataCountSlider.value);
-            numTrueClusters = parseInt(trueClusterSlider.value);
-            dataSpread = parseInt(noiseSlider.value);
-            generateData();
-        });
-
-        // --- 8. Prediction Application ---
-        function predictNewCustomer() {
-            if (!isModelTrained) {
-                predictionOutput.textContent = "Segment ?";
-                predictionOutput.className = "text-2xl font-black tracking-tight text-white opacity-50";
-                predictError.classList.remove('hidden');
-                return;
-            }
-
-            predictError.classList.add('hidden');
-            const inc = parseFloat(inputIncome.value);
-            const score = parseFloat(inputScore.value);
-            
-            if (isNaN(inc) || isNaN(score)) return;
-
-            const customer = { x: inc, y: score };
-            let minDist = Infinity;
-            let assignedCluster = 0;
-
-            centroids.forEach((centroid, i) => {
-                const dist = getDistSq(customer, centroid);
-                if (dist < minDist) {
-                    minDist = dist;
-                    assignedCluster = i;
-                }
-            });
-
-            predictionOutput.textContent = `Segment ${assignedCluster + 1}`;
-            predictionOutput.className = "text-3xl font-black tracking-tight text-white drop-shadow-md";
-            
-            // Color the result box slightly to match cluster color if possible
-            const resultBox = predictionOutput.parentElement;
-            const color = clusterColors[assignedCluster % clusterColors.length];
-            resultBox.style.backgroundColor = color.replace('0.7', '1'); // Make solid
-        }
-
-        inputIncome.addEventListener('input', predictNewCustomer);
-        inputScore.addEventListener('input', predictNewCustomer);
-
-        // --- 9. Tab Management ---
-        function switchTab(tabId) {
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.add('hidden', 'block'));
-            document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('block'));
-            document.querySelectorAll('.tab-content').forEach(el => {
-                if(el.id !== `tab-${tabId}`) el.classList.add('hidden');
-            });
-            
-            document.getElementById(`tab-${tabId}`).classList.remove('hidden');
-            document.getElementById(`tab-${tabId}`).classList.add('block');
-            
-            // Reset active states
-            document.querySelectorAll('.tab-btn').forEach(el => {
-                el.classList.remove('border-purple-500', 'text-purple-600', 'font-bold');
-                el.classList.add('border-transparent', 'text-slate-500', 'font-medium');
-            });
-
-            // Set active state
-            const activeBtn = document.getElementById(`tab-btn-${tabId}`);
-            activeBtn.classList.remove('border-transparent', 'text-slate-500', 'font-medium');
-            activeBtn.classList.add('border-purple-500', 'text-purple-600', 'font-bold');
-
-            // Force chart resize fixes visibility bugs
-            if(mainChart) mainChart.resize();
-            if(lossChart) lossChart.resize();
-        }
-
-        // --- 10. Initialization ---
-        window.onload = () => {
-            initCharts();
-            generateData(); // Generates data and resets algorithm
-        };
-
-    </script>
 </body>
 </html>
