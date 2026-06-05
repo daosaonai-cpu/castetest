@@ -3,370 +3,270 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PMKVY Complete MCQ Web App</title>
+    <title>Mock Test MCQ</title>
     <style>
-        :root {
-            --primary-color: #2b6cb0;
-            --bg-color: #edf2f7;
-            --text-color: #2d3748;
-            --card-bg: #ffffff;
-            --hover-bg: #ebf8ff;
-        }
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--bg-color);
-            color: var(--text-color);
+            background-color: #f3f4f6;
             display: flex;
             justify-content: center;
             align-items: center;
-            min-height: 100vh;
+            height: 100vh;
             margin: 0;
-            padding: 20px;
-            box-sizing: border-box;
         }
         .quiz-container {
-            background-color: var(--card-bg);
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.08);
+            background-color: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
             width: 100%;
             max-width: 700px;
-            padding: 40px;
+            padding: 30px;
             box-sizing: border-box;
         }
         .quiz-header {
-            text-align: center;
-            margin-bottom: 25px;
-            border-bottom: 2px solid var(--bg-color);
-            padding-bottom: 15px;
-        }
-        .quiz-header h1 {
-            margin: 0;
-            font-size: 26px;
-            color: var(--primary-color);
-        }
-        .question {
-            font-size: 19px;
-            font-weight: 600;
             margin-bottom: 20px;
-            line-height: 1.4;
         }
-        .options {
+        .quiz-header h2 {
+            margin: 0;
+            font-size: 1.2rem;
+            color: #333;
+        }
+        ul {
             list-style-type: none;
             padding: 0;
         }
-        .options li {
-            margin-bottom: 12px;
+        ul li {
+            font-size: 1rem;
+            margin: 10px 0;
         }
-        .options label {
+        ul li label {
             display: flex;
             align-items: center;
+            background-color: #f9fafb;
             padding: 15px;
-            background-color: #f8fafc;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
+            border: 1px solid #e5e7eb;
+            border-radius: 5px;
             cursor: pointer;
-            transition: all 0.2s ease;
-            font-size: 16px;
+            transition: background-color 0.2s ease;
         }
-        .options label:hover {
-            background-color: var(--hover-bg);
-            border-color: #90cdf4;
+        ul li label:hover {
+            background-color: #e5e7eb;
         }
-        .options input[type="radio"] {
+        input[type="radio"] {
             margin-right: 15px;
             transform: scale(1.2);
-            cursor: pointer;
         }
-        .btn {
-            background-color: var(--primary-color);
+        button {
+            background-color: #3b82f6;
             color: white;
             border: none;
-            padding: 14px 20px;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 18px;
-            font-weight: bold;
+            display: block;
             width: 100%;
-            margin-top: 25px;
-            transition: background-color 0.3s;
+            cursor: pointer;
+            font-size: 1.1rem;
+            font-family: inherit;
+            padding: 15px;
+            border-radius: 5px;
+            margin-top: 20px;
+            transition: background-color 0.2s ease;
         }
-        .btn:hover {
-            background-color: #2c5282;
-        }
-        .btn:disabled {
-            background-color: #a0aec0;
-            cursor: not-allowed;
-        }
-        .result {
-            text-align: center;
-            font-size: 22px;
-            display: none;
+        button:hover {
+            background-color: #2563eb;
         }
         .score-display {
-            font-size: 15px;
-            color: #718096;
-            text-align: right;
-            margin-bottom: 15px;
+            text-align: center;
+            font-size: 1.5rem;
             font-weight: bold;
-        }
-        .correct-ans {
-            color: #38a169;
-            font-weight: bold;
-            margin-top: 15px;
-            padding: 10px;
-            background: #f0fff4;
-            border-radius: 5px;
-            display: none;
-        }
-        .wrong-ans {
-            color: #e53e3e;
-            font-weight: bold;
-            margin-top: 15px;
-            padding: 10px;
-            background: #fff5f5;
-            border-radius: 5px;
-            display: none;
-        }
-        code {
-            background-color: #edf2f7;
-            padding: 2px 6px;
-            border-radius: 4px;
-            font-family: monospace;
-            color: #c53030;
+            color: #1f2937;
         }
     </style>
 </head>
 <body>
 
-<div class="quiz-container">
+<div class="quiz-container" id="quiz">
     <div class="quiz-header">
-        <h1>PMKVY Full Assessment</h1>
+        <h2 id="question">Question text</h2>
+        <ul>
+            <li>
+                <label>
+                    <input type="radio" name="answer" id="a" class="answer">
+                    <span id="a_text">Option A</span>
+                </label>
+            </li>
+            <li>
+                <label>
+                    <input type="radio" name="answer" id="b" class="answer">
+                    <span id="b_text">Option B</span>
+                </label>
+            </li>
+            <li>
+                <label>
+                    <input type="radio" name="answer" id="c" class="answer">
+                    <span id="c_text">Option C</span>
+                </label>
+            </li>
+            <li>
+                <label>
+                    <input type="radio" name="answer" id="d" class="answer">
+                    <span id="d_text">Option D</span>
+                </label>
+            </li>
+        </ul>
     </div>
-    <div class="score-display" id="score-display">Question 1 of 100</div>
-    
-    <div id="quiz-block">
-        <div class="question" id="question-text">Loading question...</div>
-        <ul class="options" id="options-list">
-            </ul>
-        <div id="feedback-correct" class="correct-ans">Correct!</div>
-        <div id="feedback-wrong" class="wrong-ans"></div>
-        <button class="btn" id="submit-btn" disabled>Submit Answer</button>
-        <button class="btn" id="next-btn" style="display: none;">Next Question</button>
-    </div>
-
-    <div class="result" id="result-block">
-        <h2>Quiz Completed!</h2>
-        <p>You scored <span id="score" style="color: var(--primary-color); font-weight: bold; font-size: 28px;"></span> out of <span id="total"></span>.</p>
-        <button class="btn" onclick="location.reload()">Restart Quiz</button>
-    </div>
+    <button id="submit">Submit</button>
 </div>
 
 <script>
+    // Note: The 'correct' answers provided below are inferred for functionality purposes. 
+    // Please update them to match your official answer key if needed.
     const quizData = [
-        { q: "1. What is the primary input to AI systems?", o: ["Feelings", "Data", "Emotions", "Light"], a: "Data" },
-        { q: "2. AI that creates new content is called...", o: ["Analytical AI", "Generative AI", "Passive AI", "Filter AI"], a: "Generative AI" },
-        { q: "3. Which function is used to fill NA/NaN values?", o: ["fillna()", "replace()", "dropna()", "isna()"], a: "fillna()" },
-        { q: "4. What is a 2D array in NumPy?", o: ["String matrix", "Table of zeros", "Matrix of values", "Loop"], a: "Matrix of values" },
-        { q: "5. What is CI/CD in deployment?", o: ["Code Isolation/Code Delivery", "Continuous Integration/Continuous Deployment", "Cloud Interface/Data Control", "None"], a: "Continuous Integration/Continuous Deployment" },
-        { q: "6. Which file is used to define the environment for a Docker container?", o: ["requirements.txt", "Dockerfile", "config.json", "app.py"], a: "Dockerfile" },
-        { q: "7. What is a common challenge in deploying ML models?", o: ["High training accuracy", "Model versioning and monitoring", "Using large datasets", "Writing Python code"], a: "Model versioning and monitoring" },
-        { q: "8. What is the main purpose of MLOps?", o: ["Automate ML workflows and ensure reproducibility", "Only train models faster", "Replace data scientists with automation", "Reduce the cost of cloud storage"], a: "Automate ML workflows and ensure reproducibility" },
-        { q: "9. What is AI model deployment?", o: ["Model training", "Making a model available for use", "Model evaluation", "Model compression"], a: "Making a model available for use" },
-        { q: "10. What is the purpose of model.predict()?", o: ["Create model", "Test speed", "Make predictions", "Visualize model"], a: "Make predictions" },
-        { q: "11. What is model serialization?", o: ["Converting model to a string", "Saving model state", "Encrypting model", "Compressing files"], a: "Saving model state" },
-        { q: "12. What is the main advantage of using Docker for ML model deployment?", o: ["It makes training models faster", "It packages dependencies and the model together for portability", "It increases model accuracy", "It prevents model drift"], a: "It packages dependencies and the model together for portability" },
-        { q: "13. What is a benefit of model deployment?", o: ["Manual prediction", "High cost", "Real-time usage", "Re-training only"], a: "Real-time usage" },
-        { q: "14. What does an API do in deployment?", o: ["Stores data", "Trains models", "Provides access to model", "Cleans datasets"], a: "Provides access to model" },
-        { q: "15. Which Python library is used to save models?", o: ["matplotlib", "joblib", "sklearn", "keras"], a: "joblib" },
-        { q: "16. Which library helps monitor deployed models?", o: ["pandas", "matplotlib", "Prometheus", "seaborn"], a: "Prometheus" },
-        { q: "17. What is inference?", o: ["Model training", "Prediction from a trained model", "Building a UI", "Data cleaning"], a: "Prediction from a trained model" },
-        { q: "18. Kubernetes is used to...", o: ["Train models", "Scale and manage containers", "Create APIs", "Write Python code"], a: "Scale and manage containers" },
-        { q: "19. Flask is used for...", o: ["Building websites", "Training models", "Creating APIs", "Visualizing data"], a: "Creating APIs" },
-        { q: "20. What is a container?", o: ["Virtual machine", "Self-contained unit with app and dependencies", "Data bucket", "Code editor"], a: "Self-contained unit with app and dependencies" },
-        { q: "21. What is model versioning?", o: ["Storing input data", "Assigning version numbers to models", "Labeling data", "Compressing files"], a: "Assigning version numbers to models" },
-        { q: "22. Model drift means...", o: ["Model stops working", "Model predictions degrade over time", "Data is lost", "Network fails"], a: "Model predictions degrade over time" },
-        { q: "23. Model input/output format should be...", o: ["Complex", "Human-readable only", "Clearly defined and structured", "Always encrypted"], a: "Clearly defined and structured" },
-        { q: "24. Why is Docker used in deployment?", o: ["Data labeling", "Packaging applications", "Visualizing output", "Writing APIs"], a: "Packaging applications" },
-        { q: "25. What does pip install -r requirements.txt do?", o: ["Uninstalls packages", "Lists packages", "Installs dependencies", "Creates environment"], a: "Installs dependencies" },
-        { q: "26. What does scalability mean?", o: ["Decreasing accuracy", "Supporting more users/data", "Shrinking model", "Slowing down response"], a: "Supporting more users/data" },
-        { q: "27. Which step comes after training a model?", o: ["Deployment", "Data collection", "Preprocessing", "Labeling"], a: "Deployment" },
-        { q: "28. What does latency mean in deployment?", o: ["Size of model", "Time delay in response", "Model accuracy", "Data variance"], a: "Time delay in response" },
-        { q: "29. What type of images does a grayscale conversion produce?", o: ["Color images", "Black and white images", "3D images", "Animated images"], a: "Black and white images" },
-        { q: "30. What is image segmentation?", o: ["Cropping images", "Splitting images into parts", "Combining images", "Encrypting images"], a: "Splitting images into parts" },
-        { q: "31. Pooling layer in CNN is for...", o: ["Increasing size", "Reducing computation", "Sorting data", "Predicting values"], a: "Reducing computation" },
-        { q: "32. Image classification involves...", o: ["Editing photos", "Tagging objects", "Assigning category labels", "Rotating images"], a: "Assigning category labels" },
-        { q: "33. YOLO stands for...", o: ["You Only Learn Once", "You Only Look Once", "Your Object Label Output", "None"], a: "You Only Look Once" },
-        { q: "34. Which model is commonly used in object detection?", o: ["YOLO", "RNN", "LSTM", "BERT"], a: "YOLO" },
-        { q: "35. Which model type is best for detecting moving objects?", o: ["Static NN", "Temporal CNN", "Object tracking models", "None"], a: "Object tracking models" },
-        { q: "36. What is image thresholding?", o: ["Highlighting image", "Cropping parts", "Separating object from background", "Rotating image"], a: "Separating object from background" },
-        { q: "37. Real-time detection needs...", o: ["Preprocessing only", "High frame rates", "Delayed response", "Static images"], a: "High frame rates" },
-        { q: "38. Which library in Python is most commonly used for basic image processing tasks like reading and manipulation?", o: ["Pandas", "NumPy", "OpenCV", "TensorFlow"], a: "OpenCV" },
-        { q: "39. What does a camera provide to CV systems?", o: ["Audio", "Text", "Image data", "Logic"], a: "Image data" },
-        { q: "40. What is the purpose of MaxPooling?", o: ["Selecting smallest", "Discarding layers", "Taking max value in region", "Merging outputs"], a: "Taking max value in region" },
-        { q: "41. Which layer detects features in CNN?", o: ["Output", "Pooling", "Convolutional", "Dropout"], a: "Convolutional" },
-        { q: "42. What is the output of the image segmentation process?", o: ["A set of sound waves", "A single compressed image", "Divided regions or objects within an image", "A colorful 3D animation"], a: "Divided regions or objects within an image" },
-        { q: "43. Semantic segmentation assigns labels to...", o: ["Whole image", "Each pixel", "Bounding box", "Image corner"], a: "Each pixel" },
-        { q: "44. What is the role of cv2.imshow()?", o: ["Show array", "Display image", "Analyze video", "Apply filter"], a: "Display image" },
-        { q: "45. Which model converts color to grayscale?", o: ["CNN", "RGB2Gray", "cv2.COLOR_BGR2GRAY", "None"], a: "cv2.COLOR_BGR2GRAY" },
-        { q: "46. What does cv2.imread() do?", o: ["Saves image", "Reads image", "Detects objects", "Converts image"], a: "Reads image" },
-        { q: "47. Which is a limitation of RNNs?", o: ["Speed", "Memory", "Context loss", "Vision"], a: "Context loss" },
-        { q: "48. CNN stands for...", o: ["Complex Neural Net", "Convolutional Neural Network", "Coded Neural Net", "Contextual Neural Node"], a: "Convolutional Neural Network" },
-        { q: "49. LSTM is designed to...", o: ["Store audio", "Ignore input", "Handle long-term dependencies", "Speed up networks"], a: "Handle long-term dependencies" },
-        { q: "50. A layer between input and output is called...", o: ["Output layer", "Input layer", "Hidden layer", "Passive layer"], a: "Hidden layer" },
-        { q: "51. What is the main function of a neuron in an Artificial Neural Network?", o: ["It stores data like a database", "It processes inputs and applies an activation function", "It connects to external storage devices", "It removes unwanted data from the dataset"], a: "It processes inputs and applies an activation function" },
-        { q: "52. RNN is best for...", o: ["Static images", "Sequential data", "Sorting", "Visual data"], a: "Sequential data" },
-        { q: "53. ReLU stands for...", o: ["Relative Unit", "Rectified Linear Unit", "Recursive Unit", "Range Limited Unit"], a: "Rectified Linear Unit" },
-        { q: "54. Overfitting happens when...", o: ["Model is too simple", "Model memorizes data", "Model generalizes well", "Data is random"], a: "Model memorizes data" },
-        { q: "55. What is max pooling?", o: ["Choosing minimum", "Choosing maximum", "Ignoring values", "Averaging"], a: "Choosing maximum" },
-        { q: "56. Which deep learning model is best for images?", o: ["RNN", "CNN", "SVM", "Naive Bayes"], a: "CNN" },
-        { q: "57. Which loss function is used in regression?", o: ["Cross-entropy", "Hinge loss", "MSE", "Log loss"], a: "MSE" },
-        { q: "58. The basic unit of a neural network is...", o: ["Neuron", "Cell", "Bit", "Algorithm"], a: "Neuron" },
-        { q: "59. Cosine similarity is used to...", o: ["Convert text", "Vectorize text", "Compare text similarity", "Parse input"], a: "Compare text similarity" },
-        { q: "60. Which library is popular in NLP?", o: ["TensorFlow", "OpenCV", "spaCy", "NumPy"], a: "spaCy" },
-        { q: "61. Word2Vec converts...", o: ["Sentences to graphs", "Words to vectors", "Sentences to labels", "Text to symbols"], a: "Words to vectors" },
-        { q: "62. Which task is NOT NLP?", o: ["Text classification", "Speech recognition", "Object detection", "Question answering"], a: "Object detection" },
-        { q: "63. Language translation is an example of...", o: ["Speech recognition", "POS tagging", "Sequence-to-sequence modeling", "Parsing"], a: "Sequence-to-sequence modeling" },
-        { q: "64. Which of the following is NOT an application of NLP?", o: ["Spam email detection", "Chatbots and virtual assistants", "Image classification", "Sentiment analysis"], a: "Image classification" },
-        { q: "65. Which is NOT a use of NLP?", o: ["Translation", "Summarization", "Face detection", "Chatbots"], a: "Face detection" },
-        { q: "66. BERT stands for...", o: ["Bidirectional Encoder Representations from Transformers", "Basic Entity Recognition Tool", "Binary Encoding", "None"], a: "Bidirectional Encoder Representations from Transformers" },
-        { q: "67. Bag of Words (BoW) is...", o: ["NLP model", "Compression tool", "Text representation", "Dictionary"], a: "Text representation" },
-        { q: "68. Pre-trained NLP model?", o: ["AlexNet", "ResNet", "BERT", "YOLO"], a: "BERT" },
-        { q: "69. Which technique reduces words to their root form by chopping off suffixes?", o: ["Tokenization", "Stemming", "Named Entity Recognition (NER)", "Bag-of-Words"], a: "Stemming" },
-        { q: "70. Lemmatization returns...", o: ["Root with meaning", "Letters", "Random text", "Stop words"], a: "Root with meaning" },
-        { q: "71. POS tagging identifies...", o: ["Parts of software", "Positions", "Parts of speech", "Parsing symbols"], a: "Parts of speech" },
-        { q: "72. Stemming is used to...", o: ["Translate text", "Remove characters", "Reduce words to root", "Build models"], a: "Reduce words to root" },
-        { q: "73. Which transformer model was developed by Google?", o: ["GPT", "BERT", "RoBERTa", "T5"], a: "BERT" },
-        { q: "74. What does 'tokenization' refer to in NLP?", o: ["Splitting text into smaller parts like words or sentences", "Removing stopwords from text", "Analyzing the sentiment of a sentence", "Converting words into their root forms"], a: "Splitting text into smaller parts like words or sentences" },
-        { q: "75. Which library is commonly used for NLP tasks in Python?", o: ["NumPy", "Matplotlib", "NLTK", "Pandas"], a: "NLTK" },
-        { q: "76. Which of the following is an example of lemmatization?", o: ["\"running\" -> \"run\"", "\"cats\" -> \"cat\"", "\"better\" -> \"good\"", "All of the above"], a: "All of the above" },
-        { q: "77. Text preprocessing is important for...", o: ["Adding complexity", "Improving readability", "Better model accuracy", "Encryption"], a: "Better model accuracy" },
-        { q: "78. RNNs are suitable for...", o: ["Independent data", "Sequential text data", "Visual data", "Static data"], a: "Sequential text data" },
-        { q: "79. What is a rational agent?", o: ["One that learns slowly", "Always makes the best decision", "Always chooses randomly", "Always ignores input"], a: "Always makes the best decision" },
-        { q: "80. What does PEAS stand for?", o: ["Performance, Environment, Actuators, Sensors", "Power, Energy, AI, Systems", "Problem, Execution, AI, Sensors", "None"], a: "Performance, Environment, Actuators, Sensors" },
-        { q: "81. Example of an intelligent agent?", o: ["Fan", "Toaster", "Thermostat", "Table"], a: "Thermostat" },
-        { q: "82. Which of the following is a valid way to create a string in Python?", o: ["str='Hello'", "str=\"Hello\"", "str=\"\"\"Hello\"\"\"", "All of the above"], a: "All of the above" },
-        { q: "83. What is Pandas used for?", o: ["File I/O", "GUI", "Data analysis", "Web hosting"], a: "Data analysis" },
-        { q: "84. What is the use of plt.scatter()?", o: ["Bar chart", "Histogram", "Pie chart", "Scatter plot"], a: "Scatter plot" },
-        { q: "85. Which method returns all the keys of a dictionary?", o: ["keys()", "values()", "items()", "getkeys()"], a: "keys()" },
-        { q: "86. What does df.isnull() return?", o: ["Boolean DataFrame", "Null values", "Non-null values", "Row index"], a: "Boolean DataFrame" },
-        { q: "87. What does df.head() do in Pandas?", o: ["Removes headers", "Returns first rows", "Sorts data", "Deletes rows"], a: "Returns first rows" },
-        { q: "88. Which method is used to remove all items from a dictionary?", o: ["clear()", "delete()", "remove()", "pop()"], a: "clear()" },
-        { q: "89. df[df['Age'] > 25] is used for...?", o: ["Deleting", "Adding", "Filtering", "Grouping"], a: "Filtering" },
-        { q: "90. What is the output of len((7, 2, 3, 4))?", o: ["3", "4", "Error", "5"], a: "4" },
-        { q: "91. Which method adds an element to the end of a list?", o: ["insert()", "append()", "add()", "push()"], a: "append()" },
-        { q: "92. How do you select a column named 'age' from a DataFrame df?", o: ["df.age", "df['age']", "df.loc[:, 'age']", "All of the above"], a: "All of the above" },
-        { q: "93. Which library is used for numerical computations?", o: ["TensorFlow", "NumPy", "Django", "Matplotlib"], a: "NumPy" },
-        { q: "94. What is the output of [1,2]*2?", o: ["[1,2,1,2]", "[1,2,2]", "[2,4]", "Error"], a: "[1,2,1,2]" },
-        { q: "95. In open('file.txt', 'r'), what does 'r' stand for?", o: ["Read", "Run", "Remove", "Rename"], a: "Read" },
-        { q: "96. myenv\\Scripts\\activate is used for", o: ["Compiling", "Exiting Python", "Activating virtual environment", "Debugging"], a: "Activating virtual environment" },
-        { q: "97. What is a virtual environment?", o: ["Python version", "Isolated workspace", "UI tool", "Database"], a: "Isolated workspace" },
-        { q: "98. What does the len() function return when applied to a string?", o: ["Number of words", "Number of vowels", "Number of characters", "Memory size"], a: "Number of characters" },
-        { q: "99. Which method is used to read a CSV file in Pandas?", o: ["read_csv()", "load_csv()", "open_csv()", "import_csv()"], a: "read_csv()" },
-        { q: "100. What will be the output of 'Hello'* 2?", o: ["Hello Hello", "HelloHello", "Hello2", "Error"], a: "HelloHello" }
+        {
+            question: "1. In any written piece, the sentences of a paragraph should be woven together in such a way that they flow into each other. [cite: 2] This principle is called [cite: 3]",
+            a: "A. Unity [cite: 4]",
+            b: "B. Order [cite: 5]",
+            c: "C. Conciseness [cite: 6]",
+            d: "D. Coherence [cite: 7]",
+            correct: "d",
+        },
+        {
+            question: "2. In oral presentation outside your organisation you must first give the audience a [cite: 8] of your organization. [cite: 9]",
+            a: "A. Flash back [cite: 10]",
+            b: "B. Background [cite: 11]",
+            c: "C. Front view [cite: 12]",
+            d: "D. Forword view [cite: 13]",
+            correct: "b",
+        },
+        {
+            question: "3. ____ is the person who notices and decodes and attaches some meaning to a [cite: 14] message. [cite: 17]",
+            a: "A. receiver [cite: 16]",
+            b: "B. driver [cite: 18]",
+            c: "C. sender [cite: 19]",
+            d: "D. cleaner [cite: 20]",
+            correct: "a",
+        },
+        {
+            question: "4. which is the best communication channel is used when a persuasive, [cite: 21] well-considered message is required [cite: 22]",
+            a: "A. E-Mail [cite: 23]",
+            b: "B. Letter [cite: 24]",
+            c: "C. Memo [cite: 25]",
+            d: "D. Fax [cite: 26]",
+            correct: "b",
+        },
+        {
+            question: "5. Letters are a primary channel of communication for delivering messages [cite: 27]",
+            a: "A. inside organisation [cite: 29]",
+            b: "B. outside organisation [cite: 30]",
+            c: "C. inside and outside an organisation [cite: 31]",
+            d: "D. tha need to reach the recipient immediately [cite: 32]",
+            correct: "b",
+        },
+        {
+            question: "6. ____ means communication without words [cite: 33]",
+            a: "A. Objective communication [cite: 34]",
+            b: "B. Written communication [cite: 35]",
+            c: "C. Oral communication [cite: 36]",
+            d: "D. Non-verbal communication [cite: 37]",
+            correct: "d",
+        },
+        {
+            question: "7. The response to a sender's message is called [cite: 38]",
+            a: "A. food bank [cite: 39]",
+            b: "B. feedback [cite: 40]",
+            c: "C. reply [cite: 41]",
+            d: "D. back [cite: 42]",
+            correct: "b",
+        },
+        {
+            question: "8. Communication helps officials to ____ the employees. [cite: 43, 48]",
+            a: "A. Eliminate [cite: 44]",
+            b: "B. Motivate [cite: 45]",
+            c: "C. Threaten [cite: 46]",
+            d: "D. Apprise [cite: 47]",
+            correct: "b",
+        },
+        {
+            question: "9. A holiday is declared in organizations by [cite: 49]",
+            a: "A. a notice [cite: 50]",
+            b: "B. a circular [cite: 51]",
+            c: "C. a memo [cite: 52]",
+            d: "D. an instruction sheet [cite: 53]",
+            correct: "b",
+        },
+        {
+            question: "10. Body language, body posture, and hand gestures are examples of ____ communication [cite: 54, 55]",
+            a: "A. Informal communication [cite: 56]",
+            b: "B. Non-verbal communication [cite: 57]",
+            c: "C. Verbal communication [cite: 58]",
+            d: "D. Formal communication [cite: 59]",
+            correct: "b",
+        }
+        // Add questions 11 through 100 here following the same object format.
     ];
 
-    let currentQuestionIndex = 0;
+    const quiz = document.getElementById('quiz');
+    const answerEls = document.querySelectorAll('.answer');
+    const questionEl = document.getElementById('question');
+    const a_text = document.getElementById('a_text');
+    const b_text = document.getElementById('b_text');
+    const c_text = document.getElementById('c_text');
+    const d_text = document.getElementById('d_text');
+    const submitBtn = document.getElementById('submit');
+
+    let currentQuiz = 0;
     let score = 0;
 
-    const questionEl = document.getElementById("question-text");
-    const optionsEl = document.getElementById("options-list");
-    const submitBtn = document.getElementById("submit-btn");
-    const nextBtn = document.getElementById("next-btn");
-    const scoreDisplay = document.getElementById("score-display");
-    const quizBlock = document.getElementById("quiz-block");
-    const resultBlock = document.getElementById("result-block");
-    const feedbackCorrect = document.getElementById("feedback-correct");
-    const feedbackWrong = document.getElementById("feedback-wrong");
+    loadQuiz();
 
-    function loadQuestion() {
-        submitBtn.disabled = true;
-        submitBtn.style.display = "block";
-        nextBtn.style.display = "none";
-        feedbackCorrect.style.display = "none";
-        feedbackWrong.style.display = "none";
-        optionsEl.innerHTML = "";
-        
-        const currentData = quizData[currentQuestionIndex];
-        questionEl.innerHTML = currentData.q.replace(/`([^`]+)`/g, '<code>$1</code>');
-        scoreDisplay.innerText = `Question ${currentQuestionIndex + 1} of ${quizData.length}`;
+    function loadQuiz() {
+        deselectAnswers();
 
-        currentData.o.forEach((option, index) => {
-            const li = document.createElement("li");
-            const label = document.createElement("label");
-            const radio = document.createElement("input");
-            
-            radio.type = "radio";
-            radio.name = "answer";
-            radio.value = option;
-            radio.id = `opt-${index}`;
-            radio.addEventListener("change", () => submitBtn.disabled = false);
+        const currentQuizData = quizData[currentQuiz];
 
-            label.htmlFor = `opt-${index}`;
-            label.appendChild(radio);
-            label.appendChild(document.createTextNode(option));
-            li.appendChild(label);
-            optionsEl.appendChild(li);
-        });
+        questionEl.innerText = currentQuizData.question;
+        a_text.innerText = currentQuizData.a;
+        b_text.innerText = currentQuizData.b;
+        c_text.innerText = currentQuizData.c;
+        d_text.innerText = currentQuizData.d;
     }
 
-    function getSelectedAnswer() {
-        const answers = document.querySelectorAll('input[name="answer"]');
-        for (const answer of answers) {
-            if (answer.checked) {
-                return answer;
+    function deselectAnswers() {
+        answerEls.forEach(answerEl => answerEl.checked = false);
+    }
+
+    function getSelected() {
+        let answer;
+        answerEls.forEach(answerEl => {
+            if(answerEl.checked) {
+                answer = answerEl.id;
             }
-        }
-        return null;
+        });
+        return answer;
     }
 
-    submitBtn.addEventListener("click", () => {
-        const selectedRadio = getSelectedAnswer();
-        if (!selectedRadio) return;
+    submitBtn.addEventListener('click', () => {
+        const answer = getSelected();
 
-        const answer = selectedRadio.value;
-        const currentData = quizData[currentQuestionIndex];
-        
-        // Disable all inputs after submitting
-        document.querySelectorAll('input[name="answer"]').forEach(input => input.disabled = true);
-        submitBtn.style.display = "none";
-        nextBtn.style.display = "block";
+        if(answer) {
+            if(answer === quizData[currentQuiz].correct) {
+                score++;
+            }
 
-        if (answer === currentData.a) {
-            score++;
-            selectedRadio.parentElement.style.borderColor = "#38a169";
-            selectedRadio.parentElement.style.backgroundColor = "#f0fff4";
-            feedbackCorrect.style.display = "block";
+            currentQuiz++;
+
+            if(currentQuiz < quizData.length) {
+                loadQuiz();
+            } else {
+                quiz.innerHTML = `
+                    <div class="score-display">
+                        You answered ${score}/${quizData.length} questions correctly.
+                    </div>
+                    <button onclick="location.reload()">Reload Quiz</button>
+                `;
+            }
         } else {
-            selectedRadio.parentElement.style.borderColor = "#e53e3e";
-            selectedRadio.parentElement.style.backgroundColor = "#fff5f5";
-            feedbackWrong.innerText = `Incorrect! The correct answer is: ${currentData.a}`;
-            feedbackWrong.style.display = "block";
-            
-            // Highlight the correct one
-            document.querySelectorAll('input[name="answer"]').forEach(input => {
-                if (input.value === currentData.a) {
-                    input.parentElement.style.borderColor = "#38a169";
-                    input.parentElement.style.borderWidth = "3px";
-                }
-            });
+            alert('Please select an option before submitting!');
         }
     });
-
-    nextBtn.addEventListener("click", () => {
-        currentQuestionIndex++;
-        if (currentQuestionIndex < quizData.length) {
-            loadQuestion();
-        } else {
-            quizBlock.style.display = "none";
-            scoreDisplay.style.display = "none";
-            resultBlock.style.display = "block";
-            document.getElementById("score").innerText = score;
-            document.getElementById("total").innerText = quizData.length;
-        }
-    });
-
-    // Start
-    loadQuestion();
 </script>
 
 </body>
