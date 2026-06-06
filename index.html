@@ -221,6 +221,44 @@
             font-weight: bold;
         }
 
+        .admin-modal-content {
+            max-width: 800px;
+        }
+
+        .admin-table-container {
+            overflow-x: auto;
+            margin-bottom: 1.5rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            max-height: 400px;
+        }
+
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 600px;
+        }
+
+        .admin-table th, .admin-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.95rem;
+        }
+
+        .admin-table th {
+            background-color: var(--primary-light);
+            color: var(--primary);
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
+        }
+
+        .admin-table tbody tr:hover {
+            background-color: #f8fafc;
+        }
+
         .form-group {
             margin-bottom: 1rem;
             display: flex;
@@ -372,15 +410,15 @@
             <form id="applyForm">
                 <div class="form-group">
                     <label>Full Name</label>
-                    <input type="text" required placeholder="e.g. Muluk Baglary">
+                    <input type="text" id="applyName" required placeholder="e.g. Muluk Baglary">
                 </div>
                 <div class="form-group">
                     <label>Email</label>
-                    <input type="email" required placeholder="email@example.com">
+                    <input type="email" id="applyEmail" required placeholder="email@example.com">
                 </div>
                 <div class="form-group">
                     <label>Phone Number</label>
-                    <input type="tel" required placeholder="+91 9876543210">
+                    <input type="tel" id="applyPhone" required placeholder="+91 9876543210">
                 </div>
                 <div class="btn-group">
                     <button type="button" class="btn-secondary" onclick="closeModal('applyModal')">Cancel</button>
@@ -433,6 +471,34 @@
                     <button type="submit" class="btn-primary">Publish Job</button>
                 </div>
             </form>
+        </div>
+    </div>
+
+    <!-- Admin Modal (Triggered by 'p') -->
+    <div class="modal-overlay" id="adminModal">
+        <div class="modal-content admin-modal-content">
+            <div class="modal-header">Admin Dashboard - Applications</div>
+            <div class="admin-table-container">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Job Title</th>
+                            <th>Company</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminTableBody">
+                        <!-- Data will be injected here -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="btn-group">
+                <button type="button" class="btn-secondary" onclick="closeModal('adminModal')">Close Dashboard</button>
+                <button type="button" class="btn-primary" onclick="downloadCSV()">Download CSV</button>
+            </div>
         </div>
     </div>
 
@@ -601,10 +667,27 @@
         // Form Event Listeners
         postJobBtn.addEventListener('click', () => openModal('postJobModal'));
 
+        // Store applications data in memory
+        const applicationsData = [];
+
         // Handle Application Form Submit
         document.getElementById('applyForm').addEventListener('submit', function(e) {
             e.preventDefault();
             const title = document.getElementById('applyJobTitle').textContent;
+            const name = document.getElementById('applyName').value;
+            const email = document.getElementById('applyEmail').value;
+            const phone = document.getElementById('applyPhone').value;
+
+            // Save application to the array
+            applicationsData.push({
+                date: new Date().toLocaleDateString(),
+                name: name,
+                email: email,
+                phone: phone,
+                jobTitle: title,
+                company: currentApplyingCompany
+            });
+
             closeModal('applyModal');
             showToast(`Application successfully sent to ${currentApplyingCompany} for ${title}!`);
             this.reset();
@@ -627,6 +710,83 @@
             showToast(`Job "${newJob.title}" posted successfully!`);
             this.reset(); // Clear the form
         });
+
+        // --- Admin Features ---
+
+        // Listen for 'p' key press
+        document.addEventListener('keydown', function(event) {
+            if (event.key.toLowerCase() === 'p') {
+                // Ensure user isn't currently typing inside an input field
+                const activeTag = document.activeElement.tagName.toLowerCase();
+                if (activeTag !== 'input' && activeTag !== 'textarea' && activeTag !== 'select') {
+                    renderAdminTable();
+                    openModal('adminModal');
+                }
+            }
+        });
+
+        // Render the admin table with data
+        function renderAdminTable() {
+            const tbody = document.getElementById('adminTableBody');
+            tbody.innerHTML = '';
+            
+            if (applicationsData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-light); padding: 2rem;">No applications received yet.</td></tr>';
+                return;
+            }
+
+            applicationsData.forEach(app => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${app.date}</td>
+                    <td>${app.name}</td>
+                    <td>${app.email}</td>
+                    <td>${app.phone}</td>
+                    <td>${app.jobTitle}</td>
+                    <td>${app.company}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Generate and download CSV
+        window.downloadCSV = function() {
+            if (applicationsData.length === 0) {
+                showToast("No applications to download.");
+                return;
+            }
+
+            // Define CSV headers
+            const headers = ["Date", "Applicant Name", "Email", "Phone", "Job Title", "Company"];
+            
+            // Format rows (wrap in quotes to prevent issues with commas in names)
+            const rows = applicationsData.map(app => [
+                `"${app.date}"`,
+                `"${app.name}"`,
+                `"${app.email}"`,
+                `"${app.phone}"`,
+                `"${app.jobTitle}"`,
+                `"${app.company}"`
+            ]);
+
+            // Construct CSV string
+            const csvContent = [headers.join(","), ...rows.map(r => r.join(","))].join("\n");
+            
+            // Create Blob and trigger download
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
+            
+            link.setAttribute("href", url);
+            link.setAttribute("download", "muluk_hub_applications.csv");
+            link.style.visibility = 'hidden';
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showToast("Applications CSV Downloaded successfully!");
+        };
 
         // Initial render on page load
         renderJobs(jobsData);
