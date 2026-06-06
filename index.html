@@ -3,271 +3,1201 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Mock Test MCQ</title>
+    <title>MulukCareerHub - Find Your Next Professional Opportunity</title>
+    
+    <!-- Google Fonts: Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+
+    <!-- Tailwind Config for Custom Colors/Fonts -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            900: '#1e3a8a',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
     <style>
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f3f4f6;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
-            margin: 0;
+        /* Custom Scrollbar for a premium feel */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
         }
-        .quiz-container {
-            background-color: #ffffff;
-            border-radius: 10px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            width: 100%;
-            max-width: 700px;
-            padding: 30px;
-            box-sizing: border-box;
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9; 
         }
-        .quiz-header {
-            margin-bottom: 20px;
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
+            border-radius: 4px;
         }
-        .quiz-header h2 {
-            margin: 0;
-            font-size: 1.2rem;
-            color: #333;
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
         }
-        ul {
-            list-style-type: none;
-            padding: 0;
+        
+        /* Smooth transitions */
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
         }
-        ul li {
-            font-size: 1rem;
-            margin: 10px 0;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        ul li label {
-            display: flex;
-            align-items: center;
-            background-color: #f9fafb;
-            padding: 15px;
-            border: 1px solid #e5e7eb;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: background-color 0.2s ease;
-        }
-        ul li label:hover {
-            background-color: #e5e7eb;
-        }
-        input[type="radio"] {
-            margin-right: 15px;
-            transform: scale(1.2);
-        }
-        button {
-            background-color: #3b82f6;
-            color: white;
-            border: none;
-            display: block;
-            width: 100%;
-            cursor: pointer;
-            font-size: 1.1rem;
-            font-family: inherit;
-            padding: 15px;
-            border-radius: 5px;
-            margin-top: 20px;
-            transition: background-color 0.2s ease;
-        }
-        button:hover {
-            background-color: #2563eb;
-        }
-        .score-display {
-            text-align: center;
-            font-size: 1.5rem;
-            font-weight: bold;
-            color: #1f2937;
+
+        /* Modal backdrop blur */
+        .modal-backdrop {
+            backdrop-filter: blur(4px);
         }
     </style>
 </head>
-<body>
+<body class="bg-slate-50 text-slate-900 antialiased min-h-screen flex flex-col">
 
-<div class="quiz-container" id="quiz">
-    <div class="quiz-header">
-        <h2 id="question">Question text</h2>
-        <ul>
-            <li>
-                <label>
-                    <input type="radio" name="answer" id="a" class="answer">
-                    <span id="a_text">Option A</span>
-                </label>
-            </li>
-            <li>
-                <label>
-                    <input type="radio" name="answer" id="b" class="answer">
-                    <span id="b_text">Option B</span>
-                </label>
-            </li>
-            <li>
-                <label>
-                    <input type="radio" name="answer" id="c" class="answer">
-                    <span id="c_text">Option C</span>
-                </label>
-            </li>
-            <li>
-                <label>
-                    <input type="radio" name="answer" id="d" class="answer">
-                    <span id="d_text">Option D</span>
-                </label>
-            </li>
-        </ul>
-    </div>
-    <button id="submit">Submit</button>
-</div>
+    <!-- Toast Notification Container -->
+    <div id="toast-container" class="fixed top-20 right-4 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
-<script>
-    // Note: The 'correct' answers provided below are inferred for functionality purposes. 
-    // Please update them to match your official answer key if needed.
-    const quizData = [
-        {
-            question: "1. In any written piece, the sentences of a paragraph should be woven together in such a way that they flow into each other. [cite: 2] This principle is called [cite: 3]",
-            a: "A. Unity [cite: 4]",
-            b: "B. Order [cite: 5]",
-            c: "C. Conciseness [cite: 6]",
-            d: "D. Coherence [cite: 7]",
-            correct: "d",
-        },
-        {
-            question: "2. In oral presentation outside your organisation you must first give the audience a [cite: 8] of your organization. [cite: 9]",
-            a: "A. Flash back [cite: 10]",
-            b: "B. Background [cite: 11]",
-            c: "C. Front view [cite: 12]",
-            d: "D. Forword view [cite: 13]",
-            correct: "b",
-        },
-        {
-            question: "3. ____ is the person who notices and decodes and attaches some meaning to a [cite: 14] message. [cite: 17]",
-            a: "A. receiver [cite: 16]",
-            b: "B. driver [cite: 18]",
-            c: "C. sender [cite: 19]",
-            d: "D. cleaner [cite: 20]",
-            correct: "a",
-        },
-        {
-            question: "4. which is the best communication channel is used when a persuasive, [cite: 21] well-considered message is required [cite: 22]",
-            a: "A. E-Mail [cite: 23]",
-            b: "B. Letter [cite: 24]",
-            c: "C. Memo [cite: 25]",
-            d: "D. Fax [cite: 26]",
-            correct: "b",
-        },
-        {
-            question: "5. Letters are a primary channel of communication for delivering messages [cite: 27]",
-            a: "A. inside organisation [cite: 29]",
-            b: "B. outside organisation [cite: 30]",
-            c: "C. inside and outside an organisation [cite: 31]",
-            d: "D. tha need to reach the recipient immediately [cite: 32]",
-            correct: "b",
-        },
-        {
-            question: "6. ____ means communication without words [cite: 33]",
-            a: "A. Objective communication [cite: 34]",
-            b: "B. Written communication [cite: 35]",
-            c: "C. Oral communication [cite: 36]",
-            d: "D. Non-verbal communication [cite: 37]",
-            correct: "d",
-        },
-        {
-            question: "7. The response to a sender's message is called [cite: 38]",
-            a: "A. food bank [cite: 39]",
-            b: "B. feedback [cite: 40]",
-            c: "C. reply [cite: 41]",
-            d: "D. back [cite: 42]",
-            correct: "b",
-        },
-        {
-            question: "8. Communication helps officials to ____ the employees. [cite: 43, 48]",
-            a: "A. Eliminate [cite: 44]",
-            b: "B. Motivate [cite: 45]",
-            c: "C. Threaten [cite: 46]",
-            d: "D. Apprise [cite: 47]",
-            correct: "b",
-        },
-        {
-            question: "9. A holiday is declared in organizations by [cite: 49]",
-            a: "A. a notice [cite: 50]",
-            b: "B. a circular [cite: 51]",
-            c: "C. a memo [cite: 52]",
-            d: "D. an instruction sheet [cite: 53]",
-            correct: "b",
-        },
-        {
-            question: "10. Body language, body posture, and hand gestures are examples of ____ communication [cite: 54, 55]",
-            a: "A. Informal communication [cite: 56]",
-            b: "B. Non-verbal communication [cite: 57]",
-            c: "C. Verbal communication [cite: 58]",
-            d: "D. Formal communication [cite: 59]",
-            correct: "b",
-        }
-        // Add questions 11 through 100 here following the same object format.
-    ];
-
-    const quiz = document.getElementById('quiz');
-    const answerEls = document.querySelectorAll('.answer');
-    const questionEl = document.getElementById('question');
-    const a_text = document.getElementById('a_text');
-    const b_text = document.getElementById('b_text');
-    const c_text = document.getElementById('c_text');
-    const d_text = document.getElementById('d_text');
-    const submitBtn = document.getElementById('submit');
-
-    let currentQuiz = 0;
-    let score = 0;
-
-    loadQuiz();
-
-    function loadQuiz() {
-        deselectAnswers();
-
-        const currentQuizData = quizData[currentQuiz];
-
-        questionEl.innerText = currentQuizData.question;
-        a_text.innerText = currentQuizData.a;
-        b_text.innerText = currentQuizData.b;
-        c_text.innerText = currentQuizData.c;
-        d_text.innerText = currentQuizData.d;
-    }
-
-    function deselectAnswers() {
-        answerEls.forEach(answerEl => answerEl.checked = false);
-    }
-
-    function getSelected() {
-        let answer;
-        answerEls.forEach(answerEl => {
-            if(answerEl.checked) {
-                answer = answerEl.id;
-            }
-        });
-        return answer;
-    }
-
-    submitBtn.addEventListener('click', () => {
-        const answer = getSelected();
-
-        if(answer) {
-            if(answer === quizData[currentQuiz].correct) {
-                score++;
-            }
-
-            currentQuiz++;
-
-            if(currentQuiz < quizData.length) {
-                loadQuiz();
-            } else {
-                quiz.innerHTML = `
-                    <div class="score-display">
-                        You answered ${score}/${quizData.length} questions correctly.
+    <!-- Navigation -->
+    <nav class="bg-white border-b border-slate-200 sticky top-0 z-40 shadow-sm">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16 items-center">
+                <div class="flex items-center cursor-pointer" onclick="app.navigate('home')">
+                    <div class="flex items-center justify-center w-10 h-10 bg-primary-600 rounded-lg text-white mr-3">
+                        <i data-lucide="briefcase" class="w-6 h-6"></i>
                     </div>
-                    <button onclick="location.reload()">Reload Quiz</button>
-                `;
-            }
-        } else {
-            alert('Please select an option before submitting!');
-        }
-    });
-</script>
+                    <span class="font-bold text-xl tracking-tight text-slate-900">MulukCareerHub</span>
+                </div>
+                
+                <!-- Desktop Menu -->
+                <div class="hidden md:flex space-x-8 items-center">
+                    <button onclick="app.navigate('home')" class="nav-btn text-slate-600 hover:text-primary-600 font-medium transition-colors" data-target="home">Home</button>
+                    <button onclick="app.navigate('jobs')" class="nav-btn text-slate-600 hover:text-primary-600 font-medium transition-colors" data-target="jobs">Find Jobs</button>
+                    <button onclick="app.navigate('dashboard')" class="nav-btn text-slate-600 hover:text-primary-600 font-medium transition-colors" data-target="dashboard">Dashboard</button>
+                    <div class="h-6 w-px bg-slate-200"></div>
+                    <button onclick="app.navigate('post')" class="bg-slate-900 hover:bg-slate-800 text-white px-5 py-2.5 rounded-lg font-medium transition-all shadow-sm flex items-center gap-2">
+                        <i data-lucide="plus-circle" class="w-4 h-4"></i> Post a Job
+                    </button>
+                </div>
 
+                <!-- Mobile menu button -->
+                <div class="md:hidden flex items-center">
+                    <button id="mobile-menu-btn" class="text-slate-600 hover:text-slate-900 focus:outline-none">
+                        <i data-lucide="menu" class="w-6 h-6"></i>
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Mobile Menu -->
+        <div id="mobile-menu" class="hidden md:hidden bg-white border-b border-slate-200 px-4 pt-2 pb-4 space-y-1 shadow-lg absolute w-full">
+            <button onclick="app.navigate('home'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-primary-600 hover:bg-slate-50">Home</button>
+            <button onclick="app.navigate('jobs'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-primary-600 hover:bg-slate-50">Find Jobs</button>
+            <button onclick="app.navigate('dashboard'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-slate-700 hover:text-primary-600 hover:bg-slate-50">Dashboard</button>
+            <button onclick="app.navigate('post'); toggleMobileMenu()" class="block w-full text-left px-3 py-2 rounded-md text-base font-medium text-primary-600 bg-primary-50 hover:bg-primary-100 mt-4">Post a Job</button>
+        </div>
+    </nav>
+
+    <!-- Main Content Area -->
+    <main class="flex-grow">
+        
+        <!-- ==================== HOME VIEW ==================== -->
+        <div id="view-home" class="view-section fade-in block">
+            <!-- Hero Section -->
+            <div class="bg-white border-b border-slate-200">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 lg:py-28">
+                    <div class="text-center max-w-3xl mx-auto">
+                        <h1 class="text-4xl md:text-5xl lg:text-6xl font-bold text-slate-900 tracking-tight leading-tight mb-6">
+                            Discover your next <span class="text-primary-600">career move</span>
+                        </h1>
+                        <p class="text-lg md:text-xl text-slate-600 mb-10">
+                            Connect with leading companies globally. Browse thousands of specialized roles in technology, finance, healthcare, and more.
+                        </p>
+                        
+                        <!-- Search Bar -->
+                        <div class="bg-white p-2 rounded-xl shadow-lg border border-slate-200 flex flex-col md:flex-row gap-2">
+                            <div class="flex-1 flex items-center px-4 py-3 md:py-0 border-b md:border-b-0 md:border-r border-slate-200">
+                                <i data-lucide="search" class="text-slate-400 w-5 h-5 mr-3"></i>
+                                <input type="text" id="hero-search-query" placeholder="Job title, keyword, or company" class="w-full focus:outline-none text-slate-700 placeholder-slate-400 text-lg">
+                            </div>
+                            <div class="flex-1 flex items-center px-4 py-3 md:py-0">
+                                <i data-lucide="map-pin" class="text-slate-400 w-5 h-5 mr-3"></i>
+                                <input type="text" id="hero-search-location" placeholder="City, state, or 'Remote'" class="w-full focus:outline-none text-slate-700 placeholder-slate-400 text-lg">
+                            </div>
+                            <button onclick="app.executeHeroSearch()" class="bg-primary-600 hover:bg-primary-700 text-white px-8 py-3.5 rounded-lg font-semibold transition-colors w-full md:w-auto">
+                                Search
+                            </button>
+                        </div>
+                        
+                        <div class="mt-6 flex flex-wrap justify-center gap-3 text-sm text-slate-500">
+                            <span>Popular:</span>
+                            <button onclick="app.quickSearch('Software Engineer')" class="hover:text-primary-600 font-medium transition-colors">Software Engineer</button>
+                            <button onclick="app.quickSearch('Product Manager')" class="hover:text-primary-600 font-medium transition-colors">Product Manager</button>
+                            <button onclick="app.quickSearch('Data Scientist')" class="hover:text-primary-600 font-medium transition-colors">Data Scientist</button>
+                            <button onclick="app.quickSearch('Remote')" class="hover:text-primary-600 font-medium transition-colors">Remote</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Featured Jobs Section -->
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-16">
+                <div class="flex justify-between items-end mb-8">
+                    <div>
+                        <h2 class="text-2xl font-bold text-slate-900">Featured Opportunities</h2>
+                        <p class="text-slate-600 mt-1">Curated positions from top-tier employers.</p>
+                    </div>
+                    <button onclick="app.navigate('jobs')" class="hidden sm:flex items-center text-primary-600 font-medium hover:text-primary-700 transition-colors">
+                        View all jobs <i data-lucide="arrow-right" class="w-4 h-4 ml-1"></i>
+                    </button>
+                </div>
+                
+                <div id="featured-jobs-container" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                    <!-- Featured jobs populated via JS -->
+                </div>
+                
+                <button onclick="app.navigate('jobs')" class="sm:hidden w-full mt-8 bg-white border border-slate-300 text-slate-700 py-3 rounded-lg font-medium hover:bg-slate-50 transition-colors flex justify-center items-center">
+                    View all jobs <i data-lucide="arrow-right" class="w-4 h-4 ml-2"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- ==================== JOBS LISTING VIEW ==================== -->
+        <div id="view-jobs" class="view-section hidden bg-slate-50 min-h-screen pb-16">
+            <div class="bg-white border-b border-slate-200 py-8">
+                <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                    <h1 class="text-3xl font-bold text-slate-900 mb-6">Explore Jobs</h1>
+                    
+                    <!-- Main Search & Filter Bar -->
+                    <div class="flex flex-col lg:flex-row gap-4">
+                        <div class="flex-1 relative">
+                            <i data-lucide="search" class="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5"></i>
+                            <input type="text" id="jobs-search-input" placeholder="Search by job title or keyword..." class="w-full pl-11 pr-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all text-slate-700">
+                        </div>
+                        <div class="w-full lg:w-64 relative">
+                            <i data-lucide="map-pin" class="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5"></i>
+                            <select id="jobs-location-filter" class="w-full pl-11 pr-10 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all text-slate-700 appearance-none bg-white">
+                                <option value="">All Locations</option>
+                                <option value="Remote">Remote</option>
+                                <option value="New York">New York</option>
+                                <option value="San Francisco">San Francisco</option>
+                                <option value="London">London</option>
+                                <option value="Berlin">Berlin</option>
+                            </select>
+                            <i data-lucide="chevron-down" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4 pointer-events-none"></i>
+                        </div>
+                        <div class="w-full lg:w-64 relative">
+                            <i data-lucide="briefcase" class="absolute left-4 top-1/2 transform -translate-y-1/2 text-slate-400 w-5 h-5"></i>
+                            <select id="jobs-type-filter" class="w-full pl-11 pr-10 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all text-slate-700 appearance-none bg-white">
+                                <option value="">All Job Types</option>
+                                <option value="Full-time">Full-time</option>
+                                <option value="Part-time">Part-time</option>
+                                <option value="Contract">Contract</option>
+                                <option value="Freelance">Freelance</option>
+                            </select>
+                            <i data-lucide="chevron-down" class="absolute right-4 top-1/2 transform -translate-y-1/2 text-slate-400 w-4 h-4 pointer-events-none"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+                <div class="flex flex-col lg:flex-row gap-8">
+                    
+                    <!-- Sidebar Filters -->
+                    <aside class="w-full lg:w-64 flex-shrink-0">
+                        <div class="bg-white rounded-xl shadow-sm border border-slate-200 p-6 sticky top-24">
+                            <div class="flex justify-between items-center mb-4">
+                                <h3 class="font-semibold text-slate-900">Filters</h3>
+                                <button onclick="app.resetFilters()" class="text-sm text-primary-600 hover:text-primary-700 font-medium">Clear all</button>
+                            </div>
+                            
+                            <!-- Salary Range -->
+                            <div class="mb-6">
+                                <h4 class="text-sm font-medium text-slate-700 mb-3">Salary Range</h4>
+                                <div class="space-y-2">
+                                    <label class="flex items-center gap-3 cursor-pointer group">
+                                        <input type="radio" name="salary" value="all" checked class="w-4 h-4 text-primary-600 focus:ring-primary-500 border-slate-300" onchange="app.filterJobs()">
+                                        <span class="text-sm text-slate-600 group-hover:text-slate-900">Any Salary</span>
+                                    </label>
+                                    <label class="flex items-center gap-3 cursor-pointer group">
+                                        <input type="radio" name="salary" value="50-100" class="w-4 h-4 text-primary-600 focus:ring-primary-500 border-slate-300" onchange="app.filterJobs()">
+                                        <span class="text-sm text-slate-600 group-hover:text-slate-900">$50k - $100k</span>
+                                    </label>
+                                    <label class="flex items-center gap-3 cursor-pointer group">
+                                        <input type="radio" name="salary" value="100-150" class="w-4 h-4 text-primary-600 focus:ring-primary-500 border-slate-300" onchange="app.filterJobs()">
+                                        <span class="text-sm text-slate-600 group-hover:text-slate-900">$100k - $150k</span>
+                                    </label>
+                                    <label class="flex items-center gap-3 cursor-pointer group">
+                                        <input type="radio" name="salary" value="150+" class="w-4 h-4 text-primary-600 focus:ring-primary-500 border-slate-300" onchange="app.filterJobs()">
+                                        <span class="text-sm text-slate-600 group-hover:text-slate-900">$150k+</span>
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <!-- Experience Level -->
+                            <div>
+                                <h4 class="text-sm font-medium text-slate-700 mb-3">Experience Level</h4>
+                                <div class="space-y-2">
+                                    <label class="flex items-center gap-3 cursor-pointer group">
+                                        <input type="checkbox" value="Entry" class="exp-filter w-4 h-4 text-primary-600 focus:ring-primary-500 border-slate-300 rounded" onchange="app.filterJobs()">
+                                        <span class="text-sm text-slate-600 group-hover:text-slate-900">Entry Level</span>
+                                    </label>
+                                    <label class="flex items-center gap-3 cursor-pointer group">
+                                        <input type="checkbox" value="Mid" class="exp-filter w-4 h-4 text-primary-600 focus:ring-primary-500 border-slate-300 rounded" onchange="app.filterJobs()">
+                                        <span class="text-sm text-slate-600 group-hover:text-slate-900">Mid Level</span>
+                                    </label>
+                                    <label class="flex items-center gap-3 cursor-pointer group">
+                                        <input type="checkbox" value="Senior" class="exp-filter w-4 h-4 text-primary-600 focus:ring-primary-500 border-slate-300 rounded" onchange="app.filterJobs()">
+                                        <span class="text-sm text-slate-600 group-hover:text-slate-900">Senior Level</span>
+                                    </label>
+                                    <label class="flex items-center gap-3 cursor-pointer group">
+                                        <input type="checkbox" value="Lead" class="exp-filter w-4 h-4 text-primary-600 focus:ring-primary-500 border-slate-300 rounded" onchange="app.filterJobs()">
+                                        <span class="text-sm text-slate-600 group-hover:text-slate-900">Lead / Manager</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                    </aside>
+
+                    <!-- Job List -->
+                    <div class="flex-1">
+                        <div class="flex justify-between items-center mb-6">
+                            <p class="text-slate-600"><span id="job-count" class="font-semibold text-slate-900">0</span> jobs found</p>
+                            <div class="flex items-center gap-2">
+                                <span class="text-sm text-slate-500">Sort by:</span>
+                                <select id="sort-select" onchange="app.filterJobs()" class="text-sm border-none bg-transparent font-medium text-slate-900 focus:ring-0 cursor-pointer outline-none">
+                                    <option value="newest">Newest first</option>
+                                    <option value="salary">Highest Salary</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div id="main-jobs-container" class="space-y-4">
+                            <!-- Main jobs list populated via JS -->
+                        </div>
+                        
+                        <!-- Empty State -->
+                        <div id="no-jobs-state" class="hidden bg-white rounded-xl border border-slate-200 p-12 text-center">
+                            <div class="w-16 h-16 bg-slate-100 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <i data-lucide="search-x" class="w-8 h-8 text-slate-400"></i>
+                            </div>
+                            <h3 class="text-lg font-bold text-slate-900 mb-2">No jobs found</h3>
+                            <p class="text-slate-500 mb-6">We couldn't find any positions matching your specific criteria. Try adjusting your filters or search terms.</p>
+                            <button onclick="app.resetFilters()" class="bg-primary-50 text-primary-700 hover:bg-primary-100 px-6 py-2.5 rounded-lg font-medium transition-colors">
+                                Clear Filters
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== POST JOB VIEW ==================== -->
+        <div id="view-post" class="view-section hidden fade-in py-12">
+            <div class="max-w-3xl mx-auto px-4 sm:px-6">
+                <div class="text-center mb-10">
+                    <h1 class="text-3xl font-bold text-slate-900">Post a New Opportunity</h1>
+                    <p class="text-slate-600 mt-2">Reach thousands of qualified professionals immediately.</p>
+                </div>
+                
+                <div class="bg-white rounded-2xl shadow-sm border border-slate-200 p-8 md:p-10">
+                    <form id="post-job-form" onsubmit="app.handlePostJob(event)" class="space-y-8">
+                        
+                        <!-- Company Info -->
+                        <div>
+                            <h3 class="text-lg font-semibold text-slate-900 border-b border-slate-200 pb-3 mb-5">Company Details</h3>
+                            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-2">Company Name *</label>
+                                    <input type="text" id="post-company" required class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all">
+                                </div>
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-2">Industry</label>
+                                    <input type="text" id="post-industry" placeholder="e.g. Technology, Finance" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all">
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Job Details -->
+                        <div>
+                            <h3 class="text-lg font-semibold text-slate-900 border-b border-slate-200 pb-3 mb-5">Job Details</h3>
+                            <div class="space-y-6">
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-2">Job Title *</label>
+                                    <input type="text" id="post-title" required placeholder="e.g. Senior Frontend Developer" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all">
+                                </div>
+                                
+                                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                    <div>
+                                        <label class="block text-sm font-medium text-slate-700 mb-2">Location *</label>
+                                        <input type="text" id="post-location" required placeholder="City, Country or Remote" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-slate-700 mb-2">Job Type *</label>
+                                        <select id="post-type" required class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all appearance-none bg-white">
+                                            <option value="Full-time">Full-time</option>
+                                            <option value="Part-time">Part-time</option>
+                                            <option value="Contract">Contract</option>
+                                            <option value="Freelance">Freelance</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-slate-700 mb-2">Experience Level</label>
+                                        <select id="post-level" required class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all appearance-none bg-white">
+                                            <option value="Entry">Entry Level</option>
+                                            <option value="Mid">Mid Level</option>
+                                            <option value="Senior">Senior Level</option>
+                                            <option value="Lead">Lead / Manager</option>
+                                        </select>
+                                    </div>
+                                </div>
+
+                                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                                    <div>
+                                        <label class="block text-sm font-medium text-slate-700 mb-2">Min Salary (USD)</label>
+                                        <input type="number" id="post-salary-min" placeholder="e.g. 80000" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all">
+                                    </div>
+                                    <div>
+                                        <label class="block text-sm font-medium text-slate-700 mb-2">Max Salary (USD)</label>
+                                        <input type="number" id="post-salary-max" placeholder="e.g. 120000" class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all">
+                                    </div>
+                                </div>
+
+                                <div>
+                                    <label class="block text-sm font-medium text-slate-700 mb-2">Job Description *</label>
+                                    <textarea id="post-description" required rows="6" placeholder="Describe the role, responsibilities, and requirements..." class="w-full px-4 py-3 rounded-lg border border-slate-300 focus:ring-2 focus:ring-primary-500 focus:border-primary-500 outline-none transition-all resize-none"></textarea>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="pt-4 border-t border-slate-200 flex justify-end gap-4">
+                            <button type="button" onclick="app.navigate('home')" class="px-6 py-3 rounded-lg font-medium text-slate-700 hover:bg-slate-100 transition-colors">Cancel</button>
+                            <button type="submit" class="bg-primary-600 hover:bg-primary-700 text-white px-8 py-3 rounded-lg font-semibold transition-colors shadow-sm">Post Job Listing</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <!-- ==================== DASHBOARD VIEW ==================== -->
+        <div id="view-dashboard" class="view-section hidden fade-in py-12 bg-slate-50 min-h-screen">
+            <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                
+                <div class="flex items-center gap-4 mb-8">
+                    <div class="w-16 h-16 bg-indigo-100 rounded-full flex items-center justify-center text-indigo-600 border-2 border-white shadow-sm">
+                        <i data-lucide="user" class="w-8 h-8"></i>
+                    </div>
+                    <div>
+                        <h1 class="text-3xl font-bold text-slate-900">My Dashboard</h1>
+                        <p class="text-slate-600">Manage your applications and saved opportunities.</p>
+                    </div>
+                </div>
+
+                <!-- Tabs -->
+                <div class="border-b border-slate-200 mb-8 flex gap-8">
+                    <button onclick="app.switchDashboardTab('applied')" id="tab-applied" class="pb-4 font-medium border-b-2 border-primary-600 text-primary-600 transition-colors">
+                        Applied Jobs (<span id="count-applied">0</span>)
+                    </button>
+                    <button onclick="app.switchDashboardTab('saved')" id="tab-saved" class="pb-4 font-medium border-b-2 border-transparent text-slate-500 hover:text-slate-700 transition-colors">
+                        Saved Jobs (<span id="count-saved">0</span>)
+                    </button>
+                </div>
+
+                <!-- Dashboard Content -->
+                <div id="dashboard-content" class="space-y-4">
+                    <!-- Populated via JS -->
+                </div>
+
+            </div>
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="bg-slate-900 text-slate-400 py-12 mt-auto border-t border-slate-800">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8">
+                <div class="col-span-1 md:col-span-1">
+                    <div class="flex items-center text-white mb-4">
+                        <div class="flex items-center justify-center w-8 h-8 bg-primary-600 rounded text-white mr-2">
+                            <i data-lucide="briefcase" class="w-5 h-5"></i>
+                        </div>
+                        <span class="font-bold text-xl tracking-tight">MulukCareerHub</span>
+                    </div>
+                    <p class="text-sm">Connecting exceptional talent with world-class organizations globally.</p>
+                </div>
+                <div>
+                    <h4 class="text-white font-semibold mb-4">For Candidates</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="hover:text-white transition-colors">Browse Jobs</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Salary Checker</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Career Advice</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-semibold mb-4">For Employers</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" onclick="app.navigate('post')" class="hover:text-white transition-colors">Post a Job</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Pricing Solutions</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Talent Search</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="text-white font-semibold mb-4">Company</h4>
+                    <ul class="space-y-2 text-sm">
+                        <li><a href="#" class="hover:text-white transition-colors">About Us</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Contact</a></li>
+                        <li><a href="#" class="hover:text-white transition-colors">Privacy Policy</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-slate-800 mt-12 pt-8 text-sm flex flex-col md:flex-row justify-between items-center">
+                <p>&copy; 2026 MulukCareerHub Portal. All rights reserved.</p>
+                <div class="flex space-x-4 mt-4 md:mt-0">
+                    <a href="#" class="text-slate-400 hover:text-white"><i data-lucide="twitter" class="w-5 h-5"></i></a>
+                    <a href="#" class="text-slate-400 hover:text-white"><i data-lucide="linkedin" class="w-5 h-5"></i></a>
+                    <a href="#" class="text-slate-400 hover:text-white"><i data-lucide="github" class="w-5 h-5"></i></a>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Job Details Modal -->
+    <div id="job-modal" class="hidden fixed inset-0 z-50 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
+            <!-- Background overlay -->
+            <div class="fixed inset-0 bg-slate-900 bg-opacity-60 modal-backdrop transition-opacity cursor-pointer" onclick="app.closeModal()"></div>
+
+            <span class="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            
+            <!-- Modal Panel -->
+            <div class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-2xl w-full">
+                
+                <!-- Header with Action Buttons -->
+                <div class="absolute top-0 right-0 pt-4 pr-4 flex gap-2">
+                    <button id="modal-save-btn" class="p-2 rounded-full bg-white hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors shadow-sm border border-slate-200">
+                        <i data-lucide="bookmark" class="w-5 h-5"></i>
+                    </button>
+                    <button onclick="app.closeModal()" class="p-2 rounded-full bg-white hover:bg-slate-100 text-slate-400 hover:text-slate-600 transition-colors shadow-sm border border-slate-200">
+                        <i data-lucide="x" class="w-5 h-5"></i>
+                    </button>
+                </div>
+
+                <div class="bg-white px-4 pt-5 pb-4 sm:p-8 sm:pb-6">
+                    <div class="sm:flex sm:items-start">
+                        <div class="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                            <!-- Logo & Basic Info -->
+                            <div class="flex items-center mb-6">
+                                <div id="modal-logo" class="w-16 h-16 rounded-xl flex items-center justify-center text-2xl font-bold text-white shadow-sm mr-5 flex-shrink-0">
+                                    <!-- Dynamic Initials -->
+                                </div>
+                                <div>
+                                    <h3 class="text-2xl leading-6 font-bold text-slate-900 mb-1" id="modal-title">Job Title</h3>
+                                    <p class="text-lg font-medium text-primary-600" id="modal-company">Company Name</p>
+                                </div>
+                            </div>
+
+                            <!-- Meta Badges -->
+                            <div class="flex flex-wrap gap-2 mb-8 border-b border-slate-100 pb-6" id="modal-badges">
+                                <!-- Populated dynamically -->
+                            </div>
+
+                            <!-- Job Description -->
+                            <div class="mt-2">
+                                <h4 class="text-lg font-semibold text-slate-900 mb-3">About the Role</h4>
+                                <div id="modal-description" class="text-slate-600 text-sm leading-relaxed space-y-4 whitespace-pre-line">
+                                    <!-- Dynamic Description -->
+                                </div>
+                            </div>
+                            
+                            <div class="mt-8 bg-slate-50 p-4 rounded-xl border border-slate-100">
+                                <h4 class="text-sm font-semibold text-slate-900 mb-2">Requirements</h4>
+                                <ul class="list-disc list-inside text-sm text-slate-600 space-y-1" id="modal-requirements">
+                                    <!-- Populated dynamically or mocked based on level -->
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Footer Action -->
+                <div class="bg-slate-50 px-4 py-4 sm:px-8 sm:flex sm:flex-row-reverse border-t border-slate-200">
+                    <button type="button" id="modal-apply-btn" class="w-full inline-flex justify-center rounded-lg border border-transparent shadow-sm px-8 py-3 bg-primary-600 text-base font-medium text-white hover:bg-primary-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:ml-3 sm:w-auto sm:text-sm transition-colors">
+                        Apply Now
+                    </button>
+                    <button type="button" onclick="app.closeModal()" class="mt-3 w-full inline-flex justify-center rounded-lg border border-slate-300 shadow-sm px-6 py-3 bg-white text-base font-medium text-slate-700 hover:bg-slate-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm transition-colors">
+                        Cancel
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Success Modal -->
+    <div id="success-modal" class="hidden fixed inset-0 z-[60] overflow-y-auto">
+        <div class="flex items-center justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:p-0">
+            <div class="fixed inset-0 bg-slate-900 bg-opacity-60 modal-backdrop transition-opacity"></div>
+            <div class="inline-block align-bottom bg-white rounded-2xl text-left overflow-hidden shadow-2xl transform transition-all sm:my-8 sm:align-middle sm:max-w-sm w-full p-8 text-center">
+                <div class="mx-auto flex items-center justify-center h-16 w-16 rounded-full bg-green-100 mb-6">
+                    <i data-lucide="check" class="h-8 w-8 text-green-600"></i>
+                </div>
+                <h3 class="text-2xl font-bold text-slate-900 mb-2">Application Sent!</h3>
+                <p class="text-slate-500 mb-8">Your profile has been successfully submitted to the employer. You can track your status in the Dashboard.</p>
+                <button onclick="app.closeSuccessModal()" class="w-full inline-flex justify-center rounded-lg border border-transparent shadow-sm px-4 py-3 bg-primary-600 text-base font-medium text-white hover:bg-primary-700 focus:outline-none transition-colors">
+                    Back to Jobs
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Application Logic -->
+    <script>
+        // --- 1. Realistic Mock Data ---
+        const initialJobs = [
+            {
+                id: 'j1',
+                title: 'Senior Full Stack Engineer',
+                company: 'Innovate AI',
+                location: 'San Francisco, CA',
+                type: 'Full-time',
+                level: 'Senior',
+                salaryMin: 140000,
+                salaryMax: 180000,
+                posted: '2 hours ago',
+                color: '#3b82f6', // Blue
+                featured: true,
+                description: `We are looking for a Senior Full Stack Engineer to join our core product team. You will be responsible for architecting and building highly scalable, intelligent web applications that leverage our proprietary AI models.
+
+                In this role, you will collaborate closely with machine learning engineers, product managers, and designers to define and ship new features. The ideal candidate has deep expertise in React, Node.js, and modern cloud infrastructure (AWS/GCP), along with a passion for clean, maintainable code.
+                
+                You will mentor junior engineers, establish best practices, and drive the technical direction of critical frontend and backend systems.`
+            },
+            {
+                id: 'j2',
+                title: 'Product Designer (UX/UI)',
+                company: 'Fintech Solutions',
+                location: 'Remote',
+                type: 'Full-time',
+                level: 'Mid',
+                salaryMin: 110000,
+                salaryMax: 145000,
+                posted: '5 hours ago',
+                color: '#10b981', // Emerald
+                featured: true,
+                description: `Fintech Solutions is seeking an imaginative and detail-oriented Product Designer. You will take ownership of the user experience for our flagship mobile application, transforming complex financial data into intuitive, engaging interfaces.
+
+                You will conduct user research, create wireframes and high-fidelity prototypes, and work alongside engineering teams to ensure flawless implementation. Strong proficiency in Figma and a compelling portfolio demonstrating complex problem-solving are required. Experience in the financial or banking sector is a huge plus.`
+            },
+            {
+                id: 'j3',
+                title: 'DevOps Cloud Specialist',
+                company: 'CloudScale Inc',
+                location: 'New York, NY',
+                type: 'Contract',
+                level: 'Senior',
+                salaryMin: 130000,
+                salaryMax: 160000,
+                posted: '1 day ago',
+                color: '#8b5cf6', // Violet
+                featured: false,
+                description: `We need an experienced DevOps professional to lead our migration to a containerized microservices architecture. You will design, implement, and maintain CI/CD pipelines using Jenkins and GitLab Actions, and manage our Kubernetes clusters in AWS.
+
+                Security and reliability are paramount. You will implement robust monitoring and alerting systems (Prometheus, Grafana) and ensure infrastructure as code practices are strictly followed using Terraform.`
+            },
+            {
+                id: 'j4',
+                title: 'Data Scientist',
+                company: 'HealthPlus Metrics',
+                location: 'Berlin, Germany',
+                type: 'Full-time',
+                level: 'Mid',
+                salaryMin: 85000,
+                salaryMax: 115000,
+                posted: '2 days ago',
+                color: '#ec4899', // Pink
+                featured: true,
+                description: `Join HealthPlus Metrics in our mission to revolutionize patient care through data. As a Data Scientist, you will analyze massive healthcare datasets to identify trends, build predictive models, and extract actionable insights.
+
+                You must be proficient in Python, SQL, and popular ML frameworks (scikit-learn, TensorFlow, or PyTorch). Experience working with sensitive data (HIPAA/GDPR compliance) is highly desirable.`
+            },
+            {
+                id: 'j5',
+                title: 'Frontend React Developer',
+                company: 'E-Commerce Global',
+                location: 'Remote',
+                type: 'Full-time',
+                level: 'Entry',
+                salaryMin: 70000,
+                salaryMax: 90000,
+                posted: '3 days ago',
+                color: '#f59e0b', // Amber
+                featured: false,
+                description: `We are expanding our consumer-facing storefront team and looking for a driven Frontend Developer. You will help build responsive, accessible, and highly performant web interfaces using React, Next.js, and Tailwind CSS.
+
+                This is an excellent opportunity to learn from experienced engineers in a fast-paced environment. Strong knowledge of modern JavaScript (ES6+) and a solid understanding of web fundamentals are required.`
+            },
+            {
+                id: 'j6',
+                title: 'Engineering Manager',
+                company: 'TechFlow',
+                location: 'London, UK',
+                type: 'Full-time',
+                level: 'Lead',
+                salaryMin: 150000,
+                salaryMax: 190000,
+                posted: '1 week ago',
+                color: '#14b8a6', // Teal
+                featured: false,
+                description: `TechFlow is looking for an Engineering Manager to lead a cross-functional squad of 6-8 engineers. You will focus on team growth, technical strategy, and delivery execution.
+
+                You should have a strong background in software engineering, excellent communication skills, and a proven track record of mentoring developers and delivering complex projects on time. While this is primarily a management role, you should be technical enough to participate in architecture discussions and code reviews.`
+            }
+        ];
+
+        // --- 2. Application State ---
+        const app = {
+            jobs: [...initialJobs],
+            savedJobs: new Set(),
+            appliedJobs: new Set(),
+            currentView: 'home',
+            activeModalJobId: null,
+            dashboardTab: 'applied',
+            
+            // Initialization
+            init() {
+                // Initialize icons
+                lucide.createIcons();
+                
+                // Add event listeners to search inputs
+                document.getElementById('jobs-search-input').addEventListener('input', this.debounce(() => this.filterJobs(), 300));
+                document.getElementById('jobs-location-filter').addEventListener('change', () => this.filterJobs());
+                document.getElementById('jobs-type-filter').addEventListener('change', () => this.filterJobs());
+                
+                // Set up navigation
+                this.navigate('home');
+                
+                // Render initial data
+                this.renderFeaturedJobs();
+                this.renderJobsList(this.jobs);
+            },
+
+            // Navigation
+            navigate(viewId) {
+                // Hide all views
+                document.querySelectorAll('.view-section').forEach(el => {
+                    el.classList.add('hidden');
+                    el.classList.remove('block');
+                });
+                
+                // Show target view
+                const targetEl = document.getElementById(`view-${viewId}`);
+                if (targetEl) {
+                    targetEl.classList.remove('hidden');
+                    targetEl.classList.add('block');
+                }
+                
+                // Update nav styling
+                document.querySelectorAll('.nav-btn').forEach(btn => {
+                    if (btn.dataset.target === viewId) {
+                        btn.classList.add('text-primary-600', 'font-semibold');
+                        btn.classList.remove('text-slate-600', 'font-medium');
+                    } else {
+                        btn.classList.remove('text-primary-600', 'font-semibold');
+                        btn.classList.add('text-slate-600', 'font-medium');
+                    }
+                });
+
+                this.currentView = viewId;
+
+                // View specific logic
+                if (viewId === 'jobs') {
+                    this.filterJobs();
+                } else if (viewId === 'dashboard') {
+                    this.renderDashboard();
+                }
+
+                // Scroll to top
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+            },
+
+            // Search & Filtering
+            executeHeroSearch() {
+                const query = document.getElementById('hero-search-query').value;
+                const location = document.getElementById('hero-search-location').value;
+                
+                document.getElementById('jobs-search-input').value = query;
+                
+                // Try to match location to dropdown, otherwise leave as custom (filtering logic handles custom string matches)
+                const locSelect = document.getElementById('jobs-location-filter');
+                let foundLoc = false;
+                for(let i=0; i<locSelect.options.length; i++) {
+                    if(locSelect.options[i].value.toLowerCase() === location.toLowerCase()) {
+                        locSelect.selectedIndex = i;
+                        foundLoc = true;
+                        break;
+                    }
+                }
+                if(!foundLoc && location) {
+                    // For simplicity in this vanilla demo, if it doesn't match standard dropdown, 
+                    // we just append it to the search query so text search picks it up.
+                    document.getElementById('jobs-search-input').value += ` ${location}`;
+                }
+
+                this.navigate('jobs');
+            },
+
+            quickSearch(term) {
+                if (term === 'Remote') {
+                    document.getElementById('jobs-location-filter').value = 'Remote';
+                    document.getElementById('jobs-search-input').value = '';
+                } else {
+                    document.getElementById('jobs-search-input').value = term;
+                    document.getElementById('jobs-location-filter').value = '';
+                }
+                this.navigate('jobs');
+            },
+
+            filterJobs() {
+                const query = document.getElementById('jobs-search-input').value.toLowerCase();
+                const location = document.getElementById('jobs-location-filter').value;
+                const type = document.getElementById('jobs-type-filter').value;
+                const sort = document.getElementById('sort-select').value;
+                
+                // Radio salary
+                const salaryChecked = document.querySelector('input[name="salary"]:checked').value;
+                
+                // Checkbox Experience
+                const expCheckboxes = document.querySelectorAll('.exp-filter:checked');
+                const expLevels = Array.from(expCheckboxes).map(cb => cb.value);
+
+                let filtered = this.jobs.filter(job => {
+                    // Text search
+                    const matchText = job.title.toLowerCase().includes(query) || 
+                                      job.company.toLowerCase().includes(query) ||
+                                      job.description.toLowerCase().includes(query);
+                    // Dropdowns
+                    const matchLoc = location === '' || job.location.includes(location);
+                    const matchType = type === '' || job.type === type;
+                    
+                    // Salary
+                    let matchSal = true;
+                    if (salaryChecked === '50-100') matchSal = job.salaryMax >= 50000 && job.salaryMin <= 100000;
+                    else if (salaryChecked === '100-150') matchSal = job.salaryMax >= 100000 && job.salaryMin <= 150000;
+                    else if (salaryChecked === '150+') matchSal = job.salaryMax >= 150000;
+
+                    // Experience
+                    const matchExp = expLevels.length === 0 || expLevels.includes(job.level);
+
+                    return matchText && matchLoc && matchType && matchSal && matchExp;
+                });
+
+                // Sorting
+                if (sort === 'salary') {
+                    filtered.sort((a, b) => b.salaryMax - a.salaryMax);
+                } else {
+                    // Mock newest logic: Since ID dictates insert order loosely, sort reverse ID
+                    filtered.sort((a, b) => b.id.localeCompare(a.id));
+                }
+
+                this.renderJobsList(filtered);
+            },
+
+            resetFilters() {
+                document.getElementById('jobs-search-input').value = '';
+                document.getElementById('jobs-location-filter').value = '';
+                document.getElementById('jobs-type-filter').value = '';
+                document.querySelector('input[name="salary"][value="all"]').checked = true;
+                document.querySelectorAll('.exp-filter').forEach(cb => cb.checked = false);
+                this.filterJobs();
+            },
+
+            // Rendering
+            createJobCardHTML(job) {
+                const isSaved = this.savedJobs.has(job.id);
+                const isApplied = this.appliedJobs.has(job.id);
+                const salaryRange = `$${(job.salaryMin/1000).toFixed(0)}k - $${(job.salaryMax/1000).toFixed(0)}k`;
+                const initials = job.company.substring(0, 2).toUpperCase();
+                
+                return `
+                    <div class="bg-white rounded-xl shadow-sm hover:shadow-md border border-slate-200 p-6 transition-all group flex flex-col sm:flex-row gap-5 relative">
+                        <!-- Logo -->
+                        <div class="w-14 h-14 rounded-lg flex items-center justify-center text-xl font-bold text-white flex-shrink-0 shadow-sm" style="background-color: ${job.color}">
+                            ${initials}
+                        </div>
+                        
+                        <!-- Info -->
+                        <div class="flex-grow">
+                            <div class="flex justify-between items-start mb-1">
+                                <h3 class="text-lg font-bold text-slate-900 group-hover:text-primary-600 transition-colors cursor-pointer" onclick="app.openModal('${job.id}')">${job.title}</h3>
+                                <button onclick="app.toggleSave('${job.id}', event)" class="text-slate-400 hover:text-primary-600 transition-colors hidden sm:block p-1">
+                                    <i data-lucide="bookmark" class="w-5 h-5 ${isSaved ? 'fill-primary-600 text-primary-600' : ''}"></i>
+                                </button>
+                            </div>
+                            <p class="text-slate-600 font-medium mb-3">${job.company}</p>
+                            
+                            <div class="flex flex-wrap gap-2 md:gap-4 text-sm text-slate-500 mb-4">
+                                <span class="flex items-center"><i data-lucide="map-pin" class="w-4 h-4 mr-1"></i> ${job.location}</span>
+                                <span class="flex items-center"><i data-lucide="briefcase" class="w-4 h-4 mr-1"></i> ${job.type}</span>
+                                <span class="flex items-center"><i data-lucide="dollar-sign" class="w-4 h-4 mr-1"></i> ${salaryRange}</span>
+                                <span class="flex items-center"><i data-lucide="clock" class="w-4 h-4 mr-1"></i> ${job.posted}</span>
+                            </div>
+
+                            <div class="flex flex-wrap gap-2">
+                                <span class="px-2.5 py-1 bg-slate-100 text-slate-600 rounded-md text-xs font-medium">${job.level}</span>
+                                ${job.location.toLowerCase().includes('remote') ? '<span class="px-2.5 py-1 bg-green-50 text-green-700 rounded-md text-xs font-medium">Remote</span>' : ''}
+                            </div>
+                        </div>
+
+                        <!-- Actions -->
+                        <div class="flex sm:flex-col justify-end items-end gap-3 mt-4 sm:mt-0">
+                            <button onclick="app.toggleSave('${job.id}', event)" class="sm:hidden p-2 rounded-lg border border-slate-200 text-slate-500">
+                                <i data-lucide="bookmark" class="w-5 h-5 ${isSaved ? 'fill-primary-600 text-primary-600' : ''}"></i>
+                            </button>
+                            ${isApplied 
+                                ? `<button disabled class="bg-green-50 text-green-700 border border-green-200 px-5 py-2.5 rounded-lg font-medium cursor-not-allowed w-full sm:w-auto flex items-center justify-center gap-2"><i data-lucide="check-circle" class="w-4 h-4"></i> Applied</button>`
+                                : `<button onclick="app.openModal('${job.id}')" class="bg-primary-50 text-primary-700 hover:bg-primary-100 px-5 py-2.5 rounded-lg font-medium transition-colors w-full sm:w-auto">View & Apply</button>`
+                            }
+                        </div>
+                    </div>
+                `;
+            },
+
+            renderFeaturedJobs() {
+                const container = document.getElementById('featured-jobs-container');
+                const featured = this.jobs.filter(j => j.featured).slice(0, 3);
+                
+                let html = '';
+                featured.forEach(job => {
+                    const initials = job.company.substring(0, 2).toUpperCase();
+                    html += `
+                        <div class="bg-white rounded-xl border border-slate-200 p-6 hover:shadow-lg transition-all cursor-pointer group flex flex-col h-full" onclick="app.openModal('${job.id}')">
+                            <div class="flex items-center gap-4 mb-4">
+                                <div class="w-12 h-12 rounded-lg flex items-center justify-center text-lg font-bold text-white shadow-sm" style="background-color: ${job.color}">
+                                    ${initials}
+                                </div>
+                                <div>
+                                    <h3 class="font-bold text-slate-900 group-hover:text-primary-600 transition-colors line-clamp-1">${job.title}</h3>
+                                    <p class="text-sm text-slate-500">${job.company}</p>
+                                </div>
+                            </div>
+                            <p class="text-sm text-slate-600 mb-4 line-clamp-3 flex-grow">${job.description}</p>
+                            <div class="flex flex-wrap gap-2 text-xs font-medium mt-auto">
+                                <span class="bg-slate-100 text-slate-600 px-2 py-1 rounded">${job.location}</span>
+                                <span class="bg-slate-100 text-slate-600 px-2 py-1 rounded">${job.type}</span>
+                            </div>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+            },
+
+            renderJobsList(jobsToRender) {
+                const container = document.getElementById('main-jobs-container');
+                const emptyState = document.getElementById('no-jobs-state');
+                const countLabel = document.getElementById('job-count');
+                
+                countLabel.textContent = jobsToRender.length;
+
+                if (jobsToRender.length === 0) {
+                    container.innerHTML = '';
+                    emptyState.classList.remove('hidden');
+                } else {
+                    emptyState.classList.add('hidden');
+                    container.innerHTML = jobsToRender.map(job => this.createJobCardHTML(job)).join('');
+                    lucide.createIcons(); // Re-initialize icons for new DOM elements
+                }
+            },
+
+            // Modal Interactions
+            openModal(jobId) {
+                const job = this.jobs.find(j => j.id === jobId);
+                if (!job) return;
+
+                this.activeModalJobId = jobId;
+                
+                document.getElementById('modal-title').textContent = job.title;
+                document.getElementById('modal-company').textContent = job.company;
+                document.getElementById('modal-description').textContent = job.description;
+                
+                // Set Logo
+                const logoEl = document.getElementById('modal-logo');
+                logoEl.style.backgroundColor = job.color;
+                logoEl.textContent = job.company.substring(0, 2).toUpperCase();
+
+                // Set Badges
+                const salaryRange = `$${(job.salaryMin/1000).toFixed(0)}k - $${(job.salaryMax/1000).toFixed(0)}k`;
+                document.getElementById('modal-badges').innerHTML = `
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-slate-100 text-slate-800"><i data-lucide="map-pin" class="w-4 h-4 mr-1.5 text-slate-500"></i> ${job.location}</span>
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-slate-100 text-slate-800"><i data-lucide="briefcase" class="w-4 h-4 mr-1.5 text-slate-500"></i> ${job.type}</span>
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-slate-100 text-slate-800"><i data-lucide="dollar-sign" class="w-4 h-4 mr-1.5 text-slate-500"></i> ${salaryRange}</span>
+                    <span class="inline-flex items-center px-3 py-1 rounded-full text-sm font-medium bg-blue-50 text-blue-700"><i data-lucide="bar-chart" class="w-4 h-4 mr-1.5 text-blue-500"></i> ${job.level} Level</span>
+                `;
+
+                // Set Requirements Mock
+                const reqs = job.level === 'Senior' || job.level === 'Lead' 
+                    ? ['5+ years of relevant experience', 'Proven track record of delivering complex projects', 'Strong architectural knowledge', 'Mentorship and leadership skills']
+                    : ['2-4 years of experience', 'Solid understanding of core principles', 'Ability to work independently and in a team', 'Strong problem-solving mindset'];
+                document.getElementById('modal-requirements').innerHTML = reqs.map(r => `<li>${r}</li>`).join('');
+
+                // Manage Action Buttons State
+                const saveBtn = document.getElementById('modal-save-btn');
+                const saveIcon = saveBtn.querySelector('i');
+                if (this.savedJobs.has(jobId)) {
+                    saveIcon.classList.add('fill-primary-600', 'text-primary-600');
+                } else {
+                    saveIcon.classList.remove('fill-primary-600', 'text-primary-600');
+                }
+                
+                // Re-bind save event to current job
+                saveBtn.onclick = (e) => {
+                    this.toggleSave(jobId, e);
+                    // update icon immediately
+                    if (this.savedJobs.has(jobId)) {
+                        saveIcon.classList.add('fill-primary-600', 'text-primary-600');
+                    } else {
+                        saveIcon.classList.remove('fill-primary-600', 'text-primary-600');
+                    }
+                };
+
+                const applyBtn = document.getElementById('modal-apply-btn');
+                if (this.appliedJobs.has(jobId)) {
+                    applyBtn.textContent = 'Application Submitted';
+                    applyBtn.classList.remove('bg-primary-600', 'hover:bg-primary-700', 'text-white');
+                    applyBtn.classList.add('bg-green-100', 'text-green-800', 'cursor-not-allowed');
+                    applyBtn.disabled = true;
+                } else {
+                    applyBtn.textContent = 'Apply Now';
+                    applyBtn.classList.add('bg-primary-600', 'hover:bg-primary-700', 'text-white');
+                    applyBtn.classList.remove('bg-green-100', 'text-green-800', 'cursor-not-allowed');
+                    applyBtn.disabled = false;
+                    applyBtn.onclick = () => this.applyForJob(jobId);
+                }
+
+                lucide.createIcons();
+                document.getElementById('job-modal').classList.remove('hidden');
+                document.body.style.overflow = 'hidden'; // Prevent background scroll
+            },
+
+            closeModal() {
+                document.getElementById('job-modal').classList.add('hidden');
+                document.body.style.overflow = '';
+                this.activeModalJobId = null;
+            },
+
+            // Actions
+            toggleSave(jobId, event) {
+                if (event) event.stopPropagation();
+                if (this.savedJobs.has(jobId)) {
+                    this.savedJobs.delete(jobId);
+                    this.showToast('Job removed from saved list');
+                } else {
+                    this.savedJobs.add(jobId);
+                    this.showToast('Job saved successfully');
+                }
+                
+                // Re-render current view to update icons
+                if (this.currentView === 'jobs') this.filterJobs();
+                if (this.currentView === 'dashboard') this.renderDashboard();
+                
+                // Update header counts
+                document.getElementById('count-saved').textContent = this.savedJobs.size;
+            },
+
+            applyForJob(jobId) {
+                this.appliedJobs.add(jobId);
+                this.closeModal();
+                
+                // Show Success
+                const sm = document.getElementById('success-modal');
+                sm.classList.remove('hidden');
+                
+                // Update Dashboard counts
+                document.getElementById('count-applied').textContent = this.appliedJobs.size;
+                
+                // Re-render
+                if (this.currentView === 'jobs') this.filterJobs();
+            },
+
+            closeSuccessModal() {
+                document.getElementById('success-modal').classList.add('hidden');
+            },
+
+            // Post Job Form
+            handlePostJob(e) {
+                e.preventDefault();
+                
+                // Gather data
+                const newJob = {
+                    id: 'j' + Date.now(),
+                    title: document.getElementById('post-title').value,
+                    company: document.getElementById('post-company').value,
+                    location: document.getElementById('post-location').value,
+                    type: document.getElementById('post-type').value,
+                    level: document.getElementById('post-level').value,
+                    salaryMin: parseInt(document.getElementById('post-salary-min').value) || 0,
+                    salaryMax: parseInt(document.getElementById('post-salary-max').value) || 0,
+                    description: document.getElementById('post-description').value,
+                    posted: 'Just now',
+                    featured: false,
+                    color: ['#3b82f6', '#10b981', '#8b5cf6', '#ec4899', '#f59e0b', '#14b8a6'][Math.floor(Math.random() * 6)]
+                };
+
+                // Add to start of array
+                this.jobs.unshift(newJob);
+                
+                // Reset form
+                e.target.reset();
+                
+                // Show notification and navigate
+                this.showToast('Job posted successfully!');
+                this.navigate('jobs');
+            },
+
+            // Dashboard
+            switchDashboardTab(tab) {
+                this.dashboardTab = tab;
+                
+                const tabApplied = document.getElementById('tab-applied');
+                const tabSaved = document.getElementById('tab-saved');
+
+                if (tab === 'applied') {
+                    tabApplied.classList.add('border-primary-600', 'text-primary-600');
+                    tabApplied.classList.remove('border-transparent', 'text-slate-500');
+                    tabSaved.classList.remove('border-primary-600', 'text-primary-600');
+                    tabSaved.classList.add('border-transparent', 'text-slate-500');
+                } else {
+                    tabSaved.classList.add('border-primary-600', 'text-primary-600');
+                    tabSaved.classList.remove('border-transparent', 'text-slate-500');
+                    tabApplied.classList.remove('border-primary-600', 'text-primary-600');
+                    tabApplied.classList.add('border-transparent', 'text-slate-500');
+                }
+                
+                this.renderDashboard();
+            },
+
+            renderDashboard() {
+                const container = document.getElementById('dashboard-content');
+                document.getElementById('count-applied').textContent = this.appliedJobs.size;
+                document.getElementById('count-saved').textContent = this.savedJobs.size;
+
+                let itemsToRender = [];
+                if (this.dashboardTab === 'applied') {
+                    itemsToRender = this.jobs.filter(j => this.appliedJobs.has(j.id));
+                } else {
+                    itemsToRender = this.jobs.filter(j => this.savedJobs.has(j.id));
+                }
+
+                if (itemsToRender.length === 0) {
+                    const msg = this.dashboardTab === 'applied' ? "You haven't applied to any jobs yet." : "You haven't saved any jobs yet.";
+                    container.innerHTML = `
+                        <div class="bg-white rounded-xl border border-slate-200 p-12 text-center">
+                            <div class="w-16 h-16 bg-slate-50 rounded-full flex items-center justify-center mx-auto mb-4 text-slate-400">
+                                <i data-lucide="${this.dashboardTab === 'applied' ? 'send' : 'bookmark'}" class="w-8 h-8"></i>
+                            </div>
+                            <h3 class="text-lg font-medium text-slate-900 mb-2">No jobs here</h3>
+                            <p class="text-slate-500 mb-6">${msg}</p>
+                            <button onclick="app.navigate('jobs')" class="bg-white border border-slate-300 text-slate-700 hover:bg-slate-50 px-6 py-2 rounded-lg font-medium transition-colors">
+                                Browse Jobs
+                            </button>
+                        </div>
+                    `;
+                } else {
+                    container.innerHTML = itemsToRender.map(job => {
+                        const statusBadge = this.dashboardTab === 'applied' 
+                            ? `<span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-xs font-semibold flex items-center w-fit"><i data-lucide="check-circle" class="w-3 h-3 mr-1"></i> In Review</span>`
+                            : `<button onclick="app.openModal('${job.id}')" class="text-sm font-medium text-primary-600 hover:text-primary-700">Apply Now</button>`;
+
+                        return `
+                            <div class="bg-white rounded-xl border border-slate-200 p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
+                                <div class="flex items-center gap-4">
+                                    <div class="w-12 h-12 rounded-lg flex items-center justify-center text-lg font-bold text-white flex-shrink-0 shadow-sm" style="background-color: ${job.color}">
+                                        ${job.company.substring(0, 2).toUpperCase()}
+                                    </div>
+                                    <div>
+                                        <h4 class="font-bold text-slate-900 cursor-pointer hover:text-primary-600 transition-colors" onclick="app.openModal('${job.id}')">${job.title}</h4>
+                                        <p class="text-sm text-slate-500">${job.company} &bull; ${job.location}</p>
+                                    </div>
+                                </div>
+                                <div class="flex md:flex-col items-center md:items-end justify-between md:justify-center gap-2 border-t border-slate-100 md:border-0 pt-3 md:pt-0">
+                                    ${statusBadge}
+                                    <button onclick="app.toggleSave('${job.id}', event)" class="text-sm text-slate-400 hover:text-red-500 transition-colors flex items-center">
+                                        <i data-lucide="trash-2" class="w-4 h-4 mr-1"></i> Remove
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+                }
+                lucide.createIcons();
+            },
+
+            // Utils
+            showToast(message) {
+                const container = document.getElementById('toast-container');
+                const toast = document.createElement('div');
+                toast.className = 'bg-slate-900 text-white px-6 py-3 rounded-lg shadow-lg flex items-center gap-3 fade-in';
+                toast.innerHTML = `<i data-lucide="info" class="w-5 h-5 text-primary-400"></i> ${message}`;
+                
+                container.appendChild(toast);
+                lucide.createIcons();
+
+                setTimeout(() => {
+                    toast.style.opacity = '0';
+                    toast.style.transform = 'translateY(-10px)';
+                    toast.style.transition = 'all 0.3s ease';
+                    setTimeout(() => toast.remove(), 300);
+                }, 3000);
+            },
+
+            debounce(func, wait) {
+                let timeout;
+                return function executedFunction(...args) {
+                    const later = () => {
+                        clearTimeout(timeout);
+                        func(...args);
+                    };
+                    clearTimeout(timeout);
+                    timeout = setTimeout(later, wait);
+                };
+            }
+        };
+
+        // Mobile Menu Toggle
+        function toggleMobileMenu() {
+            const menu = document.getElementById('mobile-menu');
+            if (menu.classList.contains('hidden')) {
+                menu.classList.remove('hidden');
+            } else {
+                menu.classList.add('hidden');
+            }
+        }
+        document.getElementById('mobile-menu-btn').addEventListener('click', toggleMobileMenu);
+
+        // Initialize app on load
+        window.addEventListener('DOMContentLoaded', () => {
+            app.init();
+        });
+
+    </script>
 </body>
+
 </html>
