@@ -3,793 +3,377 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>MulukCareer Hub - Guwahati Job Portal</title>
-    
+    <title>AI Deployment Concept Quiz</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        :root {
-            --primary: #2e7d32; /* Assam Green */
-            --primary-light: #e8f5e9;
-            --text-dark: #2c3e50;
-            --text-light: #606f7b;
-            --bg-color: #f4f7f6;
-            --card-bg: #ffffff;
-        }
-
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-
         body {
-            background-color: var(--bg-color);
-            color: var(--text-dark);
-            position: relative;
-            min-height: 100vh;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            background-color: #f3f4f6;
         }
-
-        header {
-            background-color: var(--primary);
-            color: white;
-            padding: 2.5rem 1rem;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        .correct {
+            background-color: #d1fae5 !important;
+            border-color: #10b981 !important;
+            color: #065f46 !important;
         }
-
-        .header-content {
-            max-width: 1000px;
-            margin: 0 auto;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 2rem;
-            text-align: left;
+        .incorrect {
+            background-color: #fee2e2 !important;
+            border-color: #ef4444 !important;
+            color: #991b1b !important;
         }
-
-        .logo-wrapper {
-            background-color: white;
-            padding: 1rem;
-            border-radius: 16px;
-            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
-            display: flex;
-            align-items: center;
-            justify-content: center;
+        .option-label {
+            transition: all 0.2s ease-in-out;
         }
-
-        header h1 {
-            font-size: 2.8rem;
-            margin-bottom: 0.5rem;
-            letter-spacing: -0.5px;
+        .option-label:hover {
+            background-color: #e5e7eb;
         }
-
-        header p {
-            font-size: 1.1rem;
-            opacity: 0.9;
-            font-weight: 300;
-        }
-
-        .container {
-            max-width: 1000px;
-            margin: 0 auto;
-            padding: 2rem 1rem;
-        }
-
-        .controls {
-            display: flex;
-            gap: 1rem;
-            margin-bottom: 2rem;
-            background: var(--card-bg);
-            padding: 1.5rem;
-            border-radius: 12px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
-        }
-
-        .controls input, .controls select {
-            flex: 1;
-            padding: 0.8rem 1rem;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: 1rem;
-            outline: none;
-            transition: border-color 0.2s ease;
-        }
-
-        .controls input:focus, .controls select:focus {
-            border-color: var(--primary);
-        }
-
-        .job-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 1.5rem;
-        }
-
-        .job-card {
-            background: var(--card-bg);
-            padding: 1.5rem;
-            border-radius: 12px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
-            transition: transform 0.2s ease, box-shadow 0.2s ease;
-            border-left: 5px solid var(--primary);
-            display: flex;
-            flex-direction: column;
-        }
-
-        .job-card:hover {
-            transform: translateY(-4px);
-            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
-        }
-
-        .job-title {
-            font-size: 1.3rem;
-            color: var(--primary);
-            margin-bottom: 0.5rem;
-        }
-
-        .job-company {
+        input[type="radio"]:checked + span {
             font-weight: 600;
-            color: var(--text-dark);
-            margin-bottom: 0.5rem;
-            font-size: 1.05rem;
-        }
-
-        .job-details {
-            color: var(--text-light);
-            font-size: 0.95rem;
-            margin-bottom: 1.5rem;
-            line-height: 1.6;
-            flex-grow: 1;
-        }
-
-        .job-details span {
-            display: flex;
-            align-items: center;
-            gap: 0.5rem;
-            margin-top: 0.3rem;
-        }
-
-        .apply-btn {
-            display: inline-block;
-            background-color: var(--primary);
-            color: white;
-            padding: 0.8rem 1.2rem;
-            text-decoration: none;
-            border-radius: 8px;
-            font-weight: 600;
-            transition: background-color 0.2s, transform 0.1s;
-            cursor: pointer;
-            border: none;
-            width: 100%;
-            text-align: center;
-            font-size: 1rem;
-        }
-
-        .apply-btn:hover {
-            background-color: #1b5e20;
-        }
-
-        .apply-btn:active {
-            transform: scale(0.98);
-        }
-
-        .no-results {
-            text-align: center;
-            grid-column: 1 / -1;
-            padding: 3rem 1rem;
-            color: var(--text-light);
-            font-size: 1.2rem;
-            background: var(--card-bg);
-            border-radius: 12px;
-        }
-
-        .modal-overlay {
-            position: fixed;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: rgba(0,0,0,0.6);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-        }
-
-        .modal-overlay.active {
-            display: flex;
-            opacity: 1;
-        }
-
-        .modal-content {
-            background: var(--card-bg);
-            padding: 2rem;
-            border-radius: 12px;
-            width: 90%;
-            max-width: 500px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-            transform: translateY(-20px);
-            transition: transform 0.3s ease;
-        }
-
-        .modal-overlay.active .modal-content {
-            transform: translateY(0);
-        }
-
-        .modal-header {
-            font-size: 1.5rem;
-            color: var(--primary);
-            margin-bottom: 1.5rem;
-            font-weight: bold;
-        }
-
-        .admin-modal-content {
-            max-width: 800px;
-        }
-
-        .admin-table-container {
-            overflow-x: auto;
-            margin-bottom: 1.5rem;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            max-height: 400px;
-        }
-
-        .admin-table {
-            width: 100%;
-            border-collapse: collapse;
-            min-width: 600px;
-        }
-
-        .admin-table th, .admin-table td {
-            padding: 12px 15px;
-            text-align: left;
-            border-bottom: 1px solid #e2e8f0;
-            font-size: 0.95rem;
-        }
-
-        .admin-table th {
-            background-color: var(--primary-light);
-            color: var(--primary);
-            font-weight: 600;
-            position: sticky;
-            top: 0;
-            z-index: 10;
-        }
-
-        .admin-table tbody tr:hover {
-            background-color: #f8fafc;
-        }
-
-        .form-group {
-            margin-bottom: 1rem;
-            display: flex;
-            flex-direction: column;
-            gap: 0.4rem;
-        }
-
-        .form-group label {
-            font-weight: 600;
-            font-size: 0.9rem;
-        }
-
-        .form-group input, .form-group select {
-            padding: 0.8rem;
-            border: 2px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: 1rem;
-            outline: none;
-            transition: border-color 0.2s ease;
-        }
-
-        .form-group input:focus, .form-group select:focus {
-            border-color: var(--primary);
-        }
-
-        .btn-group {
-            display: flex;
-            gap: 1rem;
-            margin-top: 1.5rem;
-        }
-
-        .btn-primary {
-            background-color: var(--primary);
-            color: white;
-            padding: 0.8rem 1.2rem;
-            border-radius: 8px;
-            font-weight: 600;
-            border: none;
-            cursor: pointer;
-            flex: 1;
-            font-size: 1rem;
-            transition: background-color 0.2s;
-        }
-
-        .btn-secondary {
-            background-color: #e2e8f0;
-            color: var(--text-dark);
-            padding: 0.8rem 1.2rem;
-            border-radius: 8px;
-            font-weight: 600;
-            border: none;
-            cursor: pointer;
-            flex: 1;
-            font-size: 1rem;
-            transition: background-color 0.2s;
-        }
-
-        .btn-primary:hover { background-color: #1b5e20; }
-        .btn-secondary:hover { background-color: #cbd5e1; }
-
-        /* Custom Toast Notification Styles */
-        #toast-container {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 1000;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-
-        .toast {
-            background-color: var(--text-dark);
-            color: white;
-            padding: 1rem 1.5rem;
-            border-radius: 8px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-            font-size: 0.95rem;
-            transform: translateX(120%);
-            opacity: 0;
-            animation: slideIn 0.3s forwards ease-out;
-        }
-
-        @keyframes slideIn {
-            to { transform: translateX(0); opacity: 1; }
-        }
-
-        @keyframes fadeOut {
-            to { opacity: 0; transform: translateY(10px); }
-        }
-
-        @media (max-width: 600px) {
-            .header-content {
-                flex-direction: column;
-                text-align: center;
-                gap: 1.5rem;
-            }
-            .controls {
-                flex-direction: column;
-            }
-            header h1 {
-                font-size: 2.2rem;
-            }
         }
     </style>
 </head>
-<body>
+<body class="text-gray-800 antialiased py-8 px-4 sm:px-6 lg:px-8">
 
-    <header>
-        <div class="header-content">
-            <div class="logo-wrapper">
-                <!-- Hosted Image from ImgBB -->
-                <img src="https://i.ibb.co/xKS1pb3X/Screenshot-2026-06-06-195242.png" alt="MulukCareer Hub Logo" style="width: 120px; height: auto; max-height: 160px; object-fit: contain;">
-            </div>
-            <div>
-                <h1>MulukCareer Hub</h1>
-                <p>Find your next big opportunity in Guwahati</p>
-            </div>
-        </div>
-    </header>
-
-    <div class="container">
-        <!-- Search Controls -->
-        <div class="controls">
-            <input type="text" id="searchInput" placeholder="Search job title or keyword...">
-            <select id="locationFilter">
-                <option value="All">All Guwahati Locations</option>
-                <option value="GS Road">GS Road</option>
-                <option value="Paltan Bazar">Paltan Bazar</option>
-                <option value="Dispur">Dispur</option>
-                <option value="Chandmari">Chandmari</option>
-                <option value="Beltola">Beltola</option>
-                <option value="Jalukbari">Jalukbari</option>
-                <option value="Uzan Bazar">Uzan Bazar</option>
-            </select>
-            <button id="postJobBtn" class="btn-primary" style="flex: 0 0 auto; white-space: nowrap; padding: 0.8rem 1.5rem;">+ Post Job</button>
+    <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden">
+        
+        <!-- Header -->
+        <div class="bg-blue-600 px-6 py-8 text-center text-white">
+            <h1 class="text-3xl font-bold mb-2">AI Deployment Concept Quiz</h1>
+            <p class="text-blue-100">Test your knowledge on the realities of taking AI from the lab to the real world.</p>
         </div>
 
-        <!-- Job Listings -->
-        <div class="job-grid" id="jobGrid">
-            <!-- Job cards will be injected here by JavaScript -->
-        </div>
-    </div>
-
-    <!-- Apply Modal -->
-    <div class="modal-overlay" id="applyModal">
-        <div class="modal-content">
-            <div class="modal-header">Apply for <span id="applyJobTitle">Job</span></div>
-            <form id="applyForm">
-                <div class="form-group">
-                    <label>Full Name</label>
-                    <input type="text" id="applyName" required placeholder="e.g. Muluk Baglary">
-                </div>
-                <div class="form-group">
-                    <label>Email</label>
-                    <input type="email" id="applyEmail" required placeholder="email@example.com">
-                </div>
-                <div class="form-group">
-                    <label>Phone Number</label>
-                    <input type="tel" id="applyPhone" required placeholder="+91 9876543210">
-                </div>
-                <div class="btn-group">
-                    <button type="button" class="btn-secondary" onclick="closeModal('applyModal')">Cancel</button>
-                    <button type="submit" class="btn-primary">Submit Application</button>
-                </div>
+        <!-- Quiz Container -->
+        <div id="quiz-container" class="p-6 md:p-10">
+            <form id="quiz-form">
+                <!-- Questions will be injected here via JavaScript -->
             </form>
-        </div>
-    </div>
 
-    <!-- Post Job Modal -->
-    <div class="modal-overlay" id="postJobModal">
-        <div class="modal-content">
-            <div class="modal-header">Post a New Job</div>
-            <form id="postJobForm">
-                <div class="form-group">
-                    <label>Job Title</label>
-                    <input type="text" id="pjTitle" required placeholder="e.g. Senior Accountant">
+            <div class="mt-8 pt-6 border-t border-gray-200 flex flex-col items-center">
+                <button type="button" id="submit-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transition duration-200 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-300">
+                    Submit Answers
+                </button>
+                <div id="result-display" class="hidden mt-6 text-center">
+                    <h2 class="text-2xl font-bold text-gray-800">Your Score: <span id="score-text" class="text-blue-600"></span></h2>
+                    <p id="feedback-text" class="text-gray-600 mt-2"></p>
+                    <button type="button" id="retry-btn" class="mt-4 text-blue-600 hover:text-blue-800 font-semibold underline focus:outline-none">
+                        Retry Quiz
+                    </button>
                 </div>
-                <div class="form-group">
-                    <label>Company Name</label>
-                    <input type="text" id="pjCompany" required placeholder="e.g. Assam Tech Ltd.">
-                </div>
-                <div class="form-group">
-                    <label>Location</label>
-                    <select id="pjLocation" required>
-                        <option value="GS Road">GS Road</option>
-                        <option value="Paltan Bazar">Paltan Bazar</option>
-                        <option value="Dispur">Dispur</option>
-                        <option value="Chandmari">Chandmari</option>
-                        <option value="Beltola">Beltola</option>
-                        <option value="Jalukbari">Jalukbari</option>
-                        <option value="Uzan Bazar">Uzan Bazar</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Job Type</label>
-                    <select id="pjType" required>
-                        <option value="Full-Time">Full-Time</option>
-                        <option value="Part-Time">Part-Time</option>
-                        <option value="Contract">Contract</option>
-                        <option value="Internship">Internship</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Salary Details</label>
-                    <input type="text" id="pjSalary" required placeholder="e.g. ₹20,000 / month">
-                </div>
-                <div class="btn-group">
-                    <button type="button" class="btn-secondary" onclick="closeModal('postJobModal')">Cancel</button>
-                    <button type="submit" class="btn-primary">Publish Job</button>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <!-- Admin Modal (Triggered by 'p') -->
-    <div class="modal-overlay" id="adminModal">
-        <div class="modal-content admin-modal-content">
-            <div class="modal-header">Admin Dashboard - Applications</div>
-            <div class="admin-table-container">
-                <table class="admin-table">
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Name</th>
-                            <th>Email</th>
-                            <th>Phone</th>
-                            <th>Job Title</th>
-                            <th>Company</th>
-                        </tr>
-                    </thead>
-                    <tbody id="adminTableBody">
-                        <!-- Data will be injected here -->
-                    </tbody>
-                </table>
-            </div>
-            <div class="btn-group">
-                <button type="button" class="btn-secondary" onclick="closeModal('adminModal')">Close Dashboard</button>
-                <button type="button" class="btn-primary" onclick="downloadCSV()">Download CSV</button>
             </div>
         </div>
     </div>
-
-    <!-- Container for custom notifications -->
-    <div id="toast-container"></div>
 
     <script>
-        // Mock Data specifically for Guwahati
-        const jobsData = [
+        const quizData = [
             {
-                title: "Frontend Web Developer",
-                company: "TechNortheast Solutions",
-                location: "GS Road",
-                type: "Full-Time",
-                salary: "₹3,00,000 - ₹5,00,000 / year"
+                question: "What is the primary objective of AI deployment according to the text?",
+                options: [
+                    "To train a model using millions of images and text documents.",
+                    "To isolate a development environment from real-world operations.",
+                    "To transform a static computational artifact into a dynamic, accessible service.",
+                    "To increase the parameter size of a neural network."
+                ],
+                answer: 2
             },
             {
-                title: "Tea Estate Operations Manager",
-                company: "Brahmaputra Valley Tea Co.",
-                location: "Chandmari",
-                type: "Full-Time",
-                salary: "₹6,00,000 - ₹9,00,000 / year"
+                question: "In Module 1, what does the instructor describe as the 'dirty little secret' of the tech industry?",
+                options: [
+                    "The trained AI is useless to the average person because it requires massive servers and electricity.",
+                    "APIs are highly insecure and leak personal data.",
+                    "Most AI models do not actually use neural networks.",
+                    "Deployment is significantly cheaper than training an AI model."
+                ],
+                answer: 0
             },
             {
-                title: "Front Desk Receptionist",
-                company: "Hotel City Heart",
-                location: "Paltan Bazar",
-                type: "Full-Time",
-                salary: "₹15,000 - ₹20,000 / month"
+                question: "What does API stand for?",
+                options: [
+                    "Automated Processing Integration",
+                    "Application Programming Interface",
+                    "Artificial Performance Indicator",
+                    "Application Protocol Infrastructure"
+                ],
+                answer: 1
             },
             {
-                title: "Digital Marketing Executive",
-                company: "Kaziranga Media Agency",
-                location: "Uzan Bazar",
-                type: "Full-Time",
-                salary: "₹2,50,000 - ₹4,00,000 / year"
+                question: "How does a smartphone handle complex AI tasks like live 3D face filters?",
+                options: [
+                    "It downloads the massive AI model directly into the phone's local storage.",
+                    "It uses a local version of the AI that relies strictly on the phone's battery.",
+                    "It acts as a 'dumb waiter', sending inputs via an API to a massive server farm for processing.",
+                    "It uses a specialized microchip that completely eliminates the need for APIs."
+                ],
+                answer: 2
             },
             {
-                title: "Data Entry Operator",
-                company: "Dispur Admin Services",
-                location: "Dispur",
-                type: "Contract",
-                salary: "₹12,000 / month"
+                question: "What is the 'Latency vs. Accuracy Trade-Off'?",
+                options: [
+                    "Increasing model accuracy generally makes processing speeds faster.",
+                    "Increasing model complexity to improve precision usually results in slower processing speeds.",
+                    "Low latency models are always more accurate than high latency models.",
+                    "Accuracy is entirely dependent on the speed of the user's internet connection."
+                ],
+                answer: 1
             },
             {
-                title: "Sales Executive (Automobiles)",
-                company: "Guwahati Motors",
-                location: "Beltola",
-                type: "Full-Time",
-                salary: "₹20,000 / month + Incentives"
+                question: "Which application is an example of prioritizing high accuracy over low latency?",
+                options: [
+                    "Smartphone autocorrect / spellcheck",
+                    "Social media video filters",
+                    "Siri or voice assistants",
+                    "Medical Diagnosis AI"
+                ],
+                answer: 3
             },
             {
-                title: "Warehouse Supervisor",
-                company: "Assam Logistics Hub",
-                location: "Jalukbari",
-                type: "Full-Time",
-                salary: "₹25,000 / month"
+                question: "Which application requires near-zero latency, often at the expense of 'brain power'?",
+                options: [
+                    "Medical Diagnosis AI",
+                    "Self-driving car navigation routing",
+                    "Spellcheck / Autocorrect",
+                    "Complex protein folding simulations"
+                ],
+                answer: 2
             },
             {
-                title: "Customer Support Associate",
-                company: "BPO Assam",
-                location: "GS Road",
-                type: "Night Shift",
-                salary: "₹18,000 - ₹22,000 / month"
+                question: "What is the function of a 'Data Pipeline' in AI deployment?",
+                options: [
+                    "It creates the training data set from scratch.",
+                    "It is the automated infrastructure that collects, processes, and routes data inputs to the AI models in real-time.",
+                    "It physically connects the smartphone's camera to the battery.",
+                    "It is a legal document defining the AI's data usage."
+                ],
+                answer: 1
+            },
+            {
+                question: "Why does the instructor call the data pipeline an 'engineering nightmare'?",
+                options: [
+                    "Because it requires advanced quantum mathematics to build.",
+                    "Because users often refuse to submit data.",
+                    "Because it must flawlessly route millions of diverse requests per second, balancing loads and choosing model versions.",
+                    "Because data pipelines are entirely manual processes."
+                ],
+                answer: 2
+            },
+            {
+                question: "According to the text, how does Generative AI differ economically from a traditional Google search?",
+                options: [
+                    "Generative AI retrieves static information, making it cheaper.",
+                    "Generative AI doesn't retrieve; it creates, requiring active GPU cycles for every output.",
+                    "Google searches cost dollars per query, while Generative AI is free.",
+                    "There is no economic difference between the two."
+                ],
+                answer: 1
+            },
+            {
+                question: "What is 'Token Bleed'?",
+                options: [
+                    "The financial drain caused by the constant computational cost of running AI inference at scale.",
+                    "A data leak in the AI's training set.",
+                    "The process of a model forgetting old information to learn new information.",
+                    "A bug in the API that causes it to lose user inputs."
+                ],
+                answer: 0
+            },
+            {
+                question: "What is 'Shadow Deployment'?",
+                options: [
+                    "Deploying an AI exclusively on the dark web.",
+                    "Turning off an old model immediately before the new one is tested.",
+                    "Running a new AI model in the background of a live system to validate performance without affecting users.",
+                    "Hiding the AI's UI from the user so they don't know they are interacting with a machine."
+                ],
+                answer: 2
+            },
+            {
+                question: "Why do companies use A/B testing and Shadow Mode?",
+                options: [
+                    "Because it is cheaper to run two models at once.",
+                    "To act as 'invisible surveillance' and validate a new model's performance without risking a system crash for end-users.",
+                    "To drain the user's battery faster so they buy a new phone.",
+                    "To bypass local privacy laws by hiding the algorithm."
+                ],
+                answer: 1
+            },
+            {
+                question: "What defines an 'Edge Case' in AI deployment?",
+                options: [
+                    "The physical borders of the server farm.",
+                    "The most common, everyday scenarios an AI encounters.",
+                    "Unforeseen, rare, or complex scenarios that fall outside the statistical distribution of the training data.",
+                    "The user interface boundary on a mobile screen."
+                ],
+                answer: 2
+            },
+            {
+                question: "What specific edge case does the instructor use to illustrate when a self-driving car system might break?",
+                options: [
+                    "A stop sign covered in snow.",
+                    "A pedestrian wearing a black plastic garbage bag and carrying reflective glass.",
+                    "A deer running across the highway at night.",
+                    "A sinkhole opening up in the middle of a bridge."
+                ],
+                answer: 1
+            },
+            {
+                question: "Why is hardcoding the car to 'stop for anything unknown' a dangerous solution to edge cases?",
+                options: [
+                    "It would cause the car to freeze every time harmless objects like plastic bags blow across the highway.",
+                    "It violates international traffic laws.",
+                    "It would require too many tokens to compute.",
+                    "It would instantly drain the car's battery."
+                ],
+                answer: 0
+            },
+            {
+                question: "What is 'Algorithmic Friction' in UI design?",
+                options: [
+                    "The delay caused by a slow internet connection.",
+                    "A clean, one-button interface that hides complex data from the user.",
+                    "Deliberate design elements that force human review and prevent over-reliance on AI decision-making.",
+                    "The physical heat generated by the smartphone processor."
+                ],
+                answer: 2
+            },
+            {
+                question: "According to the instructor, what is the psychological danger of a 'frictionless' UI (like Screen A)?",
+                options: [
+                    "It makes the app look outdated and ugly.",
+                    "It confuses users because there are too many options.",
+                    "It trains humans to become lazy and implicitly trust the algorithm's choices without scrutiny.",
+                    "It causes the API to crash due to input overload."
+                ],
+                answer: 2
+            },
+            {
+                question: "When deploying AI for critical choices like approving loans or bail, why might a company ethically choose 'Screen B' (which has checkboxes and friction)?",
+                options: [
+                    "To ensure human accountability remains at the core of the decision-making process.",
+                    "Because it looks cleaner and more modern.",
+                    "To hide the dangerous reality of algorithmic bias.",
+                    "To save money on API calls."
+                ],
+                answer: 0
+            },
+            {
+                question: "In the context of the lecture, why is the final step of deployment considered highly subjective?",
+                options: [
+                    "Because APIs change their protocols every day.",
+                    "Because balancing automated convenience with human accountability in UI design has no definitive 'right answer'.",
+                    "Because math cannot be subjective.",
+                    "Because edge cases don't actually exist in the real world."
+                ],
+                answer: 1
             }
         ];
 
-        const jobGrid = document.getElementById('jobGrid');
-        const searchInput = document.getElementById('searchInput');
-        const locationFilter = document.getElementById('locationFilter');
-        const toastContainer = document.getElementById('toast-container');
-        const postJobBtn = document.getElementById('postJobBtn');
+        const formElement = document.getElementById('quiz-form');
+        const submitBtn = document.getElementById('submit-btn');
+        const resultDisplay = document.getElementById('result-display');
+        const scoreText = document.getElementById('score-text');
+        const feedbackText = document.getElementById('feedback-text');
+        const retryBtn = document.getElementById('retry-btn');
 
-        // Modal controls
-        window.openModal = function(modalId) {
-            document.getElementById(modalId).classList.add('active');
-        }
+        // Render Quiz
+        function renderQuiz() {
+            formElement.innerHTML = ''; // Clear existing
+            quizData.forEach((item, index) => {
+                const questionBlock = document.createElement('div');
+                questionBlock.className = 'mb-8 p-6 bg-white rounded-xl border border-gray-200 shadow-sm transition-all';
+                questionBlock.id = `q-block-${index}`;
 
-        window.closeModal = function(modalId) {
-            document.getElementById(modalId).classList.remove('active');
-        }
+                const questionTitle = document.createElement('h3');
+                questionTitle.className = 'text-lg font-semibold text-gray-800 mb-4';
+                questionTitle.innerText = `${index + 1}. ${item.question}`;
+                questionBlock.appendChild(questionTitle);
 
-        // Close modals on outside click
-        window.onclick = function(event) {
-            if (event.target.classList.contains('modal-overlay')) {
-                event.target.classList.remove('active');
-            }
-        }
+                const optionsContainer = document.createElement('div');
+                optionsContainer.className = 'space-y-3';
 
-        // Custom function to show a temporary notification (replaces alert)
-        window.showToast = function(message) {
-            const toast = document.createElement('div');
-            toast.className = 'toast';
-            toast.textContent = message;
-            
-            toastContainer.appendChild(toast);
+                item.options.forEach((opt, optIndex) => {
+                    const label = document.createElement('label');
+                    label.className = 'option-label flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50';
+                    label.id = `label-${index}-${optIndex}`;
 
-            // Trigger fade out after 2.5 seconds
-            setTimeout(() => {
-                toast.style.animation = 'fadeOut 0.3s forwards ease-in';
-                // Remove from DOM after fade out completes
-                setTimeout(() => {
-                    toast.remove();
-                }, 300);
-            }, 2500);
-        };
+                    const radio = document.createElement('input');
+                    radio.type = 'radio';
+                    radio.name = `question-${index}`;
+                    radio.value = optIndex;
+                    radio.className = 'w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300';
 
-        // Function triggered when "Apply Now" is clicked
-        let currentApplyingCompany = '';
-        window.applyForJob = function(title, company) {
-            document.getElementById('applyJobTitle').textContent = title;
-            currentApplyingCompany = company;
-            openModal('applyModal');
-        };
+                    const span = document.createElement('span');
+                    span.className = 'ml-3 text-gray-700 block w-full';
+                    span.innerText = opt;
 
-        // Function to render jobs to the DOM
-        function renderJobs(jobs) {
-            jobGrid.innerHTML = ''; // Clear current jobs
+                    label.appendChild(radio);
+                    label.appendChild(span);
+                    optionsContainer.appendChild(label);
+                });
 
-            if (jobs.length === 0) {
-                jobGrid.innerHTML = '<div class="no-results">No jobs found matching your criteria. Try adjusting your search or location.</div>';
-                return;
-            }
-
-            jobs.forEach(job => {
-                const jobCard = document.createElement('div');
-                jobCard.className = 'job-card';
-                // Escape quotes in strings to prevent HTML injection issues in onclick
-                const safeTitle = job.title.replace(/'/g, "\\'");
-                const safeCompany = job.company.replace(/'/g, "\\'");
-
-                jobCard.innerHTML = `
-                    <h2 class="job-title">${job.title}</h2>
-                    <div class="job-company">${job.company}</div>
-                    <div class="job-details">
-                        <span>📍 ${job.location}, Guwahati</span>
-                        <span>💼 ${job.type}</span>
-                        <span>💰 ${job.salary}</span>
-                    </div>
-                    <button class="apply-btn" onclick="applyForJob('${safeTitle}', '${safeCompany}')">Apply Now</button>
-                `;
-                jobGrid.appendChild(jobCard);
+                questionBlock.appendChild(optionsContainer);
+                formElement.appendChild(questionBlock);
             });
         }
 
-        // Function to filter jobs based on search text and location dropdown
-        function filterJobs() {
-            const searchTerm = searchInput.value.toLowerCase();
-            const locationTerm = locationFilter.value;
+        // Calculate and Show Results
+        function submitQuiz() {
+            let score = 0;
+            const formData = new FormData(formElement);
 
-            const filteredJobs = jobsData.filter(job => {
-                const matchesSearch = job.title.toLowerCase().includes(searchTerm) || 
-                                      job.company.toLowerCase().includes(searchTerm);
-                const matchesLocation = locationTerm === 'All' || job.location === locationTerm;
+            // Disable all inputs
+            const allInputs = formElement.querySelectorAll('input[type="radio"]');
+            allInputs.forEach(input => input.disabled = true);
+
+            quizData.forEach((item, index) => {
+                const selectedVal = formData.get(`question-${index}`);
+                const qBlock = document.getElementById(`q-block-${index}`);
                 
-                return matchesSearch && matchesLocation;
-            });
+                // Highlight correct answer
+                const correctLabel = document.getElementById(`label-${index}-${item.answer}`);
+                correctLabel.classList.add('correct');
 
-            renderJobs(filteredJobs);
-        }
-
-        // Event Listeners for interactive filtering
-        searchInput.addEventListener('input', filterJobs);
-        locationFilter.addEventListener('change', filterJobs);
-
-        // Form Event Listeners
-        postJobBtn.addEventListener('click', () => openModal('postJobModal'));
-
-        // Store applications data in memory
-        const applicationsData = [];
-
-        // Handle Application Form Submit
-        document.getElementById('applyForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const title = document.getElementById('applyJobTitle').textContent;
-            const name = document.getElementById('applyName').value;
-            const email = document.getElementById('applyEmail').value;
-            const phone = document.getElementById('applyPhone').value;
-
-            // Save application to the array
-            applicationsData.push({
-                date: new Date().toLocaleDateString(),
-                name: name,
-                email: email,
-                phone: phone,
-                jobTitle: title,
-                company: currentApplyingCompany
-            });
-
-            closeModal('applyModal');
-            showToast(`Application successfully sent to ${currentApplyingCompany} for ${title}!`);
-            this.reset();
-        });
-
-        // Handle Post Job Form Submit
-        document.getElementById('postJobForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            const newJob = {
-                title: document.getElementById('pjTitle').value,
-                company: document.getElementById('pjCompany').value,
-                location: document.getElementById('pjLocation').value,
-                type: document.getElementById('pjType').value,
-                salary: document.getElementById('pjSalary').value
-            };
-            
-            jobsData.unshift(newJob); // Add new job to the top of the array
-            filterJobs(); // Re-render the grid so the new job appears immediately
-            closeModal('postJobModal');
-            showToast(`Job "${newJob.title}" posted successfully!`);
-            this.reset(); // Clear the form
-        });
-
-        // --- Admin Features ---
-
-        // Listen for 'p' key press
-        document.addEventListener('keydown', function(event) {
-            if (event.key.toLowerCase() === 'p') {
-                // Ensure user isn't currently typing inside an input field
-                const activeTag = document.activeElement.tagName.toLowerCase();
-                if (activeTag !== 'input' && activeTag !== 'textarea' && activeTag !== 'select') {
-                    renderAdminTable();
-                    openModal('adminModal');
+                if (selectedVal !== null) {
+                    if (parseInt(selectedVal) === item.answer) {
+                        score++;
+                    } else {
+                        // Highlight selected incorrect answer
+                        const incorrectLabel = document.getElementById(`label-${index}-${selectedVal}`);
+                        incorrectLabel.classList.add('incorrect');
+                    }
                 }
-            }
-        });
-
-        // Render the admin table with data
-        function renderAdminTable() {
-            const tbody = document.getElementById('adminTableBody');
-            tbody.innerHTML = '';
-            
-            if (applicationsData.length === 0) {
-                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-light); padding: 2rem;">No applications received yet.</td></tr>';
-                return;
-            }
-
-            applicationsData.forEach(app => {
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td>${app.date}</td>
-                    <td>${app.name}</td>
-                    <td>${app.email}</td>
-                    <td>${app.phone}</td>
-                    <td>${app.jobTitle}</td>
-                    <td>${app.company}</td>
-                `;
-                tbody.appendChild(tr);
             });
+
+            // Show results
+            submitBtn.classList.add('hidden');
+            resultDisplay.classList.remove('hidden');
+            scoreText.innerText = `${score} / ${quizData.length}`;
+
+            if (score === quizData.length) {
+                feedbackText.innerText = "Perfect score! You truly understand the complexities of AI deployment.";
+            } else if (score >= quizData.length * 0.7) {
+                feedbackText.innerText = "Great job! You have a solid grasp of the concepts.";
+            } else {
+                feedbackText.innerText = "Good effort. Review the material and try again to reinforce the concepts.";
+            }
+            
+            // Scroll to bottom
+            resultDisplay.scrollIntoView({ behavior: 'smooth' });
         }
 
-        // Generate and download CSV
-        window.downloadCSV = function() {
-            if (applicationsData.length === 0) {
-                showToast("No applications to download.");
-                return;
-            }
+        // Reset Quiz
+        function resetQuiz() {
+            submitBtn.classList.remove('hidden');
+            resultDisplay.classList.add('hidden');
+            renderQuiz();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
 
-            // Define CSV headers
-            const headers = ["Date", "Applicant Name", "Email", "Phone", "Job Title", "Company"];
-            
-            // Format rows (wrap in quotes to prevent issues with commas in names)
-            const rows = applicationsData.map(app => [
-                `"${app.date}"`,
-                `"${app.name}"`,
-                `"${app.email}"`,
-                `"${app.phone}"`,
-                `"${app.jobTitle}"`,
-                `"${app.company}"`
-            ]);
+        // Event Listeners
+        submitBtn.addEventListener('click', submitQuiz);
+        retryBtn.addEventListener('click', resetQuiz);
 
-            // Construct CSV string
-            const csvContent = [headers.join(","), ...rows.map(r => r.join(","))].join("\n");
-            
-            // Create Blob and trigger download
-            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-            const link = document.createElement("a");
-            const url = URL.createObjectURL(blob);
-            
-            link.setAttribute("href", url);
-            link.setAttribute("download", "muluk_hub_applications.csv");
-            link.style.visibility = 'hidden';
-            
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-            
-            showToast("Applications CSV Downloaded successfully!");
-        };
+        // Initialize
+        renderQuiz();
 
-        // Initial render on page load
-        renderJobs(jobsData);
     </script>
 </body>
 </html>
