@@ -41,8 +41,53 @@
             <p class="text-blue-100">Test your knowledge on the realities of taking AI from the lab to the real world.</p>
         </div>
 
+        <!-- Study Guide -->
+        <div id="study-guide" class="p-6 md:p-10">
+            <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-2">Pre-Quiz Study Guide</h2>
+            <div class="space-y-6">
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
+                    <h3 class="text-lg font-bold text-blue-900 mb-2">AI Deployment</h3>
+                    <p class="text-gray-800 text-sm leading-relaxed">AI deployment represents the critical transition of a validated machine learning model from an isolated development environment into a live production infrastructure. This phase requires the orchestration of software engineering and systems architecture to ensure the model remains functional under real-world operational conditions. In this context, the primary objective is to transform a static computational artifact into a dynamic, accessible service capable of processing live data streams.</p>
+                </div>
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
+                    <h3 class="text-lg font-bold text-blue-900 mb-2">APIs (Application Programming Interfaces)</h3>
+                    <p class="text-gray-800 text-sm leading-relaxed">APIs serve as the fundamental architectural mediators that enable seamless communication between distributed computational nodes. In the landscape of artificial intelligence, APIs allow client-side applications to leverage high-performance remote compute resources without the necessity of hosting massive model weights locally. This abstraction layer facilitates modularity, allowing developers to integrate sophisticated cognitive capabilities into lightweight interfaces through structured request-response protocols.</p>
+                </div>
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
+                    <h3 class="text-lg font-bold text-blue-900 mb-2">Latency vs. Accuracy Trade-Off</h3>
+                    <p class="text-gray-800 text-sm leading-relaxed">The latency-accuracy trade-off is a foundational optimization constraint that dictates the practical feasibility of deploying deep learning models. Engineering teams must balance the desire for high-fidelity predictive accuracy, which typically necessitates larger and more computationally intensive architectures, against the requirement for low-latency responsiveness. Consequently, successful deployment often involves techniques such as model quantization or pruning to achieve an acceptable equilibrium for the specific user context.</p>
+                </div>
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
+                    <h3 class="text-lg font-bold text-blue-900 mb-2">Data Pipelines</h3>
+                    <p class="text-gray-800 text-sm leading-relaxed">Data pipelines are sophisticated, automated frameworks designed to ingest, transform, and route high-volume data from various sources to a model's inference engine in real-time. These systems ensure that raw user inputs are correctly pre-processed and formatted to meet the specific requirements of the underlying neural architecture. Robust pipeline engineering is essential for maintaining system reliability and consistency as the volume of concurrent user requests scales within a production environment.</p>
+                </div>
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
+                    <h3 class="text-lg font-bold text-blue-900 mb-2">Token Economics / Token Bleed</h3>
+                    <p class="text-gray-800 text-sm leading-relaxed">The economic landscape of generative artificial intelligence is primarily governed by token-based compute models, where operational expenses are directly proportional to the volume of linguistic or visual units processed. Unlike traditional information retrieval, generative inference requires active GPU cycles for every unique output generated, creating a linear relationship between user engagement and computational cost. Managing this "token bleed" is a vital aspect of deployment strategy to ensure the financial sustainability of a platform as it scales.</p>
+                </div>
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
+                    <h3 class="text-lg font-bold text-blue-900 mb-2">Shadow Deployment & Parallel Testing</h3>
+                    <p class="text-gray-800 text-sm leading-relaxed">Shadow deployment and parallel testing methodologies are rigorous risk mitigation strategies used to validate new model versions within a live ecosystem without impacting the end-user. In shadow mode, the experimental model processes real-world traffic in the background, allowing engineers to compare its performance against a baseline model in a non-destructive manner. This approach provides empirical evidence of a model's stability and accuracy before it is promoted to a primary, user-facing role.</p>
+                </div>
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
+                    <h3 class="text-lg font-bold text-blue-900 mb-2">Edge Cases & Model Robustness</h3>
+                    <p class="text-gray-800 text-sm leading-relaxed">Model robustness is defined by the system's ability to maintain performance when encountering edge cases, which are rare or unforeseen scenarios that fall outside the statistical distribution of the training data. These failures often reveal significant vulnerabilities in an AI's reasoning, as the model may lack the necessary context to process highly irregular or novel inputs. Addressing these challenges is a primary focus of safe deployment, requiring extensive validation to prevent catastrophic outcomes in critical applications.</p>
+                </div>
+                <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
+                    <h3 class="text-lg font-bold text-blue-900 mb-2">Algorithmic Friction & Interface Ethics</h3>
+                    <p class="text-gray-800 text-sm leading-relaxed">The ethics of user interface design in AI deployment centers on the psychological impact of algorithmic transparency and the degree of agency granted to the human operator. Frictionless design can inadvertently promote over-reliance and implicit trust, potentially obscuring the inherent biases or limitations of the underlying model. Ethical deployment requires a careful evaluation of whether the interface should provide automated convenience or enforce manual review cycles to ensure human accountability remains at the core of the decision-making process.</p>
+                </div>
+            </div>
+            
+            <div class="mt-10 flex justify-center border-t border-gray-200 pt-6">
+                <button type="button" id="start-quiz-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-10 rounded-full shadow-lg transition duration-200 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-green-300">
+                    I'm Ready! Start Quiz
+                </button>
+            </div>
+        </div>
+
         <!-- Quiz Container -->
-        <div id="quiz-container" class="p-6 md:p-10">
+        <div id="quiz-container" class="hidden p-6 md:p-10">
             <form id="quiz-form">
                 <!-- Questions will be injected here via JavaScript -->
             </form>
@@ -272,6 +317,16 @@
         const scoreText = document.getElementById('score-text');
         const feedbackText = document.getElementById('feedback-text');
         const retryBtn = document.getElementById('retry-btn');
+        const studyGuide = document.getElementById('study-guide');
+        const startQuizBtn = document.getElementById('start-quiz-btn');
+        const quizContainer = document.getElementById('quiz-container');
+
+        // Start Quiz functionality
+        startQuizBtn.addEventListener('click', () => {
+            studyGuide.classList.add('hidden');
+            quizContainer.classList.remove('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
 
         // Render Quiz
         function renderQuiz() {
@@ -363,6 +418,8 @@
         function resetQuiz() {
             submitBtn.classList.remove('hidden');
             resultDisplay.classList.add('hidden');
+            studyGuide.classList.remove('hidden');
+            quizContainer.classList.add('hidden');
             renderQuiz();
             window.scrollTo({ top: 0, behavior: 'smooth' });
         }
