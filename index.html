@@ -3,434 +3,522 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Deployment Concept Quiz</title>
+    <title>AI Deployment & Docker Mastery Quiz</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
         body {
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            font-family: 'Inter', system-ui, -apple-system, sans-serif;
             background-color: #f3f4f6;
         }
-        .correct {
-            background-color: #d1fae5 !important;
-            border-color: #10b981 !important;
-            color: #065f46 !important;
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
         }
-        .incorrect {
-            background-color: #fee2e2 !important;
-            border-color: #ef4444 !important;
-            color: #991b1b !important;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-        .option-label {
-            transition: all 0.2s ease-in-out;
+        .option-btn {
+            transition: all 0.2s;
         }
-        .option-label:hover {
-            background-color: #e5e7eb;
-        }
-        input[type="radio"]:checked + span {
-            font-weight: 600;
+        .option-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
         }
     </style>
 </head>
-<body class="text-gray-800 antialiased py-8 px-4 sm:px-6 lg:px-8">
+<body class="text-gray-800 antialiased min-h-screen flex items-center justify-center p-4">
 
-    <div class="max-w-4xl mx-auto bg-white rounded-2xl shadow-xl overflow-hidden">
+    <div id="app" class="max-w-3xl w-full bg-white rounded-2xl shadow-xl overflow-hidden fade-in">
         
         <!-- Header -->
-        <div class="bg-blue-600 px-6 py-8 text-center text-white">
-            <h1 class="text-3xl font-bold mb-2">AI Deployment Concept Quiz</h1>
-            <p class="text-blue-100">Test your knowledge on the realities of taking AI from the lab to the real world.</p>
+        <div class="bg-blue-600 text-white p-6 text-center">
+            <h1 class="text-2xl font-bold">AI Deployment & Docker Basics</h1>
+            <p class="text-blue-100 mt-2 text-sm">Test your knowledge on AWS, GCP, Open Source, and Containerization</p>
         </div>
 
-        <!-- Study Guide -->
-        <div id="study-guide" class="p-6 md:p-10">
-            <h2 class="text-2xl font-bold text-gray-800 mb-6 border-b pb-2">Pre-Quiz Study Guide</h2>
-            <div class="space-y-6">
-                <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
-                    <h3 class="text-lg font-bold text-blue-900 mb-2">AI Deployment</h3>
-                    <p class="text-gray-800 text-sm leading-relaxed">AI deployment represents the critical transition of a validated machine learning model from an isolated development environment into a live production infrastructure. This phase requires the orchestration of software engineering and systems architecture to ensure the model remains functional under real-world operational conditions. In this context, the primary objective is to transform a static computational artifact into a dynamic, accessible service capable of processing live data streams.</p>
+        <!-- Start Screen -->
+        <div id="start-screen" class="p-8 text-center">
+            <div class="mb-8 text-gray-600 space-y-4">
+                <p>Welcome to the assessment! This quiz contains <strong>30</strong> multiple-choice questions covering:</p>
+                <ul class="text-left inline-block space-y-2 bg-gray-50 p-4 rounded-lg border border-gray-100">
+                    <li>☁️ AWS AI/ML Deployment (SageMaker, etc.)</li>
+                    <li>🌩️ Google Cloud AI Platform (Vertex AI, etc.)</li>
+                    <li>🌍 Open Source Deployment (FastAPI, ONNX, MLflow)</li>
+                    <li>🐳 Introduction to Docker & Containerization</li>
+                </ul>
+            </div>
+            <div class="flex flex-col sm:flex-row justify-center gap-4">
+                <button onclick="showStudyGuide()" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold py-3 px-8 rounded-lg shadow-sm transition-colors text-lg border border-indigo-200">
+                    📖 Read Study Guide
+                </button>
+                <button onclick="startQuiz()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg shadow-md transition-colors text-lg">
+                    Start Quiz Directly
+                </button>
+            </div>
+        </div>
+
+        <!-- Study Guide Screen -->
+        <div id="study-guide-screen" class="hidden p-6 sm:p-8">
+            <h2 class="text-2xl font-bold mb-6 text-gray-800 text-center">Comprehensive Study Guide</h2>
+            
+            <div class="max-h-[55vh] overflow-y-auto pr-4 space-y-8 text-gray-700">
+                <div>
+                    <h3 class="text-xl font-bold text-blue-600 mb-3 border-b pb-2">☁️ AWS AI/ML Deployment</h3>
+                    <ul class="space-y-3 list-disc pl-5">
+                        <li><strong>Amazon SageMaker:</strong> The primary fully-managed service for building, training, and deploying ML models. Use <em>SageMaker Endpoints</em> for secure, real-time HTTP inference.</li>
+                        <li><strong>Storage & Containers:</strong> Use <strong>S3</strong> to store massive datasets and serialized model artifacts (like <code>model.tar.gz</code>). Use <strong>ECR (Elastic Container Registry)</strong> to store custom Docker images for ML workloads.</li>
+                        <li><strong>Compute & Frameworks:</strong> Use <strong>Deep Learning AMIs (DLAMI)</strong> on EC2 to get pre-installed frameworks (PyTorch, TensorFlow) and CUDA drivers. For cost-effective, high-performance inference, AWS offers custom ASICs called <strong>AWS Inferentia</strong>.</li>
+                        <li><strong>Serverless AI:</strong> For lightweight models, combining <strong>API Gateway + AWS Lambda</strong> provides a highly scalable, zero-maintenance architecture.</li>
+                        <li><strong>Security:</strong> Always use <strong>IAM Roles</strong> to securely grant services (like SageMaker) permissions to access other resources (like reading from S3) without hardcoding access keys.</li>
+                    </ul>
                 </div>
-                <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
-                    <h3 class="text-lg font-bold text-blue-900 mb-2">APIs (Application Programming Interfaces)</h3>
-                    <p class="text-gray-800 text-sm leading-relaxed">APIs serve as the fundamental architectural mediators that enable seamless communication between distributed computational nodes. In the landscape of artificial intelligence, APIs allow client-side applications to leverage high-performance remote compute resources without the necessity of hosting massive model weights locally. This abstraction layer facilitates modularity, allowing developers to integrate sophisticated cognitive capabilities into lightweight interfaces through structured request-response protocols.</p>
+                
+                <div>
+                    <h3 class="text-xl font-bold text-blue-600 mb-3 border-b pb-2">🌩️ Google Cloud Platform (GCP)</h3>
+                    <ul class="space-y-3 list-disc pl-5">
+                        <li><strong>Vertex AI:</strong> Google's unified platform bringing all ML services together. It includes <em>Vertex AI AutoML</em> for training high-quality models with minimal ML expertise.</li>
+                        <li><strong>Serverless & Containers:</strong> <strong>Cloud Run</strong> is perfect for deploying containerized ML models as serverless HTTP APIs that can automatically scale to zero when not in use.</li>
+                        <li><strong>Data & Compute:</strong> <strong>BigQuery ML</strong> allows users to train and evaluate models directly using standard SQL queries. Google's custom hardware accelerators specifically built for machine learning are called <strong>TPUs (Tensor Processing Units)</strong>.</li>
+                        <li><strong>Orchestration & Storage:</strong> Store built Docker images in <strong>Artifact Registry</strong>. For highly complex, microservice-based ML apps requiring granular custom orchestration, use <strong>GKE (Google Kubernetes Engine)</strong>.</li>
+                    </ul>
                 </div>
-                <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
-                    <h3 class="text-lg font-bold text-blue-900 mb-2">Latency vs. Accuracy Trade-Off</h3>
-                    <p class="text-gray-800 text-sm leading-relaxed">The latency-accuracy trade-off is a foundational optimization constraint that dictates the practical feasibility of deploying deep learning models. Engineering teams must balance the desire for high-fidelity predictive accuracy, which typically necessitates larger and more computationally intensive architectures, against the requirement for low-latency responsiveness. Consequently, successful deployment often involves techniques such as model quantization or pruning to achieve an acceptable equilibrium for the specific user context.</p>
+
+                <div>
+                    <h3 class="text-xl font-bold text-blue-600 mb-3 border-b pb-2">🌍 Open Source & General Concepts</h3>
+                    <ul class="space-y-3 list-disc pl-5">
+                        <li><strong>FastAPI:</strong> A fast, modern Python web framework highly popular for serving ML models due to asynchronous support and automatic interactive API docs (Swagger UI).</li>
+                        <li><strong>Streamlit:</strong> An open-source framework that turns Python data scripts into interactive, shareable web apps in minutes—without needing to know HTML/CSS.</li>
+                        <li><strong>ML Lifecycle:</strong> <strong>MLflow</strong> is a widely used open-source platform for experiment tracking, reproducibility, and managing a central model registry.</li>
+                        <li><strong>Model Interoperability:</strong> <strong>ONNX (Open Neural Network Exchange)</strong> allows models to be trained in one framework (e.g., PyTorch) and easily deployed or optimized in another environment.</li>
+                        <li><strong>Hugging Face:</strong> A collaborative open-source hub for hosting NLP models, datasets, and easily deploying machine learning demos via "Spaces".</li>
+                        <li><strong>Concepts to Know:</strong> <strong>A/B Testing</strong> involves routing live traffic to old (A) and new (B) models in production to compare performance. Avoid unpickling models from untrusted sources using Python's <strong>pickle</strong> module, as unpickling can execute arbitrary malicious code on your machine.</li>
+                    </ul>
                 </div>
-                <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
-                    <h3 class="text-lg font-bold text-blue-900 mb-2">Data Pipelines</h3>
-                    <p class="text-gray-800 text-sm leading-relaxed">Data pipelines are sophisticated, automated frameworks designed to ingest, transform, and route high-volume data from various sources to a model's inference engine in real-time. These systems ensure that raw user inputs are correctly pre-processed and formatted to meet the specific requirements of the underlying neural architecture. Robust pipeline engineering is essential for maintaining system reliability and consistency as the volume of concurrent user requests scales within a production environment.</p>
+
+                <div>
+                    <h3 class="text-xl font-bold text-blue-600 mb-3 border-b pb-2">🐳 Docker & Containerization Basics</h3>
+                    <ul class="space-y-3 list-disc pl-5">
+                        <li><strong>Core Concept:</strong> Docker packages applications and their dependencies into standardized units for deployment. An <strong>Image</strong> is the static, read-only blueprint; a <strong>Container</strong> is the live, running instance of an image.</li>
+                        <li><strong>Dockerfile:</strong> The text document containing all the sequential instructions a user could call on the command line to assemble a Docker image.</li>
+                        <li><strong>Essential Commands:</strong>
+                            <ul class="list-[circle] pl-5 mt-2 space-y-1 text-sm text-gray-700 bg-gray-50 p-3 rounded-lg border">
+                                <li><code>docker build -t my-app .</code> : Builds an image from a Dockerfile located in the current directory (<code>.</code>) and tags it with a name.</li>
+                                <li><code>docker run -p 8000:80 my-image</code> : Runs a container and maps port 8000 on your host machine to port 80 inside the container.</li>
+                                <li><code>docker ps</code> : Lists all currently active/running containers on your system.</li>
+                            </ul>
+                        </li>
+                        <li><strong>Storage & Orchestration:</strong> Use <strong>Docker Volumes</strong> to persist data generated by the container so it isn't lost when the container is destroyed. Use <strong>Docker Compose</strong> (via a <code>docker-compose.yml</code> file) to define and spin up multi-container applications easily.</li>
+                    </ul>
                 </div>
-                <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
-                    <h3 class="text-lg font-bold text-blue-900 mb-2">Token Economics / Token Bleed</h3>
-                    <p class="text-gray-800 text-sm leading-relaxed">The economic landscape of generative artificial intelligence is primarily governed by token-based compute models, where operational expenses are directly proportional to the volume of linguistic or visual units processed. Unlike traditional information retrieval, generative inference requires active GPU cycles for every unique output generated, creating a linear relationship between user engagement and computational cost. Managing this "token bleed" is a vital aspect of deployment strategy to ensure the financial sustainability of a platform as it scales.</p>
-                </div>
-                <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
-                    <h3 class="text-lg font-bold text-blue-900 mb-2">Shadow Deployment & Parallel Testing</h3>
-                    <p class="text-gray-800 text-sm leading-relaxed">Shadow deployment and parallel testing methodologies are rigorous risk mitigation strategies used to validate new model versions within a live ecosystem without impacting the end-user. In shadow mode, the experimental model processes real-world traffic in the background, allowing engineers to compare its performance against a baseline model in a non-destructive manner. This approach provides empirical evidence of a model's stability and accuracy before it is promoted to a primary, user-facing role.</p>
-                </div>
-                <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
-                    <h3 class="text-lg font-bold text-blue-900 mb-2">Edge Cases & Model Robustness</h3>
-                    <p class="text-gray-800 text-sm leading-relaxed">Model robustness is defined by the system's ability to maintain performance when encountering edge cases, which are rare or unforeseen scenarios that fall outside the statistical distribution of the training data. These failures often reveal significant vulnerabilities in an AI's reasoning, as the model may lack the necessary context to process highly irregular or novel inputs. Addressing these challenges is a primary focus of safe deployment, requiring extensive validation to prevent catastrophic outcomes in critical applications.</p>
-                </div>
-                <div class="bg-blue-50 border-l-4 border-blue-500 p-4 rounded-r-lg">
-                    <h3 class="text-lg font-bold text-blue-900 mb-2">Algorithmic Friction & Interface Ethics</h3>
-                    <p class="text-gray-800 text-sm leading-relaxed">The ethics of user interface design in AI deployment centers on the psychological impact of algorithmic transparency and the degree of agency granted to the human operator. Frictionless design can inadvertently promote over-reliance and implicit trust, potentially obscuring the inherent biases or limitations of the underlying model. Ethical deployment requires a careful evaluation of whether the interface should provide automated convenience or enforce manual review cycles to ensure human accountability remains at the core of the decision-making process.</p>
-                </div>
+            </div>
+
+            <div class="mt-8 flex justify-between items-center border-t pt-6">
+                <button onclick="backToStart()" class="text-gray-500 hover:text-gray-800 font-medium py-2 px-4 transition-colors">
+                    &larr; Back
+                </button>
+                <button onclick="startQuizFromGuide()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg shadow-md transition-colors">
+                    Start Quiz Now
+                </button>
+            </div>
+        </div>
+
+        <!-- Quiz Screen -->
+        <div id="quiz-screen" class="hidden p-6 sm:p-8">
+            <div class="flex justify-between items-center mb-6 text-sm font-medium text-gray-500">
+                <span id="question-tracker">Question 1 of 30</span>
+                <span id="score-tracker">Score: 0</span>
             </div>
             
-            <div class="mt-10 flex justify-center border-t border-gray-200 pt-6">
-                <button type="button" id="start-quiz-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-10 rounded-full shadow-lg transition duration-200 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-green-300">
-                    I'm Ready! Start Quiz
+            <!-- Progress Bar -->
+            <div class="w-full bg-gray-200 rounded-full h-2.5 mb-8">
+                <div id="progress-bar" class="bg-blue-600 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+            </div>
+
+            <h2 id="question-text" class="text-xl font-semibold mb-6 text-gray-800"></h2>
+
+            <div id="options-container" class="space-y-3 mb-8">
+                <!-- Options injected here -->
+            </div>
+
+            <div id="feedback-container" class="hidden mb-6 p-4 rounded-lg text-sm border">
+                <p id="feedback-message" class="font-bold mb-1"></p>
+                <p id="feedback-explanation" class="text-gray-700"></p>
+            </div>
+
+            <div class="flex justify-end">
+                <button id="next-btn" onclick="nextQuestion()" class="hidden bg-gray-800 hover:bg-gray-900 text-white font-medium py-2 px-6 rounded-lg transition-colors">
+                    Next Question
+                </button>
+                <button id="finish-btn" onclick="showResults()" class="hidden bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-6 rounded-lg transition-colors">
+                    View Results
                 </button>
             </div>
         </div>
 
-        <!-- Quiz Container -->
-        <div id="quiz-container" class="hidden p-6 md:p-10">
-            <form id="quiz-form">
-                <!-- Questions will be injected here via JavaScript -->
-            </form>
-
-            <div class="mt-8 pt-6 border-t border-gray-200 flex flex-col items-center">
-                <button type="button" id="submit-btn" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-full shadow-lg transition duration-200 transform hover:scale-105 focus:outline-none focus:ring-4 focus:ring-blue-300">
-                    Submit Answers
-                </button>
-                <div id="result-display" class="hidden mt-6 text-center">
-                    <h2 class="text-2xl font-bold text-gray-800">Your Score: <span id="score-text" class="text-blue-600"></span></h2>
-                    <p id="feedback-text" class="text-gray-600 mt-2"></p>
-                    <button type="button" id="retry-btn" class="mt-4 text-blue-600 hover:text-blue-800 font-semibold underline focus:outline-none">
-                        Retry Quiz
-                    </button>
+        <!-- Results Screen -->
+        <div id="result-screen" class="hidden p-8 text-center">
+            <div class="mb-8">
+                <h2 class="text-3xl font-bold mb-2">Quiz Completed!</h2>
+                <p class="text-gray-600 text-lg">Here is how you did:</p>
+                
+                <div class="mt-6 inline-flex items-center justify-center w-32 h-32 rounded-full border-8 border-blue-100 bg-blue-50">
+                    <span id="final-score" class="text-3xl font-bold text-blue-600">0/30</span>
                 </div>
+                <p id="performance-message" class="mt-4 text-lg font-medium text-gray-800"></p>
             </div>
+            
+            <button onclick="restartQuiz()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg shadow-md transition-colors">
+                Restart Quiz
+            </button>
         </div>
+
     </div>
 
     <script>
         const quizData = [
+            // AWS
             {
-                question: "What is the primary objective of AI deployment according to the text?",
-                options: [
-                    "To train a model using millions of images and text documents.",
-                    "To isolate a development environment from real-world operations.",
-                    "To transform a static computational artifact into a dynamic, accessible service.",
-                    "To increase the parameter size of a neural network."
-                ],
-                answer: 2
+                question: "Which AWS service is specifically designed for developers to build, train, and deploy machine learning models quickly?",
+                options: ["AWS Lambda", "Amazon EC2", "Amazon SageMaker", "Amazon S3"],
+                correct: 2,
+                explanation: "Amazon SageMaker is a fully managed service that provides every developer and data scientist with the ability to build, train, and deploy ML models quickly."
             },
             {
-                question: "In Module 1, what does the instructor describe as the 'dirty little secret' of the tech industry?",
-                options: [
-                    "The trained AI is useless to the average person because it requires massive servers and electricity.",
-                    "APIs are highly insecure and leak personal data.",
-                    "Most AI models do not actually use neural networks.",
-                    "Deployment is significantly cheaper than training an AI model."
-                ],
-                answer: 0
+                question: "If you want to deploy a lightweight AI model as a serverless API on AWS without managing infrastructure, which combination is best?",
+                options: ["EC2 + Elastic Load Balancer", "API Gateway + AWS Lambda", "Amazon RDS + EC2", "AWS Glue + Athena"],
+                correct: 1,
+                explanation: "API Gateway combined with AWS Lambda allows you to host stateless, serverless endpoints perfect for lightweight model inference."
             },
             {
-                question: "What does API stand for?",
-                options: [
-                    "Automated Processing Integration",
-                    "Application Programming Interface",
-                    "Artificial Performance Indicator",
-                    "Application Protocol Infrastructure"
-                ],
-                answer: 1
+                question: "Where should you store large datasets and model artifacts (like model.tar.gz) in AWS before deployment?",
+                options: ["Amazon S3", "Amazon RDS", "Amazon DynamoDB", "Amazon CloudFront"],
+                correct: 0,
+                explanation: "Amazon S3 is the standard, highly scalable object storage service used to store training data and serialized model artifacts."
             },
             {
-                question: "How does a smartphone handle complex AI tasks like live 3D face filters?",
-                options: [
-                    "It downloads the massive AI model directly into the phone's local storage.",
-                    "It uses a local version of the AI that relies strictly on the phone's battery.",
-                    "It acts as a 'dumb waiter', sending inputs via an API to a massive server farm for processing.",
-                    "It uses a specialized microchip that completely eliminates the need for APIs."
-                ],
-                answer: 2
+                question: "What is an Amazon SageMaker Endpoint primarily used for?",
+                options: ["Data labeling", "Real-time model inference", "Database hosting", "Training ML models"],
+                correct: 1,
+                explanation: "SageMaker Endpoints provide a secure, scalable HTTPS endpoint for real-time model inference/predictions."
             },
             {
-                question: "What is the 'Latency vs. Accuracy Trade-Off'?",
-                options: [
-                    "Increasing model accuracy generally makes processing speeds faster.",
-                    "Increasing model complexity to improve precision usually results in slower processing speeds.",
-                    "Low latency models are always more accurate than high latency models.",
-                    "Accuracy is entirely dependent on the speed of the user's internet connection."
-                ],
-                answer: 1
+                question: "Which AWS service is a fully-managed Docker container registry used to store ML container images?",
+                options: ["Amazon EKS", "Amazon ECS", "Amazon ECR", "AWS Fargate"],
+                correct: 2,
+                explanation: "Amazon ECR (Elastic Container Registry) is where you push your custom Docker images for ML training or inference so SageMaker or ECS can use them."
             },
             {
-                question: "Which application is an example of prioritizing high accuracy over low latency?",
-                options: [
-                    "Smartphone autocorrect / spellcheck",
-                    "Social media video filters",
-                    "Siri or voice assistants",
-                    "Medical Diagnosis AI"
-                ],
-                answer: 3
+                question: "What hardware accelerator is custom-designed by AWS specifically for low-cost, high-performance machine learning inference?",
+                options: ["AWS Trainium", "AWS Graviton", "NVIDIA A100", "AWS Inferentia"],
+                correct: 3,
+                explanation: "AWS Inferentia chips are custom-designed by AWS to provide high performance ML inference at the lowest cost in the cloud."
             },
             {
-                question: "Which application requires near-zero latency, often at the expense of 'brain power'?",
-                options: [
-                    "Medical Diagnosis AI",
-                    "Self-driving car navigation routing",
-                    "Spellcheck / Autocorrect",
-                    "Complex protein folding simulations"
-                ],
-                answer: 2
+                question: "When deploying a model on EC2, what type of AMI (Amazon Machine Image) is recommended to avoid manually installing CUDA and ML frameworks?",
+                options: ["Amazon Linux 2 Base", "AWS Deep Learning AMI (DLAMI)", "Windows Server Core", "Ubuntu Minimal Server"],
+                correct: 1,
+                explanation: "Deep Learning AMIs come pre-installed with popular frameworks like TensorFlow, PyTorch, and necessary GPU drivers (CUDA)."
             },
             {
-                question: "What is the function of a 'Data Pipeline' in AI deployment?",
-                options: [
-                    "It creates the training data set from scratch.",
-                    "It is the automated infrastructure that collects, processes, and routes data inputs to the AI models in real-time.",
-                    "It physically connects the smartphone's camera to the battery.",
-                    "It is a legal document defining the AI's data usage."
-                ],
-                answer: 1
+                question: "How do you securely grant a SageMaker instance permission to read files from an S3 bucket?",
+                options: ["Embed AWS access keys in the code", "Make the S3 bucket completely public", "Attach an IAM Role with S3 read permissions to the SageMaker instance", "Use an SSH key pair"],
+                correct: 2,
+                explanation: "IAM (Identity and Access Management) Roles provide secure, temporary credentials to AWS resources without hardcoding keys."
+            },
+
+            // GCP
+            {
+                question: "What is Google Cloud's unified machine learning platform for building, deploying, and scaling AI models?",
+                options: ["Google Compute Engine", "Vertex AI", "BigQuery ML", "Cloud Functions"],
+                correct: 1,
+                explanation: "Vertex AI brings together Google Cloud's AI services into a unified API, client library, and user interface."
             },
             {
-                question: "Why does the instructor call the data pipeline an 'engineering nightmare'?",
-                options: [
-                    "Because it requires advanced quantum mathematics to build.",
-                    "Because users often refuse to submit data.",
-                    "Because it must flawlessly route millions of diverse requests per second, balancing loads and choosing model versions.",
-                    "Because data pipelines are entirely manual processes."
-                ],
-                answer: 2
+                question: "Which GCP service allows you to deploy containerized ML models as serverless HTTP applications that automatically scale to zero?",
+                options: ["Cloud Run", "Google Kubernetes Engine (GKE)", "Compute Engine", "Cloud Build"],
+                correct: 0,
+                explanation: "Cloud Run is a fully managed compute platform that automatically scales stateless containers, ideal for lightweight ML APIs."
             },
             {
-                question: "According to the text, how does Generative AI differ economically from a traditional Google search?",
-                options: [
-                    "Generative AI retrieves static information, making it cheaper.",
-                    "Generative AI doesn't retrieve; it creates, requiring active GPU cycles for every output.",
-                    "Google searches cost dollars per query, while Generative AI is free.",
-                    "There is no economic difference between the two."
-                ],
-                answer: 1
+                question: "If you want to train and evaluate ML models directly using standard SQL queries in Google Cloud, which service should you use?",
+                options: ["Cloud SQL", "Dataproc", "BigQuery ML", "Cloud Spanner"],
+                correct: 2,
+                explanation: "BigQuery ML lets users create and execute ML models in BigQuery using standard SQL queries."
             },
             {
-                question: "What is 'Token Bleed'?",
-                options: [
-                    "The financial drain caused by the constant computational cost of running AI inference at scale.",
-                    "A data leak in the AI's training set.",
-                    "The process of a model forgetting old information to learn new information.",
-                    "A bug in the API that causes it to lose user inputs."
-                ],
-                answer: 0
+                question: "What is Google's custom-developed ASIC (Application-Specific Integrated Circuit) used to accelerate machine learning workloads?",
+                options: ["GPU", "TPU", "FPGA", "CPU"],
+                correct: 1,
+                explanation: "Tensor Processing Units (TPUs) are AI accelerators developed by Google specifically for neural network machine learning."
             },
             {
-                question: "What is 'Shadow Deployment'?",
-                options: [
-                    "Deploying an AI exclusively on the dark web.",
-                    "Turning off an old model immediately before the new one is tested.",
-                    "Running a new AI model in the background of a live system to validate performance without affecting users.",
-                    "Hiding the AI's UI from the user so they don't know they are interacting with a machine."
-                ],
-                answer: 2
+                question: "Which Vertex AI feature allows users to train high-quality models with minimal machine learning expertise?",
+                options: ["Vertex AI Notebooks", "Vertex AI Feature Store", "Vertex AI Pipelines", "Vertex AI AutoML"],
+                correct: 3,
+                explanation: "AutoML allows developers with limited ML expertise to train high-quality models specific to their business needs."
             },
             {
-                question: "Why do companies use A/B testing and Shadow Mode?",
-                options: [
-                    "Because it is cheaper to run two models at once.",
-                    "To act as 'invisible surveillance' and validate a new model's performance without risking a system crash for end-users.",
-                    "To drain the user's battery faster so they buy a new phone.",
-                    "To bypass local privacy laws by hiding the algorithm."
-                ],
-                answer: 1
+                question: "In GCP, where do you typically store your built Docker images containing your ML models and API code?",
+                options: ["Cloud Storage", "Artifact Registry", "Cloud Source Repositories", "Firebase Storage"],
+                correct: 1,
+                explanation: "Google Artifact Registry (the evolution of Container Registry) is the single place for your organization to manage container images."
             },
             {
-                question: "What defines an 'Edge Case' in AI deployment?",
-                options: [
-                    "The physical borders of the server farm.",
-                    "The most common, everyday scenarios an AI encounters.",
-                    "Unforeseen, rare, or complex scenarios that fall outside the statistical distribution of the training data.",
-                    "The user interface boundary on a mobile screen."
-                ],
-                answer: 2
+                question: "For a highly complex, microservices-based ML architecture requiring custom orchestration and scaling, which GCP service is most appropriate?",
+                options: ["Cloud Functions", "Google Kubernetes Engine (GKE)", "App Engine", "Cloud Run"],
+                correct: 1,
+                explanation: "GKE provides full control over Kubernetes clusters, making it ideal for complex, distributed ML architectures."
+            },
+
+            // Open Source / General
+            {
+                question: "Which Python web framework is highly popular for serving ML models due to its speed, asynchronous support, and automatic Swagger UI generation?",
+                options: ["Django", "FastAPI", "Flask", "Streamlit"],
+                correct: 1,
+                explanation: "FastAPI is a modern, fast web framework for building APIs with Python, automatically providing interactive API documentation."
             },
             {
-                question: "What specific edge case does the instructor use to illustrate when a self-driving car system might break?",
-                options: [
-                    "A stop sign covered in snow.",
-                    "A pedestrian wearing a black plastic garbage bag and carrying reflective glass.",
-                    "A deer running across the highway at night.",
-                    "A sinkhole opening up in the middle of a bridge."
-                ],
-                answer: 1
+                question: "What is a standard open-source format designed to represent machine learning models, allowing models trained in PyTorch to be deployed in different environments?",
+                options: ["ONNX (Open Neural Network Exchange)", "CSV (Comma Separated Values)", "HDF5", "Pickle"],
+                correct: 0,
+                explanation: "ONNX provides an open source format for AI models, enabling interoperability between different frameworks (e.g., PyTorch to TensorFlow)."
             },
             {
-                question: "Why is hardcoding the car to 'stop for anything unknown' a dangerous solution to edge cases?",
-                options: [
-                    "It would cause the car to freeze every time harmless objects like plastic bags blow across the highway.",
-                    "It violates international traffic laws.",
-                    "It would require too many tokens to compute.",
-                    "It would instantly drain the car's battery."
-                ],
-                answer: 0
+                question: "Which open-source platform is widely used for managing the end-to-end machine learning lifecycle, including experiment tracking and model registry?",
+                options: ["Jenkins", "MLflow", "Prometheus", "Grafana"],
+                correct: 1,
+                explanation: "MLflow is an open-source platform to manage the ML lifecycle, including experimentation, reproducibility, deployment, and a central model registry."
             },
             {
-                question: "What is 'Algorithmic Friction' in UI design?",
-                options: [
-                    "The delay caused by a slow internet connection.",
-                    "A clean, one-button interface that hides complex data from the user.",
-                    "Deliberate design elements that force human review and prevent over-reliance on AI decision-making.",
-                    "The physical heat generated by the smartphone processor."
-                ],
-                answer: 2
+                question: "What is a common risk of using Python's 'pickle' module to load serialized models from untrusted sources?",
+                options: ["It compresses the model too much", "It only works on Linux", "It can execute arbitrary code upon unpickling", "It converts models to strings"],
+                correct: 2,
+                explanation: "Pickle is not secure against erroneous or maliciously constructed data. Unpickling untrusted data can execute arbitrary code on your machine."
             },
             {
-                question: "According to the instructor, what is the psychological danger of a 'frictionless' UI (like Screen A)?",
-                options: [
-                    "It makes the app look outdated and ugly.",
-                    "It confuses users because there are too many options.",
-                    "It trains humans to become lazy and implicitly trust the algorithm's choices without scrutiny.",
-                    "It causes the API to crash due to input overload."
-                ],
-                answer: 2
+                question: "Which popular open-source hub allows you to host, share, and deploy NLP models and datasets easily via 'Spaces'?",
+                options: ["GitHub", "Kaggle", "Hugging Face", "Docker Hub"],
+                correct: 2,
+                explanation: "Hugging Face is a collaborative platform providing tools, models, datasets, and 'Spaces' for deploying ML apps."
             },
             {
-                question: "When deploying AI for critical choices like approving loans or bail, why might a company ethically choose 'Screen B' (which has checkboxes and friction)?",
-                options: [
-                    "To ensure human accountability remains at the core of the decision-making process.",
-                    "Because it looks cleaner and more modern.",
-                    "To hide the dangerous reality of algorithmic bias.",
-                    "To save money on API calls."
-                ],
-                answer: 0
+                question: "What tool allows data scientists to build interactive web applications for their ML models entirely in Python without knowing HTML/CSS?",
+                options: ["React", "FastAPI", "Streamlit", "Nginx"],
+                correct: 2,
+                explanation: "Streamlit is an open-source app framework that turns data scripts into shareable web apps in minutes, using pure Python."
             },
             {
-                question: "In the context of the lecture, why is the final step of deployment considered highly subjective?",
-                options: [
-                    "Because APIs change their protocols every day.",
-                    "Because balancing automated convenience with human accountability in UI design has no definitive 'right answer'.",
-                    "Because math cannot be subjective.",
-                    "Because edge cases don't actually exist in the real world."
-                ],
-                answer: 1
+                question: "When deploying a model, what does 'A/B testing' refer to?",
+                options: ["Testing if a model works on both AWS and GCP", "Comparing two versions of a model in production to see which performs better", "Translating code from language A to language B", "Testing the API with positive and negative numbers"],
+                correct: 1,
+                explanation: "A/B testing in ML involves routing a portion of live traffic to a new model (B) while keeping the rest on the old model (A) to compare performance metrics."
+            },
+
+            // Docker Basics
+            {
+                question: "What is Docker primarily used for?",
+                options: ["Designing database schemas", "Creating virtual machines with full operating systems", "Packaging applications and their dependencies into standardized units for deployment", "Writing machine learning algorithms"],
+                correct: 2,
+                explanation: "Docker is a platform for developing, shipping, and running applications in isolated environments called containers."
+            },
+            {
+                question: "What is the difference between a Docker Image and a Docker Container?",
+                options: ["They are the exact same thing", "An image is a running instance; a container is the blueprint", "An image is an read-only template; a container is a running instance of an image", "An image is for Windows; a container is for Linux"],
+                correct: 2,
+                explanation: "A Docker image is a static, read-only file with all the code, libraries, and dependencies. A container is a live, running instance of that image."
+            },
+            {
+                question: "Which file contains a set of instructions used to build a Docker image?",
+                options: ["docker-compose.yml", "Dockerfile", "requirements.txt", "package.json"],
+                correct: 1,
+                explanation: "A Dockerfile is a text document that contains all the commands a user could call on the command line to assemble an image."
+            },
+            {
+                question: "Which command is used to build a Docker image from a Dockerfile in the current directory?",
+                options: ["docker run .", "docker push .", "docker build -t my-app .", "docker create my-app"],
+                correct: 2,
+                explanation: "'docker build' builds an image from a Dockerfile. The '-t' flag tags the image with a name, and '.' specifies the current directory."
+            },
+            {
+                question: "When running a container, what does the flag `-p 8000:80` do? (e.g., docker run -p 8000:80 my-image)",
+                options: ["Sets the password to 8000:80", "Maps port 8000 on the host machine to port 80 inside the container", "Limits the container to 8000 MB of RAM and 80% CPU", "Runs the container for 8000 seconds"],
+                correct: 1,
+                explanation: "The '-p' (publish) flag maps a port on your host machine to a port exposed by the container."
+            },
+            {
+                question: "If you want to persist data (like an ML model's SQLite database) so it isn't lost when a Docker container is destroyed, what should you use?",
+                options: ["Docker Volumes", "Docker Networks", "Docker Tags", "Docker Ports"],
+                correct: 0,
+                explanation: "Volumes are the preferred mechanism for persisting data generated by and used by Docker containers, existing outside the container's lifecycle."
+            },
+            {
+                question: "Which tool allows you to define and run multi-container Docker applications (like an API container and a Redis container) using a single YAML file?",
+                options: ["Docker Swarm", "Kubernetes", "Docker Compose", "Docker Hub"],
+                correct: 2,
+                explanation: "Docker Compose uses a YAML file to configure your application's services, networks, and volumes, and starts them all with a single command."
+            },
+            {
+                question: "What command lists all *currently running* Docker containers on your machine?",
+                options: ["docker images", "docker ps", "docker list", "docker run --all"],
+                correct: 1,
+                explanation: "'docker ps' lists all active/running containers. Adding '-a' (docker ps -a) lists all containers, including stopped ones."
             }
         ];
 
-        const formElement = document.getElementById('quiz-form');
-        const submitBtn = document.getElementById('submit-btn');
-        const resultDisplay = document.getElementById('result-display');
-        const scoreText = document.getElementById('score-text');
-        const feedbackText = document.getElementById('feedback-text');
-        const retryBtn = document.getElementById('retry-btn');
-        const studyGuide = document.getElementById('study-guide');
-        const startQuizBtn = document.getElementById('start-quiz-btn');
-        const quizContainer = document.getElementById('quiz-container');
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let selectedOptionIndex = null;
 
-        // Start Quiz functionality
-        startQuizBtn.addEventListener('click', () => {
-            studyGuide.classList.add('hidden');
-            quizContainer.classList.remove('hidden');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        });
+        // DOM Elements
+        const startScreen = document.getElementById('start-screen');
+        const studyGuideScreen = document.getElementById('study-guide-screen');
+        const quizScreen = document.getElementById('quiz-screen');
+        const resultScreen = document.getElementById('result-screen');
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const questionTracker = document.getElementById('question-tracker');
+        const scoreTracker = document.getElementById('score-tracker');
+        const progressBar = document.getElementById('progress-bar');
+        const nextBtn = document.getElementById('next-btn');
+        const finishBtn = document.getElementById('finish-btn');
+        const feedbackContainer = document.getElementById('feedback-container');
+        const feedbackMessage = document.getElementById('feedback-message');
+        const feedbackExplanation = document.getElementById('feedback-explanation');
 
-        // Render Quiz
-        function renderQuiz() {
-            formElement.innerHTML = ''; // Clear existing
-            quizData.forEach((item, index) => {
-                const questionBlock = document.createElement('div');
-                questionBlock.className = 'mb-8 p-6 bg-white rounded-xl border border-gray-200 shadow-sm transition-all';
-                questionBlock.id = `q-block-${index}`;
+        function showStudyGuide() {
+            startScreen.classList.add('hidden');
+            studyGuideScreen.classList.remove('hidden');
+        }
 
-                const questionTitle = document.createElement('h3');
-                questionTitle.className = 'text-lg font-semibold text-gray-800 mb-4';
-                questionTitle.innerText = `${index + 1}. ${item.question}`;
-                questionBlock.appendChild(questionTitle);
+        function backToStart() {
+            studyGuideScreen.classList.add('hidden');
+            startScreen.classList.remove('hidden');
+        }
 
-                const optionsContainer = document.createElement('div');
-                optionsContainer.className = 'space-y-3';
+        function startQuizFromGuide() {
+            studyGuideScreen.classList.add('hidden');
+            startQuiz();
+        }
 
-                item.options.forEach((opt, optIndex) => {
-                    const label = document.createElement('label');
-                    label.className = 'option-label flex items-center p-3 border border-gray-200 rounded-lg cursor-pointer hover:bg-gray-50';
-                    label.id = `label-${index}-${optIndex}`;
+        function startQuiz() {
+            startScreen.classList.add('hidden');
+            quizScreen.classList.remove('hidden');
+            currentQuestionIndex = 0;
+            score = 0;
+            loadQuestion();
+        }
 
-                    const radio = document.createElement('input');
-                    radio.type = 'radio';
-                    radio.name = `question-${index}`;
-                    radio.value = optIndex;
-                    radio.className = 'w-5 h-5 text-blue-600 focus:ring-blue-500 border-gray-300';
+        function loadQuestion() {
+            // Reset UI for new question
+            selectedOptionIndex = null;
+            optionsContainer.innerHTML = '';
+            feedbackContainer.classList.add('hidden');
+            nextBtn.classList.add('hidden');
+            finishBtn.classList.add('hidden');
 
-                    const span = document.createElement('span');
-                    span.className = 'ml-3 text-gray-700 block w-full';
-                    span.innerText = opt;
+            const q = quizData[currentQuestionIndex];
+            
+            // Update Text & Trackers
+            questionText.textContent = q.question;
+            questionTracker.textContent = `Question ${currentQuestionIndex + 1} of ${quizData.length}`;
+            scoreTracker.textContent = `Score: ${score}`;
+            progressBar.style.width = `${((currentQuestionIndex) / quizData.length) * 100}%`;
 
-                    label.appendChild(radio);
-                    label.appendChild(span);
-                    optionsContainer.appendChild(label);
-                });
-
-                questionBlock.appendChild(optionsContainer);
-                formElement.appendChild(questionBlock);
+            // Generate Options
+            q.options.forEach((opt, index) => {
+                const button = document.createElement('button');
+                button.className = 'option-btn w-full text-left p-4 border border-gray-200 rounded-lg hover:bg-gray-50 focus:outline-none bg-white text-gray-700';
+                button.textContent = opt;
+                button.onclick = () => selectOption(index, button);
+                optionsContainer.appendChild(button);
             });
         }
 
-        // Calculate and Show Results
-        function submitQuiz() {
-            let score = 0;
-            const formData = new FormData(formElement);
+        function selectOption(index, selectedButton) {
+            // Prevent multiple selections
+            if (selectedOptionIndex !== null) return;
+            
+            selectedOptionIndex = index;
+            const q = quizData[currentQuestionIndex];
+            const isCorrect = index === q.correct;
+            
+            if (isCorrect) score++;
+            scoreTracker.textContent = `Score: ${score}`;
 
-            // Disable all inputs
-            const allInputs = formElement.querySelectorAll('input[type="radio"]');
-            allInputs.forEach(input => input.disabled = true);
-
-            quizData.forEach((item, index) => {
-                const selectedVal = formData.get(`question-${index}`);
-                const qBlock = document.getElementById(`q-block-${index}`);
+            // Style buttons based on result
+            const buttons = optionsContainer.querySelectorAll('button');
+            buttons.forEach((btn, i) => {
+                btn.disabled = true;
+                btn.classList.remove('hover:bg-gray-50');
                 
-                // Highlight correct answer
-                const correctLabel = document.getElementById(`label-${index}-${item.answer}`);
-                correctLabel.classList.add('correct');
-
-                if (selectedVal !== null) {
-                    if (parseInt(selectedVal) === item.answer) {
-                        score++;
-                    } else {
-                        // Highlight selected incorrect answer
-                        const incorrectLabel = document.getElementById(`label-${index}-${selectedVal}`);
-                        incorrectLabel.classList.add('incorrect');
-                    }
+                if (i === q.correct) {
+                    btn.classList.add('bg-green-100', 'border-green-500', 'text-green-800');
+                    btn.classList.remove('bg-white', 'border-gray-200');
+                } else if (i === index && !isCorrect) {
+                    btn.classList.add('bg-red-100', 'border-red-500', 'text-red-800');
+                    btn.classList.remove('bg-white', 'border-gray-200');
+                } else {
+                    btn.classList.add('opacity-50');
                 }
             });
 
-            // Show results
-            submitBtn.classList.add('hidden');
-            resultDisplay.classList.remove('hidden');
-            scoreText.innerText = `${score} / ${quizData.length}`;
-
-            if (score === quizData.length) {
-                feedbackText.innerText = "Perfect score! You truly understand the complexities of AI deployment.";
-            } else if (score >= quizData.length * 0.7) {
-                feedbackText.innerText = "Great job! You have a solid grasp of the concepts.";
+            // Show feedback
+            feedbackContainer.classList.remove('hidden');
+            if (isCorrect) {
+                feedbackContainer.classList.add('bg-green-50', 'border-green-200');
+                feedbackContainer.classList.remove('bg-red-50', 'border-red-200');
+                feedbackMessage.textContent = '✅ Correct!';
+                feedbackMessage.className = 'font-bold mb-1 text-green-700';
             } else {
-                feedbackText.innerText = "Good effort. Review the material and try again to reinforce the concepts.";
+                feedbackContainer.classList.add('bg-red-50', 'border-red-200');
+                feedbackContainer.classList.remove('bg-green-50', 'border-green-200');
+                feedbackMessage.textContent = '❌ Incorrect';
+                feedbackMessage.className = 'font-bold mb-1 text-red-700';
             }
+            feedbackExplanation.textContent = q.explanation;
+
+            // Show Next/Finish button
+            if (currentQuestionIndex < quizData.length - 1) {
+                nextBtn.classList.remove('hidden');
+            } else {
+                finishBtn.classList.remove('hidden');
+                progressBar.style.width = '100%';
+            }
+        }
+
+        function nextQuestion() {
+            currentQuestionIndex++;
+            loadQuestion();
+        }
+
+        function showResults() {
+            quizScreen.classList.add('hidden');
+            resultScreen.classList.remove('hidden');
             
-            // Scroll to bottom
-            resultDisplay.scrollIntoView({ behavior: 'smooth' });
+            document.getElementById('final-score').textContent = `${score}/${quizData.length}`;
+            
+            const perfMsg = document.getElementById('performance-message');
+            const percentage = score / quizData.length;
+            
+            if (percentage >= 0.9) {
+                perfMsg.textContent = "Expert Level! You're ready to deploy AI to production! 🚀";
+                perfMsg.className = "mt-4 text-lg font-medium text-green-600";
+            } else if (percentage >= 0.7) {
+                perfMsg.textContent = "Great job! You have a solid understanding of AI deployment and containers. 👍";
+                perfMsg.className = "mt-4 text-lg font-medium text-blue-600";
+            } else if (percentage >= 0.5) {
+                perfMsg.textContent = "Good effort. Reviewing the explanations will help cement these concepts. 📚";
+                perfMsg.className = "mt-4 text-lg font-medium text-yellow-600";
+            } else {
+                perfMsg.textContent = "Keep learning! Cloud deployment and Docker take time to master. Don't give up! 💪";
+                perfMsg.className = "mt-4 text-lg font-medium text-red-600";
+            }
         }
 
-        // Reset Quiz
-        function resetQuiz() {
-            submitBtn.classList.remove('hidden');
-            resultDisplay.classList.add('hidden');
-            studyGuide.classList.remove('hidden');
-            quizContainer.classList.add('hidden');
-            renderQuiz();
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+        function restartQuiz() {
+            resultScreen.classList.add('hidden');
+            startScreen.classList.remove('hidden');
         }
-
-        // Event Listeners
-        submitBtn.addEventListener('click', submitQuiz);
-        retryBtn.addEventListener('click', resetQuiz);
-
-        // Initialize
-        renderQuiz();
-
     </script>
 </body>
 </html>
