@@ -3,361 +3,236 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Introduction to MLOps Quiz</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>Python Libraries MCQ Quiz</title>
     <style>
-        .correct { background-color: #dcfce7; border-color: #22c55e; }
-        .incorrect { background-color: #fee2e2; border-color: #ef4444; }
-        .missed { border-color: #22c55e; border-width: 2px; }
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            line-height: 1.6;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: auto;
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+        }
+        .question-block {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        .question-title {
+            font-weight: 600;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+        .options-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        .options-list li {
+            margin-bottom: 8px;
+        }
+        label {
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+        }
+        input[type="radio"] {
+            margin-right: 10px;
+            cursor: pointer;
+        }
+        .btn-submit {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .btn-submit:hover {
+            background: #2980b9;
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 1.5em;
+            font-weight: bold;
+            text-align: center;
+            color: #27ae60;
+        }
+        .correct {
+            color: #27ae60;
+            font-weight: bold;
+        }
+        .incorrect {
+            color: #c0392b;
+            font-weight: bold;
+        }
+        .feedback {
+            display: block;
+            margin-top: 5px;
+            font-size: 0.9em;
+        }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 font-sans p-4 md:p-8">
+<body>
 
-    <div class="max-w-3xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
-        <div class="bg-blue-600 p-6 text-white text-center">
-            <h1 class="text-3xl font-bold">Introduction to MLOps</h1>
-            <p class="mt-2 text-blue-100">Learn the basics and test your knowledge.</p>
-        </div>
+<div class="container">
+    <h1>Python Libraries MCQ Quiz</h1>
+    <div id="quiz-container"></div>
+    <button class="btn-submit" onclick="calculateScore()">Submit Answers</button>
+    <div id="result"></div>
+</div>
 
-        <!-- Navigation Tabs -->
-        <div class="flex border-b border-slate-200 bg-white">
-            <button id="tabGuide" class="flex-1 py-4 font-semibold text-blue-600 border-b-2 border-blue-600 hover:bg-slate-50 transition">📖 Study Guide</button>
-            <button id="tabQuiz" class="flex-1 py-4 font-semibold text-slate-500 hover:text-blue-600 hover:bg-slate-50 transition">📝 Take Quiz</button>
-        </div>
-
-        <div class="p-6 md:p-8">
-            <!-- Guide Section -->
-            <div id="guideSection" class="block">
-                <!-- Comprehensive Guide Section -->
-                <div class="mb-4 bg-white rounded-lg border border-slate-200 p-6 md:p-8 shadow-sm">
-                    <h2 class="text-2xl font-bold text-slate-800 mb-4">A Comprehensive Guide to MLOps</h2>
-                    
-                    <p class="text-slate-600 mb-4 leading-relaxed">
-                        Welcome to the world of <strong>Machine Learning Operations (MLOps)</strong>. Before you take the quiz, let's explore what MLOps is, why it exists, and the core principles that drive it. Whether you are a data scientist, a software engineer, or a product manager, understanding MLOps is critical for successfully deploying and maintaining AI in the real world.
-                    </p>
-
-                <h3 class="text-xl font-semibold text-slate-800 mt-8 mb-3">1. What is MLOps?</h3>
-                <p class="text-slate-600 mb-4 leading-relaxed">
-                    MLOps is a set of practices that aims to deploy and maintain machine learning models in production reliably and efficiently. The word is a compound of <em>Machine Learning</em> and the continuous development practice of DevOps in the software field. MLOps seeks to increase automation and improve the quality of production ML while also focusing on business and regulatory requirements. It acts as the bridge connecting Data Scientists (who build the models) with IT/DevOps teams (who manage the infrastructure).
-                </p>
-
-                <h3 class="text-xl font-semibold text-slate-800 mt-8 mb-3">2. Why is MLOps Necessary?</h3>
-                <p class="text-slate-600 mb-4 leading-relaxed">
-                    Building a machine learning model in a Jupyter Notebook is only a small fraction of the battle. The famous Google paper, <em>"Hidden Technical Debt in Machine Learning Systems,"</em> highlights that ML code is just a tiny box in the middle of a vast, complex infrastructure. Without MLOps, organizations face:
-                </p>
-                <ul class="list-disc pl-6 space-y-2 mb-4 text-slate-600">
-                    <li><strong>Siloed Teams:</strong> Data Scientists and Engineers using different tools and speaking different languages.</li>
-                    <li><strong>Deployment Bottlenecks:</strong> Taking months to move a model from research to a live production environment.</li>
-                    <li><strong>Silent Failures:</strong> Models degrading over time because the real-world data changed, but no one was monitoring it.</li>
-                    <li><strong>Lack of Reproducibility:</strong> Inability to recreate a model because the specific data version or hyperparameter settings were lost.</li>
-                </ul>
-
-                <h3 class="text-xl font-semibold text-slate-800 mt-8 mb-3">3. The Core Principles of MLOps</h3>
-                <p class="text-slate-600 mb-4 leading-relaxed">
-                    MLOps adopts the CI/CD concepts from traditional software engineering but introduces a new component unique to machine learning: Continuous Training (CT).
-                </p>
-                <div class="space-y-4 mb-6">
-                    <div class="bg-slate-50 p-4 rounded border border-slate-100">
-                        <strong class="text-slate-800">Continuous Integration (CI):</strong> In software, CI is about testing code. In MLOps, CI extends to testing and validating data, data schemas, and models. It ensures that any new code or data committed to the repository does not break the pipeline.
-                    </div>
-                    <div class="bg-slate-50 p-4 rounded border border-slate-100">
-                        <strong class="text-slate-800">Continuous Deployment (CD):</strong> This is not just about deploying a single software package. It's about deploying a <em>pipeline</em> (an ML training pipeline) that automatically deploys another service (a model prediction API).
-                    </div>
-                    <div class="bg-slate-50 p-4 rounded border border-slate-100">
-                        <strong class="text-slate-800">Continuous Training (CT):</strong> A concept exclusive to ML. Models degrade over time as the world changes. CT is the process of automatically retraining and serving models whenever model performance drops or when new data arrives.
-                    </div>
-                </div>
-
-                <h3 class="text-xl font-semibold text-slate-800 mt-8 mb-3">4. The Machine Learning Lifecycle</h3>
-                <p class="text-slate-600 mb-4 leading-relaxed">
-                    A mature MLOps pipeline generally follows these iterative stages:
-                </p>
-                <ol class="list-decimal pl-6 space-y-2 mb-4 text-slate-600">
-                    <li><strong>Data Extraction & Preparation:</strong> Gathering data from various sources, cleaning it, and versioning it (using tools like DVC). Data versioning ensures reproducibility.</li>
-                    <li><strong>Model Experimentation:</strong> Data scientists train various models, tuning hyperparameters. All experiments are tracked in a centralized <strong>Model Registry</strong> (like MLflow or Weights & Biases).</li>
-                    <li><strong>Model Packaging:</strong> The winning model is containerized. Tools like <strong>Docker</strong> are used to package the model code alongside all its dependencies to ensure it runs identically on any machine.</li>
-                    <li><strong>Model Serving:</strong> Deploying the packaged model to a cloud server or edge device where it can receive data and return predictions (via REST APIs or batch processing).</li>
-                    <li><strong>Model Monitoring:</strong> Continuously observing the model in the wild. This involves checking for <strong>Model Drift</strong> (when the relationship between features and target variables changes) and <strong>Data Drift</strong> (when the distribution of incoming data changes).</li>
-                </ol>
-
-                <h3 class="text-xl font-semibold text-slate-800 mt-8 mb-3">5. Conclusion</h3>
-                <p class="text-slate-600 mb-6 leading-relaxed">
-                    By implementing MLOps, companies can release models faster, ensure they are reliable, and scale them infinitely. It turns machine learning from a messy, artisanal craft into an automated, predictable engineering discipline.
-                </p>
-
-                <div class="border-t-2 border-slate-200 mt-8 pt-8 text-center">
-                    <h3 class="text-2xl font-bold text-blue-600">Ready to test your knowledge?</h3>
-                    <button type="button" id="startQuizBtn" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition duration-200 text-lg shadow-sm">
-                        Start Quiz Now
-                    </button>
-                </div>
-                </div>
-            </div>
-
-            <!-- Quiz Section -->
-            <div id="quizSection" class="hidden">
-                <form id="quizForm" class="space-y-8">
-                    <!-- Question 1 -->
-                    <div class="question-block" id="block-q1">
-                        <p class="font-semibold text-lg mb-3">1. What does MLOps stand for?</p>
-                        <div class="space-y-2">
-                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q1" value="a" class="mr-2"> a) Machine Logic Operations</label>
-                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q1" value="b" class="mr-2"> b) Machine Learning Operations</label>
-                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q1" value="c" class="mr-2"> c) Modern Learning Options</label>
-                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q1" value="d" class="mr-2"> d) Mainstream Language Operations</label>
-                        </div>
-                    </div>
-
-                    <!-- Question 2 -->
-                    <div class="question-block" id="block-q2">
-                        <p class="font-semibold text-lg mb-3">2. What is the primary goal of MLOps?</p>
-                        <div class="space-y-2">
-                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q2" value="a" class="mr-2"> a) To build faster hardware for model training</label>
-                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q2" value="b" class="mr-2"> b) To write data science research papers automatically</label>
-                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q2" value="c" class="mr-2"> c) To manually test software infrastructure</label>
-                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q2" value="d" class="mr-2"> d) To streamline, automate, and scale the machine learning lifecycle</label>
-                        </div>
-                    </div>
-
-                    <!-- Question 3 -->
-                    <div class="question-block" id="block-q3">
-                        <p class="font-semibold text-lg mb-3">3. Which of the following is NOT a core concept of MLOps?</p>
-                        <div class="space-y-2">
-                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q3" value="a" class="mr-2"> a) Continuous Integration (CI)</label>
-                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q3" value="b" class="mr-2"> b) Search Engine Optimization (SEO)</label>
-                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q3" value="c" class="mr-2"> c) Continuous Deployment (CD)</label>
-                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q3" value="d" class="mr-2"> d) Continuous Training (CT)</label>
-                        </div>
-                    </div>
-
-                    <!-- Question 4 -->
-                    <div class="question-block" id="block-q4">
-                        <p class="font-semibold text-lg mb-3">4. What does "Model Drift" refer to?</p>
-                        <div class="space-y-2">
-                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q4" value="a" class="mr-2"> a) The degradation of model predictive performance over time due to changes in real-world data</label>
-                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q4" value="b" class="mr-2"> b) Moving a model from a local environment to a cloud server</label>
-                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q4" value="c" class="mr-2"> c) Changing the algorithms used inside a neural network</label>
-                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q4" value="d" class="mr-2"> d) The speed at which a model returns a prediction</label>
-                        </div>
-                    </div>
-
-                    <!-- Question 5 -->
-                    <div class="question-block" id="block-q5">
-                        <p class="font-semibold text-lg mb-3">5. What is the main purpose of a Model Registry?</p>
-                        <div class="space-y-2">
-                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q5" value="a" class="mr-2"> a) To store raw, uncleaned databases</label>
-                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q5" value="b" class="mr-2"> b) To register new users to a machine learning application</label>
-                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q5" value="c" class="mr-2"> c) To act as a centralized repository to store, version, and manage trained models</label>
-                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q5" value="d" class="mr-2"> d) To monitor overall network traffic and security</label>
-                        </div>
-                    </div>
-
-                    <!-- Question 6 -->
-                    <div class="question-block" id="block-q6">
-                        <p class="font-semibold text-lg mb-3">6. Why is Data Versioning important in MLOps?</p>
-                        <div class="space-y-2">
-                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q6" value="a" class="mr-2"> a) It automatically cleans the dataset of missing values</label>
-                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q6" value="b" class="mr-2"> b) It ensures reproducibility by tracking the exact datasets used to train specific models</label>
-                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q6" value="c" class="mr-2"> c) It guarantees that the trained model will be 100% accurate</label>
-                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q6" value="d" class="mr-2"> d) It compresses the data to make it smaller in size</label>
-                        </div>
-                    </div>
-
-                    <!-- Question 7 -->
-                    <div class="question-block" id="block-q7">
-                        <p class="font-semibold text-lg mb-3">7. Which two historically separated teams does MLOps primarily seek to align?</p>
-                        <div class="space-y-2">
-                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q7" value="a" class="mr-2"> a) Front-end developers and UI/UX designers</label>
-                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q7" value="b" class="mr-2"> b) Sales and Marketing teams</label>
-                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q7" value="c" class="mr-2"> c) Data Scientists and Operations/IT (DevOps) teams</label>
-                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q7" value="d" class="mr-2"> d) Human Resources and Executive Management</label>
-                        </div>
-                    </div>
-
-                    <!-- Question 8 -->
-                    <div class="question-block" id="block-q8">
-                        <p class="font-semibold text-lg mb-3">8. What does Continuous Training (CT) entail?</p>
-                        <div class="space-y-2">
-                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q8" value="a" class="mr-2"> a) Automatically retraining the model as new data becomes available or performance drops</label>
-                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q8" value="b" class="mr-2"> b) Employees taking mandatory continuous courses on machine learning</label>
-                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q8" value="c" class="mr-2"> c) Training models indefinitely without ever deploying them</label>
-                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q8" value="d" class="mr-2"> d) Running the training code on a loop to stress-test the hardware servers</label>
-                        </div>
-                    </div>
-
-                    <!-- Question 9 -->
-                    <div class="question-block" id="block-q9">
-                        <p class="font-semibold text-lg mb-3">9. Which of the following tools is commonly used to containerize ML models for consistent deployment?</p>
-                        <div class="space-y-2">
-                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q9" value="a" class="mr-2"> a) Jupyter Notebooks</label>
-                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q9" value="b" class="mr-2"> b) Microsoft Excel</label>
-                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q9" value="c" class="mr-2"> c) Docker</label>
-                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q9" value="d" class="mr-2"> d) Git</label>
-                        </div>
-                    </div>
-
-                    <!-- Question 10 -->
-                    <div class="question-block" id="block-q10">
-                        <p class="font-semibold text-lg mb-3">10. In the context of MLOps, what is the role of "Monitoring"?</p>
-                        <div class="space-y-2">
-                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q10" value="a" class="mr-2"> a) Tracking the health, predictive accuracy, and resource usage of a deployed model in production</label>
-                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q10" value="b" class="mr-2"> b) Watching data scientists write Python code</label>
-                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q10" value="c" class="mr-2"> c) Ensuring employees are adhering to cybersecurity protocols</label>
-                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q10" value="d" class="mr-2"> d) Checking the stock prices of competitors offering AI solutions</label>
-                        </div>
-                    </div>
-
-                    <div class="pt-6 border-t">
-                        <button type="button" id="submitBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200 text-lg">
-                            Submit Quiz
-                        </button>
-                    </div>
-                </form>
-
-                <!-- Results Section -->
-                <div id="resultContainer" class="hidden mt-8 p-6 bg-slate-100 rounded-lg text-center border-2 border-blue-200">
-                    <h2 class="text-2xl font-bold mb-2 text-slate-800">Your Score: <span id="scoreDisplay" class="text-blue-600"></span>/10</h2>
-                    <p id="feedbackText" class="text-lg text-slate-600"></p>
-                    <button type="button" id="retryBtn" class="mt-4 bg-slate-800 hover:bg-slate-900 text-white font-semibold py-2 px-6 rounded-lg transition duration-200">
-                        Try Again
-                    </button>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <script>
-        // Correct answers mapping
-        const answers = {
-            q1: 'b',
-            q2: 'd',
-            q3: 'b',
-            q4: 'a',
-            q5: 'c',
-            q6: 'b',
-            q7: 'c',
-            q8: 'a',
-            q9: 'c',
-            q10: 'a'
-        };
-
-        const form = document.getElementById('quizForm');
-        const submitBtn = document.getElementById('submitBtn');
-        const resultContainer = document.getElementById('resultContainer');
-        const scoreDisplay = document.getElementById('scoreDisplay');
-        const feedbackText = document.getElementById('feedbackText');
-        const retryBtn = document.getElementById('retryBtn');
-
-        // Tab Navigation Logic
-        const tabGuide = document.getElementById('tabGuide');
-        const tabQuiz = document.getElementById('tabQuiz');
-        const guideSection = document.getElementById('guideSection');
-        const quizSection = document.getElementById('quizSection');
-        const startQuizBtn = document.getElementById('startQuizBtn');
-
-        function showGuide() {
-            guideSection.classList.remove('hidden');
-            quizSection.classList.add('hidden');
-            
-            tabGuide.classList.add('text-blue-600', 'border-b-2', 'border-blue-600');
-            tabGuide.classList.remove('text-slate-500');
-            
-            tabQuiz.classList.remove('text-blue-600', 'border-b-2', 'border-blue-600');
-            tabQuiz.classList.add('text-slate-500');
+<script>
+    // The extracted questions and their correct answers
+    const quizData = [
+        {
+            question: "1. Which function is used to fill NA/NaN values?",
+            options: ["fillna()", "replace()", "dropna()", "isna()"],
+            answer: "fillna()"
+        },
+        {
+            question: "2. What is a 2D array in NumPy?",
+            options: ["String matrix", "Table of zeros", "Matrix of values", "Loop"],
+            answer: "Matrix of values"
+        },
+        {
+            question: "3. What is Pandas used for?",
+            options: ["File I/O", "GUI", "Data analysis", "Web hosting"],
+            answer: "Data analysis"
+        },
+        {
+            question: "4. What does df.isnull() return?",
+            options: ["Boolean DataFrame", "Null values", "Non-null values", "Row index"],
+            answer: "Boolean DataFrame"
+        },
+        {
+            question: "5. What does df.head() do in Pandas?",
+            options: ["Removes headers", "Returns first rows", "Sorts data", "Deletes rows"],
+            answer: "Returns first rows"
+        },
+        {
+            question: "6. df[df['Age'] > 25] is used for...?",
+            options: ["Deleting", "Adding", "Filtering", "Grouping"],
+            answer: "Filtering"
+        },
+        {
+            question: "7. Which library is used for numerical computations?",
+            options: ["TensorFlow", "NumPy", "Django", "Matplotlib"],
+            answer: "NumPy"
+        },
+        {
+            question: "8. Which Python library is used to save models?",
+            options: ["matplotlib", "joblib", "sklearn", "keras"],
+            answer: "joblib"
+        },
+        {
+            question: "9. Which library in Python is most commonly used for basic image processing tasks like reading and manipulation?",
+            options: ["Pandas", "NumPy", "OpenCV", "TensorFlow"],
+            answer: "OpenCV"
+        },
+        {
+            question: "10. What is the use of plt.scatter()?",
+            options: ["Bar chart", "Histogram", "Pie chart", "Scatter plot"],
+            answer: "Scatter plot"
         }
+    ];
 
-        function showQuiz() {
-            quizSection.classList.remove('hidden');
-            guideSection.classList.add('hidden');
-            
-            tabQuiz.classList.add('text-blue-600', 'border-b-2', 'border-blue-600');
-            tabQuiz.classList.remove('text-slate-500');
-            
-            // Disable the Guide tab to prevent returning
-            tabGuide.classList.remove('text-blue-600', 'border-b-2', 'border-blue-600', 'hover:bg-slate-50', 'text-slate-500');
-            tabGuide.classList.add('text-slate-300', 'cursor-not-allowed');
-            tabGuide.disabled = true;
-            
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-        }
+    const quizContainer = document.getElementById("quiz-container");
 
-        tabGuide.addEventListener('click', () => {
-            if (!tabGuide.disabled) showGuide();
-        });
-        tabQuiz.addEventListener('click', showQuiz);
-        startQuizBtn.addEventListener('click', showQuiz);
+    // Render the questions
+    function buildQuiz() {
+        quizData.forEach((item, index) => {
+            const questionBlock = document.createElement("div");
+            questionBlock.classList.add("question-block");
+            questionBlock.id = `q-block-${index}`;
 
-        submitBtn.addEventListener('click', () => {
-            let score = 0;
-            const formData = new FormData(form);
+            const questionTitle = document.createElement("div");
+            questionTitle.classList.add("question-title");
+            questionTitle.innerText = item.question;
+            questionBlock.appendChild(questionTitle);
 
-            // Reset previous styles
-            document.querySelectorAll('.question-block label').forEach(label => {
-                label.classList.remove('correct', 'incorrect', 'missed');
+            const optionsList = document.createElement("ul");
+            optionsList.classList.add("options-list");
+
+            item.options.forEach(option => {
+                const li = document.createElement("li");
+                const label = document.createElement("label");
+                
+                const radio = document.createElement("input");
+                radio.type = "radio";
+                radio.name = `question${index}`;
+                radio.value = option;
+
+                label.appendChild(radio);
+                label.appendChild(document.createTextNode(option));
+                li.appendChild(label);
+                optionsList.appendChild(li);
             });
 
-            // Evaluate answers
-            for (let i = 1; i <= 10; i++) {
-                const questionName = `q${i}`;
-                const selectedValue = formData.get(questionName);
-                const correctValue = answers[questionName];
-                
-                const block = document.getElementById(`block-q${i}`);
-                if (!block) continue; // Safety check
-                
-                const options = block.querySelectorAll('label');
+            const feedback = document.createElement("div");
+            feedback.id = `feedback-${index}`;
+            feedback.classList.add("feedback");
 
-                options.forEach(label => {
-                    const input = label.querySelector('input');
-                    // Disable inputs after submission
-                    input.disabled = true;
+            questionBlock.appendChild(optionsList);
+            questionBlock.appendChild(feedback);
+            quizContainer.appendChild(questionBlock);
+        });
+    }
 
-                    if (input.value === correctValue) {
-                        if (selectedValue === correctValue) {
-                            label.classList.add('correct');
-                        } else {
-                            label.classList.add('missed'); // Show the right answer if missed
-                        }
-                    } else if (input.value === selectedValue && selectedValue !== correctValue) {
-                        label.classList.add('incorrect');
-                    }
-                });
+    // Calculate score and show correct/incorrect feedback
+    function calculateScore() {
+        let score = 0;
 
-                if (selectedValue === correctValue) {
+        quizData.forEach((item, index) => {
+            const selectedOption = document.querySelector(`input[name="question${index}"]:checked`);
+            const feedbackEl = document.getElementById(`feedback-${index}`);
+
+            if (selectedOption) {
+                if (selectedOption.value === item.answer) {
                     score++;
+                    feedbackEl.innerHTML = `<span class="correct">✔ Correct!</span>`;
+                } else {
+                    feedbackEl.innerHTML = `<span class="incorrect">✘ Incorrect. The correct answer is: ${item.answer}</span>`;
                 }
-            }
-
-            // Display results
-            scoreDisplay.textContent = score;
-            submitBtn.classList.add('hidden');
-            resultContainer.classList.remove('hidden');
-
-            if (score === 10) {
-                feedbackText.textContent = "Perfect! You're ready to deploy models like a pro.";
-            } else if (score >= 7) {
-                feedbackText.textContent = "Great job! You have a solid grasp of MLOps fundamentals.";
-            } else if (score >= 4) {
-                feedbackText.textContent = "Good effort. Reviewing the core concepts of the ML lifecycle will help.";
             } else {
-                feedbackText.textContent = "Keep learning! MLOps is a big field, don't give up.";
+                feedbackEl.innerHTML = `<span class="incorrect">⚠ You didn't select an answer. The correct answer is: ${item.answer}</span>`;
             }
-        });
-
-        // Retry logic
-        retryBtn.addEventListener('click', () => {
-            form.reset();
             
-            // Re-enable inputs and remove styles
-            document.querySelectorAll('.question-block label').forEach(label => {
-                label.classList.remove('correct', 'incorrect', 'missed');
-                label.querySelector('input').disabled = false;
-            });
-
-            submitBtn.classList.remove('hidden');
-            resultContainer.classList.add('hidden');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
+            // Disable inputs after submission
+            const allRadios = document.querySelectorAll(`input[name="question${index}"]`);
+            allRadios.forEach(radio => radio.disabled = true);
         });
-    </script>
+
+        const resultContainer = document.getElementById("result");
+        resultContainer.innerText = `You scored ${score} out of ${quizData.length}!`;
+        
+        // Disable the submit button
+        document.querySelector(".btn-submit").disabled = true;
+        document.querySelector(".btn-submit").style.background = "#bdc3c7";
+        document.querySelector(".btn-submit").innerText = "Quiz Completed";
+        window.scrollTo(0, document.body.scrollHeight);
+    }
+
+    // Initialize the app
+    buildQuiz();
+</script>
+
 </body>
 </html>
