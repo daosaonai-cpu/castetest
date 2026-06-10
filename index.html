@@ -3,522 +3,361 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Deployment & Docker Mastery Quiz</title>
+    <title>Introduction to MLOps Quiz</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body {
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            background-color: #f3f4f6;
-        }
-        .fade-in {
-            animation: fadeIn 0.3s ease-in-out;
-        }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .option-btn {
-            transition: all 0.2s;
-        }
-        .option-btn:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-        }
+        .correct { background-color: #dcfce7; border-color: #22c55e; }
+        .incorrect { background-color: #fee2e2; border-color: #ef4444; }
+        .missed { border-color: #22c55e; border-width: 2px; }
     </style>
 </head>
-<body class="text-gray-800 antialiased min-h-screen flex items-center justify-center p-4">
+<body class="bg-slate-50 text-slate-800 font-sans p-4 md:p-8">
 
-    <div id="app" class="max-w-3xl w-full bg-white rounded-2xl shadow-xl overflow-hidden fade-in">
-        
-        <!-- Header -->
-        <div class="bg-blue-600 text-white p-6 text-center">
-            <h1 class="text-2xl font-bold">AI Deployment & Docker Basics</h1>
-            <p class="text-blue-100 mt-2 text-sm">Test your knowledge on AWS, GCP, Open Source, and Containerization</p>
+    <div class="max-w-3xl mx-auto bg-white rounded-xl shadow-lg overflow-hidden">
+        <div class="bg-blue-600 p-6 text-white text-center">
+            <h1 class="text-3xl font-bold">Introduction to MLOps</h1>
+            <p class="mt-2 text-blue-100">Learn the basics and test your knowledge.</p>
         </div>
 
-        <!-- Start Screen -->
-        <div id="start-screen" class="p-8 text-center">
-            <div class="mb-8 text-gray-600 space-y-4">
-                <p>Welcome to the assessment! This quiz contains <strong>30</strong> multiple-choice questions covering:</p>
-                <ul class="text-left inline-block space-y-2 bg-gray-50 p-4 rounded-lg border border-gray-100">
-                    <li>☁️ AWS AI/ML Deployment (SageMaker, etc.)</li>
-                    <li>🌩️ Google Cloud AI Platform (Vertex AI, etc.)</li>
-                    <li>🌍 Open Source Deployment (FastAPI, ONNX, MLflow)</li>
-                    <li>🐳 Introduction to Docker & Containerization</li>
+        <!-- Navigation Tabs -->
+        <div class="flex border-b border-slate-200 bg-white">
+            <button id="tabGuide" class="flex-1 py-4 font-semibold text-blue-600 border-b-2 border-blue-600 hover:bg-slate-50 transition">📖 Study Guide</button>
+            <button id="tabQuiz" class="flex-1 py-4 font-semibold text-slate-500 hover:text-blue-600 hover:bg-slate-50 transition">📝 Take Quiz</button>
+        </div>
+
+        <div class="p-6 md:p-8">
+            <!-- Guide Section -->
+            <div id="guideSection" class="block">
+                <!-- Comprehensive Guide Section -->
+                <div class="mb-4 bg-white rounded-lg border border-slate-200 p-6 md:p-8 shadow-sm">
+                    <h2 class="text-2xl font-bold text-slate-800 mb-4">A Comprehensive Guide to MLOps</h2>
+                    
+                    <p class="text-slate-600 mb-4 leading-relaxed">
+                        Welcome to the world of <strong>Machine Learning Operations (MLOps)</strong>. Before you take the quiz, let's explore what MLOps is, why it exists, and the core principles that drive it. Whether you are a data scientist, a software engineer, or a product manager, understanding MLOps is critical for successfully deploying and maintaining AI in the real world.
+                    </p>
+
+                <h3 class="text-xl font-semibold text-slate-800 mt-8 mb-3">1. What is MLOps?</h3>
+                <p class="text-slate-600 mb-4 leading-relaxed">
+                    MLOps is a set of practices that aims to deploy and maintain machine learning models in production reliably and efficiently. The word is a compound of <em>Machine Learning</em> and the continuous development practice of DevOps in the software field. MLOps seeks to increase automation and improve the quality of production ML while also focusing on business and regulatory requirements. It acts as the bridge connecting Data Scientists (who build the models) with IT/DevOps teams (who manage the infrastructure).
+                </p>
+
+                <h3 class="text-xl font-semibold text-slate-800 mt-8 mb-3">2. Why is MLOps Necessary?</h3>
+                <p class="text-slate-600 mb-4 leading-relaxed">
+                    Building a machine learning model in a Jupyter Notebook is only a small fraction of the battle. The famous Google paper, <em>"Hidden Technical Debt in Machine Learning Systems,"</em> highlights that ML code is just a tiny box in the middle of a vast, complex infrastructure. Without MLOps, organizations face:
+                </p>
+                <ul class="list-disc pl-6 space-y-2 mb-4 text-slate-600">
+                    <li><strong>Siloed Teams:</strong> Data Scientists and Engineers using different tools and speaking different languages.</li>
+                    <li><strong>Deployment Bottlenecks:</strong> Taking months to move a model from research to a live production environment.</li>
+                    <li><strong>Silent Failures:</strong> Models degrading over time because the real-world data changed, but no one was monitoring it.</li>
+                    <li><strong>Lack of Reproducibility:</strong> Inability to recreate a model because the specific data version or hyperparameter settings were lost.</li>
                 </ul>
+
+                <h3 class="text-xl font-semibold text-slate-800 mt-8 mb-3">3. The Core Principles of MLOps</h3>
+                <p class="text-slate-600 mb-4 leading-relaxed">
+                    MLOps adopts the CI/CD concepts from traditional software engineering but introduces a new component unique to machine learning: Continuous Training (CT).
+                </p>
+                <div class="space-y-4 mb-6">
+                    <div class="bg-slate-50 p-4 rounded border border-slate-100">
+                        <strong class="text-slate-800">Continuous Integration (CI):</strong> In software, CI is about testing code. In MLOps, CI extends to testing and validating data, data schemas, and models. It ensures that any new code or data committed to the repository does not break the pipeline.
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded border border-slate-100">
+                        <strong class="text-slate-800">Continuous Deployment (CD):</strong> This is not just about deploying a single software package. It's about deploying a <em>pipeline</em> (an ML training pipeline) that automatically deploys another service (a model prediction API).
+                    </div>
+                    <div class="bg-slate-50 p-4 rounded border border-slate-100">
+                        <strong class="text-slate-800">Continuous Training (CT):</strong> A concept exclusive to ML. Models degrade over time as the world changes. CT is the process of automatically retraining and serving models whenever model performance drops or when new data arrives.
+                    </div>
+                </div>
+
+                <h3 class="text-xl font-semibold text-slate-800 mt-8 mb-3">4. The Machine Learning Lifecycle</h3>
+                <p class="text-slate-600 mb-4 leading-relaxed">
+                    A mature MLOps pipeline generally follows these iterative stages:
+                </p>
+                <ol class="list-decimal pl-6 space-y-2 mb-4 text-slate-600">
+                    <li><strong>Data Extraction & Preparation:</strong> Gathering data from various sources, cleaning it, and versioning it (using tools like DVC). Data versioning ensures reproducibility.</li>
+                    <li><strong>Model Experimentation:</strong> Data scientists train various models, tuning hyperparameters. All experiments are tracked in a centralized <strong>Model Registry</strong> (like MLflow or Weights & Biases).</li>
+                    <li><strong>Model Packaging:</strong> The winning model is containerized. Tools like <strong>Docker</strong> are used to package the model code alongside all its dependencies to ensure it runs identically on any machine.</li>
+                    <li><strong>Model Serving:</strong> Deploying the packaged model to a cloud server or edge device where it can receive data and return predictions (via REST APIs or batch processing).</li>
+                    <li><strong>Model Monitoring:</strong> Continuously observing the model in the wild. This involves checking for <strong>Model Drift</strong> (when the relationship between features and target variables changes) and <strong>Data Drift</strong> (when the distribution of incoming data changes).</li>
+                </ol>
+
+                <h3 class="text-xl font-semibold text-slate-800 mt-8 mb-3">5. Conclusion</h3>
+                <p class="text-slate-600 mb-6 leading-relaxed">
+                    By implementing MLOps, companies can release models faster, ensure they are reliable, and scale them infinitely. It turns machine learning from a messy, artisanal craft into an automated, predictable engineering discipline.
+                </p>
+
+                <div class="border-t-2 border-slate-200 mt-8 pt-8 text-center">
+                    <h3 class="text-2xl font-bold text-blue-600">Ready to test your knowledge?</h3>
+                    <button type="button" id="startQuizBtn" class="mt-4 bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg transition duration-200 text-lg shadow-sm">
+                        Start Quiz Now
+                    </button>
+                </div>
+                </div>
             </div>
-            <div class="flex flex-col sm:flex-row justify-center gap-4">
-                <button onclick="showStudyGuide()" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold py-3 px-8 rounded-lg shadow-sm transition-colors text-lg border border-indigo-200">
-                    📖 Read Study Guide
-                </button>
-                <button onclick="startQuiz()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg shadow-md transition-colors text-lg">
-                    Start Quiz Directly
-                </button>
+
+            <!-- Quiz Section -->
+            <div id="quizSection" class="hidden">
+                <form id="quizForm" class="space-y-8">
+                    <!-- Question 1 -->
+                    <div class="question-block" id="block-q1">
+                        <p class="font-semibold text-lg mb-3">1. What does MLOps stand for?</p>
+                        <div class="space-y-2">
+                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q1" value="a" class="mr-2"> a) Machine Logic Operations</label>
+                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q1" value="b" class="mr-2"> b) Machine Learning Operations</label>
+                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q1" value="c" class="mr-2"> c) Modern Learning Options</label>
+                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q1" value="d" class="mr-2"> d) Mainstream Language Operations</label>
+                        </div>
+                    </div>
+
+                    <!-- Question 2 -->
+                    <div class="question-block" id="block-q2">
+                        <p class="font-semibold text-lg mb-3">2. What is the primary goal of MLOps?</p>
+                        <div class="space-y-2">
+                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q2" value="a" class="mr-2"> a) To build faster hardware for model training</label>
+                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q2" value="b" class="mr-2"> b) To write data science research papers automatically</label>
+                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q2" value="c" class="mr-2"> c) To manually test software infrastructure</label>
+                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q2" value="d" class="mr-2"> d) To streamline, automate, and scale the machine learning lifecycle</label>
+                        </div>
+                    </div>
+
+                    <!-- Question 3 -->
+                    <div class="question-block" id="block-q3">
+                        <p class="font-semibold text-lg mb-3">3. Which of the following is NOT a core concept of MLOps?</p>
+                        <div class="space-y-2">
+                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q3" value="a" class="mr-2"> a) Continuous Integration (CI)</label>
+                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q3" value="b" class="mr-2"> b) Search Engine Optimization (SEO)</label>
+                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q3" value="c" class="mr-2"> c) Continuous Deployment (CD)</label>
+                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q3" value="d" class="mr-2"> d) Continuous Training (CT)</label>
+                        </div>
+                    </div>
+
+                    <!-- Question 4 -->
+                    <div class="question-block" id="block-q4">
+                        <p class="font-semibold text-lg mb-3">4. What does "Model Drift" refer to?</p>
+                        <div class="space-y-2">
+                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q4" value="a" class="mr-2"> a) The degradation of model predictive performance over time due to changes in real-world data</label>
+                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q4" value="b" class="mr-2"> b) Moving a model from a local environment to a cloud server</label>
+                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q4" value="c" class="mr-2"> c) Changing the algorithms used inside a neural network</label>
+                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q4" value="d" class="mr-2"> d) The speed at which a model returns a prediction</label>
+                        </div>
+                    </div>
+
+                    <!-- Question 5 -->
+                    <div class="question-block" id="block-q5">
+                        <p class="font-semibold text-lg mb-3">5. What is the main purpose of a Model Registry?</p>
+                        <div class="space-y-2">
+                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q5" value="a" class="mr-2"> a) To store raw, uncleaned databases</label>
+                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q5" value="b" class="mr-2"> b) To register new users to a machine learning application</label>
+                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q5" value="c" class="mr-2"> c) To act as a centralized repository to store, version, and manage trained models</label>
+                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q5" value="d" class="mr-2"> d) To monitor overall network traffic and security</label>
+                        </div>
+                    </div>
+
+                    <!-- Question 6 -->
+                    <div class="question-block" id="block-q6">
+                        <p class="font-semibold text-lg mb-3">6. Why is Data Versioning important in MLOps?</p>
+                        <div class="space-y-2">
+                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q6" value="a" class="mr-2"> a) It automatically cleans the dataset of missing values</label>
+                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q6" value="b" class="mr-2"> b) It ensures reproducibility by tracking the exact datasets used to train specific models</label>
+                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q6" value="c" class="mr-2"> c) It guarantees that the trained model will be 100% accurate</label>
+                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q6" value="d" class="mr-2"> d) It compresses the data to make it smaller in size</label>
+                        </div>
+                    </div>
+
+                    <!-- Question 7 -->
+                    <div class="question-block" id="block-q7">
+                        <p class="font-semibold text-lg mb-3">7. Which two historically separated teams does MLOps primarily seek to align?</p>
+                        <div class="space-y-2">
+                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q7" value="a" class="mr-2"> a) Front-end developers and UI/UX designers</label>
+                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q7" value="b" class="mr-2"> b) Sales and Marketing teams</label>
+                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q7" value="c" class="mr-2"> c) Data Scientists and Operations/IT (DevOps) teams</label>
+                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q7" value="d" class="mr-2"> d) Human Resources and Executive Management</label>
+                        </div>
+                    </div>
+
+                    <!-- Question 8 -->
+                    <div class="question-block" id="block-q8">
+                        <p class="font-semibold text-lg mb-3">8. What does Continuous Training (CT) entail?</p>
+                        <div class="space-y-2">
+                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q8" value="a" class="mr-2"> a) Automatically retraining the model as new data becomes available or performance drops</label>
+                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q8" value="b" class="mr-2"> b) Employees taking mandatory continuous courses on machine learning</label>
+                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q8" value="c" class="mr-2"> c) Training models indefinitely without ever deploying them</label>
+                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q8" value="d" class="mr-2"> d) Running the training code on a loop to stress-test the hardware servers</label>
+                        </div>
+                    </div>
+
+                    <!-- Question 9 -->
+                    <div class="question-block" id="block-q9">
+                        <p class="font-semibold text-lg mb-3">9. Which of the following tools is commonly used to containerize ML models for consistent deployment?</p>
+                        <div class="space-y-2">
+                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q9" value="a" class="mr-2"> a) Jupyter Notebooks</label>
+                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q9" value="b" class="mr-2"> b) Microsoft Excel</label>
+                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q9" value="c" class="mr-2"> c) Docker</label>
+                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q9" value="d" class="mr-2"> d) Git</label>
+                        </div>
+                    </div>
+
+                    <!-- Question 10 -->
+                    <div class="question-block" id="block-q10">
+                        <p class="font-semibold text-lg mb-3">10. In the context of MLOps, what is the role of "Monitoring"?</p>
+                        <div class="space-y-2">
+                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q10" value="a" class="mr-2"> a) Tracking the health, predictive accuracy, and resource usage of a deployed model in production</label>
+                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q10" value="b" class="mr-2"> b) Watching data scientists write Python code</label>
+                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q10" value="c" class="mr-2"> c) Ensuring employees are adhering to cybersecurity protocols</label>
+                            <label class="block p-3 border rounded-lg hover:bg-slate-50 cursor-pointer transition"><input type="radio" name="q10" value="d" class="mr-2"> d) Checking the stock prices of competitors offering AI solutions</label>
+                        </div>
+                    </div>
+
+                    <div class="pt-6 border-t">
+                        <button type="button" id="submitBtn" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-4 rounded-lg transition duration-200 text-lg">
+                            Submit Quiz
+                        </button>
+                    </div>
+                </form>
+
+                <!-- Results Section -->
+                <div id="resultContainer" class="hidden mt-8 p-6 bg-slate-100 rounded-lg text-center border-2 border-blue-200">
+                    <h2 class="text-2xl font-bold mb-2 text-slate-800">Your Score: <span id="scoreDisplay" class="text-blue-600"></span>/10</h2>
+                    <p id="feedbackText" class="text-lg text-slate-600"></p>
+                    <button type="button" id="retryBtn" class="mt-4 bg-slate-800 hover:bg-slate-900 text-white font-semibold py-2 px-6 rounded-lg transition duration-200">
+                        Try Again
+                    </button>
+                </div>
             </div>
         </div>
-
-        <!-- Study Guide Screen -->
-        <div id="study-guide-screen" class="hidden p-6 sm:p-8">
-            <h2 class="text-2xl font-bold mb-6 text-gray-800 text-center">Comprehensive Study Guide</h2>
-            
-            <div class="max-h-[55vh] overflow-y-auto pr-4 space-y-8 text-gray-700">
-                <div>
-                    <h3 class="text-xl font-bold text-blue-600 mb-3 border-b pb-2">☁️ AWS AI/ML Deployment</h3>
-                    <ul class="space-y-3 list-disc pl-5">
-                        <li><strong>Amazon SageMaker:</strong> The primary fully-managed service for building, training, and deploying ML models. Use <em>SageMaker Endpoints</em> for secure, real-time HTTP inference.</li>
-                        <li><strong>Storage & Containers:</strong> Use <strong>S3</strong> to store massive datasets and serialized model artifacts (like <code>model.tar.gz</code>). Use <strong>ECR (Elastic Container Registry)</strong> to store custom Docker images for ML workloads.</li>
-                        <li><strong>Compute & Frameworks:</strong> Use <strong>Deep Learning AMIs (DLAMI)</strong> on EC2 to get pre-installed frameworks (PyTorch, TensorFlow) and CUDA drivers. For cost-effective, high-performance inference, AWS offers custom ASICs called <strong>AWS Inferentia</strong>.</li>
-                        <li><strong>Serverless AI:</strong> For lightweight models, combining <strong>API Gateway + AWS Lambda</strong> provides a highly scalable, zero-maintenance architecture.</li>
-                        <li><strong>Security:</strong> Always use <strong>IAM Roles</strong> to securely grant services (like SageMaker) permissions to access other resources (like reading from S3) without hardcoding access keys.</li>
-                    </ul>
-                </div>
-                
-                <div>
-                    <h3 class="text-xl font-bold text-blue-600 mb-3 border-b pb-2">🌩️ Google Cloud Platform (GCP)</h3>
-                    <ul class="space-y-3 list-disc pl-5">
-                        <li><strong>Vertex AI:</strong> Google's unified platform bringing all ML services together. It includes <em>Vertex AI AutoML</em> for training high-quality models with minimal ML expertise.</li>
-                        <li><strong>Serverless & Containers:</strong> <strong>Cloud Run</strong> is perfect for deploying containerized ML models as serverless HTTP APIs that can automatically scale to zero when not in use.</li>
-                        <li><strong>Data & Compute:</strong> <strong>BigQuery ML</strong> allows users to train and evaluate models directly using standard SQL queries. Google's custom hardware accelerators specifically built for machine learning are called <strong>TPUs (Tensor Processing Units)</strong>.</li>
-                        <li><strong>Orchestration & Storage:</strong> Store built Docker images in <strong>Artifact Registry</strong>. For highly complex, microservice-based ML apps requiring granular custom orchestration, use <strong>GKE (Google Kubernetes Engine)</strong>.</li>
-                    </ul>
-                </div>
-
-                <div>
-                    <h3 class="text-xl font-bold text-blue-600 mb-3 border-b pb-2">🌍 Open Source & General Concepts</h3>
-                    <ul class="space-y-3 list-disc pl-5">
-                        <li><strong>FastAPI:</strong> A fast, modern Python web framework highly popular for serving ML models due to asynchronous support and automatic interactive API docs (Swagger UI).</li>
-                        <li><strong>Streamlit:</strong> An open-source framework that turns Python data scripts into interactive, shareable web apps in minutes—without needing to know HTML/CSS.</li>
-                        <li><strong>ML Lifecycle:</strong> <strong>MLflow</strong> is a widely used open-source platform for experiment tracking, reproducibility, and managing a central model registry.</li>
-                        <li><strong>Model Interoperability:</strong> <strong>ONNX (Open Neural Network Exchange)</strong> allows models to be trained in one framework (e.g., PyTorch) and easily deployed or optimized in another environment.</li>
-                        <li><strong>Hugging Face:</strong> A collaborative open-source hub for hosting NLP models, datasets, and easily deploying machine learning demos via "Spaces".</li>
-                        <li><strong>Concepts to Know:</strong> <strong>A/B Testing</strong> involves routing live traffic to old (A) and new (B) models in production to compare performance. Avoid unpickling models from untrusted sources using Python's <strong>pickle</strong> module, as unpickling can execute arbitrary malicious code on your machine.</li>
-                    </ul>
-                </div>
-
-                <div>
-                    <h3 class="text-xl font-bold text-blue-600 mb-3 border-b pb-2">🐳 Docker & Containerization Basics</h3>
-                    <ul class="space-y-3 list-disc pl-5">
-                        <li><strong>Core Concept:</strong> Docker packages applications and their dependencies into standardized units for deployment. An <strong>Image</strong> is the static, read-only blueprint; a <strong>Container</strong> is the live, running instance of an image.</li>
-                        <li><strong>Dockerfile:</strong> The text document containing all the sequential instructions a user could call on the command line to assemble a Docker image.</li>
-                        <li><strong>Essential Commands:</strong>
-                            <ul class="list-[circle] pl-5 mt-2 space-y-1 text-sm text-gray-700 bg-gray-50 p-3 rounded-lg border">
-                                <li><code>docker build -t my-app .</code> : Builds an image from a Dockerfile located in the current directory (<code>.</code>) and tags it with a name.</li>
-                                <li><code>docker run -p 8000:80 my-image</code> : Runs a container and maps port 8000 on your host machine to port 80 inside the container.</li>
-                                <li><code>docker ps</code> : Lists all currently active/running containers on your system.</li>
-                            </ul>
-                        </li>
-                        <li><strong>Storage & Orchestration:</strong> Use <strong>Docker Volumes</strong> to persist data generated by the container so it isn't lost when the container is destroyed. Use <strong>Docker Compose</strong> (via a <code>docker-compose.yml</code> file) to define and spin up multi-container applications easily.</li>
-                    </ul>
-                </div>
-            </div>
-
-            <div class="mt-8 flex justify-between items-center border-t pt-6">
-                <button onclick="backToStart()" class="text-gray-500 hover:text-gray-800 font-medium py-2 px-4 transition-colors">
-                    &larr; Back
-                </button>
-                <button onclick="startQuizFromGuide()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg shadow-md transition-colors">
-                    Start Quiz Now
-                </button>
-            </div>
-        </div>
-
-        <!-- Quiz Screen -->
-        <div id="quiz-screen" class="hidden p-6 sm:p-8">
-            <div class="flex justify-between items-center mb-6 text-sm font-medium text-gray-500">
-                <span id="question-tracker">Question 1 of 30</span>
-                <span id="score-tracker">Score: 0</span>
-            </div>
-            
-            <!-- Progress Bar -->
-            <div class="w-full bg-gray-200 rounded-full h-2.5 mb-8">
-                <div id="progress-bar" class="bg-blue-600 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
-            </div>
-
-            <h2 id="question-text" class="text-xl font-semibold mb-6 text-gray-800"></h2>
-
-            <div id="options-container" class="space-y-3 mb-8">
-                <!-- Options injected here -->
-            </div>
-
-            <div id="feedback-container" class="hidden mb-6 p-4 rounded-lg text-sm border">
-                <p id="feedback-message" class="font-bold mb-1"></p>
-                <p id="feedback-explanation" class="text-gray-700"></p>
-            </div>
-
-            <div class="flex justify-end">
-                <button id="next-btn" onclick="nextQuestion()" class="hidden bg-gray-800 hover:bg-gray-900 text-white font-medium py-2 px-6 rounded-lg transition-colors">
-                    Next Question
-                </button>
-                <button id="finish-btn" onclick="showResults()" class="hidden bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-6 rounded-lg transition-colors">
-                    View Results
-                </button>
-            </div>
-        </div>
-
-        <!-- Results Screen -->
-        <div id="result-screen" class="hidden p-8 text-center">
-            <div class="mb-8">
-                <h2 class="text-3xl font-bold mb-2">Quiz Completed!</h2>
-                <p class="text-gray-600 text-lg">Here is how you did:</p>
-                
-                <div class="mt-6 inline-flex items-center justify-center w-32 h-32 rounded-full border-8 border-blue-100 bg-blue-50">
-                    <span id="final-score" class="text-3xl font-bold text-blue-600">0/30</span>
-                </div>
-                <p id="performance-message" class="mt-4 text-lg font-medium text-gray-800"></p>
-            </div>
-            
-            <button onclick="restartQuiz()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg shadow-md transition-colors">
-                Restart Quiz
-            </button>
-        </div>
-
     </div>
 
     <script>
-        const quizData = [
-            // AWS
-            {
-                question: "Which AWS service is specifically designed for developers to build, train, and deploy machine learning models quickly?",
-                options: ["AWS Lambda", "Amazon EC2", "Amazon SageMaker", "Amazon S3"],
-                correct: 2,
-                explanation: "Amazon SageMaker is a fully managed service that provides every developer and data scientist with the ability to build, train, and deploy ML models quickly."
-            },
-            {
-                question: "If you want to deploy a lightweight AI model as a serverless API on AWS without managing infrastructure, which combination is best?",
-                options: ["EC2 + Elastic Load Balancer", "API Gateway + AWS Lambda", "Amazon RDS + EC2", "AWS Glue + Athena"],
-                correct: 1,
-                explanation: "API Gateway combined with AWS Lambda allows you to host stateless, serverless endpoints perfect for lightweight model inference."
-            },
-            {
-                question: "Where should you store large datasets and model artifacts (like model.tar.gz) in AWS before deployment?",
-                options: ["Amazon S3", "Amazon RDS", "Amazon DynamoDB", "Amazon CloudFront"],
-                correct: 0,
-                explanation: "Amazon S3 is the standard, highly scalable object storage service used to store training data and serialized model artifacts."
-            },
-            {
-                question: "What is an Amazon SageMaker Endpoint primarily used for?",
-                options: ["Data labeling", "Real-time model inference", "Database hosting", "Training ML models"],
-                correct: 1,
-                explanation: "SageMaker Endpoints provide a secure, scalable HTTPS endpoint for real-time model inference/predictions."
-            },
-            {
-                question: "Which AWS service is a fully-managed Docker container registry used to store ML container images?",
-                options: ["Amazon EKS", "Amazon ECS", "Amazon ECR", "AWS Fargate"],
-                correct: 2,
-                explanation: "Amazon ECR (Elastic Container Registry) is where you push your custom Docker images for ML training or inference so SageMaker or ECS can use them."
-            },
-            {
-                question: "What hardware accelerator is custom-designed by AWS specifically for low-cost, high-performance machine learning inference?",
-                options: ["AWS Trainium", "AWS Graviton", "NVIDIA A100", "AWS Inferentia"],
-                correct: 3,
-                explanation: "AWS Inferentia chips are custom-designed by AWS to provide high performance ML inference at the lowest cost in the cloud."
-            },
-            {
-                question: "When deploying a model on EC2, what type of AMI (Amazon Machine Image) is recommended to avoid manually installing CUDA and ML frameworks?",
-                options: ["Amazon Linux 2 Base", "AWS Deep Learning AMI (DLAMI)", "Windows Server Core", "Ubuntu Minimal Server"],
-                correct: 1,
-                explanation: "Deep Learning AMIs come pre-installed with popular frameworks like TensorFlow, PyTorch, and necessary GPU drivers (CUDA)."
-            },
-            {
-                question: "How do you securely grant a SageMaker instance permission to read files from an S3 bucket?",
-                options: ["Embed AWS access keys in the code", "Make the S3 bucket completely public", "Attach an IAM Role with S3 read permissions to the SageMaker instance", "Use an SSH key pair"],
-                correct: 2,
-                explanation: "IAM (Identity and Access Management) Roles provide secure, temporary credentials to AWS resources without hardcoding keys."
-            },
+        // Correct answers mapping
+        const answers = {
+            q1: 'b',
+            q2: 'd',
+            q3: 'b',
+            q4: 'a',
+            q5: 'c',
+            q6: 'b',
+            q7: 'c',
+            q8: 'a',
+            q9: 'c',
+            q10: 'a'
+        };
 
-            // GCP
-            {
-                question: "What is Google Cloud's unified machine learning platform for building, deploying, and scaling AI models?",
-                options: ["Google Compute Engine", "Vertex AI", "BigQuery ML", "Cloud Functions"],
-                correct: 1,
-                explanation: "Vertex AI brings together Google Cloud's AI services into a unified API, client library, and user interface."
-            },
-            {
-                question: "Which GCP service allows you to deploy containerized ML models as serverless HTTP applications that automatically scale to zero?",
-                options: ["Cloud Run", "Google Kubernetes Engine (GKE)", "Compute Engine", "Cloud Build"],
-                correct: 0,
-                explanation: "Cloud Run is a fully managed compute platform that automatically scales stateless containers, ideal for lightweight ML APIs."
-            },
-            {
-                question: "If you want to train and evaluate ML models directly using standard SQL queries in Google Cloud, which service should you use?",
-                options: ["Cloud SQL", "Dataproc", "BigQuery ML", "Cloud Spanner"],
-                correct: 2,
-                explanation: "BigQuery ML lets users create and execute ML models in BigQuery using standard SQL queries."
-            },
-            {
-                question: "What is Google's custom-developed ASIC (Application-Specific Integrated Circuit) used to accelerate machine learning workloads?",
-                options: ["GPU", "TPU", "FPGA", "CPU"],
-                correct: 1,
-                explanation: "Tensor Processing Units (TPUs) are AI accelerators developed by Google specifically for neural network machine learning."
-            },
-            {
-                question: "Which Vertex AI feature allows users to train high-quality models with minimal machine learning expertise?",
-                options: ["Vertex AI Notebooks", "Vertex AI Feature Store", "Vertex AI Pipelines", "Vertex AI AutoML"],
-                correct: 3,
-                explanation: "AutoML allows developers with limited ML expertise to train high-quality models specific to their business needs."
-            },
-            {
-                question: "In GCP, where do you typically store your built Docker images containing your ML models and API code?",
-                options: ["Cloud Storage", "Artifact Registry", "Cloud Source Repositories", "Firebase Storage"],
-                correct: 1,
-                explanation: "Google Artifact Registry (the evolution of Container Registry) is the single place for your organization to manage container images."
-            },
-            {
-                question: "For a highly complex, microservices-based ML architecture requiring custom orchestration and scaling, which GCP service is most appropriate?",
-                options: ["Cloud Functions", "Google Kubernetes Engine (GKE)", "App Engine", "Cloud Run"],
-                correct: 1,
-                explanation: "GKE provides full control over Kubernetes clusters, making it ideal for complex, distributed ML architectures."
-            },
+        const form = document.getElementById('quizForm');
+        const submitBtn = document.getElementById('submitBtn');
+        const resultContainer = document.getElementById('resultContainer');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const feedbackText = document.getElementById('feedbackText');
+        const retryBtn = document.getElementById('retryBtn');
 
-            // Open Source / General
-            {
-                question: "Which Python web framework is highly popular for serving ML models due to its speed, asynchronous support, and automatic Swagger UI generation?",
-                options: ["Django", "FastAPI", "Flask", "Streamlit"],
-                correct: 1,
-                explanation: "FastAPI is a modern, fast web framework for building APIs with Python, automatically providing interactive API documentation."
-            },
-            {
-                question: "What is a standard open-source format designed to represent machine learning models, allowing models trained in PyTorch to be deployed in different environments?",
-                options: ["ONNX (Open Neural Network Exchange)", "CSV (Comma Separated Values)", "HDF5", "Pickle"],
-                correct: 0,
-                explanation: "ONNX provides an open source format for AI models, enabling interoperability between different frameworks (e.g., PyTorch to TensorFlow)."
-            },
-            {
-                question: "Which open-source platform is widely used for managing the end-to-end machine learning lifecycle, including experiment tracking and model registry?",
-                options: ["Jenkins", "MLflow", "Prometheus", "Grafana"],
-                correct: 1,
-                explanation: "MLflow is an open-source platform to manage the ML lifecycle, including experimentation, reproducibility, deployment, and a central model registry."
-            },
-            {
-                question: "What is a common risk of using Python's 'pickle' module to load serialized models from untrusted sources?",
-                options: ["It compresses the model too much", "It only works on Linux", "It can execute arbitrary code upon unpickling", "It converts models to strings"],
-                correct: 2,
-                explanation: "Pickle is not secure against erroneous or maliciously constructed data. Unpickling untrusted data can execute arbitrary code on your machine."
-            },
-            {
-                question: "Which popular open-source hub allows you to host, share, and deploy NLP models and datasets easily via 'Spaces'?",
-                options: ["GitHub", "Kaggle", "Hugging Face", "Docker Hub"],
-                correct: 2,
-                explanation: "Hugging Face is a collaborative platform providing tools, models, datasets, and 'Spaces' for deploying ML apps."
-            },
-            {
-                question: "What tool allows data scientists to build interactive web applications for their ML models entirely in Python without knowing HTML/CSS?",
-                options: ["React", "FastAPI", "Streamlit", "Nginx"],
-                correct: 2,
-                explanation: "Streamlit is an open-source app framework that turns data scripts into shareable web apps in minutes, using pure Python."
-            },
-            {
-                question: "When deploying a model, what does 'A/B testing' refer to?",
-                options: ["Testing if a model works on both AWS and GCP", "Comparing two versions of a model in production to see which performs better", "Translating code from language A to language B", "Testing the API with positive and negative numbers"],
-                correct: 1,
-                explanation: "A/B testing in ML involves routing a portion of live traffic to a new model (B) while keeping the rest on the old model (A) to compare performance metrics."
-            },
+        // Tab Navigation Logic
+        const tabGuide = document.getElementById('tabGuide');
+        const tabQuiz = document.getElementById('tabQuiz');
+        const guideSection = document.getElementById('guideSection');
+        const quizSection = document.getElementById('quizSection');
+        const startQuizBtn = document.getElementById('startQuizBtn');
 
-            // Docker Basics
-            {
-                question: "What is Docker primarily used for?",
-                options: ["Designing database schemas", "Creating virtual machines with full operating systems", "Packaging applications and their dependencies into standardized units for deployment", "Writing machine learning algorithms"],
-                correct: 2,
-                explanation: "Docker is a platform for developing, shipping, and running applications in isolated environments called containers."
-            },
-            {
-                question: "What is the difference between a Docker Image and a Docker Container?",
-                options: ["They are the exact same thing", "An image is a running instance; a container is the blueprint", "An image is an read-only template; a container is a running instance of an image", "An image is for Windows; a container is for Linux"],
-                correct: 2,
-                explanation: "A Docker image is a static, read-only file with all the code, libraries, and dependencies. A container is a live, running instance of that image."
-            },
-            {
-                question: "Which file contains a set of instructions used to build a Docker image?",
-                options: ["docker-compose.yml", "Dockerfile", "requirements.txt", "package.json"],
-                correct: 1,
-                explanation: "A Dockerfile is a text document that contains all the commands a user could call on the command line to assemble an image."
-            },
-            {
-                question: "Which command is used to build a Docker image from a Dockerfile in the current directory?",
-                options: ["docker run .", "docker push .", "docker build -t my-app .", "docker create my-app"],
-                correct: 2,
-                explanation: "'docker build' builds an image from a Dockerfile. The '-t' flag tags the image with a name, and '.' specifies the current directory."
-            },
-            {
-                question: "When running a container, what does the flag `-p 8000:80` do? (e.g., docker run -p 8000:80 my-image)",
-                options: ["Sets the password to 8000:80", "Maps port 8000 on the host machine to port 80 inside the container", "Limits the container to 8000 MB of RAM and 80% CPU", "Runs the container for 8000 seconds"],
-                correct: 1,
-                explanation: "The '-p' (publish) flag maps a port on your host machine to a port exposed by the container."
-            },
-            {
-                question: "If you want to persist data (like an ML model's SQLite database) so it isn't lost when a Docker container is destroyed, what should you use?",
-                options: ["Docker Volumes", "Docker Networks", "Docker Tags", "Docker Ports"],
-                correct: 0,
-                explanation: "Volumes are the preferred mechanism for persisting data generated by and used by Docker containers, existing outside the container's lifecycle."
-            },
-            {
-                question: "Which tool allows you to define and run multi-container Docker applications (like an API container and a Redis container) using a single YAML file?",
-                options: ["Docker Swarm", "Kubernetes", "Docker Compose", "Docker Hub"],
-                correct: 2,
-                explanation: "Docker Compose uses a YAML file to configure your application's services, networks, and volumes, and starts them all with a single command."
-            },
-            {
-                question: "What command lists all *currently running* Docker containers on your machine?",
-                options: ["docker images", "docker ps", "docker list", "docker run --all"],
-                correct: 1,
-                explanation: "'docker ps' lists all active/running containers. Adding '-a' (docker ps -a) lists all containers, including stopped ones."
-            }
-        ];
-
-        let currentQuestionIndex = 0;
-        let score = 0;
-        let selectedOptionIndex = null;
-
-        // DOM Elements
-        const startScreen = document.getElementById('start-screen');
-        const studyGuideScreen = document.getElementById('study-guide-screen');
-        const quizScreen = document.getElementById('quiz-screen');
-        const resultScreen = document.getElementById('result-screen');
-        const questionText = document.getElementById('question-text');
-        const optionsContainer = document.getElementById('options-container');
-        const questionTracker = document.getElementById('question-tracker');
-        const scoreTracker = document.getElementById('score-tracker');
-        const progressBar = document.getElementById('progress-bar');
-        const nextBtn = document.getElementById('next-btn');
-        const finishBtn = document.getElementById('finish-btn');
-        const feedbackContainer = document.getElementById('feedback-container');
-        const feedbackMessage = document.getElementById('feedback-message');
-        const feedbackExplanation = document.getElementById('feedback-explanation');
-
-        function showStudyGuide() {
-            startScreen.classList.add('hidden');
-            studyGuideScreen.classList.remove('hidden');
-        }
-
-        function backToStart() {
-            studyGuideScreen.classList.add('hidden');
-            startScreen.classList.remove('hidden');
-        }
-
-        function startQuizFromGuide() {
-            studyGuideScreen.classList.add('hidden');
-            startQuiz();
-        }
-
-        function startQuiz() {
-            startScreen.classList.add('hidden');
-            quizScreen.classList.remove('hidden');
-            currentQuestionIndex = 0;
-            score = 0;
-            loadQuestion();
-        }
-
-        function loadQuestion() {
-            // Reset UI for new question
-            selectedOptionIndex = null;
-            optionsContainer.innerHTML = '';
-            feedbackContainer.classList.add('hidden');
-            nextBtn.classList.add('hidden');
-            finishBtn.classList.add('hidden');
-
-            const q = quizData[currentQuestionIndex];
+        function showGuide() {
+            guideSection.classList.remove('hidden');
+            quizSection.classList.add('hidden');
             
-            // Update Text & Trackers
-            questionText.textContent = q.question;
-            questionTracker.textContent = `Question ${currentQuestionIndex + 1} of ${quizData.length}`;
-            scoreTracker.textContent = `Score: ${score}`;
-            progressBar.style.width = `${((currentQuestionIndex) / quizData.length) * 100}%`;
+            tabGuide.classList.add('text-blue-600', 'border-b-2', 'border-blue-600');
+            tabGuide.classList.remove('text-slate-500');
+            
+            tabQuiz.classList.remove('text-blue-600', 'border-b-2', 'border-blue-600');
+            tabQuiz.classList.add('text-slate-500');
+        }
 
-            // Generate Options
-            q.options.forEach((opt, index) => {
-                const button = document.createElement('button');
-                button.className = 'option-btn w-full text-left p-4 border border-gray-200 rounded-lg hover:bg-gray-50 focus:outline-none bg-white text-gray-700';
-                button.textContent = opt;
-                button.onclick = () => selectOption(index, button);
-                optionsContainer.appendChild(button);
+        function showQuiz() {
+            quizSection.classList.remove('hidden');
+            guideSection.classList.add('hidden');
+            
+            tabQuiz.classList.add('text-blue-600', 'border-b-2', 'border-blue-600');
+            tabQuiz.classList.remove('text-slate-500');
+            
+            // Disable the Guide tab to prevent returning
+            tabGuide.classList.remove('text-blue-600', 'border-b-2', 'border-blue-600', 'hover:bg-slate-50', 'text-slate-500');
+            tabGuide.classList.add('text-slate-300', 'cursor-not-allowed');
+            tabGuide.disabled = true;
+            
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        tabGuide.addEventListener('click', () => {
+            if (!tabGuide.disabled) showGuide();
+        });
+        tabQuiz.addEventListener('click', showQuiz);
+        startQuizBtn.addEventListener('click', showQuiz);
+
+        submitBtn.addEventListener('click', () => {
+            let score = 0;
+            const formData = new FormData(form);
+
+            // Reset previous styles
+            document.querySelectorAll('.question-block label').forEach(label => {
+                label.classList.remove('correct', 'incorrect', 'missed');
             });
-        }
 
-        function selectOption(index, selectedButton) {
-            // Prevent multiple selections
-            if (selectedOptionIndex !== null) return;
-            
-            selectedOptionIndex = index;
-            const q = quizData[currentQuestionIndex];
-            const isCorrect = index === q.correct;
-            
-            if (isCorrect) score++;
-            scoreTracker.textContent = `Score: ${score}`;
-
-            // Style buttons based on result
-            const buttons = optionsContainer.querySelectorAll('button');
-            buttons.forEach((btn, i) => {
-                btn.disabled = true;
-                btn.classList.remove('hover:bg-gray-50');
+            // Evaluate answers
+            for (let i = 1; i <= 10; i++) {
+                const questionName = `q${i}`;
+                const selectedValue = formData.get(questionName);
+                const correctValue = answers[questionName];
                 
-                if (i === q.correct) {
-                    btn.classList.add('bg-green-100', 'border-green-500', 'text-green-800');
-                    btn.classList.remove('bg-white', 'border-gray-200');
-                } else if (i === index && !isCorrect) {
-                    btn.classList.add('bg-red-100', 'border-red-500', 'text-red-800');
-                    btn.classList.remove('bg-white', 'border-gray-200');
-                } else {
-                    btn.classList.add('opacity-50');
+                const block = document.getElementById(`block-q${i}`);
+                if (!block) continue; // Safety check
+                
+                const options = block.querySelectorAll('label');
+
+                options.forEach(label => {
+                    const input = label.querySelector('input');
+                    // Disable inputs after submission
+                    input.disabled = true;
+
+                    if (input.value === correctValue) {
+                        if (selectedValue === correctValue) {
+                            label.classList.add('correct');
+                        } else {
+                            label.classList.add('missed'); // Show the right answer if missed
+                        }
+                    } else if (input.value === selectedValue && selectedValue !== correctValue) {
+                        label.classList.add('incorrect');
+                    }
+                });
+
+                if (selectedValue === correctValue) {
+                    score++;
                 }
+            }
+
+            // Display results
+            scoreDisplay.textContent = score;
+            submitBtn.classList.add('hidden');
+            resultContainer.classList.remove('hidden');
+
+            if (score === 10) {
+                feedbackText.textContent = "Perfect! You're ready to deploy models like a pro.";
+            } else if (score >= 7) {
+                feedbackText.textContent = "Great job! You have a solid grasp of MLOps fundamentals.";
+            } else if (score >= 4) {
+                feedbackText.textContent = "Good effort. Reviewing the core concepts of the ML lifecycle will help.";
+            } else {
+                feedbackText.textContent = "Keep learning! MLOps is a big field, don't give up.";
+            }
+        });
+
+        // Retry logic
+        retryBtn.addEventListener('click', () => {
+            form.reset();
+            
+            // Re-enable inputs and remove styles
+            document.querySelectorAll('.question-block label').forEach(label => {
+                label.classList.remove('correct', 'incorrect', 'missed');
+                label.querySelector('input').disabled = false;
             });
 
-            // Show feedback
-            feedbackContainer.classList.remove('hidden');
-            if (isCorrect) {
-                feedbackContainer.classList.add('bg-green-50', 'border-green-200');
-                feedbackContainer.classList.remove('bg-red-50', 'border-red-200');
-                feedbackMessage.textContent = '✅ Correct!';
-                feedbackMessage.className = 'font-bold mb-1 text-green-700';
-            } else {
-                feedbackContainer.classList.add('bg-red-50', 'border-red-200');
-                feedbackContainer.classList.remove('bg-green-50', 'border-green-200');
-                feedbackMessage.textContent = '❌ Incorrect';
-                feedbackMessage.className = 'font-bold mb-1 text-red-700';
-            }
-            feedbackExplanation.textContent = q.explanation;
-
-            // Show Next/Finish button
-            if (currentQuestionIndex < quizData.length - 1) {
-                nextBtn.classList.remove('hidden');
-            } else {
-                finishBtn.classList.remove('hidden');
-                progressBar.style.width = '100%';
-            }
-        }
-
-        function nextQuestion() {
-            currentQuestionIndex++;
-            loadQuestion();
-        }
-
-        function showResults() {
-            quizScreen.classList.add('hidden');
-            resultScreen.classList.remove('hidden');
-            
-            document.getElementById('final-score').textContent = `${score}/${quizData.length}`;
-            
-            const perfMsg = document.getElementById('performance-message');
-            const percentage = score / quizData.length;
-            
-            if (percentage >= 0.9) {
-                perfMsg.textContent = "Expert Level! You're ready to deploy AI to production! 🚀";
-                perfMsg.className = "mt-4 text-lg font-medium text-green-600";
-            } else if (percentage >= 0.7) {
-                perfMsg.textContent = "Great job! You have a solid understanding of AI deployment and containers. 👍";
-                perfMsg.className = "mt-4 text-lg font-medium text-blue-600";
-            } else if (percentage >= 0.5) {
-                perfMsg.textContent = "Good effort. Reviewing the explanations will help cement these concepts. 📚";
-                perfMsg.className = "mt-4 text-lg font-medium text-yellow-600";
-            } else {
-                perfMsg.textContent = "Keep learning! Cloud deployment and Docker take time to master. Don't give up! 💪";
-                perfMsg.className = "mt-4 text-lg font-medium text-red-600";
-            }
-        }
-
-        function restartQuiz() {
-            resultScreen.classList.add('hidden');
-            startScreen.classList.remove('hidden');
-        }
+            submitBtn.classList.remove('hidden');
+            resultContainer.classList.add('hidden');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
     </script>
 </body>
 </html>
