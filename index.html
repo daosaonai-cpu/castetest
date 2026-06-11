@@ -3,522 +3,435 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AI Deployment & Docker Mastery Quiz</title>
+    <title>Computer Fundamentals: CPU, Memory & Software</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body {
-            font-family: 'Inter', system-ui, -apple-system, sans-serif;
-            background-color: #f3f4f6;
+        /* Custom styles for slide transitions */
+        .slide {
+            transition: opacity 0.6s ease-in-out, transform 0.6s ease-in-out;
         }
-        .fade-in {
-            animation: fadeIn 0.3s ease-in-out;
+        .slide-hidden {
+            opacity: 0;
+            pointer-events: none;
+            transform: scale(0.95);
+            z-index: 0;
         }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        .slide-active {
+            opacity: 1;
+            pointer-events: auto;
+            transform: scale(1);
+            z-index: 10;
         }
-        .option-btn {
-            transition: all 0.2s;
+        
+        /* Hide scrollbar for a cleaner presentation look */
+        ::-webkit-scrollbar {
+            display: none;
         }
-        .option-btn:hover:not(:disabled) {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+        html {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
         }
     </style>
 </head>
-<body class="text-gray-800 antialiased min-h-screen flex items-center justify-center p-4">
+<body class="bg-slate-900 text-slate-100 h-screen w-screen overflow-hidden font-sans selection:bg-indigo-500 selection:text-white">
 
-    <div id="app" class="max-w-3xl w-full bg-white rounded-2xl shadow-xl overflow-hidden fade-in">
-        
-        <!-- Header -->
-        <div class="bg-blue-600 text-white p-6 text-center">
-            <h1 class="text-2xl font-bold">AI Deployment & Docker Basics</h1>
-            <p class="text-blue-100 mt-2 text-sm">Test your knowledge on AWS, GCP, Open Source, and Containerization</p>
-        </div>
+    <!-- Main Slides Container -->
+    <main id="slides-container" class="relative w-full h-full flex items-center justify-center p-4 sm:p-8">
 
-        <!-- Start Screen -->
-        <div id="start-screen" class="p-8 text-center">
-            <div class="mb-8 text-gray-600 space-y-4">
-                <p>Welcome to the assessment! This quiz contains <strong>30</strong> multiple-choice questions covering:</p>
-                <ul class="text-left inline-block space-y-2 bg-gray-50 p-4 rounded-lg border border-gray-100">
-                    <li>☁️ AWS AI/ML Deployment (SageMaker, etc.)</li>
-                    <li>🌩️ Google Cloud AI Platform (Vertex AI, etc.)</li>
-                    <li>🌍 Open Source Deployment (FastAPI, ONNX, MLflow)</li>
-                    <li>🐳 Introduction to Docker & Containerization</li>
-                </ul>
+        <!-- Slide 1: Title -->
+        <section class="slide slide-active absolute inset-0 flex flex-col items-center justify-center text-center p-8">
+            <div class="bg-slate-800/50 p-12 rounded-3xl border border-slate-700 shadow-2xl max-w-4xl backdrop-blur-sm">
+                <div class="inline-flex items-center justify-center w-20 h-20 bg-indigo-600 rounded-full mb-8 shadow-lg shadow-indigo-500/30">
+                    <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                </div>
+                <h1 class="text-5xl md:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400 mb-6 tracking-tight">
+                    Computer Systems
+                </h1>
+                <p class="text-xl md:text-3xl text-slate-300 font-light mb-8">
+                    Understanding the CPU, Memory, and Software
+                </p>
+                <div class="flex items-center justify-center gap-2 text-slate-400 text-sm mt-12 animate-pulse">
+                    <span>Use arrow keys <kbd class="px-2 py-1 bg-slate-800 rounded text-xs border border-slate-700">←</kbd> <kbd class="px-2 py-1 bg-slate-800 rounded text-xs border border-slate-700">→</kbd> or swipe to navigate</span>
+                </div>
             </div>
-            <div class="flex flex-col sm:flex-row justify-center gap-4">
-                <button onclick="showStudyGuide()" class="bg-indigo-50 hover:bg-indigo-100 text-indigo-700 font-semibold py-3 px-8 rounded-lg shadow-sm transition-colors text-lg border border-indigo-200">
-                    📖 Read Study Guide
-                </button>
-                <button onclick="startQuiz()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg shadow-md transition-colors text-lg">
-                    Start Quiz Directly
-                </button>
-            </div>
-        </div>
+        </section>
 
-        <!-- Study Guide Screen -->
-        <div id="study-guide-screen" class="hidden p-6 sm:p-8">
-            <h2 class="text-2xl font-bold mb-6 text-gray-800 text-center">Comprehensive Study Guide</h2>
-            
-            <div class="max-h-[55vh] overflow-y-auto pr-4 space-y-8 text-gray-700">
+        <!-- Slide 2: CPU Overview -->
+        <section class="slide slide-hidden absolute inset-0 flex flex-col items-center justify-center p-8 max-w-6xl mx-auto">
+            <h2 class="text-4xl md:text-5xl font-bold mb-12 text-indigo-400 text-center w-full border-b border-slate-700 pb-6">The Brain: Central Processing Unit (CPU)</h2>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-12 w-full items-center">
                 <div>
-                    <h3 class="text-xl font-bold text-blue-600 mb-3 border-b pb-2">☁️ AWS AI/ML Deployment</h3>
-                    <ul class="space-y-3 list-disc pl-5">
-                        <li><strong>Amazon SageMaker:</strong> The primary fully-managed service for building, training, and deploying ML models. Use <em>SageMaker Endpoints</em> for secure, real-time HTTP inference.</li>
-                        <li><strong>Storage & Containers:</strong> Use <strong>S3</strong> to store massive datasets and serialized model artifacts (like <code>model.tar.gz</code>). Use <strong>ECR (Elastic Container Registry)</strong> to store custom Docker images for ML workloads.</li>
-                        <li><strong>Compute & Frameworks:</strong> Use <strong>Deep Learning AMIs (DLAMI)</strong> on EC2 to get pre-installed frameworks (PyTorch, TensorFlow) and CUDA drivers. For cost-effective, high-performance inference, AWS offers custom ASICs called <strong>AWS Inferentia</strong>.</li>
-                        <li><strong>Serverless AI:</strong> For lightweight models, combining <strong>API Gateway + AWS Lambda</strong> provides a highly scalable, zero-maintenance architecture.</li>
-                        <li><strong>Security:</strong> Always use <strong>IAM Roles</strong> to securely grant services (like SageMaker) permissions to access other resources (like reading from S3) without hardcoding access keys.</li>
-                    </ul>
-                </div>
-                
-                <div>
-                    <h3 class="text-xl font-bold text-blue-600 mb-3 border-b pb-2">🌩️ Google Cloud Platform (GCP)</h3>
-                    <ul class="space-y-3 list-disc pl-5">
-                        <li><strong>Vertex AI:</strong> Google's unified platform bringing all ML services together. It includes <em>Vertex AI AutoML</em> for training high-quality models with minimal ML expertise.</li>
-                        <li><strong>Serverless & Containers:</strong> <strong>Cloud Run</strong> is perfect for deploying containerized ML models as serverless HTTP APIs that can automatically scale to zero when not in use.</li>
-                        <li><strong>Data & Compute:</strong> <strong>BigQuery ML</strong> allows users to train and evaluate models directly using standard SQL queries. Google's custom hardware accelerators specifically built for machine learning are called <strong>TPUs (Tensor Processing Units)</strong>.</li>
-                        <li><strong>Orchestration & Storage:</strong> Store built Docker images in <strong>Artifact Registry</strong>. For highly complex, microservice-based ML apps requiring granular custom orchestration, use <strong>GKE (Google Kubernetes Engine)</strong>.</li>
-                    </ul>
-                </div>
-
-                <div>
-                    <h3 class="text-xl font-bold text-blue-600 mb-3 border-b pb-2">🌍 Open Source & General Concepts</h3>
-                    <ul class="space-y-3 list-disc pl-5">
-                        <li><strong>FastAPI:</strong> A fast, modern Python web framework highly popular for serving ML models due to asynchronous support and automatic interactive API docs (Swagger UI).</li>
-                        <li><strong>Streamlit:</strong> An open-source framework that turns Python data scripts into interactive, shareable web apps in minutes—without needing to know HTML/CSS.</li>
-                        <li><strong>ML Lifecycle:</strong> <strong>MLflow</strong> is a widely used open-source platform for experiment tracking, reproducibility, and managing a central model registry.</li>
-                        <li><strong>Model Interoperability:</strong> <strong>ONNX (Open Neural Network Exchange)</strong> allows models to be trained in one framework (e.g., PyTorch) and easily deployed or optimized in another environment.</li>
-                        <li><strong>Hugging Face:</strong> A collaborative open-source hub for hosting NLP models, datasets, and easily deploying machine learning demos via "Spaces".</li>
-                        <li><strong>Concepts to Know:</strong> <strong>A/B Testing</strong> involves routing live traffic to old (A) and new (B) models in production to compare performance. Avoid unpickling models from untrusted sources using Python's <strong>pickle</strong> module, as unpickling can execute arbitrary malicious code on your machine.</li>
-                    </ul>
-                </div>
-
-                <div>
-                    <h3 class="text-xl font-bold text-blue-600 mb-3 border-b pb-2">🐳 Docker & Containerization Basics</h3>
-                    <ul class="space-y-3 list-disc pl-5">
-                        <li><strong>Core Concept:</strong> Docker packages applications and their dependencies into standardized units for deployment. An <strong>Image</strong> is the static, read-only blueprint; a <strong>Container</strong> is the live, running instance of an image.</li>
-                        <li><strong>Dockerfile:</strong> The text document containing all the sequential instructions a user could call on the command line to assemble a Docker image.</li>
-                        <li><strong>Essential Commands:</strong>
-                            <ul class="list-[circle] pl-5 mt-2 space-y-1 text-sm text-gray-700 bg-gray-50 p-3 rounded-lg border">
-                                <li><code>docker build -t my-app .</code> : Builds an image from a Dockerfile located in the current directory (<code>.</code>) and tags it with a name.</li>
-                                <li><code>docker run -p 8000:80 my-image</code> : Runs a container and maps port 8000 on your host machine to port 80 inside the container.</li>
-                                <li><code>docker ps</code> : Lists all currently active/running containers on your system.</li>
-                            </ul>
+                    <p class="text-2xl text-slate-200 leading-relaxed mb-6 font-light">
+                        The CPU is the primary processing unit of a computer. Think of it as the brain—nothing happens without its command.
+                    </p>
+                    <ul class="space-y-4 text-lg text-slate-400">
+                        <li class="flex items-start">
+                            <svg class="w-6 h-6 text-cyan-400 mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            Executes software instructions and processes complex data.
                         </li>
-                        <li><strong>Storage & Orchestration:</strong> Use <strong>Docker Volumes</strong> to persist data generated by the container so it isn't lost when the container is destroyed. Use <strong>Docker Compose</strong> (via a <code>docker-compose.yml</code> file) to define and spin up multi-container applications easily.</li>
+                        <li class="flex items-start">
+                            <svg class="w-6 h-6 text-cyan-400 mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            Controls and coordinates all computer operations.
+                        </li>
+                        <li class="flex items-start">
+                            <svg class="w-6 h-6 text-cyan-400 mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                            Every single task performed by a computer passes through the CPU at lightning speed.
+                        </li>
+                    </ul>
+                </div>
+                <div class="bg-slate-800 rounded-2xl p-8 border border-slate-700 shadow-xl flex justify-center items-center">
+                    <!-- CPU SVG Illustration -->
+                    <svg class="w-48 h-48 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                        <rect x="4" y="4" width="16" height="16" rx="2" ry="2" stroke-width="1.5"></rect>
+                        <rect x="9" y="9" width="6" height="6" stroke-width="1.5"></rect>
+                        <path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3" stroke-width="1.5" stroke-linecap="round"></path>
+                    </svg>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 3: CPU Components -->
+        <section class="slide slide-hidden absolute inset-0 flex flex-col items-center justify-center p-8 max-w-7xl mx-auto w-full">
+            <h2 class="text-4xl md:text-5xl font-bold mb-12 text-indigo-400 text-center w-full border-b border-slate-700 pb-6">Main Components of the CPU</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full">
+                <!-- ALU -->
+                <div class="bg-slate-800 p-8 rounded-2xl border-t-4 border-cyan-500 shadow-lg hover:-translate-y-2 transition-transform">
+                    <h3 class="text-2xl font-bold text-white mb-4">Arithmetic Logic Unit (ALU)</h3>
+                    <p class="text-slate-400 mb-4">The math genius of the computer.</p>
+                    <ul class="list-disc pl-5 text-slate-300 space-y-2">
+                        <li>Performs all mathematical calculations (Add, Subtract, etc.).</li>
+                        <li>Handles logical comparisons (Greater than, Equal to, AND/OR).</li>
+                    </ul>
+                </div>
+                <!-- CU -->
+                <div class="bg-slate-800 p-8 rounded-2xl border-t-4 border-indigo-500 shadow-lg hover:-translate-y-2 transition-transform">
+                    <h3 class="text-2xl font-bold text-white mb-4">Control Unit (CU)</h3>
+                    <p class="text-slate-400 mb-4">The traffic cop of the system.</p>
+                    <ul class="list-disc pl-5 text-slate-300 space-y-2">
+                        <li>Controls all computer operations and subsystems.</li>
+                        <li>Directs the flow of data between hardware components.</li>
+                        <li>Decodes instructions from memory.</li>
+                    </ul>
+                </div>
+                <!-- Registers -->
+                <div class="bg-slate-800 p-8 rounded-2xl border-t-4 border-purple-500 shadow-lg hover:-translate-y-2 transition-transform">
+                    <h3 class="text-2xl font-bold text-white mb-4">Registers</h3>
+                    <p class="text-slate-400 mb-4">The CPU's ultra-fast pocket memory.</p>
+                    <ul class="list-disc pl-5 text-slate-300 space-y-2">
+                        <li>Small, high-speed storage locations built directly into the CPU.</li>
+                        <li>Temporarily hold data and instructions immediately needed for processing.</li>
                     </ul>
                 </div>
             </div>
+        </section>
 
-            <div class="mt-8 flex justify-between items-center border-t pt-6">
-                <button onclick="backToStart()" class="text-gray-500 hover:text-gray-800 font-medium py-2 px-4 transition-colors">
-                    &larr; Back
-                </button>
-                <button onclick="startQuizFromGuide()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg shadow-md transition-colors">
-                    Start Quiz Now
-                </button>
-            </div>
-        </div>
-
-        <!-- Quiz Screen -->
-        <div id="quiz-screen" class="hidden p-6 sm:p-8">
-            <div class="flex justify-between items-center mb-6 text-sm font-medium text-gray-500">
-                <span id="question-tracker">Question 1 of 30</span>
-                <span id="score-tracker">Score: 0</span>
-            </div>
+        <!-- Slide 4: Primary Memory -->
+        <section class="slide slide-hidden absolute inset-0 flex flex-col items-center justify-center p-8 max-w-6xl mx-auto">
+            <h2 class="text-4xl md:text-5xl font-bold mb-8 text-cyan-400 text-center w-full border-b border-slate-700 pb-6">Memory & Storage: Primary Memory</h2>
+            <p class="text-xl text-center text-slate-300 max-w-3xl mb-12">
+                Main memory is directly accessed by the CPU. It is extremely fast and essential for the smooth, real-time operation of your computer.
+            </p>
             
-            <!-- Progress Bar -->
-            <div class="w-full bg-gray-200 rounded-full h-2.5 mb-8">
-                <div id="progress-bar" class="bg-blue-600 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
-            </div>
-
-            <h2 id="question-text" class="text-xl font-semibold mb-6 text-gray-800"></h2>
-
-            <div id="options-container" class="space-y-3 mb-8">
-                <!-- Options injected here -->
-            </div>
-
-            <div id="feedback-container" class="hidden mb-6 p-4 rounded-lg text-sm border">
-                <p id="feedback-message" class="font-bold mb-1"></p>
-                <p id="feedback-explanation" class="text-gray-700"></p>
-            </div>
-
-            <div class="flex justify-end">
-                <button id="next-btn" onclick="nextQuestion()" class="hidden bg-gray-800 hover:bg-gray-900 text-white font-medium py-2 px-6 rounded-lg transition-colors">
-                    Next Question
-                </button>
-                <button id="finish-btn" onclick="showResults()" class="hidden bg-green-600 hover:bg-green-700 text-white font-medium py-2 px-6 rounded-lg transition-colors">
-                    View Results
-                </button>
-            </div>
-        </div>
-
-        <!-- Results Screen -->
-        <div id="result-screen" class="hidden p-8 text-center">
-            <div class="mb-8">
-                <h2 class="text-3xl font-bold mb-2">Quiz Completed!</h2>
-                <p class="text-gray-600 text-lg">Here is how you did:</p>
-                
-                <div class="mt-6 inline-flex items-center justify-center w-32 h-32 rounded-full border-8 border-blue-100 bg-blue-50">
-                    <span id="final-score" class="text-3xl font-bold text-blue-600">0/30</span>
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
+                <!-- RAM -->
+                <div class="bg-slate-800 p-8 rounded-2xl border border-slate-600 shadow-xl relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-4 opacity-10">
+                        <svg class="w-32 h-32" fill="currentColor" viewBox="0 0 24 24"><path d="M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1zm1 2v10h14V7H5zm2 2h2v6H7V9zm4 0h2v6h-2V9zm4 0h2v6h-2V9z"></path></svg>
+                    </div>
+                    <h3 class="text-3xl font-bold text-white mb-2">RAM</h3>
+                    <p class="text-cyan-400 text-sm font-semibold mb-6 uppercase tracking-wider">Random Access Memory</p>
+                    <ul class="space-y-3 text-slate-300 relative z-10">
+                        <li>• <strong>Temporary</strong> (Volatile) workspace.</li>
+                        <li>• Stores data and apps currently in use.</li>
+                        <li>• Analogy: A whiteboard that gets wiped clean when the power turns off.</li>
+                    </ul>
                 </div>
-                <p id="performance-message" class="mt-4 text-lg font-medium text-gray-800"></p>
+
+                <!-- ROM -->
+                <div class="bg-slate-800 p-8 rounded-2xl border border-slate-600 shadow-xl relative overflow-hidden">
+                    <div class="absolute top-0 right-0 p-4 opacity-10">
+                        <svg class="w-32 h-32" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"></path></svg>
+                    </div>
+                    <h3 class="text-3xl font-bold text-white mb-2">ROM</h3>
+                    <p class="text-purple-400 text-sm font-semibold mb-6 uppercase tracking-wider">Read Only Memory</p>
+                    <ul class="space-y-3 text-slate-300 relative z-10">
+                        <li>• <strong>Permanent</strong> (Non-volatile) memory.</li>
+                        <li>• Stores essential boot-up instructions (firmware).</li>
+                        <li>• Analogy: A printed book; you can read it, but you can't easily change the ink.</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 5: Secondary Memory -->
+        <section class="slide slide-hidden absolute inset-0 flex flex-col items-center justify-center p-8 max-w-5xl mx-auto">
+            <h2 class="text-4xl md:text-5xl font-bold mb-10 text-cyan-400 text-center w-full border-b border-slate-700 pb-6">Secondary Memory (Storage)</h2>
+            <div class="bg-slate-800 w-full rounded-3xl p-8 md:p-12 border border-slate-700 shadow-2xl">
+                <p class="text-xl md:text-2xl text-slate-200 mb-8 font-light text-center">
+                    Used for massive, long-term storage of your files, operating system, and installed programs.
+                </p>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10 text-lg text-slate-400">
+                    <ul class="space-y-4">
+                        <li class="flex items-center"><svg class="w-5 h-5 text-indigo-400 mr-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg> Retains data when powered off.</li>
+                        <li class="flex items-center"><svg class="w-5 h-5 text-indigo-400 mr-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg> Much larger capacity than RAM.</li>
+                    </ul>
+                    <ul class="space-y-4">
+                        <li class="flex items-center"><svg class="w-5 h-5 text-indigo-400 mr-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg> Considerably slower than Primary Memory.</li>
+                        <li class="flex items-center"><svg class="w-5 h-5 text-indigo-400 mr-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg> Often measured in Gigabytes (GB) or Terabytes (TB).</li>
+                    </ul>
+                </div>
+                
+                <div class="bg-slate-900 rounded-xl p-6">
+                    <h4 class="text-sm uppercase text-slate-500 font-bold mb-4 tracking-wider">Common Examples</h4>
+                    <div class="flex flex-wrap justify-center gap-4">
+                        <span class="px-4 py-2 bg-slate-800 rounded-lg text-indigo-300 font-medium">HDD (Hard Disk Drive)</span>
+                        <span class="px-4 py-2 bg-slate-800 rounded-lg text-indigo-300 font-medium">SSD (Solid State Drive)</span>
+                        <span class="px-4 py-2 bg-slate-800 rounded-lg text-indigo-300 font-medium">Pen Drive / USB</span>
+                        <span class="px-4 py-2 bg-slate-800 rounded-lg text-indigo-300 font-medium">Memory Card</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 6: Software Intro -->
+        <section class="slide slide-hidden absolute inset-0 flex flex-col items-center justify-center p-8 max-w-6xl mx-auto text-center">
+            <h2 class="text-4xl md:text-6xl font-bold mb-8 text-purple-400">Understanding Software</h2>
+            <p class="text-xl md:text-3xl text-slate-300 font-light max-w-4xl mb-12">
+                Hardware provides the physical foundation, but <strong>Software</strong> provides the instructions. Software is broadly categorized into 5 main types.
+            </p>
+            
+            <div class="grid grid-cols-2 md:grid-cols-5 gap-4 w-full">
+                <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 shadow flex items-center justify-center font-bold text-slate-200 h-24">1. System</div>
+                <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 shadow flex items-center justify-center font-bold text-slate-200 h-24">2. Application</div>
+                <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 shadow flex items-center justify-center font-bold text-slate-200 h-24">3. Utility</div>
+                <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 shadow flex items-center justify-center font-bold text-slate-200 h-24">4. Proprietary</div>
+                <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 shadow flex items-center justify-center font-bold text-slate-200 h-24 col-span-2 md:col-span-1">5. Open Source</div>
+            </div>
+        </section>
+
+        <!-- Slide 7: System & Application Software -->
+        <section class="slide slide-hidden absolute inset-0 flex flex-col items-center justify-center p-8 max-w-7xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
+                
+                <!-- System Software -->
+                <div class="bg-gradient-to-br from-slate-800 to-slate-900 p-10 rounded-3xl border border-slate-700 shadow-xl">
+                    <h2 class="text-3xl md:text-4xl font-bold mb-4 text-purple-400">1. System Software</h2>
+                    <p class="text-slate-300 mb-6 font-medium text-lg italic">The foundational layer.</p>
+                    <ul class="space-y-3 text-slate-400 mb-8 list-disc pl-5">
+                        <li>Manages hardware resources completely.</li>
+                        <li>Acts as the core interface between the user, application software, and hardware.</li>
+                        <li>Runs continuously in the background.</li>
+                    </ul>
+                    <div class="bg-slate-900/50 p-4 rounded-xl">
+                        <p class="text-sm text-slate-500 uppercase tracking-wider mb-2 font-bold">Examples</p>
+                        <p class="text-indigo-300 font-medium">Microsoft Windows • macOS • Ubuntu Linux • Android</p>
+                    </div>
+                </div>
+
+                <!-- Application Software -->
+                <div class="bg-gradient-to-br from-slate-800 to-slate-900 p-10 rounded-3xl border border-slate-700 shadow-xl">
+                    <h2 class="text-3xl md:text-4xl font-bold mb-4 text-purple-400">2. Application Software</h2>
+                    <p class="text-slate-300 mb-6 font-medium text-lg italic">The tool for the user.</p>
+                    <ul class="space-y-3 text-slate-400 mb-8 list-disc pl-5">
+                        <li>Designed to perform specific tasks directly for end-users.</li>
+                        <li>Helps complete day-to-day work, communication, or entertainment.</li>
+                        <li>Runs "on top" of system software.</li>
+                    </ul>
+                    <div class="bg-slate-900/50 p-4 rounded-xl">
+                        <p class="text-sm text-slate-500 uppercase tracking-wider mb-2 font-bold">Examples</p>
+                        <p class="text-indigo-300 font-medium">Microsoft Word • Google Chrome • Photoshop • Video Games</p>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- Slide 8: Utility Software -->
+        <section class="slide slide-hidden absolute inset-0 flex flex-col items-center justify-center p-8 max-w-4xl mx-auto text-center">
+            <h2 class="text-4xl md:text-5xl font-bold mb-6 text-purple-400 w-full border-b border-slate-700 pb-6">3. Utility Software</h2>
+            <p class="text-2xl text-slate-300 mb-10 font-light">
+                Software used specifically to <strong>maintain, protect, and optimize</strong> the computer system. They are the "mechanics" of your PC.
+            </p>
+            
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full text-left">
+                <div class="bg-slate-800 p-6 rounded-xl border border-slate-700">
+                    <div class="text-pink-500 mb-4">
+                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
+                    </div>
+                    <h3 class="font-bold text-xl text-white mb-2">Protection</h3>
+                    <p class="text-slate-400">Defends against viruses and malware. <br><span class="text-pink-400 text-sm">Ex: Antivirus Software</span></p>
+                </div>
+                <div class="bg-slate-800 p-6 rounded-xl border border-slate-700">
+                    <div class="text-amber-500 mb-4">
+                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                    </div>
+                    <h3 class="font-bold text-xl text-white mb-2">Optimization</h3>
+                    <p class="text-slate-400">Removes junk files and improves speeds. <br><span class="text-amber-400 text-sm">Ex: Disk Cleanup</span></p>
+                </div>
+                <div class="bg-slate-800 p-6 rounded-xl border border-slate-700">
+                    <div class="text-green-500 mb-4">
+                        <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
+                    </div>
+                    <h3 class="font-bold text-xl text-white mb-2">Maintenance</h3>
+                    <p class="text-slate-400">Safeguards data in case of failure. <br><span class="text-green-400 text-sm">Ex: Backup Tools</span></p>
+                </div>
+            </div>
+        </section>
+
+        <!-- Slide 9: Proprietary vs Open Source -->
+        <section class="slide slide-hidden absolute inset-0 flex flex-col items-center justify-center p-8 max-w-7xl mx-auto">
+            <h2 class="text-4xl md:text-5xl font-bold mb-10 text-purple-400 text-center w-full border-b border-slate-700 pb-6">Distribution Models</h2>
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
+                <!-- Proprietary -->
+                <div class="bg-slate-800 p-8 rounded-2xl border-l-8 border-red-500 shadow-xl">
+                    <h3 class="text-3xl font-bold text-white mb-4">4. Proprietary Software</h3>
+                    <p class="text-slate-400 mb-6 italic">"Closed Source"</p>
+                    <ul class="space-y-3 text-slate-300 mb-8 list-disc pl-5">
+                        <li>Owned by an individual or commercial company.</li>
+                        <li>Source code is hidden and not publicly available.</li>
+                        <li>Requires a paid license or subscription to use.</li>
+                        <li>Cannot be legally modified or redistributed by users.</li>
+                    </ul>
+                    <div class="bg-slate-900 p-4 rounded-lg">
+                        <strong class="text-slate-500 text-sm uppercase">Examples:</strong>
+                        <p class="text-red-400">Microsoft Office, Adobe Photoshop, macOS</p>
+                    </div>
+                </div>
+
+                <!-- Open Source -->
+                <div class="bg-slate-800 p-8 rounded-2xl border-l-8 border-emerald-500 shadow-xl">
+                    <h3 class="text-3xl font-bold text-white mb-4">5. Open Source Software</h3>
+                    <p class="text-slate-400 mb-6 italic">"Power to the People"</p>
+                    <ul class="space-y-3 text-slate-300 mb-8 list-disc pl-5">
+                        <li>Source code is freely visible and available to anyone.</li>
+                        <li>Usually free to download, use, modify, and share.</li>
+                        <li>Developed collaboratively by global communities.</li>
+                        <li>Promotes transparency and rapid innovation.</li>
+                    </ul>
+                    <div class="bg-slate-900 p-4 rounded-lg">
+                        <strong class="text-slate-500 text-sm uppercase">Examples:</strong>
+                        <p class="text-emerald-400">Ubuntu, Mozilla Firefox, LibreOffice, Android (AOSP)</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- Overlay Navigation & Progress -->
+    <footer class="fixed bottom-0 left-0 right-0 p-4 sm:p-6 flex flex-col z-50 pointer-events-none">
+        
+        <!-- Progress Bar -->
+        <div class="w-full h-1 bg-slate-800 rounded-full mb-6 overflow-hidden max-w-4xl mx-auto">
+            <div id="progress-bar" class="h-full bg-indigo-500 transition-all duration-500 w-[11%]"></div>
+        </div>
+
+        <div class="flex justify-between items-center max-w-6xl w-full mx-auto pointer-events-auto">
+            <!-- Prev Button -->
+            <button id="prevBtn" class="flex items-center justify-center px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg transition-colors border border-slate-600 disabled:opacity-30 disabled:hover:bg-slate-800">
+                <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
+                <span class="hidden sm:inline">Previous</span>
+            </button>
+            
+            <!-- Counter -->
+            <div class="text-slate-400 font-medium px-4 py-2 bg-slate-800/50 rounded-lg border border-slate-700/50 backdrop-blur-sm">
+                <span id="slide-counter">1</span> / 9
             </div>
             
-            <button onclick="restartQuiz()" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-3 px-8 rounded-lg shadow-md transition-colors">
-                Restart Quiz
+            <!-- Next Button -->
+            <button id="nextBtn" class="flex items-center justify-center px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors shadow-lg shadow-indigo-600/20 disabled:opacity-30 disabled:hover:bg-indigo-600">
+                <span class="hidden sm:inline">Next</span>
+                <svg class="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
             </button>
         </div>
+    </footer>
 
-    </div>
-
+    <!-- Logic -->
     <script>
-        const quizData = [
-            // AWS
-            {
-                question: "Which AWS service is specifically designed for developers to build, train, and deploy machine learning models quickly?",
-                options: ["AWS Lambda", "Amazon EC2", "Amazon SageMaker", "Amazon S3"],
-                correct: 2,
-                explanation: "Amazon SageMaker is a fully managed service that provides every developer and data scientist with the ability to build, train, and deploy ML models quickly."
-            },
-            {
-                question: "If you want to deploy a lightweight AI model as a serverless API on AWS without managing infrastructure, which combination is best?",
-                options: ["EC2 + Elastic Load Balancer", "API Gateway + AWS Lambda", "Amazon RDS + EC2", "AWS Glue + Athena"],
-                correct: 1,
-                explanation: "API Gateway combined with AWS Lambda allows you to host stateless, serverless endpoints perfect for lightweight model inference."
-            },
-            {
-                question: "Where should you store large datasets and model artifacts (like model.tar.gz) in AWS before deployment?",
-                options: ["Amazon S3", "Amazon RDS", "Amazon DynamoDB", "Amazon CloudFront"],
-                correct: 0,
-                explanation: "Amazon S3 is the standard, highly scalable object storage service used to store training data and serialized model artifacts."
-            },
-            {
-                question: "What is an Amazon SageMaker Endpoint primarily used for?",
-                options: ["Data labeling", "Real-time model inference", "Database hosting", "Training ML models"],
-                correct: 1,
-                explanation: "SageMaker Endpoints provide a secure, scalable HTTPS endpoint for real-time model inference/predictions."
-            },
-            {
-                question: "Which AWS service is a fully-managed Docker container registry used to store ML container images?",
-                options: ["Amazon EKS", "Amazon ECS", "Amazon ECR", "AWS Fargate"],
-                correct: 2,
-                explanation: "Amazon ECR (Elastic Container Registry) is where you push your custom Docker images for ML training or inference so SageMaker or ECS can use them."
-            },
-            {
-                question: "What hardware accelerator is custom-designed by AWS specifically for low-cost, high-performance machine learning inference?",
-                options: ["AWS Trainium", "AWS Graviton", "NVIDIA A100", "AWS Inferentia"],
-                correct: 3,
-                explanation: "AWS Inferentia chips are custom-designed by AWS to provide high performance ML inference at the lowest cost in the cloud."
-            },
-            {
-                question: "When deploying a model on EC2, what type of AMI (Amazon Machine Image) is recommended to avoid manually installing CUDA and ML frameworks?",
-                options: ["Amazon Linux 2 Base", "AWS Deep Learning AMI (DLAMI)", "Windows Server Core", "Ubuntu Minimal Server"],
-                correct: 1,
-                explanation: "Deep Learning AMIs come pre-installed with popular frameworks like TensorFlow, PyTorch, and necessary GPU drivers (CUDA)."
-            },
-            {
-                question: "How do you securely grant a SageMaker instance permission to read files from an S3 bucket?",
-                options: ["Embed AWS access keys in the code", "Make the S3 bucket completely public", "Attach an IAM Role with S3 read permissions to the SageMaker instance", "Use an SSH key pair"],
-                correct: 2,
-                explanation: "IAM (Identity and Access Management) Roles provide secure, temporary credentials to AWS resources without hardcoding keys."
-            },
-
-            // GCP
-            {
-                question: "What is Google Cloud's unified machine learning platform for building, deploying, and scaling AI models?",
-                options: ["Google Compute Engine", "Vertex AI", "BigQuery ML", "Cloud Functions"],
-                correct: 1,
-                explanation: "Vertex AI brings together Google Cloud's AI services into a unified API, client library, and user interface."
-            },
-            {
-                question: "Which GCP service allows you to deploy containerized ML models as serverless HTTP applications that automatically scale to zero?",
-                options: ["Cloud Run", "Google Kubernetes Engine (GKE)", "Compute Engine", "Cloud Build"],
-                correct: 0,
-                explanation: "Cloud Run is a fully managed compute platform that automatically scales stateless containers, ideal for lightweight ML APIs."
-            },
-            {
-                question: "If you want to train and evaluate ML models directly using standard SQL queries in Google Cloud, which service should you use?",
-                options: ["Cloud SQL", "Dataproc", "BigQuery ML", "Cloud Spanner"],
-                correct: 2,
-                explanation: "BigQuery ML lets users create and execute ML models in BigQuery using standard SQL queries."
-            },
-            {
-                question: "What is Google's custom-developed ASIC (Application-Specific Integrated Circuit) used to accelerate machine learning workloads?",
-                options: ["GPU", "TPU", "FPGA", "CPU"],
-                correct: 1,
-                explanation: "Tensor Processing Units (TPUs) are AI accelerators developed by Google specifically for neural network machine learning."
-            },
-            {
-                question: "Which Vertex AI feature allows users to train high-quality models with minimal machine learning expertise?",
-                options: ["Vertex AI Notebooks", "Vertex AI Feature Store", "Vertex AI Pipelines", "Vertex AI AutoML"],
-                correct: 3,
-                explanation: "AutoML allows developers with limited ML expertise to train high-quality models specific to their business needs."
-            },
-            {
-                question: "In GCP, where do you typically store your built Docker images containing your ML models and API code?",
-                options: ["Cloud Storage", "Artifact Registry", "Cloud Source Repositories", "Firebase Storage"],
-                correct: 1,
-                explanation: "Google Artifact Registry (the evolution of Container Registry) is the single place for your organization to manage container images."
-            },
-            {
-                question: "For a highly complex, microservices-based ML architecture requiring custom orchestration and scaling, which GCP service is most appropriate?",
-                options: ["Cloud Functions", "Google Kubernetes Engine (GKE)", "App Engine", "Cloud Run"],
-                correct: 1,
-                explanation: "GKE provides full control over Kubernetes clusters, making it ideal for complex, distributed ML architectures."
-            },
-
-            // Open Source / General
-            {
-                question: "Which Python web framework is highly popular for serving ML models due to its speed, asynchronous support, and automatic Swagger UI generation?",
-                options: ["Django", "FastAPI", "Flask", "Streamlit"],
-                correct: 1,
-                explanation: "FastAPI is a modern, fast web framework for building APIs with Python, automatically providing interactive API documentation."
-            },
-            {
-                question: "What is a standard open-source format designed to represent machine learning models, allowing models trained in PyTorch to be deployed in different environments?",
-                options: ["ONNX (Open Neural Network Exchange)", "CSV (Comma Separated Values)", "HDF5", "Pickle"],
-                correct: 0,
-                explanation: "ONNX provides an open source format for AI models, enabling interoperability between different frameworks (e.g., PyTorch to TensorFlow)."
-            },
-            {
-                question: "Which open-source platform is widely used for managing the end-to-end machine learning lifecycle, including experiment tracking and model registry?",
-                options: ["Jenkins", "MLflow", "Prometheus", "Grafana"],
-                correct: 1,
-                explanation: "MLflow is an open-source platform to manage the ML lifecycle, including experimentation, reproducibility, deployment, and a central model registry."
-            },
-            {
-                question: "What is a common risk of using Python's 'pickle' module to load serialized models from untrusted sources?",
-                options: ["It compresses the model too much", "It only works on Linux", "It can execute arbitrary code upon unpickling", "It converts models to strings"],
-                correct: 2,
-                explanation: "Pickle is not secure against erroneous or maliciously constructed data. Unpickling untrusted data can execute arbitrary code on your machine."
-            },
-            {
-                question: "Which popular open-source hub allows you to host, share, and deploy NLP models and datasets easily via 'Spaces'?",
-                options: ["GitHub", "Kaggle", "Hugging Face", "Docker Hub"],
-                correct: 2,
-                explanation: "Hugging Face is a collaborative platform providing tools, models, datasets, and 'Spaces' for deploying ML apps."
-            },
-            {
-                question: "What tool allows data scientists to build interactive web applications for their ML models entirely in Python without knowing HTML/CSS?",
-                options: ["React", "FastAPI", "Streamlit", "Nginx"],
-                correct: 2,
-                explanation: "Streamlit is an open-source app framework that turns data scripts into shareable web apps in minutes, using pure Python."
-            },
-            {
-                question: "When deploying a model, what does 'A/B testing' refer to?",
-                options: ["Testing if a model works on both AWS and GCP", "Comparing two versions of a model in production to see which performs better", "Translating code from language A to language B", "Testing the API with positive and negative numbers"],
-                correct: 1,
-                explanation: "A/B testing in ML involves routing a portion of live traffic to a new model (B) while keeping the rest on the old model (A) to compare performance metrics."
-            },
-
-            // Docker Basics
-            {
-                question: "What is Docker primarily used for?",
-                options: ["Designing database schemas", "Creating virtual machines with full operating systems", "Packaging applications and their dependencies into standardized units for deployment", "Writing machine learning algorithms"],
-                correct: 2,
-                explanation: "Docker is a platform for developing, shipping, and running applications in isolated environments called containers."
-            },
-            {
-                question: "What is the difference between a Docker Image and a Docker Container?",
-                options: ["They are the exact same thing", "An image is a running instance; a container is the blueprint", "An image is an read-only template; a container is a running instance of an image", "An image is for Windows; a container is for Linux"],
-                correct: 2,
-                explanation: "A Docker image is a static, read-only file with all the code, libraries, and dependencies. A container is a live, running instance of that image."
-            },
-            {
-                question: "Which file contains a set of instructions used to build a Docker image?",
-                options: ["docker-compose.yml", "Dockerfile", "requirements.txt", "package.json"],
-                correct: 1,
-                explanation: "A Dockerfile is a text document that contains all the commands a user could call on the command line to assemble an image."
-            },
-            {
-                question: "Which command is used to build a Docker image from a Dockerfile in the current directory?",
-                options: ["docker run .", "docker push .", "docker build -t my-app .", "docker create my-app"],
-                correct: 2,
-                explanation: "'docker build' builds an image from a Dockerfile. The '-t' flag tags the image with a name, and '.' specifies the current directory."
-            },
-            {
-                question: "When running a container, what does the flag `-p 8000:80` do? (e.g., docker run -p 8000:80 my-image)",
-                options: ["Sets the password to 8000:80", "Maps port 8000 on the host machine to port 80 inside the container", "Limits the container to 8000 MB of RAM and 80% CPU", "Runs the container for 8000 seconds"],
-                correct: 1,
-                explanation: "The '-p' (publish) flag maps a port on your host machine to a port exposed by the container."
-            },
-            {
-                question: "If you want to persist data (like an ML model's SQLite database) so it isn't lost when a Docker container is destroyed, what should you use?",
-                options: ["Docker Volumes", "Docker Networks", "Docker Tags", "Docker Ports"],
-                correct: 0,
-                explanation: "Volumes are the preferred mechanism for persisting data generated by and used by Docker containers, existing outside the container's lifecycle."
-            },
-            {
-                question: "Which tool allows you to define and run multi-container Docker applications (like an API container and a Redis container) using a single YAML file?",
-                options: ["Docker Swarm", "Kubernetes", "Docker Compose", "Docker Hub"],
-                correct: 2,
-                explanation: "Docker Compose uses a YAML file to configure your application's services, networks, and volumes, and starts them all with a single command."
-            },
-            {
-                question: "What command lists all *currently running* Docker containers on your machine?",
-                options: ["docker images", "docker ps", "docker list", "docker run --all"],
-                correct: 1,
-                explanation: "'docker ps' lists all active/running containers. Adding '-a' (docker ps -a) lists all containers, including stopped ones."
-            }
-        ];
-
-        let currentQuestionIndex = 0;
-        let score = 0;
-        let selectedOptionIndex = null;
-
-        // DOM Elements
-        const startScreen = document.getElementById('start-screen');
-        const studyGuideScreen = document.getElementById('study-guide-screen');
-        const quizScreen = document.getElementById('quiz-screen');
-        const resultScreen = document.getElementById('result-screen');
-        const questionText = document.getElementById('question-text');
-        const optionsContainer = document.getElementById('options-container');
-        const questionTracker = document.getElementById('question-tracker');
-        const scoreTracker = document.getElementById('score-tracker');
+        const slides = document.querySelectorAll('.slide');
+        const prevBtn = document.getElementById('prevBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        const slideCounter = document.getElementById('slide-counter');
         const progressBar = document.getElementById('progress-bar');
-        const nextBtn = document.getElementById('next-btn');
-        const finishBtn = document.getElementById('finish-btn');
-        const feedbackContainer = document.getElementById('feedback-container');
-        const feedbackMessage = document.getElementById('feedback-message');
-        const feedbackExplanation = document.getElementById('feedback-explanation');
+        
+        let currentSlide = 0;
+        const totalSlides = slides.length;
 
-        function showStudyGuide() {
-            startScreen.classList.add('hidden');
-            studyGuideScreen.classList.remove('hidden');
-        }
-
-        function backToStart() {
-            studyGuideScreen.classList.add('hidden');
-            startScreen.classList.remove('hidden');
-        }
-
-        function startQuizFromGuide() {
-            studyGuideScreen.classList.add('hidden');
-            startQuiz();
-        }
-
-        function startQuiz() {
-            startScreen.classList.add('hidden');
-            quizScreen.classList.remove('hidden');
-            currentQuestionIndex = 0;
-            score = 0;
-            loadQuestion();
-        }
-
-        function loadQuestion() {
-            // Reset UI for new question
-            selectedOptionIndex = null;
-            optionsContainer.innerHTML = '';
-            feedbackContainer.classList.add('hidden');
-            nextBtn.classList.add('hidden');
-            finishBtn.classList.add('hidden');
-
-            const q = quizData[currentQuestionIndex];
-            
-            // Update Text & Trackers
-            questionText.textContent = q.question;
-            questionTracker.textContent = `Question ${currentQuestionIndex + 1} of ${quizData.length}`;
-            scoreTracker.textContent = `Score: ${score}`;
-            progressBar.style.width = `${((currentQuestionIndex) / quizData.length) * 100}%`;
-
-            // Generate Options
-            q.options.forEach((opt, index) => {
-                const button = document.createElement('button');
-                button.className = 'option-btn w-full text-left p-4 border border-gray-200 rounded-lg hover:bg-gray-50 focus:outline-none bg-white text-gray-700';
-                button.textContent = opt;
-                button.onclick = () => selectOption(index, button);
-                optionsContainer.appendChild(button);
-            });
-        }
-
-        function selectOption(index, selectedButton) {
-            // Prevent multiple selections
-            if (selectedOptionIndex !== null) return;
-            
-            selectedOptionIndex = index;
-            const q = quizData[currentQuestionIndex];
-            const isCorrect = index === q.correct;
-            
-            if (isCorrect) score++;
-            scoreTracker.textContent = `Score: ${score}`;
-
-            // Style buttons based on result
-            const buttons = optionsContainer.querySelectorAll('button');
-            buttons.forEach((btn, i) => {
-                btn.disabled = true;
-                btn.classList.remove('hover:bg-gray-50');
-                
-                if (i === q.correct) {
-                    btn.classList.add('bg-green-100', 'border-green-500', 'text-green-800');
-                    btn.classList.remove('bg-white', 'border-gray-200');
-                } else if (i === index && !isCorrect) {
-                    btn.classList.add('bg-red-100', 'border-red-500', 'text-red-800');
-                    btn.classList.remove('bg-white', 'border-gray-200');
+        function updateSlides() {
+            // Update slide classes
+            slides.forEach((slide, index) => {
+                if (index === currentSlide) {
+                    slide.classList.remove('slide-hidden');
+                    slide.classList.add('slide-active');
                 } else {
-                    btn.classList.add('opacity-50');
+                    slide.classList.remove('slide-active');
+                    slide.classList.add('slide-hidden');
                 }
             });
 
-            // Show feedback
-            feedbackContainer.classList.remove('hidden');
-            if (isCorrect) {
-                feedbackContainer.classList.add('bg-green-50', 'border-green-200');
-                feedbackContainer.classList.remove('bg-red-50', 'border-red-200');
-                feedbackMessage.textContent = '✅ Correct!';
-                feedbackMessage.className = 'font-bold mb-1 text-green-700';
-            } else {
-                feedbackContainer.classList.add('bg-red-50', 'border-red-200');
-                feedbackContainer.classList.remove('bg-green-50', 'border-green-200');
-                feedbackMessage.textContent = '❌ Incorrect';
-                feedbackMessage.className = 'font-bold mb-1 text-red-700';
-            }
-            feedbackExplanation.textContent = q.explanation;
+            // Update UI elements
+            slideCounter.innerText = currentSlide + 1;
+            prevBtn.disabled = currentSlide === 0;
+            nextBtn.disabled = currentSlide === totalSlides - 1;
+            
+            // Update progress bar
+            const progress = ((currentSlide + 1) / totalSlides) * 100;
+            progressBar.style.width = `${progress}%`;
+        }
 
-            // Show Next/Finish button
-            if (currentQuestionIndex < quizData.length - 1) {
-                nextBtn.classList.remove('hidden');
-            } else {
-                finishBtn.classList.remove('hidden');
-                progressBar.style.width = '100%';
+        function goNext() {
+            if (currentSlide < totalSlides - 1) {
+                currentSlide++;
+                updateSlides();
             }
         }
 
-        function nextQuestion() {
-            currentQuestionIndex++;
-            loadQuestion();
-        }
-
-        function showResults() {
-            quizScreen.classList.add('hidden');
-            resultScreen.classList.remove('hidden');
-            
-            document.getElementById('final-score').textContent = `${score}/${quizData.length}`;
-            
-            const perfMsg = document.getElementById('performance-message');
-            const percentage = score / quizData.length;
-            
-            if (percentage >= 0.9) {
-                perfMsg.textContent = "Expert Level! You're ready to deploy AI to production! 🚀";
-                perfMsg.className = "mt-4 text-lg font-medium text-green-600";
-            } else if (percentage >= 0.7) {
-                perfMsg.textContent = "Great job! You have a solid understanding of AI deployment and containers. 👍";
-                perfMsg.className = "mt-4 text-lg font-medium text-blue-600";
-            } else if (percentage >= 0.5) {
-                perfMsg.textContent = "Good effort. Reviewing the explanations will help cement these concepts. 📚";
-                perfMsg.className = "mt-4 text-lg font-medium text-yellow-600";
-            } else {
-                perfMsg.textContent = "Keep learning! Cloud deployment and Docker take time to master. Don't give up! 💪";
-                perfMsg.className = "mt-4 text-lg font-medium text-red-600";
+        function goPrev() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                updateSlides();
             }
         }
 
-        function restartQuiz() {
-            resultScreen.classList.add('hidden');
-            startScreen.classList.remove('hidden');
+        // Button Event Listeners
+        nextBtn.addEventListener('click', goNext);
+        prevBtn.addEventListener('click', goPrev);
+
+        // Keyboard Navigation
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight' || e.key === ' ') {
+                goNext();
+            } else if (e.key === 'ArrowLeft') {
+                goPrev();
+            }
+        });
+
+        // Touch/Swipe Navigation Support
+        let touchStartX = 0;
+        let touchEndX = 0;
+        
+        document.addEventListener('touchstart', e => {
+            touchStartX = e.changedTouches[0].screenX;
+        }, {passive: true});
+
+        document.addEventListener('touchend', e => {
+            touchEndX = e.changedTouches[0].screenX;
+            handleSwipe();
+        }, {passive: true});
+
+        function handleSwipe() {
+            const threshold = 50; // Minimum distance to be considered a swipe
+            if (touchEndX < touchStartX - threshold) {
+                goNext(); // Swiped left
+            }
+            if (touchEndX > touchStartX + threshold) {
+                goPrev(); // Swiped right
+            }
         }
+
+        // Initialize state
+        updateSlides();
     </script>
 </body>
 </html>
