@@ -3,695 +3,668 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Computer Fundamentals: CPU, Memory & Software</title>
+    <title>Software & Mobile Apps Presentation</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        /* Custom styles for slide transitions */
-        .slide {
-            transition: opacity 0.6s ease-in-out, transform 0.6s ease-in-out;
-        }
-        .slide-hidden {
-            opacity: 0;
-            pointer-events: none;
-            transform: scale(0.95);
-            z-index: 0;
-            display: none;
-        }
-        .slide-active {
-            opacity: 1;
-            pointer-events: auto;
-            transform: scale(1);
-            z-index: 10;
-            display: flex;
-        }
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
         
-        /* Hide scrollbar for a cleaner presentation look */
-        ::-webkit-scrollbar {
-            display: none;
-        }
-        html {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
+        body {
+            font-family: 'Inter', sans-serif;
+            background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
+            min-height: 100vh;
         }
 
-        /* Option animations */
-        .quiz-option {
-            transition: all 0.2s ease-in-out;
+        .fade-enter {
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.4s ease-out, transform 0.4s ease-out;
         }
-        .quiz-option:hover:not(:disabled) {
-            transform: translateY(-2px);
-            border-color: #6366f1; /* indigo-500 */
+
+        .fade-enter-active {
+            opacity: 1;
+            transform: translateY(0);
+        }
+
+        .slide-content ul {
+            list-style-type: none;
+            padding-left: 0;
+        }
+
+        .slide-content li {
+            margin-bottom: 1rem;
+            position: relative;
+            padding-left: 2rem;
+            font-size: 1.125rem;
+            color: #334155;
+            line-height: 1.6;
+        }
+
+        .slide-content li::before {
+            content: '\f0da';
+            font-family: 'Font Awesome 5 Free';
+            font-weight: 900;
+            position: absolute;
+            left: 0;
+            color: #3b82f6;
+            font-size: 1.25rem;
+        }
+
+        .option-btn {
+            transition: all 0.2s ease;
+        }
+        
+        .option-btn:hover:not(:disabled) {
+            transform: scale(1.02);
+            border-color: #3b82f6;
+            background-color: #eff6ff;
+        }
+
+        .option-correct {
+            background-color: #dcfce7 !important;
+            border-color: #22c55e !important;
+            color: #166534 !important;
+        }
+
+        .option-incorrect {
+            background-color: #fee2e2 !important;
+            border-color: #ef4444 !important;
+            color: #991b1b !important;
+        }
+
+        /* Scrollbar styling for content overflow */
+        .content-scroll::-webkit-scrollbar {
+            width: 8px;
+        }
+        .content-scroll::-webkit-scrollbar-track {
+            background: #f1f1f1;
+            border-radius: 4px;
+        }
+        .content-scroll::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .content-scroll::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
         }
     </style>
 </head>
-<body class="bg-slate-900 text-slate-100 h-screen w-screen overflow-hidden font-sans selection:bg-indigo-500 selection:text-white">
+<body class="flex items-center justify-center p-4 sm:p-8">
 
-    <!-- Main Slides Container -->
-    <main id="slides-container" class="relative w-full h-full flex items-center justify-center p-4 sm:p-8 transition-opacity duration-500">
-
-        <!-- Slide 1: Title -->
-        <section class="slide slide-active absolute inset-0 flex-col items-center justify-center text-center p-8 w-full h-full">
-            <div class="bg-slate-800/50 p-12 rounded-3xl border border-slate-700 shadow-2xl max-w-4xl backdrop-blur-sm mx-auto my-auto">
-                <div class="inline-flex items-center justify-center w-20 h-20 bg-indigo-600 rounded-full mb-8 shadow-lg shadow-indigo-500/30">
-                    <svg class="w-10 h-10 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.75 17L9 20l-1 1h8l-1-1-.75-3M3 13h18M5 17h14a2 2 0 002-2V5a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                </div>
-                <h1 class="text-5xl md:text-7xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-cyan-400 mb-6 tracking-tight">
-                    Computer Systems
-                </h1>
-                <p class="text-xl md:text-3xl text-slate-300 font-light mb-8">
-                    Understanding the CPU, Memory, and Software
-                </p>
-                <div class="flex items-center justify-center gap-2 text-slate-400 text-sm mt-12 animate-pulse">
-                    <span>Use arrow keys <kbd class="px-2 py-1 bg-slate-800 rounded text-xs border border-slate-700">←</kbd> <kbd class="px-2 py-1 bg-slate-800 rounded text-xs border border-slate-700">→</kbd> or swipe to navigate</span>
-                </div>
-            </div>
-        </section>
-
-        <!-- Slide 2: CPU Overview -->
-        <section class="slide slide-hidden absolute inset-0 flex-col items-center justify-center p-8 max-w-6xl mx-auto w-full h-full">
-            <div class="my-auto w-full">
-                <h2 class="text-4xl md:text-5xl font-bold mb-12 text-indigo-400 text-center w-full border-b border-slate-700 pb-6">The Brain: Central Processing Unit (CPU)</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-12 w-full items-center">
-                    <div>
-                        <p class="text-2xl text-slate-200 leading-relaxed mb-6 font-light">
-                            The CPU is the primary processing unit of a computer. Think of it as the brain—nothing happens without its command.
-                        </p>
-                        <ul class="space-y-4 text-lg text-slate-400">
-                            <li class="flex items-start">
-                                <svg class="w-6 h-6 text-cyan-400 mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                Executes software instructions and processes complex data.
-                            </li>
-                            <li class="flex items-start">
-                                <svg class="w-6 h-6 text-cyan-400 mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                Controls and coordinates all computer operations.
-                            </li>
-                            <li class="flex items-start">
-                                <svg class="w-6 h-6 text-cyan-400 mr-3 shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                                Every single task performed by a computer passes through the CPU at lightning speed.
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="bg-slate-800 rounded-2xl p-8 border border-slate-700 shadow-xl flex justify-center items-center">
-                        <svg class="w-48 h-48 text-indigo-500" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-                            <rect x="4" y="4" width="16" height="16" rx="2" ry="2" stroke-width="1.5"></rect>
-                            <rect x="9" y="9" width="6" height="6" stroke-width="1.5"></rect>
-                            <path d="M9 1v3M15 1v3M9 20v3M15 20v3M20 9h3M20 14h3M1 9h3M1 14h3" stroke-width="1.5" stroke-linecap="round"></path>
-                        </svg>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Slide 3: CPU Components -->
-        <section class="slide slide-hidden absolute inset-0 flex-col items-center justify-center p-8 max-w-7xl mx-auto w-full h-full">
-            <div class="my-auto w-full">
-                <h2 class="text-4xl md:text-5xl font-bold mb-12 text-indigo-400 text-center w-full border-b border-slate-700 pb-6">Main Components of the CPU</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8 w-full">
-                    <div class="bg-slate-800 p-8 rounded-2xl border-t-4 border-cyan-500 shadow-lg hover:-translate-y-2 transition-transform">
-                        <h3 class="text-2xl font-bold text-white mb-4">Arithmetic Logic Unit (ALU)</h3>
-                        <p class="text-slate-400 mb-4">The math genius of the computer.</p>
-                        <ul class="list-disc pl-5 text-slate-300 space-y-2">
-                            <li>Performs all mathematical calculations (Add, Subtract, etc.).</li>
-                            <li>Handles logical comparisons (Greater than, Equal to, AND/OR).</li>
-                        </ul>
-                    </div>
-                    <div class="bg-slate-800 p-8 rounded-2xl border-t-4 border-indigo-500 shadow-lg hover:-translate-y-2 transition-transform">
-                        <h3 class="text-2xl font-bold text-white mb-4">Control Unit (CU)</h3>
-                        <p class="text-slate-400 mb-4">The traffic cop of the system.</p>
-                        <ul class="list-disc pl-5 text-slate-300 space-y-2">
-                            <li>Controls all computer operations and subsystems.</li>
-                            <li>Directs the flow of data between hardware components.</li>
-                            <li>Decodes instructions from memory.</li>
-                        </ul>
-                    </div>
-                    <div class="bg-slate-800 p-8 rounded-2xl border-t-4 border-purple-500 shadow-lg hover:-translate-y-2 transition-transform">
-                        <h3 class="text-2xl font-bold text-white mb-4">Registers</h3>
-                        <p class="text-slate-400 mb-4">The CPU's ultra-fast pocket memory.</p>
-                        <ul class="list-disc pl-5 text-slate-300 space-y-2">
-                            <li>Small, high-speed storage locations built directly into the CPU.</li>
-                            <li>Temporarily hold data and instructions immediately needed for processing.</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Slide 4: Primary Memory -->
-        <section class="slide slide-hidden absolute inset-0 flex-col items-center justify-center p-8 max-w-6xl mx-auto w-full h-full">
-            <div class="my-auto w-full flex flex-col items-center">
-                <h2 class="text-4xl md:text-5xl font-bold mb-8 text-cyan-400 text-center w-full border-b border-slate-700 pb-6">Memory & Storage: Primary Memory</h2>
-                <p class="text-xl text-center text-slate-300 max-w-3xl mb-12">
-                    Main memory is directly accessed by the CPU. It is extremely fast and essential for the smooth, real-time operation of your computer.
-                </p>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
-                    <div class="bg-slate-800 p-8 rounded-2xl border border-slate-600 shadow-xl relative overflow-hidden">
-                        <div class="absolute top-0 right-0 p-4 opacity-10">
-                            <svg class="w-32 h-32" fill="currentColor" viewBox="0 0 24 24"><path d="M4 5h16a1 1 0 0 1 1 1v12a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V6a1 1 0 0 1 1-1zm1 2v10h14V7H5zm2 2h2v6H7V9zm4 0h2v6h-2V9zm4 0h2v6h-2V9z"></path></svg>
-                        </div>
-                        <h3 class="text-3xl font-bold text-white mb-2">RAM</h3>
-                        <p class="text-cyan-400 text-sm font-semibold mb-6 uppercase tracking-wider">Random Access Memory</p>
-                        <ul class="space-y-3 text-slate-300 relative z-10">
-                            <li>• <strong>Temporary</strong> (Volatile) workspace.</li>
-                            <li>• Stores data and apps currently in use.</li>
-                            <li>• Analogy: A whiteboard that gets wiped clean when the power turns off.</li>
-                        </ul>
-                    </div>
-                    <div class="bg-slate-800 p-8 rounded-2xl border border-slate-600 shadow-xl relative overflow-hidden">
-                        <div class="absolute top-0 right-0 p-4 opacity-10">
-                            <svg class="w-32 h-32" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 17.93c-3.95-.49-7-3.85-7-7.93 0-.62.08-1.21.21-1.79L9 15v1c0 1.1.9 2 2 2v1.93zm6.9-2.54c-.26-.81-1-1.39-1.9-1.39h-1v-3c0-.55-.45-1-1-1H8v-2h2c.55 0 1-.45 1-1V7h2c1.1 0 2-.9 2-2v-.41c2.93 1.19 5 4.06 5 7.41 0 2.08-.8 3.97-2.1 5.39z"></path></svg>
-                        </div>
-                        <h3 class="text-3xl font-bold text-white mb-2">ROM</h3>
-                        <p class="text-purple-400 text-sm font-semibold mb-6 uppercase tracking-wider">Read Only Memory</p>
-                        <ul class="space-y-3 text-slate-300 relative z-10">
-                            <li>• <strong>Permanent</strong> (Non-volatile) memory.</li>
-                            <li>• Stores essential boot-up instructions (firmware).</li>
-                            <li>• Analogy: A printed book; you can read it, but you can't easily change the ink.</li>
-                        </ul>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Slide 5: Secondary Memory -->
-        <section class="slide slide-hidden absolute inset-0 flex-col items-center justify-center p-8 max-w-5xl mx-auto w-full h-full">
-            <div class="my-auto w-full flex flex-col items-center">
-                <h2 class="text-4xl md:text-5xl font-bold mb-10 text-cyan-400 text-center w-full border-b border-slate-700 pb-6">Secondary Memory (Storage)</h2>
-                <div class="bg-slate-800 w-full rounded-3xl p-8 md:p-12 border border-slate-700 shadow-2xl">
-                    <p class="text-xl md:text-2xl text-slate-200 mb-8 font-light text-center">
-                        Used for massive, long-term storage of your files, operating system, and installed programs.
-                    </p>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-10 text-lg text-slate-400">
-                        <ul class="space-y-4">
-                            <li class="flex items-center"><svg class="w-5 h-5 text-indigo-400 mr-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg> Retains data when powered off.</li>
-                            <li class="flex items-center"><svg class="w-5 h-5 text-indigo-400 mr-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg> Much larger capacity than RAM.</li>
-                        </ul>
-                        <ul class="space-y-4">
-                            <li class="flex items-center"><svg class="w-5 h-5 text-indigo-400 mr-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg> Considerably slower than Primary Memory.</li>
-                            <li class="flex items-center"><svg class="w-5 h-5 text-indigo-400 mr-3" fill="currentColor" viewBox="0 0 20 20"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd"></path></svg> Often measured in Gigabytes (GB) or Terabytes (TB).</li>
-                        </ul>
-                    </div>
-                    
-                    <div class="bg-slate-900 rounded-xl p-6">
-                        <h4 class="text-sm uppercase text-slate-500 font-bold mb-4 tracking-wider">Common Examples</h4>
-                        <div class="flex flex-wrap justify-center gap-4">
-                            <span class="px-4 py-2 bg-slate-800 rounded-lg text-indigo-300 font-medium">HDD (Hard Disk)</span>
-                            <span class="px-4 py-2 bg-slate-800 rounded-lg text-indigo-300 font-medium">SSD (Solid State)</span>
-                            <span class="px-4 py-2 bg-slate-800 rounded-lg text-indigo-300 font-medium">Pen Drive</span>
-                            <span class="px-4 py-2 bg-slate-800 rounded-lg text-indigo-300 font-medium">Memory Card</span>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Slide 6: Software Intro -->
-        <section class="slide slide-hidden absolute inset-0 flex-col items-center justify-center p-8 max-w-6xl mx-auto text-center w-full h-full">
-            <div class="my-auto w-full flex flex-col items-center">
-                <h2 class="text-4xl md:text-6xl font-bold mb-8 text-purple-400">Understanding Software</h2>
-                <p class="text-xl md:text-3xl text-slate-300 font-light max-w-4xl mb-12">
-                    Hardware provides the physical foundation, but <strong>Software</strong> provides the instructions. Software is broadly categorized into 5 main types.
-                </p>
-                <div class="grid grid-cols-2 md:grid-cols-5 gap-4 w-full">
-                    <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 shadow flex items-center justify-center font-bold text-slate-200 h-24">1. System</div>
-                    <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 shadow flex items-center justify-center font-bold text-slate-200 h-24">2. Application</div>
-                    <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 shadow flex items-center justify-center font-bold text-slate-200 h-24">3. Utility</div>
-                    <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 shadow flex items-center justify-center font-bold text-slate-200 h-24">4. Proprietary</div>
-                    <div class="bg-slate-800 p-4 rounded-xl border border-slate-700 shadow flex items-center justify-center font-bold text-slate-200 h-24 col-span-2 md:col-span-1">5. Open Source</div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Slide 7: System & Application Software -->
-        <section class="slide slide-hidden absolute inset-0 flex-col items-center justify-center p-8 max-w-7xl mx-auto w-full h-full">
-            <div class="my-auto w-full">
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
-                    <div class="bg-gradient-to-br from-slate-800 to-slate-900 p-10 rounded-3xl border border-slate-700 shadow-xl">
-                        <h2 class="text-3xl md:text-4xl font-bold mb-4 text-purple-400">1. System Software</h2>
-                        <p class="text-slate-300 mb-6 font-medium text-lg italic">The foundational layer.</p>
-                        <ul class="space-y-3 text-slate-400 mb-8 list-disc pl-5">
-                            <li>Manages hardware resources completely.</li>
-                            <li>Acts as the core interface between the user, application software, and hardware.</li>
-                            <li>Runs continuously in the background.</li>
-                        </ul>
-                        <div class="bg-slate-900/50 p-4 rounded-xl">
-                            <p class="text-sm text-slate-500 uppercase tracking-wider mb-2 font-bold">Examples</p>
-                            <p class="text-indigo-300 font-medium">Microsoft Windows • macOS • Ubuntu Linux • Android</p>
-                        </div>
-                    </div>
-                    <div class="bg-gradient-to-br from-slate-800 to-slate-900 p-10 rounded-3xl border border-slate-700 shadow-xl">
-                        <h2 class="text-3xl md:text-4xl font-bold mb-4 text-purple-400">2. Application Software</h2>
-                        <p class="text-slate-300 mb-6 font-medium text-lg italic">The tool for the user.</p>
-                        <ul class="space-y-3 text-slate-400 mb-8 list-disc pl-5">
-                            <li>Designed to perform specific tasks directly for end-users.</li>
-                            <li>Helps complete day-to-day work, communication, or entertainment.</li>
-                            <li>Runs "on top" of system software.</li>
-                        </ul>
-                        <div class="bg-slate-900/50 p-4 rounded-xl">
-                            <p class="text-sm text-slate-500 uppercase tracking-wider mb-2 font-bold">Examples</p>
-                            <p class="text-indigo-300 font-medium">Microsoft Word • Google Chrome • Photoshop • Games</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Slide 8: Utility Software -->
-        <section class="slide slide-hidden absolute inset-0 flex-col items-center justify-center p-8 max-w-4xl mx-auto text-center w-full h-full">
-            <div class="my-auto w-full flex flex-col items-center">
-                <h2 class="text-4xl md:text-5xl font-bold mb-6 text-purple-400 w-full border-b border-slate-700 pb-6">3. Utility Software</h2>
-                <p class="text-2xl text-slate-300 mb-10 font-light">
-                    Software used specifically to <strong>maintain, protect, and optimize</strong> the computer system. They are the "mechanics" of your PC.
-                </p>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 w-full text-left">
-                    <div class="bg-slate-800 p-6 rounded-xl border border-slate-700">
-                        <div class="text-pink-500 mb-4">
-                            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"></path></svg>
-                        </div>
-                        <h3 class="font-bold text-xl text-white mb-2">Protection</h3>
-                        <p class="text-slate-400">Defends against viruses and malware. <br><span class="text-pink-400 text-sm">Ex: Antivirus</span></p>
-                    </div>
-                    <div class="bg-slate-800 p-6 rounded-xl border border-slate-700">
-                        <div class="text-amber-500 mb-4">
-                            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
-                        </div>
-                        <h3 class="font-bold text-xl text-white mb-2">Optimization</h3>
-                        <p class="text-slate-400">Removes junk files and improves speeds. <br><span class="text-amber-400 text-sm">Ex: Disk Cleanup</span></p>
-                    </div>
-                    <div class="bg-slate-800 p-6 rounded-xl border border-slate-700">
-                        <div class="text-green-500 mb-4">
-                            <svg class="w-10 h-10" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V9a2 2 0 00-2-2h-3m-1 4l-3 3m0 0l-3-3m3 3V4"></path></svg>
-                        </div>
-                        <h3 class="font-bold text-xl text-white mb-2">Maintenance</h3>
-                        <p class="text-slate-400">Safeguards data in case of failure. <br><span class="text-green-400 text-sm">Ex: Backups</span></p>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-        <!-- Slide 9: Proprietary vs Open Source -->
-        <section class="slide slide-hidden absolute inset-0 flex-col items-center justify-center p-8 max-w-7xl mx-auto w-full h-full">
-            <div class="my-auto w-full">
-                <h2 class="text-4xl md:text-5xl font-bold mb-10 text-purple-400 text-center w-full border-b border-slate-700 pb-6">Distribution Models</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
-                    <div class="bg-slate-800 p-8 rounded-2xl border-l-8 border-red-500 shadow-xl">
-                        <h3 class="text-3xl font-bold text-white mb-4">4. Proprietary Software</h3>
-                        <p class="text-slate-400 mb-6 italic">"Closed Source"</p>
-                        <ul class="space-y-3 text-slate-300 mb-8 list-disc pl-5">
-                            <li>Owned by an individual or commercial company.</li>
-                            <li>Source code is hidden and not publicly available.</li>
-                            <li>Requires a paid license or subscription to use.</li>
-                            <li>Cannot be legally modified or redistributed by users.</li>
-                        </ul>
-                        <div class="bg-slate-900 p-4 rounded-lg">
-                            <strong class="text-slate-500 text-sm uppercase">Examples:</strong>
-                            <p class="text-red-400">Microsoft Office, Adobe Photoshop, macOS</p>
-                        </div>
-                    </div>
-                    <div class="bg-slate-800 p-8 rounded-2xl border-l-8 border-emerald-500 shadow-xl">
-                        <h3 class="text-3xl font-bold text-white mb-4">5. Open Source Software</h3>
-                        <p class="text-slate-400 mb-6 italic">"Power to the People"</p>
-                        <ul class="space-y-3 text-slate-300 mb-8 list-disc pl-5">
-                            <li>Source code is freely visible and available to anyone.</li>
-                            <li>Usually free to download, use, modify, and share.</li>
-                            <li>Developed collaboratively by global communities.</li>
-                            <li>Promotes transparency and rapid innovation.</li>
-                        </ul>
-                        <div class="bg-slate-900 p-4 rounded-lg">
-                            <strong class="text-slate-500 text-sm uppercase">Examples:</strong>
-                            <p class="text-emerald-400">Ubuntu, Mozilla Firefox, Android (AOSP)</p>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </section>
-
-    </main>
-
-    <!-- Quiz Container (Hidden initially) -->
-    <div id="quiz-container" class="hidden absolute inset-0 flex-col items-center justify-center p-4 sm:p-8 w-full max-w-4xl mx-auto z-50 transition-opacity duration-500 opacity-0 pointer-events-none">
-        <div class="w-full bg-slate-800 p-8 md:p-12 rounded-3xl border border-slate-700 shadow-2xl">
-            <div class="flex justify-between items-center mb-8 border-b border-slate-700 pb-4">
-                <h3 class="text-2xl text-indigo-400 font-bold flex items-center">
-                    <svg class="w-6 h-6 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
-                    Knowledge Check
-                </h3>
-                <span id="quiz-counter" class="text-slate-400 font-medium bg-slate-900 px-4 py-2 rounded-lg shadow-inner">Question 1 of 20</span>
-            </div>
-            
-            <h2 id="quiz-question" class="text-2xl md:text-3xl font-bold text-white mb-8 leading-tight min-h-[5rem]">
-                Question text here?
-            </h2>
-            
-            <div id="quiz-options" class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-8">
-                <!-- Options injected via JS -->
-            </div>
-            
-            <div class="flex justify-end mt-8 border-t border-slate-700 pt-6 min-h-[5rem]">
-                <button id="quiz-next-btn" onclick="nextQuestion()" class="hidden px-8 py-3 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl transition-all shadow-lg shadow-indigo-600/20 transform hover:-translate-y-1">
-                    Next Question
-                </button>
-            </div>
-        </div>
+    <!-- Main Container -->
+    <div id="app-container" class="bg-white rounded-2xl shadow-2xl w-full max-w-5xl overflow-hidden relative" style="height: 85vh; min-height: 600px;">
         
-        <!-- Progress bar for quiz -->
-        <div class="w-full h-2 bg-slate-800 rounded-full mt-8 overflow-hidden max-w-4xl shadow-inner border border-slate-700">
-            <div id="quiz-progress-bar" class="h-full bg-gradient-to-r from-indigo-500 to-cyan-400 transition-all duration-300 w-[5%]"></div>
-        </div>
-    </div>
-
-    <!-- Results Container (Hidden initially) -->
-    <div id="result-container" class="hidden absolute inset-0 flex-col items-center justify-center p-4 sm:p-8 z-50 text-center transition-opacity duration-500 opacity-0 pointer-events-none">
-        <div class="w-full max-w-2xl bg-slate-800 p-12 rounded-3xl border border-slate-700 shadow-2xl">
-            <div id="result-icon-container" class="inline-flex items-center justify-center w-24 h-24 rounded-full mb-8 shadow-lg">
-                <!-- Icon injected via JS -->
+        <!-- ==================== PRESENTATION VIEW ==================== -->
+        <div id="presentation-view" class="h-full flex flex-col">
+            <!-- Header/Progress -->
+            <div class="h-2 bg-gray-100">
+                <div id="slide-progress" class="h-full bg-blue-500 transition-all duration-300 w-0"></div>
             </div>
-            <h2 id="result-title" class="text-4xl font-bold text-white mb-4">Quiz Completed!</h2>
-            <p class="text-xl text-slate-300 mb-8">You scored <span id="final-score" class="text-white font-bold text-4xl mx-2">0</span> out of 20.</p>
-            <p id="result-message" class="text-xl text-slate-400 mb-10 font-light"></p>
             
-            <div class="flex flex-col sm:flex-row gap-4 justify-center">
-                <button onclick="restartQuiz()" class="px-8 py-4 bg-indigo-600 hover:bg-indigo-500 text-white font-bold rounded-xl transition-all shadow-lg shadow-indigo-600/20 flex items-center justify-center">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
-                    Retake Quiz
+            <div class="flex justify-between items-center px-8 py-4 border-b border-gray-100">
+                <div class="text-sm font-semibold text-gray-500 tracking-wider uppercase">Slide <span id="current-slide-num">1</span> of <span id="total-slides-num">x</span></div>
+                <div class="text-blue-500 font-bold"><i class="fas fa-desktop mr-2"></i>Tech Basics</div>
+            </div>
+
+            <!-- Slide Content Area -->
+            <div id="slide-container" class="flex-grow p-8 sm:p-12 overflow-y-auto content-scroll flex flex-col justify-center">
+                <!-- Content injected via JS -->
+            </div>
+
+            <!-- Footer/Controls -->
+            <div class="px-8 py-6 border-t border-gray-100 flex justify-between items-center bg-gray-50">
+                <button id="prev-btn" onclick="prevSlide()" class="px-6 py-3 rounded-lg font-semibold text-gray-600 bg-white border border-gray-200 hover:bg-gray-100 hover:text-gray-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center shadow-sm">
+                    <i class="fas fa-arrow-left mr-2"></i> Previous
                 </button>
-                <button onclick="backToPresentation()" class="px-8 py-4 bg-slate-700 hover:bg-slate-600 text-white font-bold rounded-xl transition-colors flex items-center justify-center">
-                    <svg class="w-5 h-5 mr-2" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
-                    Review Slides
+                <button id="next-btn" onclick="nextSlide()" class="px-6 py-3 rounded-lg font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors shadow-md flex items-center">
+                    Next <i class="fas fa-arrow-right ml-2"></i>
                 </button>
             </div>
         </div>
-    </div>
 
-    <!-- Overlay Navigation & Progress (For Slides) -->
-    <footer id="slide-footer" class="fixed bottom-0 left-0 right-0 p-4 sm:p-6 flex flex-col z-40 transition-opacity duration-500">
-        <div class="w-full h-1 bg-slate-800 rounded-full mb-6 overflow-hidden max-w-4xl mx-auto">
-            <div id="progress-bar" class="h-full bg-indigo-500 transition-all duration-500 w-[11%]"></div>
-        </div>
-
-        <div class="flex justify-between items-center max-w-6xl w-full mx-auto">
-            <button id="prevBtn" class="flex items-center justify-center px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded-lg transition-colors border border-slate-600 disabled:opacity-30 disabled:hover:bg-slate-800">
-                <svg class="w-5 h-5 mr-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"></path></svg>
-                <span class="hidden sm:inline">Previous</span>
-            </button>
-            
-            <div class="text-slate-400 font-medium px-4 py-2 bg-slate-800/50 rounded-lg border border-slate-700/50 backdrop-blur-sm shadow-inner">
-                <span id="slide-counter">1</span> / 9
+        <!-- ==================== QUIZ VIEW ==================== -->
+        <div id="quiz-view" class="h-full flex flex-col hidden">
+            <!-- Header/Progress -->
+            <div class="h-2 bg-gray-100">
+                <div id="quiz-progress" class="h-full bg-green-500 transition-all duration-300 w-0"></div>
             </div>
             
-            <button id="nextBtn" class="flex items-center justify-center px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded-lg transition-colors shadow-lg shadow-indigo-600/20 disabled:opacity-30 disabled:hover:bg-indigo-600">
-                <span id="next-text" class="hidden sm:inline">Next</span>
-                <svg id="next-icon" class="w-5 h-5 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path></svg>
+            <div class="flex justify-between items-center px-8 py-4 border-b border-gray-100 bg-white">
+                <div class="text-sm font-semibold text-gray-500 tracking-wider uppercase">Question <span id="current-q-num">1</span> of <span id="total-q-num">30</span></div>
+                <div class="text-green-500 font-bold"><i class="fas fa-tasks mr-2"></i>Knowledge Check</div>
+                <div class="text-sm font-bold text-gray-700 bg-gray-100 px-3 py-1 rounded-full">Score: <span id="current-score">0</span></div>
+            </div>
+
+            <!-- Quiz Content Area -->
+            <div class="flex-grow p-8 sm:p-12 overflow-y-auto content-scroll flex flex-col items-center justify-center bg-gray-50">
+                <div class="w-full max-w-2xl">
+                    <h2 id="question-text" class="text-2xl sm:text-3xl font-bold text-gray-800 mb-8 leading-tight text-center">Question goes here?</h2>
+                    
+                    <div id="options-container" class="grid grid-cols-1 gap-4">
+                        <!-- Options injected via JS -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Quiz Footer -->
+            <div class="px-8 py-6 border-t border-gray-100 flex justify-end items-center bg-white">
+                <button id="next-q-btn" onclick="nextQuestion()" class="px-8 py-3 rounded-lg font-semibold text-white bg-green-600 hover:bg-green-700 transition-colors shadow-md flex items-center disabled:opacity-50 disabled:cursor-not-allowed hidden">
+                    Next Question <i class="fas fa-chevron-right ml-2"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- ==================== RESULTS VIEW ==================== -->
+        <div id="results-view" class="h-full flex flex-col items-center justify-center p-8 hidden text-center bg-white">
+            <i class="fas fa-award text-6xl text-yellow-400 mb-6 drop-shadow-md"></i>
+            <h1 class="text-4xl font-bold text-gray-800 mb-2">Quiz Completed!</h1>
+            <p class="text-xl text-gray-600 mb-8">Here is how you did on the assessment.</p>
+            
+            <div class="bg-gray-50 border border-gray-200 rounded-2xl p-8 mb-8 shadow-inner w-full max-w-md">
+                <div class="text-6xl font-black text-blue-600 mb-2" id="final-score-text">0/30</div>
+                <p class="text-lg font-medium text-gray-500 uppercase tracking-widest" id="score-percentage">0%</p>
+                <div class="mt-4 text-lg font-semibold text-gray-700" id="feedback-message">Good effort!</div>
+            </div>
+
+            <button onclick="restartApp()" class="px-8 py-4 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-700 transition-all shadow-lg hover:shadow-xl flex items-center transform hover:-translate-y-1">
+                <i class="fas fa-redo-alt mr-2"></i> Restart Presentation & Quiz
             </button>
         </div>
-    </footer>
+
+    </div>
 
     <!-- Application Logic -->
     <script>
-        /* =========================================
-           SLIDESHOW LOGIC
-           ========================================= */
-        const slides = document.querySelectorAll('.slide');
-        const prevBtn = document.getElementById('prevBtn');
-        const nextBtn = document.getElementById('nextBtn');
-        const nextText = document.getElementById('next-text');
-        const nextIcon = document.getElementById('next-icon');
-        const slideCounter = document.getElementById('slide-counter');
-        const progressBar = document.getElementById('progress-bar');
-        const slideContainer = document.getElementById('slides-container');
-        const slideFooter = document.getElementById('slide-footer');
-        
-        let currentSlide = 0;
-        const totalSlides = slides.length;
-
-        function updateSlides() {
-            slides.forEach((slide, index) => {
-                if (index === currentSlide) {
-                    slide.classList.remove('slide-hidden');
-                    slide.classList.add('slide-active');
-                } else {
-                    slide.classList.remove('slide-active');
-                    slide.classList.add('slide-hidden');
-                }
-            });
-
-            slideCounter.innerText = currentSlide + 1;
-            prevBtn.disabled = currentSlide === 0;
-            
-            // On last slide, change 'Next' button to 'Start Quiz'
-            if (currentSlide === totalSlides - 1) {
-                nextText.innerText = "Start Quiz";
-                nextBtn.classList.remove('bg-indigo-600', 'hover:bg-indigo-500');
-                nextBtn.classList.add('bg-cyan-600', 'hover:bg-cyan-500', 'shadow-cyan-600/20');
-                nextIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path>';
-            } else {
-                nextText.innerText = "Next";
-                nextBtn.classList.add('bg-indigo-600', 'hover:bg-indigo-500');
-                nextBtn.classList.remove('bg-cyan-600', 'hover:bg-cyan-500', 'shadow-cyan-600/20');
-                nextIcon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>';
+        // ==================== PRESENTATION DATA ====================
+        const slidesData = [
+            {
+                title: "Basics of Software & Mobile Apps",
+                subtitle: "An overview of Open-Source, Proprietary Software, and Mobile Technology",
+                content: `
+                    <div class="text-center mt-8">
+                        <i class="fas fa-laptop-code text-6xl text-blue-500 mb-6"></i>
+                        <p class="text-xl text-gray-600 max-w-2xl mx-auto">Welcome to this interactive learning module. We will explore the fundamental differences in software licensing and how mobile applications are revolutionizing our daily lives and workplaces.</p>
+                        <div class="mt-8 p-4 bg-blue-50 rounded-lg inline-block border border-blue-100 text-blue-800">
+                            <i class="fas fa-info-circle mr-2"></i> A 30-question quiz will begin automatically after the final slide.
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: "What is Software Licensing?",
+                content: `
+                    <p class="text-lg text-gray-600 mb-6">Software is governed by licenses that dictate how it can be used, modified, and distributed. The two primary paradigms are Open-Source and Proprietary.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
+                        <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                            <h3 class="text-xl font-bold text-gray-800 mb-3"><i class="fas fa-box-open text-green-500 mr-2"></i> Open-Source</h3>
+                            <p class="text-gray-600">The source code is accessible to anyone. Users can view, modify, and distribute the code freely.</p>
+                        </div>
+                        <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
+                            <h3 class="text-xl font-bold text-gray-800 mb-3"><i class="fas fa-lock text-red-500 mr-2"></i> Proprietary</h3>
+                            <p class="text-gray-600">The source code is hidden and owned by the creator. Users purchase the right to use the software under strict terms.</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: "Deep Dive: Open-Source Software (OSS)",
+                content: `
+                    <p class="text-lg text-gray-600 mb-4">Open-source software relies on community collaboration. It is built on the philosophy of transparency and shared knowledge.</p>
+                    <div class="slide-content mt-6">
+                        <ul>
+                            <li><strong>Transparency:</strong> Code is visible to the public, allowing peers to audit for security and bugs.</li>
+                            <li><strong>Cost:</strong> Generally free to download and use, though support or premium features may cost money.</li>
+                            <li><strong>Customization:</strong> Developers can alter the code to suit specific business or personal needs.</li>
+                            <li><strong>Examples:</strong> Linux Operating System, Mozilla Firefox browser, WordPress CMS, VLC Media Player.</li>
+                        </ul>
+                    </div>
+                `
+            },
+            {
+                title: "Pros & Cons of Open-Source",
+                content: `
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <h3 class="text-xl font-bold text-green-600 mb-4 border-b pb-2"><i class="fas fa-plus-circle mr-2"></i> Advantages</h3>
+                            <div class="slide-content">
+                                <ul>
+                                    <li>Highly cost-effective (free).</li>
+                                    <li>Flexibility and freedom from vendor lock-in.</li>
+                                    <li>Rapid bug fixes driven by a global community.</li>
+                                    <li>High security due to constant community auditing.</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-red-600 mb-4 border-b pb-2"><i class="fas fa-minus-circle mr-2"></i> Disadvantages</h3>
+                            <div class="slide-content">
+                                <ul>
+                                    <li>Can have a steeper learning curve.</li>
+                                    <li>Lack of dedicated, official customer support (often relies on forums).</li>
+                                    <li>Compatibility issues with proprietary hardware/software.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: "Deep Dive: Proprietary Software",
+                content: `
+                    <p class="text-lg text-gray-600 mb-4">Also known as closed-source software, proprietary software is the traditional model of software distribution where the creator retains all intellectual property rights.</p>
+                    <div class="slide-content mt-6">
+                        <ul>
+                            <li><strong>Ownership:</strong> Licensed, not sold. You buy the right to use it, not the code itself.</li>
+                            <li><strong>Support:</strong> Usually comes with dedicated, professional customer service and service level agreements (SLAs).</li>
+                            <li><strong>User Experience:</strong> Often highly polished, user-friendly, and extensively tested by the owning company.</li>
+                            <li><strong>Examples:</strong> Microsoft Windows, Microsoft Office, Adobe Photoshop, macOS.</li>
+                        </ul>
+                    </div>
+                `
+            },
+            {
+                title: "Pros & Cons of Proprietary Software",
+                content: `
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                        <div>
+                            <h3 class="text-xl font-bold text-green-600 mb-4 border-b pb-2"><i class="fas fa-plus-circle mr-2"></i> Advantages</h3>
+                            <div class="slide-content">
+                                <ul>
+                                    <li>Polished, intuitive User Interfaces (UI).</li>
+                                    <li>Guaranteed official support and regular automated updates.</li>
+                                    <li>High stability and seamless integration within its own ecosystem.</li>
+                                </ul>
+                            </div>
+                        </div>
+                        <div>
+                            <h3 class="text-xl font-bold text-red-600 mb-4 border-b pb-2"><i class="fas fa-minus-circle mr-2"></i> Disadvantages</h3>
+                            <div class="slide-content">
+                                <ul>
+                                    <li>High licensing fees and subscription costs.</li>
+                                    <li>Zero customization of the core product.</li>
+                                    <li>Vendor lock-in: Difficult to migrate away once fully integrated.</li>
+                                    <li>Security relies entirely on the vendor finding and patching flaws.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: "Transition to Mobile Technology",
+                content: `
+                    <div class="text-center mt-4 mb-8">
+                        <i class="fas fa-mobile-alt text-6xl text-indigo-500"></i>
+                    </div>
+                    <p class="text-lg text-gray-600 text-center max-w-3xl mx-auto mb-6">While underlying software licenses dictate how code is managed, the <strong>platform</strong> dictates how software is delivered. Today, the most dominant platform for software delivery is the Mobile Application.</p>
+                    <div class="bg-indigo-50 p-6 rounded-xl border border-indigo-100 text-center">
+                        <p class="text-indigo-800 font-medium">A Mobile Application (App) is a type of application software designed to run on a mobile device, such as a smartphone or tablet computer.</p>
+                    </div>
+                `
+            },
+            {
+                title: "Types of Mobile Applications",
+                content: `
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
+                        <div class="bg-white p-5 rounded-xl border-t-4 border-blue-500 shadow-md">
+                            <h3 class="text-lg font-bold text-gray-800 mb-2">Native Apps</h3>
+                            <p class="text-sm text-gray-600 mb-2">Built specifically for one platform (iOS or Android) using specific languages (Swift for iOS, Kotlin for Android).</p>
+                            <p class="text-xs font-semibold text-blue-500">Best Performance</p>
+                        </div>
+                        <div class="bg-white p-5 rounded-xl border-t-4 border-green-500 shadow-md">
+                            <h3 class="text-lg font-bold text-gray-800 mb-2">Web Apps</h3>
+                            <p class="text-sm text-gray-600 mb-2">Responsive websites that adapt to mobile screens, accessed via a mobile browser. Not installed via app stores.</p>
+                            <p class="text-xs font-semibold text-green-500">No Installation</p>
+                        </div>
+                        <div class="bg-white p-5 rounded-xl border-t-4 border-purple-500 shadow-md">
+                            <h3 class="text-lg font-bold text-gray-800 mb-2">Hybrid Apps</h3>
+                            <p class="text-sm text-gray-600 mb-2">Web apps wrapped in a native shell. Cross-platform framework (like React Native). Write once, run anywhere.</p>
+                            <p class="text-xs font-semibold text-purple-500">Cost Effective</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: "Mobile Apps in Office Automation",
+                content: `
+                    <p class="text-lg text-gray-600 mb-4">Office automation refers to using hardware and software to digitize, store, process, and communicate business information. Mobile apps have made this a 24/7, location-independent reality.</p>
+                    <div class="slide-content mt-6">
+                        <ul>
+                            <li><strong>Communication:</strong> Instant messaging, video conferencing, and unified communications (e.g., Slack, Microsoft Teams, Zoom).</li>
+                            <li><strong>Document Management:</strong> Accessing, editing, and sharing documents on the go via cloud storage (e.g., Google Drive, OneDrive).</li>
+                            <li><strong>Task Management:</strong> Tracking project progress and assigning tasks remotely (e.g., Trello, Asana, Jira).</li>
+                            <li><strong>Enterprise Resource Planning (ERP):</strong> Approving invoices, checking inventory, and HR functions directly from a phone.</li>
+                        </ul>
+                    </div>
+                `
+            },
+            {
+                title: "Key Benefits of Mobile Office Automation",
+                content: `
+                    <div class="space-y-4 mt-2">
+                        <div class="flex items-start p-4 bg-white rounded-lg shadow-sm border border-gray-100">
+                            <div class="bg-blue-100 p-3 rounded-full text-blue-600 mr-4"><i class="fas fa-globe"></i></div>
+                            <div>
+                                <h4 class="font-bold text-gray-800">Remote Work Enablement</h4>
+                                <p class="text-gray-600 text-sm">Employees are no longer tethered to a physical desk, enabling global, flexible workforces.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start p-4 bg-white rounded-lg shadow-sm border border-gray-100">
+                            <div class="bg-green-100 p-3 rounded-full text-green-600 mr-4"><i class="fas fa-bolt"></i></div>
+                            <div>
+                                <h4 class="font-bold text-gray-800">Increased Productivity</h4>
+                                <p class="text-gray-600 text-sm">Approvals, emails, and quick tasks can be handled during commutes or downtime.</p>
+                            </div>
+                        </div>
+                        <div class="flex items-start p-4 bg-white rounded-lg shadow-sm border border-gray-100">
+                            <div class="bg-orange-100 p-3 rounded-full text-orange-600 mr-4"><i class="fas fa-camera"></i></div>
+                            <div>
+                                <h4 class="font-bold text-gray-800">Hardware Replacement</h4>
+                                <p class="text-gray-600 text-sm">Apps like CamScanner turn phones into portable document scanners, replacing bulky office equipment.</p>
+                            </div>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: "Mobile Apps in Daily Life",
+                content: `
+                    <p class="text-lg text-gray-600 mb-6">Beyond the office, mobile applications have fundamentally re-engineered how humans navigate their daily personal lives.</p>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
+                        <div class="p-4 bg-pink-50 rounded-lg text-pink-700">
+                            <i class="fas fa-comments text-3xl mb-2"></i>
+                            <h4 class="font-bold text-sm">Social & Media</h4>
+                            <p class="text-xs mt-1">Connecting globally (WhatsApp, Instagram)</p>
+                        </div>
+                        <div class="p-4 bg-teal-50 rounded-lg text-teal-700">
+                            <i class="fas fa-shopping-cart text-3xl mb-2"></i>
+                            <h4 class="font-bold text-sm">E-Commerce</h4>
+                            <p class="text-xs mt-1">Shopping & Delivery (Amazon, UberEats)</p>
+                        </div>
+                        <div class="p-4 bg-blue-50 rounded-lg text-blue-700">
+                            <i class="fas fa-map-marked-alt text-3xl mb-2"></i>
+                            <h4 class="font-bold text-sm">Navigation</h4>
+                            <p class="text-xs mt-1">Real-time transit (Google Maps, Waze)</p>
+                        </div>
+                        <div class="p-4 bg-purple-50 rounded-lg text-purple-700">
+                            <i class="fas fa-heartbeat text-3xl mb-2"></i>
+                            <h4 class="font-bold text-sm">Health/Fintech</h4>
+                            <p class="text-xs mt-1">Tracking fitness & banking (MyFitnessPal, PayPal)</p>
+                        </div>
+                    </div>
+                `
+            },
+            {
+                title: "Conclusion & Summary",
+                content: `
+                    <div class="bg-gray-800 text-white p-8 rounded-2xl shadow-lg">
+                        <h3 class="text-2xl font-bold mb-4 border-b border-gray-600 pb-2">Key Takeaways</h3>
+                        <ul class="space-y-3 text-lg">
+                            <li><i class="fas fa-check text-green-400 mr-3"></i> <strong>Open-Source</strong> software provides transparency, customizability, and community-driven security.</li>
+                            <li><i class="fas fa-check text-green-400 mr-3"></i> <strong>Proprietary</strong> software offers polished user experiences, official support, and ecosystem stability.</li>
+                            <li><i class="fas fa-check text-green-400 mr-3"></i> <strong>Mobile Applications</strong> (Native, Web, Hybrid) are the primary vehicle for modern software delivery.</li>
+                            <li><i class="fas fa-check text-green-400 mr-3"></i> <strong>Office Automation</strong> is driven by mobile apps enabling remote work and cloud collaboration.</li>
+                        </ul>
+                    </div>
+                `
+            },
+            {
+                title: "Ready for the Quiz?",
+                content: `
+                    <div class="text-center flex flex-col items-center justify-center h-full">
+                        <div class="w-24 h-24 bg-green-100 text-green-500 rounded-full flex items-center justify-center text-4xl mb-6 animate-pulse">
+                            <i class="fas fa-clipboard-check"></i>
+                        </div>
+                        <h2 class="text-3xl font-bold text-gray-800 mb-4">Presentation Complete</h2>
+                        <p class="text-xl text-gray-600 max-w-lg mb-8">You have reached the end of the presentation. Click the button below to test your knowledge with a 30-question assessment.</p>
+                        
+                        <!-- The "Next" button in the footer will say "Start Quiz" on this slide -->
+                    </div>
+                `
             }
-
-            const progress = ((currentSlide + 1) / totalSlides) * 100;
-            progressBar.style.width = `${progress}%`;
-        }
-
-        function goNext() {
-            if (currentSlide < totalSlides - 1) {
-                currentSlide++;
-                updateSlides();
-            } else {
-                startQuizMode();
-            }
-        }
-
-        function goPrev() {
-            if (currentSlide > 0) {
-                currentSlide--;
-                updateSlides();
-            }
-        }
-
-        nextBtn.addEventListener('click', goNext);
-        prevBtn.addEventListener('click', goPrev);
-
-        document.addEventListener('keydown', (e) => {
-            // Only trigger slide navigation if quiz isn't active
-            if (quizContainer.classList.contains('opacity-0')) {
-                if (e.key === 'ArrowRight' || e.key === ' ') {
-                    goNext();
-                } else if (e.key === 'ArrowLeft') {
-                    goPrev();
-                }
-            }
-        });
-
-        // Swipe Navigation
-        let touchStartX = 0;
-        let touchEndX = 0;
-        
-        document.addEventListener('touchstart', e => {
-            touchStartX = e.changedTouches[0].screenX;
-        }, {passive: true});
-
-        document.addEventListener('touchend', e => {
-            touchEndX = e.changedTouches[0].screenX;
-            if (quizContainer.classList.contains('opacity-0')) {
-                const threshold = 50; 
-                if (touchEndX < touchStartX - threshold) goNext(); 
-                if (touchEndX > touchStartX + threshold) goPrev(); 
-            }
-        }, {passive: true});
-
-        updateSlides();
-
-
-        /* =========================================
-           QUIZ LOGIC & DATA
-           ========================================= */
-        const quizData = [
-            { q: "What does CPU stand for?", options: ["Computer Processing Unit", "Central Processing Unit", "Central Performance Unit", "Core Processing Unit"], ans: 1 },
-            { q: "Which component is often referred to as the 'brain' of the computer?", options: ["RAM", "ROM", "CPU", "SSD"], ans: 2 },
-            { q: "What is the function of the Arithmetic Logic Unit (ALU)?", options: ["Stores temporary data", "Directs data flow", "Performs mathematical calculations", "Cools down the processor"], ans: 2 },
-            { q: "Which CPU component acts as the 'traffic cop' directing operations?", options: ["Control Unit (CU)", "Registers", "ALU", "Motherboard"], ans: 0 },
-            { q: "What are the ultra-fast storage locations built directly into the CPU called?", options: ["Hard Drives", "RAM", "Cache", "Registers"], ans: 3 },
-            { q: "Which type of memory is considered a 'temporary workspace'?", options: ["ROM", "SSD", "RAM", "HDD"], ans: 2 },
-            { q: "What happens to the data in RAM when the computer is powered off?", options: ["It is saved permanently", "It is wiped clean", "It moves to ROM", "It is uploaded to the cloud"], ans: 1 },
-            { q: "Which memory stores the essential boot-up instructions (firmware)?", options: ["Registers", "RAM", "Cache", "ROM"], ans: 3 },
-            { q: "Which of the following best describes ROM?", options: ["Volatile, temporary memory", "Non-volatile, permanent memory", "External storage", "Processing unit"], ans: 1 },
-            { q: "Which of the following is an example of Secondary Memory?", options: ["Registers", "RAM", "Solid State Drive (SSD)", "Control Unit"], ans: 2 },
-            { q: "How does Secondary Memory compare to Primary Memory?", options: ["It is faster and smaller", "It is slower but has a larger capacity", "They are exactly the same", "It cannot store data permanently"], ans: 1 },
-            { q: "Which type of software acts as the foundational layer, completely managing hardware?", options: ["Utility Software", "System Software", "Application Software", "Proprietary Software"], ans: 1 },
-            { q: "macOS and Ubuntu Linux are examples of which type of software?", options: ["Utility Software", "Application Software", "System Software", "Open Source Software only"], ans: 2 },
-            { q: "Software designed to help end-users perform specific tasks like writing documents is called:", options: ["Application Software", "System Software", "Firmware", "Utility Software"], ans: 0 },
-            { q: "Google Chrome and Photoshop are examples of:", options: ["System Software", "Utility Software", "Application Software", "Hardware"], ans: 2 },
-            { q: "What is the primary purpose of Utility Software?", options: ["To play video games", "To maintain, protect, and optimize the computer", "To replace the operating system", "To write code"], ans: 1 },
-            { q: "Antivirus software and Disk Cleanup tools fall under which category?", options: ["System Software", "Application Software", "Open Source Software", "Utility Software"], ans: 3 },
-            { q: "Which type of software has hidden source code and usually requires a paid license?", options: ["Proprietary Software", "Open Source Software", "Free Software", "Utility Software"], ans: 0 },
-            { q: "Microsoft Office is an example of what distribution model?", options: ["Open Source", "Proprietary Software", "Freeware", "Public Domain"], ans: 1 },
-            { q: "What defines Open Source Software?", options: ["It is owned strictly by one company", "It cannot be downloaded freely", "Source code is visible and available to modify", "It is only used for Utility tasks"], ans: 2 }
         ];
 
-        let currentQuestionIndex = 0;
-        let score = 0;
-        let hasAnswered = false;
-
-        const quizContainer = document.getElementById('quiz-container');
-        const resultContainer = document.getElementById('result-container');
-        const questionEl = document.getElementById('quiz-question');
-        const optionsEl = document.getElementById('quiz-options');
-        const quizCounterEl = document.getElementById('quiz-counter');
-        const quizProgressBar = document.getElementById('quiz-progress-bar');
-        const quizNextBtn = document.getElementById('quiz-next-btn');
-
-        function startQuizMode() {
-            // Hide presentation
-            slideContainer.classList.add('opacity-0', 'pointer-events-none');
-            slideFooter.classList.add('opacity-0', 'pointer-events-none');
+        // ==================== QUIZ DATA (30 Questions) ====================
+        const quizData = [
+            { q: "What does OSS stand for?", options: ["Operational System Software", "Open-Source Software", "Online System Security", "Original Source Script"], ans: 1 },
+            { q: "Which of the following is a key characteristic of Open-Source Software?", options: ["High licensing fees", "Source code is hidden", "Source code is accessible and modifiable", "Only the creator can fix bugs"], ans: 2 },
+            { q: "Which of the following is an example of Open-Source Software?", options: ["Microsoft Windows", "Adobe Photoshop", "Linux", "Microsoft Office"], ans: 2 },
+            { q: "Proprietary software is also commonly referred to as:", options: ["Public domain software", "Closed-source software", "Freeware", "Shareware"], ans: 1 },
+            { q: "In Proprietary Software, who generally holds the intellectual property rights?", options: ["The user", "The open-source community", "The government", "The creator or vendor company"], ans: 3 },
+            { q: "Which of the following is an example of Proprietary Software?", options: ["Mozilla Firefox", "macOS", "WordPress", "VLC Media Player"], ans: 1 },
+            { q: "What is considered a major advantage of Open-Source Software?", options: ["Guaranteed 24/7 dedicated phone support", "It is usually free and highly customizable", "It always has the best graphical user interface", "You cannot modify it, preventing errors"], ans: 1 },
+            { q: "What is a major advantage of Proprietary Software?", options: ["Free access to source code", "Community-driven bug fixes", "Guaranteed official support and regular updates", "No licensing fees"], ans: 2 },
+            { q: "Vendor lock-in is a disadvantage most commonly associated with:", options: ["Open-Source Software", "Proprietary Software", "Hardware", "Freeware"], ans: 1 },
+            { q: "Which model relies heavily on a global community of volunteer developers for security auditing?", options: ["Proprietary", "Closed-source", "Open-Source", "Commercial"], ans: 2 },
             
-            setTimeout(() => {
-                slideContainer.classList.add('hidden');
-                slideFooter.classList.add('hidden');
-                
-                // Show quiz
-                quizContainer.classList.remove('hidden');
-                setTimeout(() => {
-                    quizContainer.classList.remove('opacity-0', 'pointer-events-none');
-                    currentQuestionIndex = 0;
-                    score = 0;
-                    loadQuestion();
-                }, 50);
-            }, 500);
+            { q: "What is a Mobile Application?", options: ["A desktop computer program", "Hardware inside a phone", "Software designed specifically to run on mobile devices", "A type of internet connection"], ans: 2 },
+            { q: "Apps built using specific languages for a single platform (like Swift for iOS) are called:", options: ["Web Apps", "Native Apps", "Hybrid Apps", "Desktop Apps"], ans: 1 },
+            { q: "Which type of mobile app requires no installation from an App Store?", options: ["Native Apps", "Hybrid Apps", "Web Apps", "Enterprise Apps"], ans: 2 },
+            { q: "A 'Hybrid App' can be best described as:", options: ["An app that works without electricity", "An app that is half proprietary, half open-source", "A web app wrapped in a native shell to work across platforms", "An app that only runs on tablets"], ans: 2 },
+            { q: "Which framework is often used to build Hybrid or Cross-platform mobile apps?", options: ["React Native", "C++", "Assembly", "Photoshop"], ans: 0 },
+            { q: "Native apps are generally known for:", options: ["Being the cheapest to develop", "Offering the best performance and UI integration", "Requiring internet to function at all times", "Being accessible via a URL only"], ans: 1 },
+            
+            { q: "What is the primary goal of Office Automation?", options: ["To replace human workers with robots", "To digitize, store, and communicate business information efficiently", "To print more paper documents", "To stop using mobile phones at work"], ans: 1 },
+            { q: "Which mobile app is a prominent example of enterprise communication in office automation?", options: ["Candy Crush", "Netflix", "Microsoft Teams", "Spotify"], ans: 2 },
+            { q: "How do mobile apps aid in document management for modern offices?", options: ["By providing cloud storage access (e.g., Google Drive) on the go", "By automatically deleting old files", "By printing documents remotely", "By blocking access to confidential files"], ans: 0 },
+            { q: "Trello and Asana mobile apps are primarily used for:", options: ["Video conferencing", "Task and project management", "Graphic design", "Network security"], ans: 1 },
+            { q: "Mobile apps have replaced physical office hardware. For example, apps like CamScanner act as portable:", options: ["Printers", "Fax machines", "Scanners", "Projectors"], ans: 2 },
+            { q: "One major impact of mobile office automation is:", options: ["Decreased employee communication", "The enablement of remote and flexible workforces", "Higher costs for physical office supplies", "Forcing everyone to work 9-to-5 exclusively"], ans: 1 },
+            { q: "ERP stands for Enterprise Resource Planning. Mobile ERP apps allow managers to:", options: ["Play games during meetings", "Approve invoices and check inventory from their phones", "Write source code for the company website", "Design company logos"], ans: 1 },
+            
+            { q: "Google Maps and Waze fall under which daily life app category?", options: ["Fintech", "E-commerce", "Navigation", "Health & Fitness"], ans: 2 },
+            { q: "Amazon and UberEats are examples of:", options: ["Educational Apps", "E-commerce & Delivery Apps", "Social Media Apps", "Productivity Apps"], ans: 1 },
+            { q: "MyFitnessPal is an application designed to help users with:", options: ["Tracking health, diet, and fitness", "Managing bank accounts", "Booking flights", "Learning new languages"], ans: 0 },
+            { q: "What is a primary function of Fintech/Banking mobile apps in daily life?", options: ["Tracking heart rate", "Sending money and managing finances instantly", "Editing photographs", "Navigating traffic"], ans: 1 },
+            { q: "WhatsApp and Instagram are primarily categorized as:", options: ["Office Automation tools", "Social and Media communication apps", "Open-source operating systems", "Document management systems"], ans: 1 },
+            { q: "Apps like Duolingo or Coursera demonstrate the use of mobile technology in:", options: ["Education and Learning", "Logistics", "Manufacturing", "Healthcare diagnostics"], ans: 0 },
+            { q: "Overall, the transition to mobile apps in daily life has led to:", options: ["Slower access to information", "Decreased global communication", "On-demand access to services, information, and communication 24/7", "The obsolescence of the internet"], ans: 2 }
+        ];
+
+        // ==================== STATE VARIABLES ====================
+        let currentSlide = 0;
+        let currentQuestion = 0;
+        let score = 0;
+        let isQuizActive = false;
+        let optionSelectedForCurrentQ = false;
+
+        // ==================== DOM ELEMENTS ====================
+        const presentationView = document.getElementById('presentation-view');
+        const quizView = document.getElementById('quiz-view');
+        const resultsView = document.getElementById('results-view');
+        
+        const slideContainer = document.getElementById('slide-container');
+        const slideProgress = document.getElementById('slide-progress');
+        const currentSlideNum = document.getElementById('current-slide-num');
+        const totalSlidesNum = document.getElementById('total-slides-num');
+        const prevBtn = document.getElementById('prev-btn');
+        const nextBtn = document.getElementById('next-btn');
+
+        const quizProgress = document.getElementById('quiz-progress');
+        const currentQNum = document.getElementById('current-q-num');
+        const totalQNum = document.getElementById('total-q-num');
+        const currentScoreEl = document.getElementById('current-score');
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const nextQBtn = document.getElementById('next-q-btn');
+
+        // ==================== INITIALIZATION ====================
+        function init() {
+            totalSlidesNum.innerText = slidesData.length;
+            totalQNum.innerText = quizData.length;
+            renderSlide();
         }
 
-        function loadQuestion() {
-            hasAnswered = false;
-            quizNextBtn.classList.add('hidden');
+        // ==================== PRESENTATION LOGIC ====================
+        function renderSlide() {
+            const slide = slidesData[currentSlide];
             
-            const currentQ = quizData[currentQuestionIndex];
-            questionEl.innerText = currentQ.q;
-            quizCounterEl.innerText = `Question ${currentQuestionIndex + 1} of ${quizData.length}`;
+            // Animate content
+            slideContainer.classList.remove('fade-enter-active');
             
-            const progress = ((currentQuestionIndex) / quizData.length) * 100;
-            quizProgressBar.style.width = `${progress}%`;
+            setTimeout(() => {
+                let html = `<h1 class="text-3xl sm:text-4xl font-bold text-gray-800 mb-2">${slide.title}</h1>`;
+                if (slide.subtitle) {
+                    html += `<p class="text-xl text-gray-500 mb-8">${slide.subtitle}</p>`;
+                } else {
+                    html += `<div class="h-1 w-20 bg-blue-500 rounded my-6"></div>`;
+                }
+                html += `<div>${slide.content}</div>`;
+                
+                slideContainer.innerHTML = html;
+                
+                // Add animation class
+                slideContainer.classList.add('fade-enter');
+                setTimeout(() => slideContainer.classList.add('fade-enter-active'), 50);
+            }, 150); // slight delay for fade out
 
-            optionsEl.innerHTML = '';
-            currentQ.options.forEach((option, index) => {
+            // Update UI elements
+            currentSlideNum.innerText = currentSlide + 1;
+            slideProgress.style.width = `${((currentSlide + 1) / slidesData.length) * 100}%`;
+            
+            // Button states
+            prevBtn.disabled = currentSlide === 0;
+            
+            if (currentSlide === slidesData.length - 1) {
+                nextBtn.innerHTML = `Start Quiz <i class="fas fa-play ml-2"></i>`;
+                nextBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
+                nextBtn.classList.add('bg-green-600', 'hover:bg-green-700');
+            } else {
+                nextBtn.innerHTML = `Next <i class="fas fa-arrow-right ml-2"></i>`;
+                nextBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
+                nextBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
+            }
+        }
+
+        function nextSlide() {
+            if (currentSlide === slidesData.length - 1) {
+                startQuiz();
+            } else {
+                currentSlide++;
+                renderSlide();
+            }
+        }
+
+        function prevSlide() {
+            if (currentSlide > 0) {
+                currentSlide--;
+                renderSlide();
+            }
+        }
+
+        // ==================== QUIZ LOGIC ====================
+        function startQuiz() {
+            presentationView.classList.add('hidden');
+            quizView.classList.remove('hidden');
+            isQuizActive = true;
+            renderQuestion();
+        }
+
+        function renderQuestion() {
+            optionSelectedForCurrentQ = false;
+            nextQBtn.classList.add('hidden');
+            
+            const qData = quizData[currentQuestion];
+            questionText.innerText = qData.q;
+            
+            optionsContainer.innerHTML = '';
+            
+            qData.options.forEach((opt, index) => {
                 const btn = document.createElement('button');
-                btn.className = 'quiz-option text-left w-full p-5 rounded-xl border-2 border-slate-700 bg-slate-800 text-slate-200 font-medium hover:bg-slate-700 focus:outline-none';
-                btn.innerHTML = `<span class="inline-block w-8 h-8 text-center leading-8 rounded bg-slate-700 text-slate-400 mr-3">${String.fromCharCode(65 + index)}</span> ${option}`;
+                btn.className = 'option-btn w-full text-left p-4 sm:p-5 rounded-xl border-2 border-gray-200 bg-white text-gray-700 font-medium text-lg flex items-center';
+                
+                // Add letter (A, B, C, D)
+                const letter = String.fromCharCode(65 + index);
+                btn.innerHTML = `<span class="inline-flex items-center justify-center w-8 h-8 rounded bg-gray-100 text-gray-600 font-bold mr-4 text-sm">${letter}</span> ${opt}`;
+                
                 btn.onclick = () => selectOption(index, btn);
-                optionsEl.appendChild(btn);
+                optionsContainer.appendChild(btn);
             });
+
+            currentQNum.innerText = currentQuestion + 1;
+            quizProgress.style.width = `${((currentQuestion) / quizData.length) * 100}%`;
+            currentScoreEl.innerText = score;
         }
 
         function selectOption(selectedIndex, selectedBtn) {
-            if (hasAnswered) return;
-            hasAnswered = true;
-
-            const currentQ = quizData[currentQuestionIndex];
-            const isCorrect = selectedIndex === currentQ.ans;
-            const buttons = optionsEl.querySelectorAll('button');
-
-            if (isCorrect) {
-                score++;
-                selectedBtn.classList.remove('border-slate-700', 'bg-slate-800', 'hover:bg-slate-700');
-                selectedBtn.classList.add('border-emerald-500', 'bg-emerald-500/10', 'text-emerald-400');
-                selectedBtn.querySelector('span').classList.replace('bg-slate-700', 'bg-emerald-500');
-                selectedBtn.querySelector('span').classList.replace('text-slate-400', 'text-white');
-            } else {
-                selectedBtn.classList.remove('border-slate-700', 'bg-slate-800', 'hover:bg-slate-700');
-                selectedBtn.classList.add('border-red-500', 'bg-red-500/10', 'text-red-400');
-                selectedBtn.querySelector('span').classList.replace('bg-slate-700', 'bg-red-500');
-                selectedBtn.querySelector('span').classList.replace('text-slate-400', 'text-white');
-
-                // Highlight correct answer
-                const correctBtn = buttons[currentQ.ans];
-                correctBtn.classList.remove('border-slate-700');
-                correctBtn.classList.add('border-emerald-500');
-                correctBtn.querySelector('span').classList.replace('bg-slate-700', 'bg-emerald-500');
-                correctBtn.querySelector('span').classList.replace('text-slate-400', 'text-white');
-            }
-
+            if (optionSelectedForCurrentQ) return; // Prevent multiple selections
+            optionSelectedForCurrentQ = true;
+            
+            const qData = quizData[currentQuestion];
+            const buttons = optionsContainer.querySelectorAll('button');
+            
             // Disable all buttons
             buttons.forEach(btn => btn.disabled = true);
             
-            // Show Next Button
-            quizNextBtn.innerText = currentQuestionIndex === quizData.length - 1 ? 'Finish Quiz' : 'Next Question';
-            quizNextBtn.classList.remove('hidden');
+            // Check answer
+            if (selectedIndex === qData.ans) {
+                // Correct
+                selectedBtn.classList.add('option-correct');
+                selectedBtn.innerHTML += `<i class="fas fa-check-circle ml-auto text-xl"></i>`;
+                score++;
+                currentScoreEl.innerText = score;
+            } else {
+                // Incorrect
+                selectedBtn.classList.add('option-incorrect');
+                selectedBtn.innerHTML += `<i class="fas fa-times-circle ml-auto text-xl"></i>`;
+                
+                // Highlight correct answer
+                const correctBtn = buttons[qData.ans];
+                correctBtn.classList.add('option-correct');
+                correctBtn.innerHTML += `<i class="fas fa-check-circle ml-auto text-xl"></i>`;
+            }
+
+            // Show next button
+            nextQBtn.classList.remove('hidden');
+            
+            // Change next button text on last question
+            if (currentQuestion === quizData.length - 1) {
+                nextQBtn.innerHTML = `See Results <i class="fas fa-flag-checkered ml-2"></i>`;
+            }
         }
 
         function nextQuestion() {
-            if (currentQuestionIndex < quizData.length - 1) {
-                currentQuestionIndex++;
-                loadQuestion();
-            } else {
+            if (currentQuestion === quizData.length - 1) {
                 showResults();
+            } else {
+                currentQuestion++;
+                renderQuestion();
             }
         }
 
         function showResults() {
-            quizProgressBar.style.width = `100%`;
-            quizContainer.classList.add('opacity-0', 'pointer-events-none');
+            quizView.classList.add('hidden');
+            resultsView.classList.remove('hidden');
             
-            setTimeout(() => {
-                quizContainer.classList.add('hidden');
-                resultContainer.classList.remove('hidden');
-                
-                // Populate Result details
-                document.getElementById('final-score').innerText = score;
-                const messageEl = document.getElementById('result-message');
-                const iconContainer = document.getElementById('result-icon-container');
-                
-                const percentage = score / quizData.length;
-                if (percentage >= 0.8) {
-                    messageEl.innerText = "Excellent! You have a solid grasp of computer fundamentals.";
-                    iconContainer.className = "inline-flex items-center justify-center w-24 h-24 rounded-full mb-8 shadow-lg bg-emerald-500/20 text-emerald-500";
-                    iconContainer.innerHTML = '<svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
-                } else if (percentage >= 0.5) {
-                    messageEl.innerText = "Good job! A quick review of the slides will make you an expert.";
-                    iconContainer.className = "inline-flex items-center justify-center w-24 h-24 rounded-full mb-8 shadow-lg bg-amber-500/20 text-amber-500";
-                    iconContainer.innerHTML = '<svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.828 14.828a4 4 0 01-5.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
-                } else {
-                    messageEl.innerText = "Keep practicing! Review the slides and try the quiz again.";
-                    iconContainer.className = "inline-flex items-center justify-center w-24 h-24 rounded-full mb-8 shadow-lg bg-red-500/20 text-red-500";
-                    iconContainer.innerHTML = '<svg class="w-12 h-12" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>';
-                }
-
-                setTimeout(() => {
-                    resultContainer.classList.remove('opacity-0', 'pointer-events-none');
-                }, 50);
-            }, 500);
+            document.getElementById('final-score-text').innerText = `${score}/${quizData.length}`;
+            
+            const percentage = Math.round((score / quizData.length) * 100);
+            document.getElementById('score-percentage').innerText = `${percentage}%`;
+            
+            let feedback = "";
+            if (percentage >= 90) feedback = "Excellent! You have a strong grasp of software and mobile tech concepts. 🌟";
+            else if (percentage >= 70) feedback = "Great job! You understand the core basics well. 👍";
+            else if (percentage >= 50) feedback = "Good effort, but you might want to review the presentation again. 📚";
+            else feedback = "Keep learning! Restart the presentation to refresh your knowledge. 💡";
+            
+            document.getElementById('feedback-message').innerText = feedback;
         }
 
-        function restartQuiz() {
-            resultContainer.classList.add('opacity-0', 'pointer-events-none');
-            setTimeout(() => {
-                resultContainer.classList.add('hidden');
-                quizContainer.classList.remove('hidden');
-                setTimeout(() => {
-                    quizContainer.classList.remove('opacity-0', 'pointer-events-none');
-                    currentQuestionIndex = 0;
-                    score = 0;
-                    loadQuestion();
-                }, 50);
-            }, 500);
+        function restartApp() {
+            currentSlide = 0;
+            currentQuestion = 0;
+            score = 0;
+            isQuizActive = false;
+            
+            resultsView.classList.add('hidden');
+            presentationView.classList.remove('hidden');
+            
+            init();
         }
 
-        function backToPresentation() {
-            resultContainer.classList.add('opacity-0', 'pointer-events-none');
-            setTimeout(() => {
-                resultContainer.classList.add('hidden');
-                slideContainer.classList.remove('hidden');
-                slideFooter.classList.remove('hidden');
-                
-                currentSlide = 0;
-                updateSlides();
-                
-                setTimeout(() => {
-                    slideContainer.classList.remove('opacity-0', 'pointer-events-none');
-                    slideFooter.classList.remove('opacity-0', 'pointer-events-none');
-                }, 50);
-            }, 500);
-        }
+        // Run on load
+        window.onload = init;
+
     </script>
 </body>
 </html>
