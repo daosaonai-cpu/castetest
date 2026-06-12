@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Software & Mobile Apps Presentation</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
@@ -13,6 +13,8 @@
             font-family: 'Inter', sans-serif;
             background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
             min-height: 100vh;
+            /* Fallback for browsers that do not support dvh */
+            min-height: 100dvh; 
         }
 
         .fade-enter {
@@ -32,12 +34,11 @@
         }
 
         .slide-content li {
-            margin-bottom: 1rem;
+            margin-bottom: 0.75rem;
             position: relative;
-            padding-left: 2rem;
-            font-size: 1.125rem;
+            padding-left: 1.75rem;
             color: #334155;
-            line-height: 1.6;
+            line-height: 1.5;
         }
 
         .slide-content li::before {
@@ -47,7 +48,8 @@
             position: absolute;
             left: 0;
             color: #3b82f6;
-            font-size: 1.25rem;
+            font-size: 1.1rem;
+            top: 0.1rem;
         }
 
         .option-btn {
@@ -55,7 +57,7 @@
         }
         
         .option-btn:hover:not(:disabled) {
-            transform: scale(1.02);
+            transform: scale(1.01);
             border-color: #3b82f6;
             background-color: #eff6ff;
         }
@@ -74,7 +76,7 @@
 
         /* Scrollbar styling for content overflow */
         .content-scroll::-webkit-scrollbar {
-            width: 8px;
+            width: 6px;
         }
         .content-scroll::-webkit-scrollbar-track {
             background: #f1f1f1;
@@ -89,91 +91,78 @@
         }
     </style>
 </head>
-<body class="flex items-center justify-center p-4 sm:p-8">
+<body class="flex items-center justify-center p-0 sm:p-6 md:p-8">
 
-    <!-- Main Container -->
-    <div id="app-container" class="bg-white rounded-2xl shadow-2xl w-full max-w-5xl overflow-hidden relative" style="height: 85vh; min-height: 600px;">
+    <div id="app-container" class="bg-white sm:rounded-2xl shadow-none sm:shadow-2xl w-full max-w-5xl overflow-hidden relative flex flex-col h-[100dvh] sm:h-[85vh] sm:min-h-[600px]">
         
-        <!-- ==================== PRESENTATION VIEW ==================== -->
         <div id="presentation-view" class="h-full flex flex-col">
-            <!-- Header/Progress -->
-            <div class="h-2 bg-gray-100">
+            <div class="h-1.5 sm:h-2 bg-gray-100 flex-shrink-0">
                 <div id="slide-progress" class="h-full bg-blue-500 transition-all duration-300 w-0"></div>
             </div>
             
-            <div class="flex justify-between items-center px-8 py-4 border-b border-gray-100">
-                <div class="text-sm font-semibold text-gray-500 tracking-wider uppercase">Slide <span id="current-slide-num">1</span> of <span id="total-slides-num">x</span></div>
-                <div class="text-blue-500 font-bold"><i class="fas fa-desktop mr-2"></i>Tech Basics</div>
+            <div class="flex justify-between items-center px-4 sm:px-8 py-3 sm:py-4 border-b border-gray-100 flex-shrink-0">
+                <div class="text-xs sm:text-sm font-semibold text-gray-500 tracking-wider uppercase">Slide <span id="current-slide-num">1</span> of <span id="total-slides-num">x</span></div>
+                <div class="text-blue-500 font-bold text-sm sm:text-base"><i class="fas fa-desktop mr-1 sm:mr-2"></i><span class="hidden sm:inline">Tech Basics</span></div>
             </div>
 
-            <!-- Slide Content Area -->
-            <div id="slide-container" class="flex-grow p-8 sm:p-12 overflow-y-auto content-scroll flex flex-col justify-center">
-                <!-- Content injected via JS -->
-            </div>
+            <div id="slide-container" class="flex-grow p-5 sm:p-8 md:p-12 overflow-y-auto content-scroll flex flex-col justify-center">
+                </div>
 
-            <!-- Footer/Controls -->
-            <div class="px-8 py-6 border-t border-gray-100 flex justify-between items-center bg-gray-50">
-                <button id="prev-btn" onclick="prevSlide()" class="px-6 py-3 rounded-lg font-semibold text-gray-600 bg-white border border-gray-200 hover:bg-gray-100 hover:text-gray-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center shadow-sm">
-                    <i class="fas fa-arrow-left mr-2"></i> Previous
+            <div class="px-4 sm:px-8 py-4 sm:py-6 border-t border-gray-100 flex justify-between items-center bg-gray-50 flex-shrink-0 gap-3">
+                <button id="prev-btn" onclick="prevSlide()" class="px-4 py-2.5 sm:px-6 sm:py-3 rounded-lg font-semibold text-gray-600 bg-white border border-gray-200 hover:bg-gray-100 hover:text-gray-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center shadow-sm text-sm sm:text-base w-1/2 sm:w-auto justify-center">
+                    <i class="fas fa-arrow-left mr-2"></i> Prev<span class="hidden sm:inline">ious</span>
                 </button>
-                <button id="next-btn" onclick="nextSlide()" class="px-6 py-3 rounded-lg font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors shadow-md flex items-center">
+                <button id="next-btn" onclick="nextSlide()" class="px-4 py-2.5 sm:px-6 sm:py-3 rounded-lg font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors shadow-md flex items-center text-sm sm:text-base w-1/2 sm:w-auto justify-center">
                     Next <i class="fas fa-arrow-right ml-2"></i>
                 </button>
             </div>
         </div>
 
-        <!-- ==================== QUIZ VIEW ==================== -->
         <div id="quiz-view" class="h-full flex flex-col hidden">
-            <!-- Header/Progress -->
-            <div class="h-2 bg-gray-100">
+            <div class="h-1.5 sm:h-2 bg-gray-100 flex-shrink-0">
                 <div id="quiz-progress" class="h-full bg-green-500 transition-all duration-300 w-0"></div>
             </div>
             
-            <div class="flex justify-between items-center px-8 py-4 border-b border-gray-100 bg-white">
-                <div class="text-sm font-semibold text-gray-500 tracking-wider uppercase">Question <span id="current-q-num">1</span> of <span id="total-q-num">30</span></div>
-                <div class="text-green-500 font-bold"><i class="fas fa-tasks mr-2"></i>Knowledge Check</div>
-                <div class="text-sm font-bold text-gray-700 bg-gray-100 px-3 py-1 rounded-full">Score: <span id="current-score">0</span></div>
+            <div class="flex justify-between items-center px-4 sm:px-8 py-3 sm:py-4 border-b border-gray-100 bg-white flex-shrink-0">
+                <div class="text-xs sm:text-sm font-semibold text-gray-500 tracking-wider uppercase">Q <span id="current-q-num">1</span> / <span id="total-q-num">30</span></div>
+                <div class="hidden sm:block text-green-500 font-bold"><i class="fas fa-tasks mr-2"></i>Knowledge Check</div>
+                <div class="text-xs sm:text-sm font-bold text-gray-700 bg-gray-100 px-3 py-1 sm:px-4 sm:py-1.5 rounded-full">Score: <span id="current-score">0</span></div>
             </div>
 
-            <!-- Quiz Content Area -->
-            <div class="flex-grow p-8 sm:p-12 overflow-y-auto content-scroll flex flex-col items-center justify-center bg-gray-50">
-                <div class="w-full max-w-2xl">
-                    <h2 id="question-text" class="text-2xl sm:text-3xl font-bold text-gray-800 mb-8 leading-tight text-center">Question goes here?</h2>
+            <div class="flex-grow p-4 sm:p-8 md:p-12 overflow-y-auto content-scroll flex flex-col items-center justify-center bg-gray-50">
+                <div class="w-full max-w-2xl py-4 sm:py-0">
+                    <h2 id="question-text" class="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 mb-6 sm:mb-8 leading-tight text-center">Question goes here?</h2>
                     
-                    <div id="options-container" class="grid grid-cols-1 gap-4">
-                        <!-- Options injected via JS -->
-                    </div>
+                    <div id="options-container" class="grid grid-cols-1 gap-3 sm:gap-4">
+                        </div>
                 </div>
             </div>
 
-            <!-- Quiz Footer -->
-            <div class="px-8 py-6 border-t border-gray-100 flex justify-end items-center bg-white">
-                <button id="next-q-btn" onclick="nextQuestion()" class="px-8 py-3 rounded-lg font-semibold text-white bg-green-600 hover:bg-green-700 transition-colors shadow-md flex items-center disabled:opacity-50 disabled:cursor-not-allowed hidden">
+            <div class="px-4 sm:px-8 py-4 sm:py-6 border-t border-gray-100 flex justify-end items-center bg-white flex-shrink-0 min-h-[72px] sm:min-h-[88px]">
+                <button id="next-q-btn" onclick="nextQuestion()" class="w-full sm:w-auto px-6 py-3 rounded-lg font-semibold text-white bg-green-600 hover:bg-green-700 transition-colors shadow-md flex justify-center items-center disabled:opacity-50 disabled:cursor-not-allowed hidden text-sm sm:text-base">
                     Next Question <i class="fas fa-chevron-right ml-2"></i>
                 </button>
             </div>
         </div>
 
-        <!-- ==================== RESULTS VIEW ==================== -->
-        <div id="results-view" class="h-full flex flex-col items-center justify-center p-8 hidden text-center bg-white">
-            <i class="fas fa-award text-6xl text-yellow-400 mb-6 drop-shadow-md"></i>
-            <h1 class="text-4xl font-bold text-gray-800 mb-2">Quiz Completed!</h1>
-            <p class="text-xl text-gray-600 mb-8">Here is how you did on the assessment.</p>
+        <div id="results-view" class="h-full flex flex-col items-center justify-center p-6 sm:p-8 hidden text-center bg-white overflow-y-auto">
+            <i class="fas fa-award text-5xl sm:text-6xl text-yellow-400 mb-4 sm:mb-6 drop-shadow-md"></i>
+            <h1 class="text-3xl sm:text-4xl font-bold text-gray-800 mb-2">Quiz Completed!</h1>
+            <p class="text-base sm:text-xl text-gray-600 mb-6 sm:mb-8">Here is how you did on the assessment.</p>
             
-            <div class="bg-gray-50 border border-gray-200 rounded-2xl p-8 mb-8 shadow-inner w-full max-w-md">
-                <div class="text-6xl font-black text-blue-600 mb-2" id="final-score-text">0/30</div>
-                <p class="text-lg font-medium text-gray-500 uppercase tracking-widest" id="score-percentage">0%</p>
-                <div class="mt-4 text-lg font-semibold text-gray-700" id="feedback-message">Good effort!</div>
+            <div class="bg-gray-50 border border-gray-200 rounded-2xl p-6 sm:p-8 mb-6 sm:mb-8 shadow-inner w-full max-w-md">
+                <div class="text-5xl sm:text-6xl font-black text-blue-600 mb-2" id="final-score-text">0/30</div>
+                <p class="text-base sm:text-lg font-medium text-gray-500 uppercase tracking-widest" id="score-percentage">0%</p>
+                <div class="mt-4 text-base sm:text-lg font-semibold text-gray-700" id="feedback-message">Good effort!</div>
             </div>
 
-            <button onclick="restartApp()" class="px-8 py-4 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-700 transition-all shadow-lg hover:shadow-xl flex items-center transform hover:-translate-y-1">
-                <i class="fas fa-redo-alt mr-2"></i> Restart Presentation & Quiz
+            <button onclick="restartApp()" class="w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-700 transition-all shadow-lg hover:shadow-xl flex justify-center items-center transform hover:-translate-y-1 text-sm sm:text-base">
+                <i class="fas fa-redo-alt mr-2"></i> Restart
             </button>
         </div>
 
     </div>
 
-    <!-- Application Logic -->
     <script>
         // ==================== PRESENTATION DATA ====================
         const slidesData = [
@@ -181,11 +170,11 @@
                 title: "Basics of Software & Mobile Apps",
                 subtitle: "An overview of Open-Source, Proprietary Software, and Mobile Technology",
                 content: `
-                    <div class="text-center mt-8">
-                        <i class="fas fa-laptop-code text-6xl text-blue-500 mb-6"></i>
-                        <p class="text-xl text-gray-600 max-w-2xl mx-auto">Welcome to this interactive learning module. We will explore the fundamental differences in software licensing and how mobile applications are revolutionizing our daily lives and workplaces.</p>
-                        <div class="mt-8 p-4 bg-blue-50 rounded-lg inline-block border border-blue-100 text-blue-800">
-                            <i class="fas fa-info-circle mr-2"></i> A 30-question quiz will begin automatically after the final slide.
+                    <div class="text-center mt-4 sm:mt-8">
+                        <i class="fas fa-laptop-code text-5xl sm:text-6xl text-blue-500 mb-4 sm:mb-6"></i>
+                        <p class="text-base sm:text-xl text-gray-600 max-w-2xl mx-auto">Welcome to this interactive learning module. We will explore the fundamental differences in software licensing and how mobile applications are revolutionizing our daily lives and workplaces.</p>
+                        <div class="mt-6 sm:mt-8 p-3 sm:p-4 bg-blue-50 rounded-lg inline-block border border-blue-100 text-blue-800 text-sm sm:text-base">
+                            <i class="fas fa-info-circle mr-1 sm:mr-2"></i> A 30-question quiz will begin automatically after the final slide.
                         </div>
                     </div>
                 `
@@ -193,15 +182,15 @@
             {
                 title: "What is Software Licensing?",
                 content: `
-                    <p class="text-lg text-gray-600 mb-6">Software is governed by licenses that dictate how it can be used, modified, and distributed. The two primary paradigms are Open-Source and Proprietary.</p>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-4">
-                        <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                            <h3 class="text-xl font-bold text-gray-800 mb-3"><i class="fas fa-box-open text-green-500 mr-2"></i> Open-Source</h3>
-                            <p class="text-gray-600">The source code is accessible to anyone. Users can view, modify, and distribute the code freely.</p>
+                    <p class="text-base sm:text-lg text-gray-600 mb-4 sm:mb-6">Software is governed by licenses that dictate how it can be used, modified, and distributed. The two primary paradigms are Open-Source and Proprietary.</p>
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mt-4">
+                        <div class="bg-white p-5 sm:p-6 rounded-xl border border-gray-200 shadow-sm">
+                            <h3 class="text-lg sm:text-xl font-bold text-gray-800 mb-2 sm:mb-3"><i class="fas fa-box-open text-green-500 mr-2"></i> Open-Source</h3>
+                            <p class="text-sm sm:text-base text-gray-600">The source code is accessible to anyone. Users can view, modify, and distribute the code freely.</p>
                         </div>
-                        <div class="bg-white p-6 rounded-xl border border-gray-200 shadow-sm">
-                            <h3 class="text-xl font-bold text-gray-800 mb-3"><i class="fas fa-lock text-red-500 mr-2"></i> Proprietary</h3>
-                            <p class="text-gray-600">The source code is hidden and owned by the creator. Users purchase the right to use the software under strict terms.</p>
+                        <div class="bg-white p-5 sm:p-6 rounded-xl border border-gray-200 shadow-sm">
+                            <h3 class="text-lg sm:text-xl font-bold text-gray-800 mb-2 sm:mb-3"><i class="fas fa-lock text-red-500 mr-2"></i> Proprietary</h3>
+                            <p class="text-sm sm:text-base text-gray-600">The source code is hidden and owned by the creator. Users purchase the right to use the software under strict terms.</p>
                         </div>
                     </div>
                 `
@@ -209,8 +198,8 @@
             {
                 title: "Deep Dive: Open-Source Software (OSS)",
                 content: `
-                    <p class="text-lg text-gray-600 mb-4">Open-source software relies on community collaboration. It is built on the philosophy of transparency and shared knowledge.</p>
-                    <div class="slide-content mt-6">
+                    <p class="text-base sm:text-lg text-gray-600 mb-3 sm:mb-4">Open-source software relies on community collaboration. It is built on the philosophy of transparency and shared knowledge.</p>
+                    <div class="slide-content text-sm sm:text-base mt-4 sm:mt-6">
                         <ul>
                             <li><strong>Transparency:</strong> Code is visible to the public, allowing peers to audit for security and bugs.</li>
                             <li><strong>Cost:</strong> Generally free to download and use, though support or premium features may cost money.</li>
@@ -223,10 +212,10 @@
             {
                 title: "Pros & Cons of Open-Source",
                 content: `
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
                         <div>
-                            <h3 class="text-xl font-bold text-green-600 mb-4 border-b pb-2"><i class="fas fa-plus-circle mr-2"></i> Advantages</h3>
-                            <div class="slide-content">
+                            <h3 class="text-lg sm:text-xl font-bold text-green-600 mb-3 sm:mb-4 border-b pb-2"><i class="fas fa-plus-circle mr-2"></i> Advantages</h3>
+                            <div class="slide-content text-sm sm:text-base">
                                 <ul>
                                     <li>Highly cost-effective (free).</li>
                                     <li>Flexibility and freedom from vendor lock-in.</li>
@@ -236,8 +225,8 @@
                             </div>
                         </div>
                         <div>
-                            <h3 class="text-xl font-bold text-red-600 mb-4 border-b pb-2"><i class="fas fa-minus-circle mr-2"></i> Disadvantages</h3>
-                            <div class="slide-content">
+                            <h3 class="text-lg sm:text-xl font-bold text-red-600 mb-3 sm:mb-4 border-b pb-2"><i class="fas fa-minus-circle mr-2"></i> Disadvantages</h3>
+                            <div class="slide-content text-sm sm:text-base">
                                 <ul>
                                     <li>Can have a steeper learning curve.</li>
                                     <li>Lack of dedicated, official customer support (often relies on forums).</li>
@@ -251,11 +240,11 @@
             {
                 title: "Deep Dive: Proprietary Software",
                 content: `
-                    <p class="text-lg text-gray-600 mb-4">Also known as closed-source software, proprietary software is the traditional model of software distribution where the creator retains all intellectual property rights.</p>
-                    <div class="slide-content mt-6">
+                    <p class="text-base sm:text-lg text-gray-600 mb-3 sm:mb-4">Also known as closed-source software, proprietary software is the traditional model of software distribution where the creator retains all intellectual property rights.</p>
+                    <div class="slide-content text-sm sm:text-base mt-4 sm:mt-6">
                         <ul>
                             <li><strong>Ownership:</strong> Licensed, not sold. You buy the right to use it, not the code itself.</li>
-                            <li><strong>Support:</strong> Usually comes with dedicated, professional customer service and service level agreements (SLAs).</li>
+                            <li><strong>Support:</strong> Usually comes with dedicated, professional customer service and SLAs.</li>
                             <li><strong>User Experience:</strong> Often highly polished, user-friendly, and extensively tested by the owning company.</li>
                             <li><strong>Examples:</strong> Microsoft Windows, Microsoft Office, Adobe Photoshop, macOS.</li>
                         </ul>
@@ -265,10 +254,10 @@
             {
                 title: "Pros & Cons of Proprietary Software",
                 content: `
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
                         <div>
-                            <h3 class="text-xl font-bold text-green-600 mb-4 border-b pb-2"><i class="fas fa-plus-circle mr-2"></i> Advantages</h3>
-                            <div class="slide-content">
+                            <h3 class="text-lg sm:text-xl font-bold text-green-600 mb-3 sm:mb-4 border-b pb-2"><i class="fas fa-plus-circle mr-2"></i> Advantages</h3>
+                            <div class="slide-content text-sm sm:text-base">
                                 <ul>
                                     <li>Polished, intuitive User Interfaces (UI).</li>
                                     <li>Guaranteed official support and regular automated updates.</li>
@@ -277,8 +266,8 @@
                             </div>
                         </div>
                         <div>
-                            <h3 class="text-xl font-bold text-red-600 mb-4 border-b pb-2"><i class="fas fa-minus-circle mr-2"></i> Disadvantages</h3>
-                            <div class="slide-content">
+                            <h3 class="text-lg sm:text-xl font-bold text-red-600 mb-3 sm:mb-4 border-b pb-2"><i class="fas fa-minus-circle mr-2"></i> Disadvantages</h3>
+                            <div class="slide-content text-sm sm:text-base">
                                 <ul>
                                     <li>High licensing fees and subscription costs.</li>
                                     <li>Zero customization of the core product.</li>
@@ -293,33 +282,33 @@
             {
                 title: "Transition to Mobile Technology",
                 content: `
-                    <div class="text-center mt-4 mb-8">
-                        <i class="fas fa-mobile-alt text-6xl text-indigo-500"></i>
+                    <div class="text-center mt-2 sm:mt-4 mb-4 sm:mb-8">
+                        <i class="fas fa-mobile-alt text-5xl sm:text-6xl text-indigo-500"></i>
                     </div>
-                    <p class="text-lg text-gray-600 text-center max-w-3xl mx-auto mb-6">While underlying software licenses dictate how code is managed, the <strong>platform</strong> dictates how software is delivered. Today, the most dominant platform for software delivery is the Mobile Application.</p>
-                    <div class="bg-indigo-50 p-6 rounded-xl border border-indigo-100 text-center">
-                        <p class="text-indigo-800 font-medium">A Mobile Application (App) is a type of application software designed to run on a mobile device, such as a smartphone or tablet computer.</p>
+                    <p class="text-base sm:text-lg text-gray-600 text-center max-w-3xl mx-auto mb-4 sm:mb-6">While underlying software licenses dictate how code is managed, the <strong>platform</strong> dictates how software is delivered. Today, the most dominant platform for software delivery is the Mobile Application.</p>
+                    <div class="bg-indigo-50 p-4 sm:p-6 rounded-xl border border-indigo-100 text-center">
+                        <p class="text-indigo-800 font-medium text-sm sm:text-base">A Mobile Application (App) is a type of application software designed to run on a mobile device, such as a smartphone or tablet computer.</p>
                     </div>
                 `
             },
             {
                 title: "Types of Mobile Applications",
                 content: `
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-4">
-                        <div class="bg-white p-5 rounded-xl border-t-4 border-blue-500 shadow-md">
-                            <h3 class="text-lg font-bold text-gray-800 mb-2">Native Apps</h3>
-                            <p class="text-sm text-gray-600 mb-2">Built specifically for one platform (iOS or Android) using specific languages (Swift for iOS, Kotlin for Android).</p>
-                            <p class="text-xs font-semibold text-blue-500">Best Performance</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mt-2 sm:mt-4">
+                        <div class="bg-white p-4 sm:p-5 rounded-xl border-t-4 border-blue-500 shadow-md">
+                            <h3 class="text-base sm:text-lg font-bold text-gray-800 mb-1 sm:mb-2">Native Apps</h3>
+                            <p class="text-xs sm:text-sm text-gray-600 mb-2">Built specifically for one platform (iOS or Android) using specific languages (Swift, Kotlin).</p>
+                            <p class="text-[10px] sm:text-xs font-semibold text-blue-500 uppercase">Best Performance</p>
                         </div>
-                        <div class="bg-white p-5 rounded-xl border-t-4 border-green-500 shadow-md">
-                            <h3 class="text-lg font-bold text-gray-800 mb-2">Web Apps</h3>
-                            <p class="text-sm text-gray-600 mb-2">Responsive websites that adapt to mobile screens, accessed via a mobile browser. Not installed via app stores.</p>
-                            <p class="text-xs font-semibold text-green-500">No Installation</p>
+                        <div class="bg-white p-4 sm:p-5 rounded-xl border-t-4 border-green-500 shadow-md">
+                            <h3 class="text-base sm:text-lg font-bold text-gray-800 mb-1 sm:mb-2">Web Apps</h3>
+                            <p class="text-xs sm:text-sm text-gray-600 mb-2">Responsive websites that adapt to mobile screens, accessed via browser. Not installed via app stores.</p>
+                            <p class="text-[10px] sm:text-xs font-semibold text-green-500 uppercase">No Installation</p>
                         </div>
-                        <div class="bg-white p-5 rounded-xl border-t-4 border-purple-500 shadow-md">
-                            <h3 class="text-lg font-bold text-gray-800 mb-2">Hybrid Apps</h3>
-                            <p class="text-sm text-gray-600 mb-2">Web apps wrapped in a native shell. Cross-platform framework (like React Native). Write once, run anywhere.</p>
-                            <p class="text-xs font-semibold text-purple-500">Cost Effective</p>
+                        <div class="bg-white p-4 sm:p-5 rounded-xl border-t-4 border-purple-500 shadow-md">
+                            <h3 class="text-base sm:text-lg font-bold text-gray-800 mb-1 sm:mb-2">Hybrid Apps</h3>
+                            <p class="text-xs sm:text-sm text-gray-600 mb-2">Web apps wrapped in a native shell. Cross-platform framework (React Native). Write once, run anywhere.</p>
+                            <p class="text-[10px] sm:text-xs font-semibold text-purple-500 uppercase">Cost Effective</p>
                         </div>
                     </div>
                 `
@@ -327,13 +316,13 @@
             {
                 title: "Mobile Apps in Office Automation",
                 content: `
-                    <p class="text-lg text-gray-600 mb-4">Office automation refers to using hardware and software to digitize, store, process, and communicate business information. Mobile apps have made this a 24/7, location-independent reality.</p>
-                    <div class="slide-content mt-6">
+                    <p class="text-base sm:text-lg text-gray-600 mb-3 sm:mb-4">Office automation refers to using hardware and software to digitize, store, process, and communicate business information. Mobile apps have made this a 24/7 reality.</p>
+                    <div class="slide-content text-sm sm:text-base mt-4 sm:mt-6">
                         <ul>
-                            <li><strong>Communication:</strong> Instant messaging, video conferencing, and unified communications (e.g., Slack, Microsoft Teams, Zoom).</li>
-                            <li><strong>Document Management:</strong> Accessing, editing, and sharing documents on the go via cloud storage (e.g., Google Drive, OneDrive).</li>
-                            <li><strong>Task Management:</strong> Tracking project progress and assigning tasks remotely (e.g., Trello, Asana, Jira).</li>
-                            <li><strong>Enterprise Resource Planning (ERP):</strong> Approving invoices, checking inventory, and HR functions directly from a phone.</li>
+                            <li><strong>Communication:</strong> Instant messaging, video conferencing, and unified communications.</li>
+                            <li><strong>Document Management:</strong> Accessing, editing, and sharing documents via cloud storage.</li>
+                            <li><strong>Task Management:</strong> Tracking project progress and assigning tasks remotely.</li>
+                            <li><strong>ERP Systems:</strong> Approving invoices, checking inventory, and HR functions on the go.</li>
                         </ul>
                     </div>
                 `
@@ -341,26 +330,26 @@
             {
                 title: "Key Benefits of Mobile Office Automation",
                 content: `
-                    <div class="space-y-4 mt-2">
-                        <div class="flex items-start p-4 bg-white rounded-lg shadow-sm border border-gray-100">
-                            <div class="bg-blue-100 p-3 rounded-full text-blue-600 mr-4"><i class="fas fa-globe"></i></div>
+                    <div class="space-y-3 sm:space-y-4 mt-2">
+                        <div class="flex items-start p-3 sm:p-4 bg-white rounded-lg shadow-sm border border-gray-100">
+                            <div class="bg-blue-100 p-2 sm:p-3 rounded-full text-blue-600 mr-3 sm:mr-4"><i class="fas fa-globe text-sm sm:text-base"></i></div>
                             <div>
-                                <h4 class="font-bold text-gray-800">Remote Work Enablement</h4>
-                                <p class="text-gray-600 text-sm">Employees are no longer tethered to a physical desk, enabling global, flexible workforces.</p>
+                                <h4 class="font-bold text-gray-800 text-sm sm:text-base">Remote Work Enablement</h4>
+                                <p class="text-gray-600 text-xs sm:text-sm mt-1">Employees are no longer tethered to a physical desk, enabling global, flexible workforces.</p>
                             </div>
                         </div>
-                        <div class="flex items-start p-4 bg-white rounded-lg shadow-sm border border-gray-100">
-                            <div class="bg-green-100 p-3 rounded-full text-green-600 mr-4"><i class="fas fa-bolt"></i></div>
+                        <div class="flex items-start p-3 sm:p-4 bg-white rounded-lg shadow-sm border border-gray-100">
+                            <div class="bg-green-100 p-2 sm:p-3 rounded-full text-green-600 mr-3 sm:mr-4"><i class="fas fa-bolt text-sm sm:text-base"></i></div>
                             <div>
-                                <h4 class="font-bold text-gray-800">Increased Productivity</h4>
-                                <p class="text-gray-600 text-sm">Approvals, emails, and quick tasks can be handled during commutes or downtime.</p>
+                                <h4 class="font-bold text-gray-800 text-sm sm:text-base">Increased Productivity</h4>
+                                <p class="text-gray-600 text-xs sm:text-sm mt-1">Approvals, emails, and quick tasks can be handled during commutes or downtime.</p>
                             </div>
                         </div>
-                        <div class="flex items-start p-4 bg-white rounded-lg shadow-sm border border-gray-100">
-                            <div class="bg-orange-100 p-3 rounded-full text-orange-600 mr-4"><i class="fas fa-camera"></i></div>
+                        <div class="flex items-start p-3 sm:p-4 bg-white rounded-lg shadow-sm border border-gray-100">
+                            <div class="bg-orange-100 p-2 sm:p-3 rounded-full text-orange-600 mr-3 sm:mr-4"><i class="fas fa-camera text-sm sm:text-base"></i></div>
                             <div>
-                                <h4 class="font-bold text-gray-800">Hardware Replacement</h4>
-                                <p class="text-gray-600 text-sm">Apps like CamScanner turn phones into portable document scanners, replacing bulky office equipment.</p>
+                                <h4 class="font-bold text-gray-800 text-sm sm:text-base">Hardware Replacement</h4>
+                                <p class="text-gray-600 text-xs sm:text-sm mt-1">Apps like CamScanner turn phones into portable document scanners, replacing bulky equipment.</p>
                             </div>
                         </div>
                     </div>
@@ -369,27 +358,27 @@
             {
                 title: "Mobile Apps in Daily Life",
                 content: `
-                    <p class="text-lg text-gray-600 mb-6">Beyond the office, mobile applications have fundamentally re-engineered how humans navigate their daily personal lives.</p>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-center">
-                        <div class="p-4 bg-pink-50 rounded-lg text-pink-700">
-                            <i class="fas fa-comments text-3xl mb-2"></i>
-                            <h4 class="font-bold text-sm">Social & Media</h4>
-                            <p class="text-xs mt-1">Connecting globally (WhatsApp, Instagram)</p>
+                    <p class="text-base sm:text-lg text-gray-600 mb-4 sm:mb-6">Beyond the office, mobile applications have fundamentally re-engineered how humans navigate their daily personal lives.</p>
+                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 text-center">
+                        <div class="p-3 sm:p-4 bg-pink-50 rounded-lg text-pink-700 flex flex-col items-center justify-center">
+                            <i class="fas fa-comments text-2xl sm:text-3xl mb-2"></i>
+                            <h4 class="font-bold text-xs sm:text-sm">Social & Media</h4>
+                            <p class="text-[10px] sm:text-xs mt-1">Connecting globally (WhatsApp, Instagram)</p>
                         </div>
-                        <div class="p-4 bg-teal-50 rounded-lg text-teal-700">
-                            <i class="fas fa-shopping-cart text-3xl mb-2"></i>
-                            <h4 class="font-bold text-sm">E-Commerce</h4>
-                            <p class="text-xs mt-1">Shopping & Delivery (Amazon, UberEats)</p>
+                        <div class="p-3 sm:p-4 bg-teal-50 rounded-lg text-teal-700 flex flex-col items-center justify-center">
+                            <i class="fas fa-shopping-cart text-2xl sm:text-3xl mb-2"></i>
+                            <h4 class="font-bold text-xs sm:text-sm">E-Commerce</h4>
+                            <p class="text-[10px] sm:text-xs mt-1">Shopping & Delivery (Amazon, UberEats)</p>
                         </div>
-                        <div class="p-4 bg-blue-50 rounded-lg text-blue-700">
-                            <i class="fas fa-map-marked-alt text-3xl mb-2"></i>
-                            <h4 class="font-bold text-sm">Navigation</h4>
-                            <p class="text-xs mt-1">Real-time transit (Google Maps, Waze)</p>
+                        <div class="p-3 sm:p-4 bg-blue-50 rounded-lg text-blue-700 flex flex-col items-center justify-center">
+                            <i class="fas fa-map-marked-alt text-2xl sm:text-3xl mb-2"></i>
+                            <h4 class="font-bold text-xs sm:text-sm">Navigation</h4>
+                            <p class="text-[10px] sm:text-xs mt-1">Real-time transit (Google Maps, Waze)</p>
                         </div>
-                        <div class="p-4 bg-purple-50 rounded-lg text-purple-700">
-                            <i class="fas fa-heartbeat text-3xl mb-2"></i>
-                            <h4 class="font-bold text-sm">Health/Fintech</h4>
-                            <p class="text-xs mt-1">Tracking fitness & banking (MyFitnessPal, PayPal)</p>
+                        <div class="p-3 sm:p-4 bg-purple-50 rounded-lg text-purple-700 flex flex-col items-center justify-center">
+                            <i class="fas fa-heartbeat text-2xl sm:text-3xl mb-2"></i>
+                            <h4 class="font-bold text-xs sm:text-sm">Health/Fintech</h4>
+                            <p class="text-[10px] sm:text-xs mt-1">Tracking fitness & banking (PayPal, MyFitnessPal)</p>
                         </div>
                     </div>
                 `
@@ -397,13 +386,13 @@
             {
                 title: "Conclusion & Summary",
                 content: `
-                    <div class="bg-gray-800 text-white p-8 rounded-2xl shadow-lg">
-                        <h3 class="text-2xl font-bold mb-4 border-b border-gray-600 pb-2">Key Takeaways</h3>
-                        <ul class="space-y-3 text-lg">
-                            <li><i class="fas fa-check text-green-400 mr-3"></i> <strong>Open-Source</strong> software provides transparency, customizability, and community-driven security.</li>
-                            <li><i class="fas fa-check text-green-400 mr-3"></i> <strong>Proprietary</strong> software offers polished user experiences, official support, and ecosystem stability.</li>
-                            <li><i class="fas fa-check text-green-400 mr-3"></i> <strong>Mobile Applications</strong> (Native, Web, Hybrid) are the primary vehicle for modern software delivery.</li>
-                            <li><i class="fas fa-check text-green-400 mr-3"></i> <strong>Office Automation</strong> is driven by mobile apps enabling remote work and cloud collaboration.</li>
+                    <div class="bg-gray-800 text-white p-5 sm:p-8 rounded-2xl shadow-lg mt-2">
+                        <h3 class="text-lg sm:text-2xl font-bold mb-3 sm:mb-4 border-b border-gray-600 pb-2">Key Takeaways</h3>
+                        <ul class="space-y-2 sm:space-y-3 text-sm sm:text-lg">
+                            <li class="flex items-start"><i class="fas fa-check text-green-400 mt-1 mr-2 sm:mr-3 flex-shrink-0"></i> <span><strong>Open-Source</strong> software provides transparency, customizability, and community-driven security.</span></li>
+                            <li class="flex items-start"><i class="fas fa-check text-green-400 mt-1 mr-2 sm:mr-3 flex-shrink-0"></i> <span><strong>Proprietary</strong> software offers polished user experiences, official support, and ecosystem stability.</span></li>
+                            <li class="flex items-start"><i class="fas fa-check text-green-400 mt-1 mr-2 sm:mr-3 flex-shrink-0"></i> <span><strong>Mobile Applications</strong> are the primary vehicle for modern software delivery.</span></li>
+                            <li class="flex items-start"><i class="fas fa-check text-green-400 mt-1 mr-2 sm:mr-3 flex-shrink-0"></i> <span><strong>Office Automation</strong> is driven by mobile apps enabling remote work and cloud collaboration.</span></li>
                         </ul>
                     </div>
                 `
@@ -411,14 +400,12 @@
             {
                 title: "Ready for the Quiz?",
                 content: `
-                    <div class="text-center flex flex-col items-center justify-center h-full">
-                        <div class="w-24 h-24 bg-green-100 text-green-500 rounded-full flex items-center justify-center text-4xl mb-6 animate-pulse">
+                    <div class="text-center flex flex-col items-center justify-center h-full py-8 sm:py-0">
+                        <div class="w-20 h-20 sm:w-24 sm:h-24 bg-green-100 text-green-500 rounded-full flex items-center justify-center text-3xl sm:text-4xl mb-4 sm:mb-6 animate-pulse">
                             <i class="fas fa-clipboard-check"></i>
                         </div>
-                        <h2 class="text-3xl font-bold text-gray-800 mb-4">Presentation Complete</h2>
-                        <p class="text-xl text-gray-600 max-w-lg mb-8">You have reached the end of the presentation. Click the button below to test your knowledge with a 30-question assessment.</p>
-                        
-                        <!-- The "Next" button in the footer will say "Start Quiz" on this slide -->
+                        <h2 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-3 sm:mb-4">Presentation Complete</h2>
+                        <p class="text-base sm:text-xl text-gray-600 max-w-lg mb-6 sm:mb-8">You have reached the end of the presentation. Tap the button below to test your knowledge.</p>
                     </div>
                 `
             }
@@ -503,11 +490,11 @@
             slideContainer.classList.remove('fade-enter-active');
             
             setTimeout(() => {
-                let html = `<h1 class="text-3xl sm:text-4xl font-bold text-gray-800 mb-2">${slide.title}</h1>`;
+                let html = `<h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 mb-2">${slide.title}</h1>`;
                 if (slide.subtitle) {
-                    html += `<p class="text-xl text-gray-500 mb-8">${slide.subtitle}</p>`;
+                    html += `<p class="text-base sm:text-xl text-gray-500 mb-4 sm:mb-8">${slide.subtitle}</p>`;
                 } else {
-                    html += `<div class="h-1 w-20 bg-blue-500 rounded my-6"></div>`;
+                    html += `<div class="h-1 w-16 sm:w-20 bg-blue-500 rounded my-4 sm:my-6"></div>`;
                 }
                 html += `<div>${slide.content}</div>`;
                 
@@ -571,11 +558,11 @@
             
             qData.options.forEach((opt, index) => {
                 const btn = document.createElement('button');
-                btn.className = 'option-btn w-full text-left p-4 sm:p-5 rounded-xl border-2 border-gray-200 bg-white text-gray-700 font-medium text-lg flex items-center';
+                btn.className = 'option-btn w-full text-left p-3.5 sm:p-5 rounded-xl border-2 border-gray-200 bg-white text-gray-700 font-medium text-sm sm:text-lg flex items-center';
                 
                 // Add letter (A, B, C, D)
                 const letter = String.fromCharCode(65 + index);
-                btn.innerHTML = `<span class="inline-flex items-center justify-center w-8 h-8 rounded bg-gray-100 text-gray-600 font-bold mr-4 text-sm">${letter}</span> ${opt}`;
+                btn.innerHTML = `<span class="inline-flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded bg-gray-100 text-gray-600 font-bold mr-3 sm:mr-4 text-xs sm:text-sm flex-shrink-0">${letter}</span> <span class="flex-grow">${opt}</span>`;
                 
                 btn.onclick = () => selectOption(index, btn);
                 optionsContainer.appendChild(btn);
@@ -600,18 +587,18 @@
             if (selectedIndex === qData.ans) {
                 // Correct
                 selectedBtn.classList.add('option-correct');
-                selectedBtn.innerHTML += `<i class="fas fa-check-circle ml-auto text-xl"></i>`;
+                selectedBtn.innerHTML += `<i class="fas fa-check-circle ml-3 flex-shrink-0 text-lg sm:text-xl"></i>`;
                 score++;
                 currentScoreEl.innerText = score;
             } else {
                 // Incorrect
                 selectedBtn.classList.add('option-incorrect');
-                selectedBtn.innerHTML += `<i class="fas fa-times-circle ml-auto text-xl"></i>`;
+                selectedBtn.innerHTML += `<i class="fas fa-times-circle ml-3 flex-shrink-0 text-lg sm:text-xl"></i>`;
                 
                 // Highlight correct answer
                 const correctBtn = buttons[qData.ans];
                 correctBtn.classList.add('option-correct');
-                correctBtn.innerHTML += `<i class="fas fa-check-circle ml-auto text-xl"></i>`;
+                correctBtn.innerHTML += `<i class="fas fa-check-circle ml-3 flex-shrink-0 text-lg sm:text-xl"></i>`;
             }
 
             // Show next button
