@@ -2,656 +2,794 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Software & Mobile Apps Presentation</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MulukCareer Hub - Guwahati Job Portal</title>
+    
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap');
-        
+        :root {
+            --primary: #2e7d32; /* Assam Green */
+            --primary-light: #e8f5e9;
+            --text-dark: #2c3e50;
+            --text-light: #606f7b;
+            --bg-color: #f4f7f6;
+            --card-bg: #ffffff;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
         body {
-            font-family: 'Inter', sans-serif;
-            background: linear-gradient(135deg, #f0f4f8 0%, #d9e2ec 100%);
+            background-color: var(--bg-color);
+            color: var(--text-dark);
+            position: relative;
             min-height: 100vh;
-            /* Fallback for browsers that do not support dvh */
-            min-height: 100dvh; 
         }
 
-        .fade-enter {
+        header {
+            background-color: var(--primary);
+            color: white;
+            padding: 2.5rem 1rem;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+        }
+
+        .header-content {
+            max-width: 1000px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+            text-align: left;
+        }
+
+        .logo-wrapper {
+            background-color: white;
+            padding: 1rem;
+            border-radius: 16px;
+            box-shadow: 0 8px 20px rgba(0,0,0,0.15);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        header h1 {
+            font-size: 2.8rem;
+            margin-bottom: 0.5rem;
+            letter-spacing: -0.5px;
+        }
+
+        header p {
+            font-size: 1.1rem;
+            opacity: 0.9;
+            font-weight: 300;
+        }
+
+        .container {
+            max-width: 1000px;
+            margin: 0 auto;
+            padding: 2rem 1rem;
+        }
+
+        .controls {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+        }
+
+        .controls input, .controls select {
+            flex: 1;
+            padding: 0.8rem 1rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        .controls input:focus, .controls select:focus {
+            border-color: var(--primary);
+        }
+
+        .job-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .job-card {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+            border-left: 5px solid var(--primary);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .job-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.1);
+        }
+
+        .job-title {
+            font-size: 1.3rem;
+            color: var(--primary);
+            margin-bottom: 0.5rem;
+        }
+
+        .job-company {
+            font-weight: 600;
+            color: var(--text-dark);
+            margin-bottom: 0.5rem;
+            font-size: 1.05rem;
+        }
+
+        .job-details {
+            color: var(--text-light);
+            font-size: 0.95rem;
+            margin-bottom: 1.5rem;
+            line-height: 1.6;
+            flex-grow: 1;
+        }
+
+        .job-details span {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            margin-top: 0.3rem;
+        }
+
+        .apply-btn {
+            display: inline-block;
+            background-color: var(--primary);
+            color: white;
+            padding: 0.8rem 1.2rem;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: background-color 0.2s, transform 0.1s;
+            cursor: pointer;
+            border: none;
+            width: 100%;
+            text-align: center;
+            font-size: 1rem;
+        }
+
+        .apply-btn:hover {
+            background-color: #1b5e20;
+        }
+
+        .apply-btn:active {
+            transform: scale(0.98);
+        }
+
+        .no-results {
+            text-align: center;
+            grid-column: 1 / -1;
+            padding: 3rem 1rem;
+            color: var(--text-light);
+            font-size: 1.2rem;
+            background: var(--card-bg);
+            border-radius: 12px;
+        }
+
+        .modal-overlay {
+            position: fixed;
+            top: 0; left: 0; right: 0; bottom: 0;
+            background: rgba(0,0,0,0.6);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
             opacity: 0;
-            transform: translateY(10px);
-            transition: opacity 0.4s ease-out, transform 0.4s ease-out;
+            transition: opacity 0.3s ease;
         }
 
-        .fade-enter-active {
+        .modal-overlay.active {
+            display: flex;
             opacity: 1;
+        }
+
+        .modal-content {
+            background: var(--card-bg);
+            padding: 2rem;
+            border-radius: 12px;
+            width: 90%;
+            max-width: 500px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            transform: translateY(-20px);
+            transition: transform 0.3s ease;
+        }
+
+        .modal-overlay.active .modal-content {
             transform: translateY(0);
         }
 
-        .slide-content ul {
-            list-style-type: none;
-            padding-left: 0;
+        .modal-header {
+            font-size: 1.5rem;
+            color: var(--primary);
+            margin-bottom: 1.5rem;
+            font-weight: bold;
         }
 
-        .slide-content li {
-            margin-bottom: 0.75rem;
-            position: relative;
-            padding-left: 1.75rem;
-            color: #334155;
-            line-height: 1.5;
+        .admin-modal-content {
+            max-width: 800px;
         }
 
-        .slide-content li::before {
-            content: '\f0da';
-            font-family: 'Font Awesome 5 Free';
-            font-weight: 900;
-            position: absolute;
-            left: 0;
-            color: #3b82f6;
-            font-size: 1.1rem;
-            top: 0.1rem;
+        .admin-table-container {
+            overflow-x: auto;
+            margin-bottom: 1.5rem;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            max-height: 400px;
         }
 
-        .option-btn {
-            transition: all 0.2s ease;
-        }
-        
-        .option-btn:hover:not(:disabled) {
-            transform: scale(1.01);
-            border-color: #3b82f6;
-            background-color: #eff6ff;
+        .admin-table {
+            width: 100%;
+            border-collapse: collapse;
+            min-width: 600px;
         }
 
-        .option-correct {
-            background-color: #dcfce7 !important;
-            border-color: #22c55e !important;
-            color: #166534 !important;
+        .admin-table th, .admin-table td {
+            padding: 12px 15px;
+            text-align: left;
+            border-bottom: 1px solid #e2e8f0;
+            font-size: 0.95rem;
         }
 
-        .option-incorrect {
-            background-color: #fee2e2 !important;
-            border-color: #ef4444 !important;
-            color: #991b1b !important;
+        .admin-table th {
+            background-color: var(--primary-light);
+            color: var(--primary);
+            font-weight: 600;
+            position: sticky;
+            top: 0;
+            z-index: 10;
         }
 
-        /* Scrollbar styling for content overflow */
-        .content-scroll::-webkit-scrollbar {
-            width: 6px;
+        .admin-table tbody tr:hover {
+            background-color: #f8fafc;
         }
-        .content-scroll::-webkit-scrollbar-track {
-            background: #f1f1f1;
-            border-radius: 4px;
+
+        .form-group {
+            margin-bottom: 1rem;
+            display: flex;
+            flex-direction: column;
+            gap: 0.4rem;
         }
-        .content-scroll::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
+
+        .form-group label {
+            font-weight: 600;
+            font-size: 0.9rem;
         }
-        .content-scroll::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
+
+        .form-group input, .form-group select {
+            padding: 0.8rem;
+            border: 2px solid #e2e8f0;
+            border-radius: 8px;
+            font-size: 1rem;
+            outline: none;
+            transition: border-color 0.2s ease;
+        }
+
+        .form-group input:focus, .form-group select:focus {
+            border-color: var(--primary);
+        }
+
+        .btn-group {
+            display: flex;
+            gap: 1rem;
+            margin-top: 1.5rem;
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            padding: 0.8rem 1.2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            flex: 1;
+            font-size: 1rem;
+            transition: background-color 0.2s;
+        }
+
+        .btn-secondary {
+            background-color: #e2e8f0;
+            color: var(--text-dark);
+            padding: 0.8rem 1.2rem;
+            border-radius: 8px;
+            font-weight: 600;
+            border: none;
+            cursor: pointer;
+            flex: 1;
+            font-size: 1rem;
+            transition: background-color 0.2s;
+        }
+
+        .btn-primary:hover { background-color: #1b5e20; }
+        .btn-secondary:hover { background-color: #cbd5e1; }
+
+        /* Custom Toast Notification Styles */
+        #toast-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+
+        .toast {
+            background-color: var(--text-dark);
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 8px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            font-size: 0.95rem;
+            transform: translateX(120%);
+            opacity: 0;
+            animation: slideIn 0.3s forwards ease-out;
+        }
+
+        @keyframes slideIn {
+            to { transform: translateX(0); opacity: 1; }
+        }
+
+        @keyframes fadeOut {
+            to { opacity: 0; transform: translateY(10px); }
+        }
+
+        @media (max-width: 600px) {
+            .header-content {
+                flex-direction: column;
+                text-align: center;
+                gap: 1.5rem;
+            }
+            .controls {
+                flex-direction: column;
+            }
+            header h1 {
+                font-size: 2.2rem;
+            }
         }
     </style>
 </head>
-<body class="flex items-center justify-center p-0 sm:p-6 md:p-8">
+<body>
 
-    <div id="app-container" class="bg-white sm:rounded-2xl shadow-none sm:shadow-2xl w-full max-w-5xl overflow-hidden relative flex flex-col h-[100dvh] sm:h-[85vh] sm:min-h-[600px]">
-        
-        <div id="presentation-view" class="h-full flex flex-col">
-            <div class="h-1.5 sm:h-2 bg-gray-100 flex-shrink-0">
-                <div id="slide-progress" class="h-full bg-blue-500 transition-all duration-300 w-0"></div>
+    <header>
+        <div class="header-content">
+            <div class="logo-wrapper">
+                <!-- Hosted Image from ImgBB -->
+                <img src="https://i.ibb.co/xKS1pb3X/Screenshot-2026-06-06-195242.png" alt="MulukCareer Hub Logo" style="width: 120px; height: auto; max-height: 160px; object-fit: contain;">
             </div>
-            
-            <div class="flex justify-between items-center px-4 sm:px-8 py-3 sm:py-4 border-b border-gray-100 flex-shrink-0">
-                <div class="text-xs sm:text-sm font-semibold text-gray-500 tracking-wider uppercase">Slide <span id="current-slide-num">1</span> of <span id="total-slides-num">x</span></div>
-                <div class="text-blue-500 font-bold text-sm sm:text-base"><i class="fas fa-desktop mr-1 sm:mr-2"></i><span class="hidden sm:inline">Tech Basics</span></div>
-            </div>
-
-            <div id="slide-container" class="flex-grow p-5 sm:p-8 md:p-12 overflow-y-auto content-scroll flex flex-col justify-center">
-                </div>
-
-            <div class="px-4 sm:px-8 py-4 sm:py-6 border-t border-gray-100 flex justify-between items-center bg-gray-50 flex-shrink-0 gap-3">
-                <button id="prev-btn" onclick="prevSlide()" class="px-4 py-2.5 sm:px-6 sm:py-3 rounded-lg font-semibold text-gray-600 bg-white border border-gray-200 hover:bg-gray-100 hover:text-gray-900 transition-colors disabled:opacity-50 disabled:cursor-not-allowed flex items-center shadow-sm text-sm sm:text-base w-1/2 sm:w-auto justify-center">
-                    <i class="fas fa-arrow-left mr-2"></i> Prev<span class="hidden sm:inline">ious</span>
-                </button>
-                <button id="next-btn" onclick="nextSlide()" class="px-4 py-2.5 sm:px-6 sm:py-3 rounded-lg font-semibold text-white bg-blue-600 hover:bg-blue-700 transition-colors shadow-md flex items-center text-sm sm:text-base w-1/2 sm:w-auto justify-center">
-                    Next <i class="fas fa-arrow-right ml-2"></i>
-                </button>
+            <div>
+                <h1>MulukCareer Hub</h1>
+                <p>Find your next big opportunity in Guwahati</p>
             </div>
         </div>
+    </header>
 
-        <div id="quiz-view" class="h-full flex flex-col hidden">
-            <div class="h-1.5 sm:h-2 bg-gray-100 flex-shrink-0">
-                <div id="quiz-progress" class="h-full bg-green-500 transition-all duration-300 w-0"></div>
-            </div>
-            
-            <div class="flex justify-between items-center px-4 sm:px-8 py-3 sm:py-4 border-b border-gray-100 bg-white flex-shrink-0">
-                <div class="text-xs sm:text-sm font-semibold text-gray-500 tracking-wider uppercase">Q <span id="current-q-num">1</span> / <span id="total-q-num">30</span></div>
-                <div class="hidden sm:block text-green-500 font-bold"><i class="fas fa-tasks mr-2"></i>Knowledge Check</div>
-                <div class="text-xs sm:text-sm font-bold text-gray-700 bg-gray-100 px-3 py-1 sm:px-4 sm:py-1.5 rounded-full">Score: <span id="current-score">0</span></div>
-            </div>
-
-            <div class="flex-grow p-4 sm:p-8 md:p-12 overflow-y-auto content-scroll flex flex-col items-center justify-center bg-gray-50">
-                <div class="w-full max-w-2xl py-4 sm:py-0">
-                    <h2 id="question-text" class="text-xl sm:text-2xl md:text-3xl font-bold text-gray-800 mb-6 sm:mb-8 leading-tight text-center">Question goes here?</h2>
-                    
-                    <div id="options-container" class="grid grid-cols-1 gap-3 sm:gap-4">
-                        </div>
-                </div>
-            </div>
-
-            <div class="px-4 sm:px-8 py-4 sm:py-6 border-t border-gray-100 flex justify-end items-center bg-white flex-shrink-0 min-h-[72px] sm:min-h-[88px]">
-                <button id="next-q-btn" onclick="nextQuestion()" class="w-full sm:w-auto px-6 py-3 rounded-lg font-semibold text-white bg-green-600 hover:bg-green-700 transition-colors shadow-md flex justify-center items-center disabled:opacity-50 disabled:cursor-not-allowed hidden text-sm sm:text-base">
-                    Next Question <i class="fas fa-chevron-right ml-2"></i>
-                </button>
-            </div>
+    <div class="container">
+        <!-- Search Controls -->
+        <div class="controls">
+            <input type="text" id="searchInput" placeholder="Search job title or keyword...">
+            <select id="locationFilter">
+                <option value="All">All Guwahati Locations</option>
+                <option value="GS Road">GS Road</option>
+                <option value="Paltan Bazar">Paltan Bazar</option>
+                <option value="Dispur">Dispur</option>
+                <option value="Chandmari">Chandmari</option>
+                <option value="Beltola">Beltola</option>
+                <option value="Jalukbari">Jalukbari</option>
+                <option value="Uzan Bazar">Uzan Bazar</option>
+            </select>
+            <button id="postJobBtn" class="btn-primary" style="flex: 0 0 auto; white-space: nowrap; padding: 0.8rem 1.5rem;">+ Post Job</button>
         </div>
 
-        <div id="results-view" class="h-full flex flex-col items-center justify-center p-6 sm:p-8 hidden text-center bg-white overflow-y-auto">
-            <i class="fas fa-award text-5xl sm:text-6xl text-yellow-400 mb-4 sm:mb-6 drop-shadow-md"></i>
-            <h1 class="text-3xl sm:text-4xl font-bold text-gray-800 mb-2">Quiz Completed!</h1>
-            <p class="text-base sm:text-xl text-gray-600 mb-6 sm:mb-8">Here is how you did on the assessment.</p>
-            
-            <div class="bg-gray-50 border border-gray-200 rounded-2xl p-6 sm:p-8 mb-6 sm:mb-8 shadow-inner w-full max-w-md">
-                <div class="text-5xl sm:text-6xl font-black text-blue-600 mb-2" id="final-score-text">0/30</div>
-                <p class="text-base sm:text-lg font-medium text-gray-500 uppercase tracking-widest" id="score-percentage">0%</p>
-                <div class="mt-4 text-base sm:text-lg font-semibold text-gray-700" id="feedback-message">Good effort!</div>
-            </div>
-
-            <button onclick="restartApp()" class="w-full sm:w-auto px-6 sm:px-8 py-3.5 sm:py-4 rounded-xl font-bold text-white bg-blue-600 hover:bg-blue-700 transition-all shadow-lg hover:shadow-xl flex justify-center items-center transform hover:-translate-y-1 text-sm sm:text-base">
-                <i class="fas fa-redo-alt mr-2"></i> Restart
-            </button>
+        <!-- Job Listings -->
+        <div class="job-grid" id="jobGrid">
+            <!-- Job cards will be injected here by JavaScript -->
         </div>
-
     </div>
 
+    <!-- Apply Modal -->
+    <div class="modal-overlay" id="applyModal">
+        <div class="modal-content">
+            <div class="modal-header">Apply for <span id="applyJobTitle">Job</span></div>
+            <form id="applyForm">
+                <div class="form-group">
+                    <label>Full Name</label>
+                    <input type="text" id="applyName" required placeholder="e.g. Muluk Baglary">
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="applyEmail" required placeholder="email@example.com">
+                </div>
+                <div class="form-group">
+                    <label>Phone Number</label>
+                    <input type="tel" id="applyPhone" required placeholder="+91 9876543210">
+                </div>
+                <div class="btn-group">
+                    <button type="button" class="btn-secondary" onclick="closeModal('applyModal')">Cancel</button>
+                    <button type="submit" class="btn-primary">Submit Application</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Post Job Modal -->
+    <div class="modal-overlay" id="postJobModal">
+        <div class="modal-content">
+            <div class="modal-header">Post a New Job</div>
+            <form id="postJobForm">
+                <div class="form-group">
+                    <label>Job Title</label>
+                    <input type="text" id="pjTitle" required placeholder="e.g. Senior Accountant">
+                </div>
+                <div class="form-group">
+                    <label>Company Name</label>
+                    <input type="text" id="pjCompany" required placeholder="e.g. Assam Tech Ltd.">
+                </div>
+                <div class="form-group">
+                    <label>Location</label>
+                    <select id="pjLocation" required>
+                        <option value="GS Road">GS Road</option>
+                        <option value="Paltan Bazar">Paltan Bazar</option>
+                        <option value="Dispur">Dispur</option>
+                        <option value="Chandmari">Chandmari</option>
+                        <option value="Beltola">Beltola</option>
+                        <option value="Jalukbari">Jalukbari</option>
+                        <option value="Uzan Bazar">Uzan Bazar</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Job Type</label>
+                    <select id="pjType" required>
+                        <option value="Full-Time">Full-Time</option>
+                        <option value="Part-Time">Part-Time</option>
+                        <option value="Contract">Contract</option>
+                        <option value="Internship">Internship</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Salary Details</label>
+                    <input type="text" id="pjSalary" required placeholder="e.g. ₹20,000 / month">
+                </div>
+                <div class="btn-group">
+                    <button type="button" class="btn-secondary" onclick="closeModal('postJobModal')">Cancel</button>
+                    <button type="submit" class="btn-primary">Publish Job</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Admin Modal (Triggered by 'p') -->
+    <div class="modal-overlay" id="adminModal">
+        <div class="modal-content admin-modal-content">
+            <div class="modal-header">Admin Dashboard - Applications</div>
+            <div class="admin-table-container">
+                <table class="admin-table">
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Name</th>
+                            <th>Email</th>
+                            <th>Phone</th>
+                            <th>Job Title</th>
+                            <th>Company</th>
+                        </tr>
+                    </thead>
+                    <tbody id="adminTableBody">
+                        <!-- Data will be injected here -->
+                    </tbody>
+                </table>
+            </div>
+            <div class="btn-group">
+                <button type="button" class="btn-secondary" onclick="closeModal('adminModal')">Close Dashboard</button>
+                <button type="button" class="btn-primary" onclick="downloadCSV()">Download CSV</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Container for custom notifications -->
+    <div id="toast-container"></div>
+
     <script>
-        // ==================== PRESENTATION DATA ====================
-        const slidesData = [
+        // Mock Data specifically for Guwahati
+        const jobsData = [
             {
-                title: "Basics of Software & Mobile Apps",
-                subtitle: "An overview of Open-Source, Proprietary Software, and Mobile Technology",
-                content: `
-                    <div class="text-center mt-4 sm:mt-8">
-                        <i class="fas fa-laptop-code text-5xl sm:text-6xl text-blue-500 mb-4 sm:mb-6"></i>
-                        <p class="text-base sm:text-xl text-gray-600 max-w-2xl mx-auto">Welcome to this interactive learning module. We will explore the fundamental differences in software licensing and how mobile applications are revolutionizing our daily lives and workplaces.</p>
-                        <div class="mt-6 sm:mt-8 p-3 sm:p-4 bg-blue-50 rounded-lg inline-block border border-blue-100 text-blue-800 text-sm sm:text-base">
-                            <i class="fas fa-info-circle mr-1 sm:mr-2"></i> A 30-question quiz will begin automatically after the final slide.
-                        </div>
-                    </div>
-                `
+                title: "Frontend Web Developer",
+                company: "TechNortheast Solutions",
+                location: "GS Road",
+                type: "Full-Time",
+                salary: "₹3,00,000 - ₹5,00,000 / year"
             },
             {
-                title: "What is Software Licensing?",
-                content: `
-                    <p class="text-base sm:text-lg text-gray-600 mb-4 sm:mb-6">Software is governed by licenses that dictate how it can be used, modified, and distributed. The two primary paradigms are Open-Source and Proprietary.</p>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6 mt-4">
-                        <div class="bg-white p-5 sm:p-6 rounded-xl border border-gray-200 shadow-sm">
-                            <h3 class="text-lg sm:text-xl font-bold text-gray-800 mb-2 sm:mb-3"><i class="fas fa-box-open text-green-500 mr-2"></i> Open-Source</h3>
-                            <p class="text-sm sm:text-base text-gray-600">The source code is accessible to anyone. Users can view, modify, and distribute the code freely.</p>
-                        </div>
-                        <div class="bg-white p-5 sm:p-6 rounded-xl border border-gray-200 shadow-sm">
-                            <h3 class="text-lg sm:text-xl font-bold text-gray-800 mb-2 sm:mb-3"><i class="fas fa-lock text-red-500 mr-2"></i> Proprietary</h3>
-                            <p class="text-sm sm:text-base text-gray-600">The source code is hidden and owned by the creator. Users purchase the right to use the software under strict terms.</p>
-                        </div>
-                    </div>
-                `
+                title: "Tea Estate Operations Manager",
+                company: "Brahmaputra Valley Tea Co.",
+                location: "Chandmari",
+                type: "Full-Time",
+                salary: "₹6,00,000 - ₹9,00,000 / year"
             },
             {
-                title: "Deep Dive: Open-Source Software (OSS)",
-                content: `
-                    <p class="text-base sm:text-lg text-gray-600 mb-3 sm:mb-4">Open-source software relies on community collaboration. It is built on the philosophy of transparency and shared knowledge.</p>
-                    <div class="slide-content text-sm sm:text-base mt-4 sm:mt-6">
-                        <ul>
-                            <li><strong>Transparency:</strong> Code is visible to the public, allowing peers to audit for security and bugs.</li>
-                            <li><strong>Cost:</strong> Generally free to download and use, though support or premium features may cost money.</li>
-                            <li><strong>Customization:</strong> Developers can alter the code to suit specific business or personal needs.</li>
-                            <li><strong>Examples:</strong> Linux Operating System, Mozilla Firefox browser, WordPress CMS, VLC Media Player.</li>
-                        </ul>
-                    </div>
-                `
+                title: "Front Desk Receptionist",
+                company: "Hotel City Heart",
+                location: "Paltan Bazar",
+                type: "Full-Time",
+                salary: "₹15,000 - ₹20,000 / month"
             },
             {
-                title: "Pros & Cons of Open-Source",
-                content: `
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
-                        <div>
-                            <h3 class="text-lg sm:text-xl font-bold text-green-600 mb-3 sm:mb-4 border-b pb-2"><i class="fas fa-plus-circle mr-2"></i> Advantages</h3>
-                            <div class="slide-content text-sm sm:text-base">
-                                <ul>
-                                    <li>Highly cost-effective (free).</li>
-                                    <li>Flexibility and freedom from vendor lock-in.</li>
-                                    <li>Rapid bug fixes driven by a global community.</li>
-                                    <li>High security due to constant community auditing.</li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div>
-                            <h3 class="text-lg sm:text-xl font-bold text-red-600 mb-3 sm:mb-4 border-b pb-2"><i class="fas fa-minus-circle mr-2"></i> Disadvantages</h3>
-                            <div class="slide-content text-sm sm:text-base">
-                                <ul>
-                                    <li>Can have a steeper learning curve.</li>
-                                    <li>Lack of dedicated, official customer support (often relies on forums).</li>
-                                    <li>Compatibility issues with proprietary hardware/software.</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                `
+                title: "Digital Marketing Executive",
+                company: "Kaziranga Media Agency",
+                location: "Uzan Bazar",
+                type: "Full-Time",
+                salary: "₹2,50,000 - ₹4,00,000 / year"
             },
             {
-                title: "Deep Dive: Proprietary Software",
-                content: `
-                    <p class="text-base sm:text-lg text-gray-600 mb-3 sm:mb-4">Also known as closed-source software, proprietary software is the traditional model of software distribution where the creator retains all intellectual property rights.</p>
-                    <div class="slide-content text-sm sm:text-base mt-4 sm:mt-6">
-                        <ul>
-                            <li><strong>Ownership:</strong> Licensed, not sold. You buy the right to use it, not the code itself.</li>
-                            <li><strong>Support:</strong> Usually comes with dedicated, professional customer service and SLAs.</li>
-                            <li><strong>User Experience:</strong> Often highly polished, user-friendly, and extensively tested by the owning company.</li>
-                            <li><strong>Examples:</strong> Microsoft Windows, Microsoft Office, Adobe Photoshop, macOS.</li>
-                        </ul>
-                    </div>
-                `
+                title: "Data Entry Operator",
+                company: "Dispur Admin Services",
+                location: "Dispur",
+                type: "Contract",
+                salary: "₹12,000 / month"
             },
             {
-                title: "Pros & Cons of Proprietary Software",
-                content: `
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 sm:gap-8">
-                        <div>
-                            <h3 class="text-lg sm:text-xl font-bold text-green-600 mb-3 sm:mb-4 border-b pb-2"><i class="fas fa-plus-circle mr-2"></i> Advantages</h3>
-                            <div class="slide-content text-sm sm:text-base">
-                                <ul>
-                                    <li>Polished, intuitive User Interfaces (UI).</li>
-                                    <li>Guaranteed official support and regular automated updates.</li>
-                                    <li>High stability and seamless integration within its own ecosystem.</li>
-                                </ul>
-                            </div>
-                        </div>
-                        <div>
-                            <h3 class="text-lg sm:text-xl font-bold text-red-600 mb-3 sm:mb-4 border-b pb-2"><i class="fas fa-minus-circle mr-2"></i> Disadvantages</h3>
-                            <div class="slide-content text-sm sm:text-base">
-                                <ul>
-                                    <li>High licensing fees and subscription costs.</li>
-                                    <li>Zero customization of the core product.</li>
-                                    <li>Vendor lock-in: Difficult to migrate away once fully integrated.</li>
-                                    <li>Security relies entirely on the vendor finding and patching flaws.</li>
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-                `
+                title: "Sales Executive (Automobiles)",
+                company: "Guwahati Motors",
+                location: "Beltola",
+                type: "Full-Time",
+                salary: "₹20,000 / month + Incentives"
             },
             {
-                title: "Transition to Mobile Technology",
-                content: `
-                    <div class="text-center mt-2 sm:mt-4 mb-4 sm:mb-8">
-                        <i class="fas fa-mobile-alt text-5xl sm:text-6xl text-indigo-500"></i>
-                    </div>
-                    <p class="text-base sm:text-lg text-gray-600 text-center max-w-3xl mx-auto mb-4 sm:mb-6">While underlying software licenses dictate how code is managed, the <strong>platform</strong> dictates how software is delivered. Today, the most dominant platform for software delivery is the Mobile Application.</p>
-                    <div class="bg-indigo-50 p-4 sm:p-6 rounded-xl border border-indigo-100 text-center">
-                        <p class="text-indigo-800 font-medium text-sm sm:text-base">A Mobile Application (App) is a type of application software designed to run on a mobile device, such as a smartphone or tablet computer.</p>
-                    </div>
-                `
+                title: "Warehouse Supervisor",
+                company: "Assam Logistics Hub",
+                location: "Jalukbari",
+                type: "Full-Time",
+                salary: "₹25,000 / month"
             },
             {
-                title: "Types of Mobile Applications",
-                content: `
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mt-2 sm:mt-4">
-                        <div class="bg-white p-4 sm:p-5 rounded-xl border-t-4 border-blue-500 shadow-md">
-                            <h3 class="text-base sm:text-lg font-bold text-gray-800 mb-1 sm:mb-2">Native Apps</h3>
-                            <p class="text-xs sm:text-sm text-gray-600 mb-2">Built specifically for one platform (iOS or Android) using specific languages (Swift, Kotlin).</p>
-                            <p class="text-[10px] sm:text-xs font-semibold text-blue-500 uppercase">Best Performance</p>
-                        </div>
-                        <div class="bg-white p-4 sm:p-5 rounded-xl border-t-4 border-green-500 shadow-md">
-                            <h3 class="text-base sm:text-lg font-bold text-gray-800 mb-1 sm:mb-2">Web Apps</h3>
-                            <p class="text-xs sm:text-sm text-gray-600 mb-2">Responsive websites that adapt to mobile screens, accessed via browser. Not installed via app stores.</p>
-                            <p class="text-[10px] sm:text-xs font-semibold text-green-500 uppercase">No Installation</p>
-                        </div>
-                        <div class="bg-white p-4 sm:p-5 rounded-xl border-t-4 border-purple-500 shadow-md">
-                            <h3 class="text-base sm:text-lg font-bold text-gray-800 mb-1 sm:mb-2">Hybrid Apps</h3>
-                            <p class="text-xs sm:text-sm text-gray-600 mb-2">Web apps wrapped in a native shell. Cross-platform framework (React Native). Write once, run anywhere.</p>
-                            <p class="text-[10px] sm:text-xs font-semibold text-purple-500 uppercase">Cost Effective</p>
-                        </div>
-                    </div>
-                `
-            },
-            {
-                title: "Mobile Apps in Office Automation",
-                content: `
-                    <p class="text-base sm:text-lg text-gray-600 mb-3 sm:mb-4">Office automation refers to using hardware and software to digitize, store, process, and communicate business information. Mobile apps have made this a 24/7 reality.</p>
-                    <div class="slide-content text-sm sm:text-base mt-4 sm:mt-6">
-                        <ul>
-                            <li><strong>Communication:</strong> Instant messaging, video conferencing, and unified communications.</li>
-                            <li><strong>Document Management:</strong> Accessing, editing, and sharing documents via cloud storage.</li>
-                            <li><strong>Task Management:</strong> Tracking project progress and assigning tasks remotely.</li>
-                            <li><strong>ERP Systems:</strong> Approving invoices, checking inventory, and HR functions on the go.</li>
-                        </ul>
-                    </div>
-                `
-            },
-            {
-                title: "Key Benefits of Mobile Office Automation",
-                content: `
-                    <div class="space-y-3 sm:space-y-4 mt-2">
-                        <div class="flex items-start p-3 sm:p-4 bg-white rounded-lg shadow-sm border border-gray-100">
-                            <div class="bg-blue-100 p-2 sm:p-3 rounded-full text-blue-600 mr-3 sm:mr-4"><i class="fas fa-globe text-sm sm:text-base"></i></div>
-                            <div>
-                                <h4 class="font-bold text-gray-800 text-sm sm:text-base">Remote Work Enablement</h4>
-                                <p class="text-gray-600 text-xs sm:text-sm mt-1">Employees are no longer tethered to a physical desk, enabling global, flexible workforces.</p>
-                            </div>
-                        </div>
-                        <div class="flex items-start p-3 sm:p-4 bg-white rounded-lg shadow-sm border border-gray-100">
-                            <div class="bg-green-100 p-2 sm:p-3 rounded-full text-green-600 mr-3 sm:mr-4"><i class="fas fa-bolt text-sm sm:text-base"></i></div>
-                            <div>
-                                <h4 class="font-bold text-gray-800 text-sm sm:text-base">Increased Productivity</h4>
-                                <p class="text-gray-600 text-xs sm:text-sm mt-1">Approvals, emails, and quick tasks can be handled during commutes or downtime.</p>
-                            </div>
-                        </div>
-                        <div class="flex items-start p-3 sm:p-4 bg-white rounded-lg shadow-sm border border-gray-100">
-                            <div class="bg-orange-100 p-2 sm:p-3 rounded-full text-orange-600 mr-3 sm:mr-4"><i class="fas fa-camera text-sm sm:text-base"></i></div>
-                            <div>
-                                <h4 class="font-bold text-gray-800 text-sm sm:text-base">Hardware Replacement</h4>
-                                <p class="text-gray-600 text-xs sm:text-sm mt-1">Apps like CamScanner turn phones into portable document scanners, replacing bulky equipment.</p>
-                            </div>
-                        </div>
-                    </div>
-                `
-            },
-            {
-                title: "Mobile Apps in Daily Life",
-                content: `
-                    <p class="text-base sm:text-lg text-gray-600 mb-4 sm:mb-6">Beyond the office, mobile applications have fundamentally re-engineered how humans navigate their daily personal lives.</p>
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-3 sm:gap-4 text-center">
-                        <div class="p-3 sm:p-4 bg-pink-50 rounded-lg text-pink-700 flex flex-col items-center justify-center">
-                            <i class="fas fa-comments text-2xl sm:text-3xl mb-2"></i>
-                            <h4 class="font-bold text-xs sm:text-sm">Social & Media</h4>
-                            <p class="text-[10px] sm:text-xs mt-1">Connecting globally (WhatsApp, Instagram)</p>
-                        </div>
-                        <div class="p-3 sm:p-4 bg-teal-50 rounded-lg text-teal-700 flex flex-col items-center justify-center">
-                            <i class="fas fa-shopping-cart text-2xl sm:text-3xl mb-2"></i>
-                            <h4 class="font-bold text-xs sm:text-sm">E-Commerce</h4>
-                            <p class="text-[10px] sm:text-xs mt-1">Shopping & Delivery (Amazon, UberEats)</p>
-                        </div>
-                        <div class="p-3 sm:p-4 bg-blue-50 rounded-lg text-blue-700 flex flex-col items-center justify-center">
-                            <i class="fas fa-map-marked-alt text-2xl sm:text-3xl mb-2"></i>
-                            <h4 class="font-bold text-xs sm:text-sm">Navigation</h4>
-                            <p class="text-[10px] sm:text-xs mt-1">Real-time transit (Google Maps, Waze)</p>
-                        </div>
-                        <div class="p-3 sm:p-4 bg-purple-50 rounded-lg text-purple-700 flex flex-col items-center justify-center">
-                            <i class="fas fa-heartbeat text-2xl sm:text-3xl mb-2"></i>
-                            <h4 class="font-bold text-xs sm:text-sm">Health/Fintech</h4>
-                            <p class="text-[10px] sm:text-xs mt-1">Tracking fitness & banking (PayPal, MyFitnessPal)</p>
-                        </div>
-                    </div>
-                `
-            },
-            {
-                title: "Conclusion & Summary",
-                content: `
-                    <div class="bg-gray-800 text-white p-5 sm:p-8 rounded-2xl shadow-lg mt-2">
-                        <h3 class="text-lg sm:text-2xl font-bold mb-3 sm:mb-4 border-b border-gray-600 pb-2">Key Takeaways</h3>
-                        <ul class="space-y-2 sm:space-y-3 text-sm sm:text-lg">
-                            <li class="flex items-start"><i class="fas fa-check text-green-400 mt-1 mr-2 sm:mr-3 flex-shrink-0"></i> <span><strong>Open-Source</strong> software provides transparency, customizability, and community-driven security.</span></li>
-                            <li class="flex items-start"><i class="fas fa-check text-green-400 mt-1 mr-2 sm:mr-3 flex-shrink-0"></i> <span><strong>Proprietary</strong> software offers polished user experiences, official support, and ecosystem stability.</span></li>
-                            <li class="flex items-start"><i class="fas fa-check text-green-400 mt-1 mr-2 sm:mr-3 flex-shrink-0"></i> <span><strong>Mobile Applications</strong> are the primary vehicle for modern software delivery.</span></li>
-                            <li class="flex items-start"><i class="fas fa-check text-green-400 mt-1 mr-2 sm:mr-3 flex-shrink-0"></i> <span><strong>Office Automation</strong> is driven by mobile apps enabling remote work and cloud collaboration.</span></li>
-                        </ul>
-                    </div>
-                `
-            },
-            {
-                title: "Ready for the Quiz?",
-                content: `
-                    <div class="text-center flex flex-col items-center justify-center h-full py-8 sm:py-0">
-                        <div class="w-20 h-20 sm:w-24 sm:h-24 bg-green-100 text-green-500 rounded-full flex items-center justify-center text-3xl sm:text-4xl mb-4 sm:mb-6 animate-pulse">
-                            <i class="fas fa-clipboard-check"></i>
-                        </div>
-                        <h2 class="text-2xl sm:text-3xl font-bold text-gray-800 mb-3 sm:mb-4">Presentation Complete</h2>
-                        <p class="text-base sm:text-xl text-gray-600 max-w-lg mb-6 sm:mb-8">You have reached the end of the presentation. Tap the button below to test your knowledge.</p>
-                    </div>
-                `
+                title: "Customer Support Associate",
+                company: "BPO Assam",
+                location: "GS Road",
+                type: "Night Shift",
+                salary: "₹18,000 - ₹22,000 / month"
             }
         ];
 
-        // ==================== QUIZ DATA (30 Questions) ====================
-        const quizData = [
-            { q: "What does OSS stand for?", options: ["Operational System Software", "Open-Source Software", "Online System Security", "Original Source Script"], ans: 1 },
-            { q: "Which of the following is a key characteristic of Open-Source Software?", options: ["High licensing fees", "Source code is hidden", "Source code is accessible and modifiable", "Only the creator can fix bugs"], ans: 2 },
-            { q: "Which of the following is an example of Open-Source Software?", options: ["Microsoft Windows", "Adobe Photoshop", "Linux", "Microsoft Office"], ans: 2 },
-            { q: "Proprietary software is also commonly referred to as:", options: ["Public domain software", "Closed-source software", "Freeware", "Shareware"], ans: 1 },
-            { q: "In Proprietary Software, who generally holds the intellectual property rights?", options: ["The user", "The open-source community", "The government", "The creator or vendor company"], ans: 3 },
-            { q: "Which of the following is an example of Proprietary Software?", options: ["Mozilla Firefox", "macOS", "WordPress", "VLC Media Player"], ans: 1 },
-            { q: "What is considered a major advantage of Open-Source Software?", options: ["Guaranteed 24/7 dedicated phone support", "It is usually free and highly customizable", "It always has the best graphical user interface", "You cannot modify it, preventing errors"], ans: 1 },
-            { q: "What is a major advantage of Proprietary Software?", options: ["Free access to source code", "Community-driven bug fixes", "Guaranteed official support and regular updates", "No licensing fees"], ans: 2 },
-            { q: "Vendor lock-in is a disadvantage most commonly associated with:", options: ["Open-Source Software", "Proprietary Software", "Hardware", "Freeware"], ans: 1 },
-            { q: "Which model relies heavily on a global community of volunteer developers for security auditing?", options: ["Proprietary", "Closed-source", "Open-Source", "Commercial"], ans: 2 },
-            
-            { q: "What is a Mobile Application?", options: ["A desktop computer program", "Hardware inside a phone", "Software designed specifically to run on mobile devices", "A type of internet connection"], ans: 2 },
-            { q: "Apps built using specific languages for a single platform (like Swift for iOS) are called:", options: ["Web Apps", "Native Apps", "Hybrid Apps", "Desktop Apps"], ans: 1 },
-            { q: "Which type of mobile app requires no installation from an App Store?", options: ["Native Apps", "Hybrid Apps", "Web Apps", "Enterprise Apps"], ans: 2 },
-            { q: "A 'Hybrid App' can be best described as:", options: ["An app that works without electricity", "An app that is half proprietary, half open-source", "A web app wrapped in a native shell to work across platforms", "An app that only runs on tablets"], ans: 2 },
-            { q: "Which framework is often used to build Hybrid or Cross-platform mobile apps?", options: ["React Native", "C++", "Assembly", "Photoshop"], ans: 0 },
-            { q: "Native apps are generally known for:", options: ["Being the cheapest to develop", "Offering the best performance and UI integration", "Requiring internet to function at all times", "Being accessible via a URL only"], ans: 1 },
-            
-            { q: "What is the primary goal of Office Automation?", options: ["To replace human workers with robots", "To digitize, store, and communicate business information efficiently", "To print more paper documents", "To stop using mobile phones at work"], ans: 1 },
-            { q: "Which mobile app is a prominent example of enterprise communication in office automation?", options: ["Candy Crush", "Netflix", "Microsoft Teams", "Spotify"], ans: 2 },
-            { q: "How do mobile apps aid in document management for modern offices?", options: ["By providing cloud storage access (e.g., Google Drive) on the go", "By automatically deleting old files", "By printing documents remotely", "By blocking access to confidential files"], ans: 0 },
-            { q: "Trello and Asana mobile apps are primarily used for:", options: ["Video conferencing", "Task and project management", "Graphic design", "Network security"], ans: 1 },
-            { q: "Mobile apps have replaced physical office hardware. For example, apps like CamScanner act as portable:", options: ["Printers", "Fax machines", "Scanners", "Projectors"], ans: 2 },
-            { q: "One major impact of mobile office automation is:", options: ["Decreased employee communication", "The enablement of remote and flexible workforces", "Higher costs for physical office supplies", "Forcing everyone to work 9-to-5 exclusively"], ans: 1 },
-            { q: "ERP stands for Enterprise Resource Planning. Mobile ERP apps allow managers to:", options: ["Play games during meetings", "Approve invoices and check inventory from their phones", "Write source code for the company website", "Design company logos"], ans: 1 },
-            
-            { q: "Google Maps and Waze fall under which daily life app category?", options: ["Fintech", "E-commerce", "Navigation", "Health & Fitness"], ans: 2 },
-            { q: "Amazon and UberEats are examples of:", options: ["Educational Apps", "E-commerce & Delivery Apps", "Social Media Apps", "Productivity Apps"], ans: 1 },
-            { q: "MyFitnessPal is an application designed to help users with:", options: ["Tracking health, diet, and fitness", "Managing bank accounts", "Booking flights", "Learning new languages"], ans: 0 },
-            { q: "What is a primary function of Fintech/Banking mobile apps in daily life?", options: ["Tracking heart rate", "Sending money and managing finances instantly", "Editing photographs", "Navigating traffic"], ans: 1 },
-            { q: "WhatsApp and Instagram are primarily categorized as:", options: ["Office Automation tools", "Social and Media communication apps", "Open-source operating systems", "Document management systems"], ans: 1 },
-            { q: "Apps like Duolingo or Coursera demonstrate the use of mobile technology in:", options: ["Education and Learning", "Logistics", "Manufacturing", "Healthcare diagnostics"], ans: 0 },
-            { q: "Overall, the transition to mobile apps in daily life has led to:", options: ["Slower access to information", "Decreased global communication", "On-demand access to services, information, and communication 24/7", "The obsolescence of the internet"], ans: 2 }
-        ];
+        const jobGrid = document.getElementById('jobGrid');
+        const searchInput = document.getElementById('searchInput');
+        const locationFilter = document.getElementById('locationFilter');
+        const toastContainer = document.getElementById('toast-container');
+        const postJobBtn = document.getElementById('postJobBtn');
 
-        // ==================== STATE VARIABLES ====================
-        let currentSlide = 0;
-        let currentQuestion = 0;
-        let score = 0;
-        let isQuizActive = false;
-        let optionSelectedForCurrentQ = false;
-
-        // ==================== DOM ELEMENTS ====================
-        const presentationView = document.getElementById('presentation-view');
-        const quizView = document.getElementById('quiz-view');
-        const resultsView = document.getElementById('results-view');
-        
-        const slideContainer = document.getElementById('slide-container');
-        const slideProgress = document.getElementById('slide-progress');
-        const currentSlideNum = document.getElementById('current-slide-num');
-        const totalSlidesNum = document.getElementById('total-slides-num');
-        const prevBtn = document.getElementById('prev-btn');
-        const nextBtn = document.getElementById('next-btn');
-
-        const quizProgress = document.getElementById('quiz-progress');
-        const currentQNum = document.getElementById('current-q-num');
-        const totalQNum = document.getElementById('total-q-num');
-        const currentScoreEl = document.getElementById('current-score');
-        const questionText = document.getElementById('question-text');
-        const optionsContainer = document.getElementById('options-container');
-        const nextQBtn = document.getElementById('next-q-btn');
-
-        // ==================== INITIALIZATION ====================
-        function init() {
-            totalSlidesNum.innerText = slidesData.length;
-            totalQNum.innerText = quizData.length;
-            renderSlide();
+        // Modal controls
+        window.openModal = function(modalId) {
+            document.getElementById(modalId).classList.add('active');
         }
 
-        // ==================== PRESENTATION LOGIC ====================
-        function renderSlide() {
-            const slide = slidesData[currentSlide];
+        window.closeModal = function(modalId) {
+            document.getElementById(modalId).classList.remove('active');
+        }
+
+        // Close modals on outside click
+        window.onclick = function(event) {
+            if (event.target.classList.contains('modal-overlay')) {
+                event.target.classList.remove('active');
+            }
+        }
+
+        // Custom function to show a temporary notification (replaces alert)
+        window.showToast = function(message) {
+            const toast = document.createElement('div');
+            toast.className = 'toast';
+            toast.textContent = message;
             
-            // Animate content
-            slideContainer.classList.remove('fade-enter-active');
-            
+            toastContainer.appendChild(toast);
+
+            // Trigger fade out after 2.5 seconds
             setTimeout(() => {
-                let html = `<h1 class="text-2xl sm:text-3xl md:text-4xl font-bold text-gray-800 mb-2">${slide.title}</h1>`;
-                if (slide.subtitle) {
-                    html += `<p class="text-base sm:text-xl text-gray-500 mb-4 sm:mb-8">${slide.subtitle}</p>`;
-                } else {
-                    html += `<div class="h-1 w-16 sm:w-20 bg-blue-500 rounded my-4 sm:my-6"></div>`;
-                }
-                html += `<div>${slide.content}</div>`;
-                
-                slideContainer.innerHTML = html;
-                
-                // Add animation class
-                slideContainer.classList.add('fade-enter');
-                setTimeout(() => slideContainer.classList.add('fade-enter-active'), 50);
-            }, 150); // slight delay for fade out
+                toast.style.animation = 'fadeOut 0.3s forwards ease-in';
+                // Remove from DOM after fade out completes
+                setTimeout(() => {
+                    toast.remove();
+                }, 300);
+            }, 2500);
+        };
 
-            // Update UI elements
-            currentSlideNum.innerText = currentSlide + 1;
-            slideProgress.style.width = `${((currentSlide + 1) / slidesData.length) * 100}%`;
-            
-            // Button states
-            prevBtn.disabled = currentSlide === 0;
-            
-            if (currentSlide === slidesData.length - 1) {
-                nextBtn.innerHTML = `Start Quiz <i class="fas fa-play ml-2"></i>`;
-                nextBtn.classList.remove('bg-blue-600', 'hover:bg-blue-700');
-                nextBtn.classList.add('bg-green-600', 'hover:bg-green-700');
-            } else {
-                nextBtn.innerHTML = `Next <i class="fas fa-arrow-right ml-2"></i>`;
-                nextBtn.classList.add('bg-blue-600', 'hover:bg-blue-700');
-                nextBtn.classList.remove('bg-green-600', 'hover:bg-green-700');
+        // Function triggered when "Apply Now" is clicked
+        let currentApplyingCompany = '';
+        window.applyForJob = function(title, company) {
+            document.getElementById('applyJobTitle').textContent = title;
+            currentApplyingCompany = company;
+            openModal('applyModal');
+        };
+
+        // Function to render jobs to the DOM
+        function renderJobs(jobs) {
+            jobGrid.innerHTML = ''; // Clear current jobs
+
+            if (jobs.length === 0) {
+                jobGrid.innerHTML = '<div class="no-results">No jobs found matching your criteria. Try adjusting your search or location.</div>';
+                return;
             }
+
+            jobs.forEach(job => {
+                const jobCard = document.createElement('div');
+                jobCard.className = 'job-card';
+                // Escape quotes in strings to prevent HTML injection issues in onclick
+                const safeTitle = job.title.replace(/'/g, "\\'");
+                const safeCompany = job.company.replace(/'/g, "\\'");
+
+                jobCard.innerHTML = `
+                    <h2 class="job-title">${job.title}</h2>
+                    <div class="job-company">${job.company}</div>
+                    <div class="job-details">
+                        <span>📍 ${job.location}, Guwahati</span>
+                        <span>💼 ${job.type}</span>
+                        <span>💰 ${job.salary}</span>
+                    </div>
+                    <button class="apply-btn" onclick="applyForJob('${safeTitle}', '${safeCompany}')">Apply Now</button>
+                `;
+                jobGrid.appendChild(jobCard);
+            });
         }
 
-        function nextSlide() {
-            if (currentSlide === slidesData.length - 1) {
-                startQuiz();
-            } else {
-                currentSlide++;
-                renderSlide();
-            }
-        }
+        // Function to filter jobs based on search text and location dropdown
+        function filterJobs() {
+            const searchTerm = searchInput.value.toLowerCase();
+            const locationTerm = locationFilter.value;
 
-        function prevSlide() {
-            if (currentSlide > 0) {
-                currentSlide--;
-                renderSlide();
-            }
-        }
-
-        // ==================== QUIZ LOGIC ====================
-        function startQuiz() {
-            presentationView.classList.add('hidden');
-            quizView.classList.remove('hidden');
-            isQuizActive = true;
-            renderQuestion();
-        }
-
-        function renderQuestion() {
-            optionSelectedForCurrentQ = false;
-            nextQBtn.classList.add('hidden');
-            
-            const qData = quizData[currentQuestion];
-            questionText.innerText = qData.q;
-            
-            optionsContainer.innerHTML = '';
-            
-            qData.options.forEach((opt, index) => {
-                const btn = document.createElement('button');
-                btn.className = 'option-btn w-full text-left p-3.5 sm:p-5 rounded-xl border-2 border-gray-200 bg-white text-gray-700 font-medium text-sm sm:text-lg flex items-center';
+            const filteredJobs = jobsData.filter(job => {
+                const matchesSearch = job.title.toLowerCase().includes(searchTerm) || 
+                                      job.company.toLowerCase().includes(searchTerm);
+                const matchesLocation = locationTerm === 'All' || job.location === locationTerm;
                 
-                // Add letter (A, B, C, D)
-                const letter = String.fromCharCode(65 + index);
-                btn.innerHTML = `<span class="inline-flex items-center justify-center w-7 h-7 sm:w-8 sm:h-8 rounded bg-gray-100 text-gray-600 font-bold mr-3 sm:mr-4 text-xs sm:text-sm flex-shrink-0">${letter}</span> <span class="flex-grow">${opt}</span>`;
-                
-                btn.onclick = () => selectOption(index, btn);
-                optionsContainer.appendChild(btn);
+                return matchesSearch && matchesLocation;
             });
 
-            currentQNum.innerText = currentQuestion + 1;
-            quizProgress.style.width = `${((currentQuestion) / quizData.length) * 100}%`;
-            currentScoreEl.innerText = score;
+            renderJobs(filteredJobs);
         }
 
-        function selectOption(selectedIndex, selectedBtn) {
-            if (optionSelectedForCurrentQ) return; // Prevent multiple selections
-            optionSelectedForCurrentQ = true;
+        // Event Listeners for interactive filtering
+        searchInput.addEventListener('input', filterJobs);
+        locationFilter.addEventListener('change', filterJobs);
+
+        // Form Event Listeners
+        postJobBtn.addEventListener('click', () => openModal('postJobModal'));
+
+        // Store applications data in memory
+        const applicationsData = [];
+
+        // Handle Application Form Submit
+        document.getElementById('applyForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const title = document.getElementById('applyJobTitle').textContent;
+            const name = document.getElementById('applyName').value;
+            const email = document.getElementById('applyEmail').value;
+            const phone = document.getElementById('applyPhone').value;
+
+            // Save application to the array
+            applicationsData.push({
+                date: new Date().toLocaleDateString(),
+                name: name,
+                email: email,
+                phone: phone,
+                jobTitle: title,
+                company: currentApplyingCompany
+            });
+
+            closeModal('applyModal');
+            showToast(`Application successfully sent to ${currentApplyingCompany} for ${title}!`);
+            this.reset();
+        });
+
+        // Handle Post Job Form Submit
+        document.getElementById('postJobForm').addEventListener('submit', function(e) {
+            e.preventDefault();
+            const newJob = {
+                title: document.getElementById('pjTitle').value,
+                company: document.getElementById('pjCompany').value,
+                location: document.getElementById('pjLocation').value,
+                type: document.getElementById('pjType').value,
+                salary: document.getElementById('pjSalary').value
+            };
             
-            const qData = quizData[currentQuestion];
-            const buttons = optionsContainer.querySelectorAll('button');
+            jobsData.unshift(newJob); // Add new job to the top of the array
+            filterJobs(); // Re-render the grid so the new job appears immediately
+            closeModal('postJobModal');
+            showToast(`Job "${newJob.title}" posted successfully!`);
+            this.reset(); // Clear the form
+        });
+
+        // --- Admin Features ---
+
+        // Listen for 'p' key press
+        document.addEventListener('keydown', function(event) {
+            if (event.key.toLowerCase() === 'p') {
+                // Ensure user isn't currently typing inside an input field
+                const activeTag = document.activeElement.tagName.toLowerCase();
+                if (activeTag !== 'input' && activeTag !== 'textarea' && activeTag !== 'select') {
+                    renderAdminTable();
+                    openModal('adminModal');
+                }
+            }
+        });
+
+        // Render the admin table with data
+        function renderAdminTable() {
+            const tbody = document.getElementById('adminTableBody');
+            tbody.innerHTML = '';
             
-            // Disable all buttons
-            buttons.forEach(btn => btn.disabled = true);
-            
-            // Check answer
-            if (selectedIndex === qData.ans) {
-                // Correct
-                selectedBtn.classList.add('option-correct');
-                selectedBtn.innerHTML += `<i class="fas fa-check-circle ml-3 flex-shrink-0 text-lg sm:text-xl"></i>`;
-                score++;
-                currentScoreEl.innerText = score;
-            } else {
-                // Incorrect
-                selectedBtn.classList.add('option-incorrect');
-                selectedBtn.innerHTML += `<i class="fas fa-times-circle ml-3 flex-shrink-0 text-lg sm:text-xl"></i>`;
-                
-                // Highlight correct answer
-                const correctBtn = buttons[qData.ans];
-                correctBtn.classList.add('option-correct');
-                correctBtn.innerHTML += `<i class="fas fa-check-circle ml-3 flex-shrink-0 text-lg sm:text-xl"></i>`;
+            if (applicationsData.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="6" style="text-align: center; color: var(--text-light); padding: 2rem;">No applications received yet.</td></tr>';
+                return;
             }
 
-            // Show next button
-            nextQBtn.classList.remove('hidden');
-            
-            // Change next button text on last question
-            if (currentQuestion === quizData.length - 1) {
-                nextQBtn.innerHTML = `See Results <i class="fas fa-flag-checkered ml-2"></i>`;
+            applicationsData.forEach(app => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${app.date}</td>
+                    <td>${app.name}</td>
+                    <td>${app.email}</td>
+                    <td>${app.phone}</td>
+                    <td>${app.jobTitle}</td>
+                    <td>${app.company}</td>
+                `;
+                tbody.appendChild(tr);
+            });
+        }
+
+        // Generate and download CSV
+        window.downloadCSV = function() {
+            if (applicationsData.length === 0) {
+                showToast("No applications to download.");
+                return;
             }
-        }
 
-        function nextQuestion() {
-            if (currentQuestion === quizData.length - 1) {
-                showResults();
-            } else {
-                currentQuestion++;
-                renderQuestion();
-            }
-        }
+            // Define CSV headers
+            const headers = ["Date", "Applicant Name", "Email", "Phone", "Job Title", "Company"];
+            
+            // Format rows (wrap in quotes to prevent issues with commas in names)
+            const rows = applicationsData.map(app => [
+                `"${app.date}"`,
+                `"${app.name}"`,
+                `"${app.email}"`,
+                `"${app.phone}"`,
+                `"${app.jobTitle}"`,
+                `"${app.company}"`
+            ]);
 
-        function showResults() {
-            quizView.classList.add('hidden');
-            resultsView.classList.remove('hidden');
+            // Construct CSV string
+            const csvContent = [headers.join(","), ...rows.map(r => r.join(","))].join("\n");
             
-            document.getElementById('final-score-text').innerText = `${score}/${quizData.length}`;
+            // Create Blob and trigger download
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const link = document.createElement("a");
+            const url = URL.createObjectURL(blob);
             
-            const percentage = Math.round((score / quizData.length) * 100);
-            document.getElementById('score-percentage').innerText = `${percentage}%`;
+            link.setAttribute("href", url);
+            link.setAttribute("download", "muluk_hub_applications.csv");
+            link.style.visibility = 'hidden';
             
-            let feedback = "";
-            if (percentage >= 90) feedback = "Excellent! You have a strong grasp of software and mobile tech concepts. 🌟";
-            else if (percentage >= 70) feedback = "Great job! You understand the core basics well. 👍";
-            else if (percentage >= 50) feedback = "Good effort, but you might want to review the presentation again. 📚";
-            else feedback = "Keep learning! Restart the presentation to refresh your knowledge. 💡";
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
             
-            document.getElementById('feedback-message').innerText = feedback;
-        }
+            showToast("Applications CSV Downloaded successfully!");
+        };
 
-        function restartApp() {
-            currentSlide = 0;
-            currentQuestion = 0;
-            score = 0;
-            isQuizActive = false;
-            
-            resultsView.classList.add('hidden');
-            presentationView.classList.remove('hidden');
-            
-            init();
-        }
-
-        // Run on load
-        window.onload = init;
-
+        // Initial render on page load
+        renderJobs(jobsData);
     </script>
 </body>
 </html>
