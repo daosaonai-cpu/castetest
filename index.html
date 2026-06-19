@@ -3,890 +3,1233 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>CyberSec Workbench: Encryption & Decryption</title>
-    
-    <!-- Tailwind CSS -->
+    <title>NIELIT KOKRAJHAR EC AI Smart Class Env.</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/camera_utils@0.3/camera_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/control_utils@0.6/control_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils@0.3/drawing_utils.js" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4/hands.js" crossorigin="anonymous"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.min.js"></script>
+    <!-- Three.js for 3D Cube -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     
-    <!-- Phosphor Icons -->
-    <script src="https://unpkg.com/@phosphor-icons/web"></script>
-    
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Custom styles for the loader, layout, and new UI elements */
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;700&display=swap');
+        
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        .loader {
+            border: 8px solid #f3f3f3; /* Light grey */
+            border-top: 8px solid #3498db; /* Blue */
+            border-radius: 50%;
+            width: 60px;
+            height: 60px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        .input_video {
+            display: none;
+        }
+        #output_canvas {
+            width: 100%;
+            height: 100%;
+            object-fit: contain; /* Use contain to see the whole page */
+        }
+        /* New 3D Canvas style */
+        #three_canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none; /* Let clicks pass through to buttons */
+            z-index: 20; /* Above the 2D canvas */
+        }
+        .mirrored {
+            transform: scaleX(-1); /* Mirror effect */
+        }
+        /* Style for disabled buttons */
+        .disabled-button {
+            background-color: #a0aec0; /* gray-500 */
+            cursor: not-allowed;
+            opacity: 0.6;
+        }
+        /* Style for notifications */
+        #notification-container {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: rgba(34, 197, 94, 0.8); /* green-500 with opacity */
+            color: white;
+            padding: 1rem 1.5rem;
+            border-radius: 0.5rem;
+            z-index: 1000;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.3s, visibility 0.3s;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            font-weight: bold;
+        }
+        #notification-container.show {
+            opacity: 1;
+            visibility: visible;
+        }
+        /* Fullscreen style for the container */
+        #container.fullscreen-mode {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            border-radius: 0;
+            z-index: 50;
+            background-color: #111827; /* bg-gray-900 */
+        }
+    </style>
+</head>
+<body class="bg-gray-900 text-white flex flex-col items-center justify-center min-h-screen p-4">
 
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        mono: ['Fira Code', 'monospace'],
-                    },
-                    colors: {
-                        slate: {
-                            850: '#151e2e',
-                            900: '#0f172a',
-                            950: '#020617',
-                        },
-                        cyan: {
-                            400: '#22d3ee',
-                            500: '#06b6d4',
-                        },
-                        emerald: {
-                            400: '#34d399',
-                            500: '#10b981',
+    <div class="w-full max-w-4xl mx-auto">
+        <h1 class="text-3xl md:text-4xl font-bold text-center mb-2 text-blue-400">NIELIT KOKRAJHAR EC AI Smart Class Env.</h1>
+        <p class="text-center text-gray-400 mb-6">BANAJIT BORO</p>
+
+        <div id="container" class="relative w-full aspect-video rounded-lg shadow-2xl bg-gray-800 flex items-center justify-center overflow-hidden">
+            <!-- 2D Drawing Canvas -->
+            <canvas id="output_canvas" class="absolute top-0 left-0 z-0"></canvas>
+            <!-- 3D Three.js Canvas -->
+            <canvas id="three_canvas" class="hidden"></canvas> 
+            
+            <video class="input_video" id="input_video" autoplay playsinline></video>
+            <div id="loading-indicator" class="absolute inset-0 flex flex-col items-center justify-center bg-gray-800 bg-opacity-75 rounded-lg z-10">
+                <div class="loader"></div>
+                <p class="mt-4 text-lg">Initializing Camera...</p>
+            </div>
+        </div>
+        
+        <div class="mt-4 flex justify-center items-center flex-wrap gap-4">
+            <button id="clear-button" class="bg-red-500 hover:bg-red-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors">
+                Clear All
+            </button>
+            <button id="fullscreen-button" class="hidden bg-green-500 hover:bg-green-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors">
+                Fullscreen
+            </button>
+            <button id="snapshot-button" class="bg-purple-500 hover:bg-purple-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors">
+                Send to phone
+            </button>
+            <input type="file" id="file-upload" class="hidden" accept="image/*,application/pdf">
+            <label for="file-upload" class="bg-pink-500 hover:bg-pink-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors cursor-pointer">
+                Upload File
+            </label>
+            <button id="prev-page-button" class="hidden bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors">Prev</button>
+            <span id="page-indicator" class="hidden text-lg"></span>
+            <button id="next-page-button" class="hidden bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-md transition-colors">Next</button>
+        </div>
+    </div>
+
+    <div id="palette-menu" class="hidden fixed top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 bg-gray-800 bg-opacity-50 backdrop-blur-sm text-white p-6 rounded-lg shadow-2xl z-[60] w-80">
+        <button id="close-palette-btn" class="absolute top-3 right-3 text-gray-400 hover:text-white text-2xl font-bold">&times;</button>
+        
+        <label for="thickness-slider" class="block text-sm font-medium mb-2">Thickness</label>
+        <input id="thickness-slider" type="range" min="2" max="30" class="w-full h-2 bg-gray-700 rounded-lg appearance-none cursor-pointer">
+
+        <label class="block text-sm font-medium mt-6 mb-2">Color</label>
+        <div class="flex flex-wrap gap-3 justify-center">
+            <button class="color-option-btn w-10 h-10 rounded-full border-2 border-transparent hover:opacity-80 focus:outline-none" data-color="#ef4444" style="background-color: #ef4444" title="Red"></button>
+            <button class="color-option-btn w-10 h-10 rounded-full border-2 border-transparent hover:opacity-80 focus:outline-none" data-color="#f97316" style="background-color: #f97316" title="Orange"></button>
+            <button class="color-option-btn w-10 h-10 rounded-full border-2 border-transparent hover:opacity-80 focus:outline-none" data-color="#eab308" style="background-color: #eab308" title="Yellow"></button>
+            <button class="color-option-btn w-10 h-10 rounded-full border-2 border-transparent hover:opacity-80 focus:outline-none" data-color="#22c55e" style="background-color: #22c55e" title="Green"></button>
+            <button class="color-option-btn w-10 h-10 rounded-full border-2 border-transparent hover:opacity-80 focus:outline-none" data-color="#3b82f6" style="background-color: #3b82f6" title="Blue"></button>
+            <button class="color-option-btn w-10 h-10 rounded-full border-2 border-transparent hover:opacity-80 focus:outline-none" data-color="#ec4899" style="background-color: #ec4899" title="Pink"></button>
+            <button class="color-option-btn w-10 h-10 rounded-full border-2 border-transparent hover:opacity-80 focus:outline-none" data-color="#ffffff" style="background-color: #ffffff" title="White"></button>
+            <button class="color-option-btn w-10 h-10 rounded-full border-2 border-gray-400 hover:opacity-80 focus:outline-none" data-color="#000000" style="background-color: #000000" title="Black"></button>
+        </div>
+    </div>
+
+    <div id="notification-container"></div>
+
+    <script type="module">
+        // Set the workerSrc for PDF.js
+        window.pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/2.16.105/pdf.worker.min.js`;
+
+        // --- Get references to the HTML elements ---
+        const videoElement = document.getElementById('input_video');
+        const canvasElement = document.getElementById('output_canvas');
+        const threeCanvasElement = document.getElementById('three_canvas');
+        const canvasCtx = canvasElement.getContext('2d');
+        const loadingIndicator = document.getElementById('loading-indicator');
+        const clearButton = document.getElementById('clear-button');
+        const fileUploadInput = document.getElementById('file-upload');
+        const prevPageButton = document.getElementById('prev-page-button');
+        const nextPageButton = document.getElementById('next-page-button');
+        const pageIndicator = document.getElementById('page-indicator');
+        const notificationContainer = document.getElementById('notification-container');
+        const fullscreenButton = document.getElementById('fullscreen-button');
+        const container = document.getElementById('container');
+        const snapshotButton = document.getElementById('snapshot-button');
+        const paletteMenu = document.getElementById('palette-menu');
+
+
+        // --- State Variables ---
+        let currentMode = 'idle'; // 'idle', 'drawing', 'erasing', 'moving'
+        let lastMode = 'idle';
+        let currentPath = [];
+        let allPaths = [];
+        let uploadedImage = null;
+        let pdfDoc = null;
+        let currentPageNum = 1;
+        let totalPages = 0;
+        let isFullscreen = false;
+        let isPaletteOpen = false;
+        let isShakaLocked = false;
+        let isPaletteDraggingSlider = false;
+        let smoothedFingerTipPos = null;
+        let showHandLandmarks = true;
+        
+        // --- State for moving individual drawings ---
+        let selectedPathIndex = -1;
+        let moveStartPoint = null;
+        let initialSelectedPathState = null;
+        
+        // --- On-Canvas Button Control State ---
+        let lastButtonPressTime = 0;
+        const BUTTON_PRESS_COOLDOWN = 1500;
+
+        // --- Configuration ---
+        let drawingColor = '#ec4899';
+        let drawingLineWidth = 6;
+        const cursorColor = '#f87171';
+        const cursorRadius = 5;
+        const smoothingFactor = 0.5;
+        const eraserRadius = 30;
+        const eraserColor = 'rgba(255, 255, 255, 0.5)';
+
+        // --- Three.js State ---
+        let isCubeMode = false;
+        let threeScene, threeCamera, threeRenderer, threeCube;
+        // Changed to arrays for multi-face support
+        let cubeContexts = []; 
+        let cubeTextures = [];
+        let raycaster = new THREE.Raycaster();
+        let lastCubeDrawPoint = null;
+        let lastCubeFaceIndex = -1;
+        let cubeRotationStart = null;
+        let cubeRotationInitial = { x: 0, y: 0 };
+
+
+        // --- Three.js Initialization ---
+        function initThreeJS() {
+            threeScene = new THREE.Scene();
+            
+            // Camera setup
+            const aspect = canvasElement.width / canvasElement.height;
+            threeCamera = new THREE.PerspectiveCamera(50, aspect, 0.1, 100);
+            threeCamera.position.z = 5;
+
+            // Renderer setup
+            threeRenderer = new THREE.WebGLRenderer({ canvas: threeCanvasElement, alpha: true, antialias: true });
+            threeRenderer.setSize(canvasElement.width, canvasElement.height);
+            threeRenderer.setPixelRatio(window.devicePixelRatio);
+
+            // Lighting
+            const ambientLight = new THREE.AmbientLight(0xffffff, 0.7);
+            threeScene.add(ambientLight);
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.5);
+            directionalLight.position.set(2, 2, 5);
+            threeScene.add(directionalLight);
+
+            // Initialize materials and contexts for 6 faces
+            cubeContexts = [];
+            cubeTextures = [];
+            const materials = [];
+            // faceNames array is no longer needed for display, but index matching remains same logic
+
+            for (let i = 0; i < 6; i++) {
+                const canvas = document.createElement('canvas');
+                // Using 512x512 per face for performance balance
+                canvas.width = 512; 
+                canvas.height = 512;
+                const ctx = canvas.getContext('2d');
+                
+                // Fill with a light background
+                ctx.fillStyle = '#f0f0f0';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                // Add a border
+                ctx.lineWidth = 20;
+                ctx.strokeStyle = '#cccccc';
+                ctx.strokeRect(0, 0, canvas.width, canvas.height);
+                
+                const texture = new THREE.CanvasTexture(canvas);
+                
+                const material = new THREE.MeshStandardMaterial({ 
+                    map: texture,
+                    color: 0xffffff,
+                    roughness: 0.3,
+                    metalness: 0.1
+                });
+
+                cubeContexts.push(ctx);
+                cubeTextures.push(texture);
+                materials.push(material);
+            }
+            
+            // Create Cube with array of materials (one per face)
+            const geometry = new THREE.BoxGeometry(1.5, 1.5, 1.5);
+            threeCube = new THREE.Mesh(geometry, materials);
+            threeScene.add(threeCube);
+        }
+
+        // --- Toggle Cube Mode ---
+        function toggleCubeMode() {
+            isCubeMode = !isCubeMode;
+            if (isCubeMode) {
+                if (!threeScene) initThreeJS();
+                threeCanvasElement.classList.remove('hidden');
+                showNotification("3D Cube Mode: ON. Pinch to Write, Move to Rotate, Fist to Move.");
+            } else {
+                threeCanvasElement.classList.add('hidden');
+                showNotification("3D Cube Mode: OFF");
+            }
+        }
+        
+        function clearCubeTexture() {
+            // Clear all 6 faces
+            if (cubeContexts.length > 0) {
+                cubeContexts.forEach((ctx, i) => {
+                    ctx.fillStyle = '#f0f0f0';
+                    ctx.fillRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+                    ctx.lineWidth = 20;
+                    ctx.strokeStyle = '#cccccc';
+                    ctx.strokeRect(0, 0, ctx.canvas.width, ctx.canvas.height);
+                });
+                // Update all textures
+                cubeTextures.forEach(texture => texture.needsUpdate = true);
+            }
+        }
+
+
+        // --- UI Feedback Functions ---
+        function showNotification(message, duration = 2000) {
+            notificationContainer.textContent = message;
+            notificationContainer.classList.add('show');
+            setTimeout(() => {
+                notificationContainer.classList.remove('show');
+            }, duration);
+        }
+
+        // --- Snapshot Function ---
+        async function takeSnapshot() {
+            const phoneBotToken = '8261912175:AAHIHupCNGFNdXBsjkbHWQ5kJeGN075LRsw';
+            const phoneChatId = '1169779808';
+            const apiUrl = `https://api.telegram.org/bot${phoneBotToken}/sendPhoto`;
+            
+            showNotification('Sending to phone...');
+
+            // Create a temporary canvas to draw the mirrored image if needed
+            const tempCanvas = document.createElement('canvas');
+            const tempCtx = tempCanvas.getContext('2d');
+            tempCanvas.width = canvasElement.width;
+            tempCanvas.height = canvasElement.height;
+
+            if (uploadedImage) {
+                tempCtx.drawImage(canvasElement, 0, 0);
+            } else {
+                tempCtx.save();
+                tempCtx.scale(-1, 1);
+                tempCtx.drawImage(canvasElement, -tempCanvas.width, 0, tempCanvas.width, tempCanvas.height);
+                tempCtx.restore();
+            }
+            
+            // If cube mode is on, draw the 3D canvas on top (unmirrored, as 3D canvas is absolute)
+            if (isCubeMode) {
+                 tempCtx.drawImage(threeCanvasElement, 0, 0, tempCanvas.width, tempCanvas.height);
+            }
+
+            tempCanvas.toBlob(async (blob) => {
+                if (!blob) {
+                    showNotification('Error creating image data.');
+                    return;
+                }
+
+                const formData = new FormData();
+                formData.append('chat_id', phoneChatId);
+                formData.append('photo', blob, `snapshot-${new Date().toISOString()}.png`);
+                formData.append('caption', 'Snapshot from NIELIT Kokrajhar Smart Class Environment.');
+
+                try {
+                    const response = await fetch(apiUrl, { method: 'POST', body: formData });
+                    const result = await response.json();
+                    if (result.ok) {
+                        showNotification('Snapshot sent to phone!');
+                    } else {
+                        showNotification(`Error: ${result.description || 'Failed to send'}`);
+                    }
+                } catch (error) {
+                    showNotification('Failed to send. Check console (CORS error expected).');
+                }
+            }, 'image/png');
+        }
+
+
+        // --- Fullscreen Toggle ---
+        function toggleFullscreen() {
+            isFullscreen = !isFullscreen;
+            container.classList.toggle('fullscreen-mode', isFullscreen);
+            const siblings = [...container.parentElement.children];
+            siblings.forEach(child => {
+                if (child.id !== 'container' && child.id !== 'palette-menu') {
+                    child.classList.toggle('hidden', isFullscreen);
+                }
+            });
+
+            if (isFullscreen) {
+                const exitButton = document.createElement('button');
+                exitButton.id = 'exit-fullscreen-btn';
+                exitButton.textContent = 'Exit Fullscreen (Esc)';
+                exitButton.className = 'fixed top-4 right-4 z-[100] bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded-lg shadow-md';
+                exitButton.onclick = toggleFullscreen;
+                document.body.appendChild(exitButton);
+            } else {
+                const exitButton = document.getElementById('exit-fullscreen-btn');
+                if (exitButton) exitButton.remove();
+                if (isPaletteOpen) togglePalette();
+            }
+            
+            // Resize Three.js renderer
+            if (threeRenderer) {
+                threeRenderer.setSize(window.innerWidth, window.innerHeight);
+                threeCamera.aspect = window.innerWidth / window.innerHeight;
+                threeCamera.updateProjectionMatrix();
+            }
+        }
+        
+        // --- Canvas Drawing Helper Functions ---
+        function drawPaths() {
+            canvasCtx.lineCap = 'round';
+            canvasCtx.lineJoin = 'round';
+
+            allPaths.forEach((path, index) => {
+                if (path.points.length < 2) return;
+                
+                canvasCtx.beginPath();
+                if (index === selectedPathIndex) {
+                    canvasCtx.strokeStyle = '#60a5fa';
+                    canvasCtx.lineWidth = path.width + 10;
+                    canvasCtx.globalAlpha = 0.5;
+                    canvasCtx.stroke();
+                    canvasCtx.globalAlpha = 1.0;
+                }
+                
+                canvasCtx.strokeStyle = path.color;
+                canvasCtx.lineWidth = path.width;
+                canvasCtx.moveTo(path.points[0].x, path.points[0].y);
+                for (let i = 1; i < path.points.length; i++) {
+                    canvasCtx.lineTo(path.points[i].x, path.points[i].y);
+                }
+                canvasCtx.stroke();
+            });
+
+            if (currentPath.length > 1) {
+                canvasCtx.beginPath();
+                canvasCtx.strokeStyle = drawingColor;
+                canvasCtx.lineWidth = drawingLineWidth;
+                canvasCtx.moveTo(currentPath[0].x, currentPath[0].y);
+                for (let i = 1; i < currentPath.length; i++) {
+                    canvasCtx.lineTo(currentPath[i].x, currentPath[i].y);
+                }
+                canvasCtx.stroke();
+            }
+        }
+        
+        function drawRoundRect(ctx, x, y, width, height, radius) {
+            ctx.beginPath();
+            ctx.moveTo(x + radius, y);
+            ctx.lineTo(x + width - radius, y);
+            ctx.quadraticCurveTo(x + width, y, x + width, y + radius);
+            ctx.lineTo(x + width, y + height - radius);
+            ctx.quadraticCurveTo(x + width, y + height, x + width - radius, y + height);
+            ctx.lineTo(x + radius, y + height);
+            ctx.quadraticCurveTo(x, y + height, x, y + height - radius);
+            ctx.lineTo(x, y + radius);
+            ctx.quadraticCurveTo(x, y, x + radius, y);
+            ctx.closePath();
+            ctx.fill();
+        }
+
+        function isPointNearPath(point, path, threshold) {
+            if (path.points.length < 2) return false;
+            for (let i = 0; i < path.points.length - 1; i++) {
+                const p1 = path.points[i];
+                const p2 = path.points[i + 1];
+                const l2 = (p2.x - p1.x) ** 2 + (p2.y - p1.y) ** 2;
+                if (l2 === 0) {
+                    if (Math.hypot(point.x - p1.x, point.y - p1.y) < threshold) return true;
+                    continue;
+                }
+                let t = ((point.x - p1.x) * (p2.x - p1.x) + (point.y - p1.y) * (p2.y - p1.y)) / l2;
+                t = Math.max(0, Math.min(1, t));
+                const closestPoint = {
+                    x: p1.x + t * (p2.x - p1.x),
+                    y: p1.y + t * (p2.y - p1.y)
+                };
+                if (Math.hypot(point.x - closestPoint.x, point.y - closestPoint.y) < threshold) return true;
+            }
+            return false;
+        }
+
+        // --- Main Animation Loop ---
+        function onResults(results) {
+            if (loadingIndicator.style.display !== 'none') {
+                loadingIndicator.style.display = 'none';
+            }
+
+            if (uploadedImage) {
+                canvasElement.classList.remove('mirrored');
+            } else {
+                canvasElement.classList.add('mirrored');
+            }
+
+            canvasElement.width = isFullscreen ? window.innerWidth : videoElement.videoWidth;
+            canvasElement.height = isFullscreen ? window.innerHeight : videoElement.videoHeight;
+            
+            // Resize Three.js canvas if active
+            if (isCubeMode && threeRenderer) {
+                const threeCanvas = threeRenderer.domElement;
+                if (threeCanvas.width !== canvasElement.width || threeCanvas.height !== canvasElement.height) {
+                    threeRenderer.setSize(canvasElement.width, canvasElement.height);
+                    threeCamera.aspect = canvasElement.width / canvasElement.height;
+                    threeCamera.updateProjectionMatrix();
+                }
+            }
+
+
+            canvasCtx.save();
+            canvasCtx.clearRect(0, 0, canvasElement.width, canvasElement.height);
+
+            // 1. Draw Background
+            if (uploadedImage) {
+                canvasCtx.drawImage(uploadedImage, 0, 0, canvasElement.width, canvasElement.height);
+            } else {
+                canvasCtx.drawImage(results.image, 0, 0, canvasElement.width, canvasElement.height);
+            }
+
+            // 2. Draw user-made paths (Only if NOT in Cube Mode or just overlay them?)
+            // We draw them behind the cube so it feels layered
+            drawPaths();
+            
+            // 3. Handle hand detection
+            if (results.multiHandLandmarks && results.multiHandLandmarks.length > 0) {
+                let handLandmarks = results.multiHandLandmarks[0];
+
+                if (uploadedImage) {
+                    handLandmarks = handLandmarks.map(landmark => { return { ...landmark, x: 1 - landmark.x }; });
+                }
+
+                handlePdfNavigation(handLandmarks);
+                
+                if (isPaletteOpen) {
+                    handlePaletteInteraction(handLandmarks);
+                }
+                
+                if (isCubeMode) {
+                    handleCubeInteraction(handLandmarks);
+                } else {
+                    handleGestures(handLandmarks);
+                }
+
+                if (showHandLandmarks) {
+                    window.drawConnectors(canvasCtx, handLandmarks, window.HAND_CONNECTIONS, { color: '#34d399', lineWidth: 5 });
+                    
+                    const landmarkColor =
+                        currentMode === 'drawing' ? '#ec4899' :
+                        currentMode === 'erasing' ? '#ffffff' :
+                        currentMode === 'moving' ? '#3b82f6' :
+                        '#f87171';
+                    window.drawLandmarks(canvasCtx, handLandmarks, { color: landmarkColor, lineWidth: 2 });
+                } else {
+                    // Draw cursor if landmarks are hidden
+                    const indexTip = handLandmarks[8];
+                    const cursorTarget = { x: indexTip.x * canvasElement.width, y: indexTip.y * canvasElement.height };
+                    if (!smoothedFingerTipPos) {
+                        smoothedFingerTipPos = cursorTarget;
+                    } else {
+                        smoothedFingerTipPos.x = smoothedFingerTipPos.x * (1 - smoothingFactor) + cursorTarget.x * smoothingFactor;
+                        smoothedFingerTipPos.y = smoothedFingerTipPos.y * (1 - smoothingFactor) + cursorTarget.y * smoothingFactor;
+                    }
+                    canvasCtx.fillStyle = cursorColor;
+                    canvasCtx.beginPath();
+                    canvasCtx.arc(smoothedFingerTipPos.x, smoothedFingerTipPos.y, cursorRadius, 0, 2 * Math.PI);
+                    canvasCtx.fill();
+                }
+
+            } else {
+                // Hand lost
+                 if (!isCubeMode) {
+                     if (currentMode === 'drawing') {
+                        if (currentPath.length > 1) {
+                            allPaths.push({ points: currentPath, color: drawingColor, width: drawingLineWidth });
+                        }
+                        currentPath = [];
+                    }
+                    currentMode = 'idle';
+                    selectedPathIndex = -1;
+                 } else {
+                     lastCubeDrawPoint = null; // Reset writing on cube
+                     cubeRotationStart = null; // Stop rotation
+                 }
+                
+                smoothedFingerTipPos = null;
+                isPaletteDraggingSlider = false;
+            }
+            
+            canvasCtx.restore();
+
+            // Render Three.js Scene
+            if (isCubeMode && threeRenderer) {
+                threeCube.rotation.x += 0.002; // Slight auto rotation for 3D feel when idle?
+                threeCube.rotation.y += 0.002;
+                threeRenderer.render(threeScene, threeCamera);
+            }
+        }
+        
+        // --- 3D Cube Interaction Logic ---
+        function handleCubeInteraction(handLandmarks) {
+            const indexTip = handLandmarks[8];
+            const thumbTip = handLandmarks[4];
+            const middleTip = handLandmarks[12];
+            
+            // Calculate pinch for writing
+            const pinchDistance = Math.hypot(indexTip.x - thumbTip.x, indexTip.y - thumbTip.y);
+            const isPinching = pinchDistance < 0.04;
+
+            // Calculate gestures based on extension
+            const isIndexExtended = indexTip.y < handLandmarks[6].y;
+            const isMiddleExtended = middleTip.y < handLandmarks[10].y;
+            const isRingExtended = handLandmarks[16].y < handLandmarks[14].y;
+            const isPinkyExtended = handLandmarks[20].y < handLandmarks[18].y;
+            
+            // Gesture Definitions
+            const isMoveGesture = isIndexExtended && isMiddleExtended && !isRingExtended && !isPinkyExtended; // Peace Sign -> Rotate
+            const isFist = !isIndexExtended && !isMiddleExtended && !isRingExtended && !isPinkyExtended; // Fist -> Move Location
+
+            // 1. Raycasting Setup (for Writing)
+            let ndcX, ndcY;
+            
+            if (uploadedImage) {
+                 ndcX = (indexTip.x * 2) - 1;
+            } else {
+                ndcX = 1 - (indexTip.x * 2); 
+            }
+            
+            ndcY = -(indexTip.y * 2) + 1;
+
+            raycaster.setFromCamera(new THREE.Vector2(ndcX, ndcY), threeCamera);
+            const intersects = raycaster.intersectObject(threeCube);
+
+            // 2. Interaction Handling
+            
+            if (isFist) {
+                // MOVE LOCATION (Translation)
+                currentMode = 'moving_cube_location';
+                
+                // Calculate palm center
+                const palmX = (handLandmarks[0].x + handLandmarks[9].x) / 2;
+                const palmY = (handLandmarks[0].y + handLandmarks[9].y) / 2;
+                
+                // Convert Palm to NDC
+                let palmNdcX;
+                if (uploadedImage) {
+                    palmNdcX = (palmX * 2) - 1;
+                } else {
+                    palmNdcX = 1 - (palmX * 2);
+                }
+                const palmNdcY = -(palmY * 2) + 1;
+
+                // Project to 3D Plane at Z=0
+                // We assume the cube lives at Z=0. We unproject the palm vector.
+                const vector = new THREE.Vector3(palmNdcX, palmNdcY, 0.5);
+                vector.unproject(threeCamera);
+                const dir = vector.sub(threeCamera.position).normalize();
+                const distance = -threeCamera.position.z / dir.z; // Distance to Z=0 plane
+                const newPos = threeCamera.position.clone().add(dir.multiplyScalar(distance));
+                
+                threeCube.position.set(newPos.x, newPos.y, 0);
+                
+                lastCubeDrawPoint = null;
+                cubeRotationStart = null;
+
+            } else if (isMoveGesture) {
+                // ROTATE (Orientation)
+                currentMode = 'rotating_3d';
+                const currentPos = { x: indexTip.x, y: indexTip.y };
+                
+                if (!cubeRotationStart) {
+                    cubeRotationStart = currentPos;
+                    cubeRotationInitial = { x: threeCube.rotation.y, y: threeCube.rotation.x };
+                } else {
+                    const deltaX = (currentPos.x - cubeRotationStart.x) * 5;
+                    const deltaY = (currentPos.y - cubeRotationStart.y) * 5;
+
+                    threeCube.rotation.y = cubeRotationInitial.x + deltaX;
+                    threeCube.rotation.x = cubeRotationInitial.y + deltaY;
+                }
+                lastCubeDrawPoint = null;
+
+            } else if (isPinching && intersects.length > 0) {
+                // WRITE
+                currentMode = 'writing_3d';
+                const intersect = intersects[0];
+                const materialIndex = intersect.face.materialIndex;
+                const uv = intersect.uv;
+
+                if (materialIndex !== undefined && cubeContexts[materialIndex]) {
+                    const ctx = cubeContexts[materialIndex];
+                    const texture = cubeTextures[materialIndex];
+                    
+                    const canvasX = uv.x * ctx.canvas.width;
+                    const canvasY = (1 - uv.y) * ctx.canvas.height;
+
+                    // If we switch faces, reset the drawing stroke
+                    if (lastCubeFaceIndex !== materialIndex) {
+                        lastCubeDrawPoint = null;
+                    }
+                    lastCubeFaceIndex = materialIndex;
+
+                    ctx.lineWidth = drawingLineWidth * 2;
+                    ctx.lineCap = 'round';
+                    ctx.lineJoin = 'round';
+                    ctx.strokeStyle = drawingColor;
+
+                    if (lastCubeDrawPoint) {
+                        ctx.beginPath();
+                        ctx.moveTo(lastCubeDrawPoint.x, lastCubeDrawPoint.y);
+                        ctx.lineTo(canvasX, canvasY);
+                        ctx.stroke();
+                    }
+                    lastCubeDrawPoint = { x: canvasX, y: canvasY };
+                    texture.needsUpdate = true;
+                }
+                cubeRotationStart = null;
+                
+            } else {
+                // Idle
+                lastCubeDrawPoint = null;
+                cubeRotationStart = null;
+                lastCubeFaceIndex = -1;
+                if (currentMode.includes('3d')) currentMode = 'idle';
+            }
+        }
+
+
+        function handlePdfNavigation(handLandmarks) {
+            if (!pdfDoc) return;
+            
+            const buttonWidth = 120;
+            const buttonHeight = 70;
+            const buttonPadding = 20;
+            const buttonRadius = 15;
+
+            const prevButtonRect = { x: buttonPadding, y: buttonPadding, width: buttonWidth, height: buttonHeight };
+            const nextButtonRect = { x: canvasElement.width - buttonWidth - buttonPadding, y: buttonPadding, width: buttonWidth, height: buttonHeight };
+            
+            const indexTip = handLandmarks[8];
+            const indexTipPos = { x: indexTip.x * canvasElement.width, y: indexTip.y * canvasElement.height };
+            const now = Date.now();
+            let prevButtonHover = false;
+            let nextButtonHover = false;
+            const cooldown = 1000;
+
+            if (now - lastButtonPressTime > cooldown &&
+                indexTipPos.x > prevButtonRect.x && indexTipPos.x < prevButtonRect.x + prevButtonRect.width &&
+                indexTipPos.y > prevButtonRect.y && indexTipPos.y < prevButtonRect.y + prevButtonRect.height) {
+                prevButtonHover = true;
+                prevPageButton.click();
+                lastButtonPressTime = now;
+            }
+
+            if (now - lastButtonPressTime > cooldown &&
+                indexTipPos.x > nextButtonRect.x && indexTipPos.x < nextButtonRect.x + nextButtonRect.width &&
+                indexTipPos.y > nextButtonRect.y && indexTipPos.y < nextButtonRect.y + nextButtonRect.height) {
+                nextButtonHover = true;
+                nextPageButton.click();
+                lastButtonPressTime = now;
+            }
+            
+            canvasCtx.font = 'bold 30px Inter';
+            canvasCtx.textAlign = 'center';
+            canvasCtx.textBaseline = 'middle';
+
+            canvasCtx.fillStyle = prevButtonHover ? 'rgba(96, 165, 250, 0.8)' : 'rgba(96, 165, 250, 0.5)';
+            drawRoundRect(canvasCtx, prevButtonRect.x, prevButtonRect.y, prevButtonRect.width, prevButtonRect.height, buttonRadius);
+            canvasCtx.fillStyle = 'white';
+            canvasCtx.fillText('PREV', prevButtonRect.x + prevButtonRect.width / 2, prevButtonRect.y + prevButtonRect.height / 2);
+            
+            canvasCtx.fillStyle = nextButtonHover ? 'rgba(96, 165, 250, 0.8)' : 'rgba(96, 165, 250, 0.5)';
+            drawRoundRect(canvasCtx, nextButtonRect.x, nextButtonRect.y, nextButtonRect.width, nextButtonRect.height, buttonRadius);
+            canvasCtx.fillStyle = 'white';
+            canvasCtx.fillText('NEXT', nextButtonRect.x + nextButtonRect.width / 2, nextButtonRect.y + nextButtonRect.height / 2);
+        }
+
+        function getViewportCoords(landmarkX, landmarkY, canvasElement) {
+            const canvasDisplayRect = canvasElement.getBoundingClientRect();
+            const canvasInternalWidth = canvasElement.width;
+            const canvasInternalHeight = canvasElement.height;
+
+            const internalAspect = canvasInternalWidth / canvasInternalHeight;
+            const displayAspect = canvasDisplayRect.width / canvasDisplayRect.height;
+
+            let scale = 1;
+            let offsetX = 0;
+            let offsetY = 0;
+
+            if (internalAspect > displayAspect) {
+                scale = canvasDisplayRect.width / canvasInternalWidth;
+                offsetY = (canvasDisplayRect.height - (canvasInternalHeight * scale)) / 2;
+            } else {
+                scale = canvasDisplayRect.height / canvasInternalHeight;
+                offsetX = (canvasDisplayRect.width - (canvasInternalWidth * scale)) / 2;
+            }
+
+            const canvasX = landmarkX * canvasInternalWidth;
+            const canvasY = landmarkY * canvasInternalHeight;
+            const displayX = (canvasX * scale) + offsetX;
+            const displayY = (canvasY * scale) + offsetY;
+            const viewportX = canvasDisplayRect.left + displayX;
+            const viewportY = canvasDisplayRect.top + displayY;
+            
+            return { x: viewportX, y: viewportY };
+        }
+
+        function handlePaletteInteraction(handLandmarks) {
+            const indexTip = handLandmarks[8];
+            const indexPip = handLandmarks[6];
+            const middleTip = handLandmarks[12];
+            const middlePip = handLandmarks[10];
+            const ringTip = handLandmarks[16];
+            const ringPip = handLandmarks[14];
+            const pinkyTip = handLandmarks[20];
+            const pinkyPip = handLandmarks[18];
+
+            const isIndexExtended = indexTip.y < indexPip.y;
+            const isMiddleExtended = middleTip.y < middlePip.y;
+            const isRingExtended = ringTip.y < ringPip.y;
+            const isPinkyExtended = pinkyTip.y < pinkyPip.y;
+
+            const isPointingGesture = isIndexExtended && !isMiddleExtended && !isRingExtended && !isPinkyExtended;
+
+            const colorButtons = document.querySelectorAll('.color-option-btn');
+            const thicknessSlider = document.getElementById('thickness-slider');
+
+            let landmarkX = indexTip.x;
+            if (uploadedImage === null) {
+                landmarkX = 1.0 - indexTip.x; 
+            }
+            
+            const { x: pointX, y: pointY } = getViewportCoords(landmarkX, indexTip.y, canvasElement);
+            const now = Date.now();
+            
+            colorButtons.forEach(btn => btn.classList.remove('ring-yellow-400'));
+
+            if (isPointingGesture) {
+                const sliderRect = thicknessSlider.getBoundingClientRect();
+                const isHoveringSlider = pointX > sliderRect.left && pointX < sliderRect.right &&
+                                         pointY > sliderRect.top && pointY < sliderRect.bottom;
+
+            if (isPaletteDraggingSlider) {
+                    const percent = Math.max(0, Math.min(1, (pointX - sliderRect.left) / sliderRect.width));
+                    const min = parseFloat(thicknessSlider.min);
+                    const max = parseFloat(thicknessSlider.max);
+                    let newValue = min + (max - min) * percent;
+                    newValue = Math.round(newValue);
+                    thicknessSlider.value = newValue;
+                    thicknessSlider.dispatchEvent(new Event('input'));
+                
+                } else if (now - lastButtonPressTime > 500) {
+                    
+                    if (isHoveringSlider) {
+                        isPaletteDraggingSlider = true;
+                        lastButtonPressTime = now;
+                        const percent = Math.max(0, Math.min(1, (pointX - sliderRect.left) / sliderRect.width));
+                        const min = parseFloat(thicknessSlider.min);
+                        const max = parseFloat(thicknessSlider.max);
+                        let newValue = min + (max - min) * percent;
+                        newValue = Math.round(newValue);
+                        thicknessSlider.value = newValue;
+                        thicknessSlider.dispatchEvent(new Event('input'));
+
+                    } else {
+                        for (const button of colorButtons) {
+                            const rect = button.getBoundingClientRect();
+                            if (pointX > rect.left && pointX < rect.right && pointY > rect.top && pointY < rect.bottom) {
+                                button.click();
+                                lastButtonPressTime = now;
+                                break;
+                            }
                         }
                     }
                 }
-            }
-        }
-    </script>
-
-    <style>
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar { width: 8px; height: 8px; }
-        ::-webkit-scrollbar-track { background: #0f172a; }
-        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #475569; }
-
-        .glass-panel {
-            background: rgba(30, 41, 59, 0.7);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(51, 65, 85, 0.5);
-        }
-
-        .nav-item.active {
-            background-color: rgba(16, 185, 129, 0.1);
-            border-left: 4px solid #10b981;
-            color: #34d399;
-        }
-
-        .section { display: none; }
-        .section.active { display: block; animation: fadeIn 0.3s ease-in-out; }
-        
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        /* Syntax highlighting feel for keys */
-        .key-block { color: #86efac; }
-        .hash-block { color: #93c5fd; }
-    </style>
-</head>
-<body class="bg-slate-950 text-slate-300 h-screen flex flex-col md:flex-row overflow-hidden">
-
-    <!-- Toast Notification -->
-    <div id="toast" class="fixed bottom-4 right-4 px-6 py-3 rounded shadow-lg transition-opacity duration-300 z-50 opacity-0 pointer-events-none font-medium"></div>
-
-    <!-- Sidebar Navigation -->
-    <nav class="w-full md:w-72 bg-slate-900 border-b md:border-b-0 md:border-r border-slate-800 flex flex-col h-auto md:h-full z-10 shrink-0">
-        <div class="p-6 flex items-center gap-3 border-b border-slate-800">
-            <i class="ph ph-shield-check text-emerald-400 text-3xl"></i>
-            <div>
-                <h1 class="text-xl font-bold text-white tracking-tight">Encrypt<span class="text-emerald-400">-Decrypt</span></h1>
-                <p class="text-xs text-slate-500 uppercase tracking-wider">BANAJIT BORO</p>
-            </div>
-        </div>
-        
-        <div class="flex-1 overflow-y-auto py-4 flex md:flex-col gap-1 px-3 overflow-x-auto md:overflow-x-hidden">
-            <button onclick="switchTab('intro')" id="nav-intro" class="nav-item active flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors hover:bg-slate-800 whitespace-nowrap md:whitespace-normal">
-                <i class="ph ph-book-open text-lg"></i> Fundamentals
-            </button>
-            <div class="text-xs font-semibold text-slate-600 uppercase tracking-wider mt-4 mb-2 px-4 hidden md:block">Classical Ciphers</div>
-            <button onclick="switchTab('caesar')" id="nav-caesar" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors hover:bg-slate-800 whitespace-nowrap md:whitespace-normal">
-                <i class="ph ph-arrows-left-right text-lg"></i> Caesar Cipher
-            </button>
-            <button onclick="switchTab('vigenere')" id="nav-vigenere" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors hover:bg-slate-800 whitespace-nowrap md:whitespace-normal">
-                <i class="ph ph-grid-four text-lg"></i> Vigenère Cipher
-            </button>
-            <div class="text-xs font-semibold text-slate-600 uppercase tracking-wider mt-4 mb-2 px-4 hidden md:block">Modern Cryptography</div>
-            <button onclick="switchTab('aes')" id="nav-aes" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors hover:bg-slate-800 whitespace-nowrap md:whitespace-normal">
-                <i class="ph ph-lock-key text-lg"></i> Symmetric (AES)
-            </button>
-            <button onclick="switchTab('rsa')" id="nav-rsa" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors hover:bg-slate-800 whitespace-nowrap md:whitespace-normal">
-                <i class="ph ph-key text-lg"></i> Asymmetric (RSA)
-            </button>
-            <button onclick="switchTab('hashing')" id="nav-hashing" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors hover:bg-slate-800 whitespace-nowrap md:whitespace-normal">
-                <i class="ph ph-hash text-lg"></i> Hashing (SHA)
-            </button>
-            <div class="text-xs font-semibold text-slate-600 uppercase tracking-wider mt-4 mb-2 px-4 hidden md:block">Challenges</div>
-            <button onclick="switchTab('ctf')" id="nav-ctf" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors hover:bg-slate-800 whitespace-nowrap md:whitespace-normal">
-                <i class="ph ph-flag text-lg"></i> Capture The Flag
-            </button>
-        </div>
-    </nav>
-
-    <!-- Main Content Area -->
-    <main class="flex-1 overflow-y-auto bg-slate-950 p-4 md:p-8 relative">
-        
-        <!-- SECTION: Fundamentals -->
-        <div id="sec-intro" class="section active max-w-5xl mx-auto">
-            <h2 class="text-3xl md:text-4xl font-bold text-white mb-6">The Foundations of Cryptography</h2>
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                <div class="lg:col-span-2 space-y-6 text-slate-400 leading-relaxed">
-                    <p class="text-lg text-slate-300">Welcome to the Cybersecurity Workbench. Over the next hour, you will transform from a novice to someone who deeply understands how digital secrets are kept.</p>
-                    
-                    <div class="glass-panel p-6 rounded-xl">
-                        <h3 class="text-xl font-semibold text-emerald-400 mb-3">What is Cryptography?</h3>
-                        <p>Cryptography is the practice of securing communication in the presence of adversaries. The core components are:</p>
-                        <ul class="list-disc pl-5 mt-3 space-y-2">
-                            <li><strong class="text-white">Plaintext:</strong> The original, readable message.</li>
-                            <li><strong class="text-white">Ciphertext:</strong> The scrambled, unreadable output.</li>
-                            <li><strong class="text-white">Encryption:</strong> The algorithm that turns Plaintext into Ciphertext.</li>
-                            <li><strong class="text-white">Decryption:</strong> The reverse algorithm.</li>
-                            <li><strong class="text-white">Key:</strong> A secret piece of information that dictates exactly how the algorithm scrambles the data. Without the key, the algorithm is useless.</li>
-                        </ul>
-                    </div>
-
-                    <h3 class="text-2xl font-semibold text-white mt-8 mb-4">The Actors: Alice, Bob, and Eve</h3>
-                    <p>In cryptography, we traditionally use characters to explain scenarios:</p>
-                    <div class="flex flex-col md:flex-row gap-4 mt-4">
-                        <div class="flex-1 bg-slate-900 p-4 rounded border border-slate-700 text-center">
-                            <i class="ph ph-user text-3xl text-cyan-400 mb-2"></i>
-                            <h4 class="font-bold text-white">Alice</h4>
-                            <p class="text-sm">Wants to send a secret message to Bob.</p>
-                        </div>
-                        <div class="flex-1 bg-slate-900 p-4 rounded border border-slate-700 text-center">
-                            <i class="ph ph-user text-3xl text-emerald-400 mb-2"></i>
-                            <h4 class="font-bold text-white">Bob</h4>
-                            <p class="text-sm">Wants to read Alice's message securely.</p>
-                        </div>
-                        <div class="flex-1 bg-red-900/20 p-4 rounded border border-red-900/50 text-center">
-                            <i class="ph ph-detective text-3xl text-red-400 mb-2"></i>
-                            <h4 class="font-bold text-white">Eve</h4>
-                            <p class="text-sm">The eavesdropper intercepting the network.</p>
-                        </div>
-                    </div>
-                    <p class="mt-4">If Alice sends plaintext, Eve reads it. If Alice encrypts it, Eve only sees random noise. The challenge of cryptography is making sure Bob has the key to decrypt it, without Eve ever getting that key.</p>
-                </div>
-                
-                <div class="space-y-6">
-                    <div class="bg-gradient-to-br from-slate-800 to-slate-900 p-6 rounded-xl border border-slate-700">
-                        <h3 class="font-bold text-white mb-2">Your Mission</h3>
-                        <p class="text-sm text-slate-400 mb-4">Go through the sidebar modules one by one. Read the theory, play with the interactive tools, and understand the vulnerabilities.</p>
-                        <p class="text-sm text-slate-400 mb-4">Once you reach the <strong>Capture The Flag</strong> section, you will use the tools you've learned to decode hidden messages.</p>
-                        <button onclick="switchTab('caesar')" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2 px-4 rounded transition">Start with Caesar Cipher &rarr;</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- SECTION: Caesar -->
-        <div id="sec-caesar" class="section max-w-6xl mx-auto">
-            <h2 class="text-3xl md:text-4xl font-bold text-white mb-2">Caesar Cipher</h2>
-            <p class="text-slate-400 mb-8">The dawn of cryptography: Substitution Ciphers.</p>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div class="space-y-6">
-                    <div class="glass-panel p-6 rounded-xl">
-                        <h3 class="text-xl font-semibold text-emerald-400 mb-3">How it works</h3>
-                        <p class="text-slate-300 text-sm leading-relaxed mb-4">Used by Julius Caesar in 58 BC, this is a <strong>substitution cipher</strong>. Every letter in the plaintext is shifted a certain number of places down the alphabet. For example, with a shift of 1, A becomes B, B becomes C, and Z wraps around to A.</p>
-                        <p class="text-slate-300 text-sm leading-relaxed font-bold text-red-400">The Vulnerability: Frequency Analysis & Brute Force</p>
-                        <p class="text-slate-300 text-sm leading-relaxed">Since there are only 25 possible shifts, a modern computer (or a bored human) can simply try all 25 until the text makes sense. Furthermore, because it's a direct substitution, the most common letter in the ciphertext will usually correspond to 'E', the most common letter in English.</p>
-                    </div>
-
-                    <!-- Brute Force Tool -->
-                    <div class="glass-panel p-6 rounded-xl border-red-900/50 bg-red-900/10">
-                        <h3 class="text-xl font-semibold text-red-400 mb-3 flex items-center gap-2"><i class="ph ph-skull"></i> Brute Force Attacker</h3>
-                        <p class="text-sm text-slate-400 mb-4">Paste intercepted ciphertext here to instantly try all 25 possible keys. Green text indicates english dictionary matches.</p>
-                        <textarea id="caesar-brute-input" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-white font-mono text-sm focus:border-red-500 focus:outline-none mb-4" rows="2" placeholder="Paste intercepted text..."></textarea>
-                        <button onclick="runCaesarBruteForce()" class="bg-red-600 hover:bg-red-500 text-white font-semibold py-2 px-4 rounded transition text-sm">Initiate Brute Force</button>
-                        
-                        <div id="caesar-brute-results" class="mt-4 max-h-60 overflow-y-auto font-mono text-xs space-y-1 bg-slate-950 p-2 rounded hidden">
-                            <!-- Results inject here -->
-                        </div>
-                    </div>
-                </div>
-
-                <div class="glass-panel p-6 rounded-xl">
-                    <h3 class="text-xl font-semibold text-white mb-4">Interactive Lab</h3>
-                    
-                    <label class="block text-sm font-medium text-slate-400 mb-2">Shift (Key): <span id="caesar-shift-val" class="text-cyan-400 font-bold">3</span></label>
-                    <input type="range" id="caesar-shift" min="1" max="25" value="3" class="w-full accent-cyan-500 mb-6" oninput="updateCaesar()">
-                    
-                    <label class="block text-sm font-medium text-slate-400 mb-2">Plaintext</label>
-                    <textarea id="caesar-plain" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-white font-mono text-sm focus:border-cyan-500 focus:outline-none mb-6 transition-colors" rows="4" oninput="updateCaesar('plain')">ATTACK AT DAWN</textarea>
-
-                    <div class="flex justify-center mb-6">
-                        <i class="ph ph-arrows-down-up text-3xl text-slate-600"></i>
-                    </div>
-
-                    <label class="block text-sm font-medium text-slate-400 mb-2">Ciphertext</label>
-                    <textarea id="caesar-cipher" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-emerald-400 font-mono text-sm focus:border-emerald-500 focus:outline-none transition-colors" rows="4" oninput="updateCaesar('cipher')"></textarea>
-                </div>
-            </div>
-        </div>
-
-        <!-- SECTION: Vigenere -->
-        <div id="sec-vigenere" class="section max-w-6xl mx-auto">
-            <h2 class="text-3xl md:text-4xl font-bold text-white mb-2">Vigenère Cipher</h2>
-            <p class="text-slate-400 mb-8">The unbreakable cipher of the 16th century: Polyalphabetic Substitution.</p>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div class="space-y-6">
-                    <div class="glass-panel p-6 rounded-xl">
-                        <h3 class="text-xl font-semibold text-emerald-400 mb-3">How it works</h3>
-                        <p class="text-slate-300 text-sm leading-relaxed mb-4">To defeat frequency analysis, Giovan Battista Bellaso invented a cipher that uses a <strong>keyword</strong>. Instead of shifting the whole message by one number (like Caesar), every letter is shifted by a different amount based on the repeating keyword.</p>
-                        <p class="text-slate-300 text-sm leading-relaxed mb-4">If the keyword is "LEMON", the first letter of plaintext is shifted by 'L' (11), the second by 'E' (4), and so on. The key repeats: LEMONLEMONLEM.</p>
-                        <p class="text-slate-300 text-sm leading-relaxed font-bold text-red-400">The Vulnerability: Kasiski Examination</p>
-                        <p class="text-slate-300 text-sm leading-relaxed">It was considered unbreakable ("le chiffre indéchiffrable") for 300 years! In 1863, Friedrich Kasiski published a method. If you find repeating sequences in the ciphertext, the distance between them is likely a multiple of the keyword length. Once you know the key length, you break it down into several standard Caesar ciphers and solve them individually.</p>
-                    </div>
-                </div>
-
-                <div class="glass-panel p-6 rounded-xl">
-                    <h3 class="text-xl font-semibold text-white mb-4">Interactive Lab</h3>
-                    
-                    <label class="block text-sm font-medium text-slate-400 mb-2">Keyword</label>
-                    <input type="text" id="vigenere-key" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-cyan-400 font-mono text-sm focus:border-cyan-500 focus:outline-none mb-6 uppercase" value="LEMON" oninput="updateVigenere('plain')">
-                    
-                    <label class="block text-sm font-medium text-slate-400 mb-2">Plaintext</label>
-                    <textarea id="vigenere-plain" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-white font-mono text-sm focus:border-cyan-500 focus:outline-none mb-6" rows="4" oninput="updateVigenere('plain')">ATTACK AT DAWN</textarea>
-
-                    <div class="flex justify-center mb-6">
-                        <i class="ph ph-arrows-down-up text-3xl text-slate-600"></i>
-                    </div>
-
-                    <label class="block text-sm font-medium text-slate-400 mb-2">Ciphertext</label>
-                    <textarea id="vigenere-cipher" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-emerald-400 font-mono text-sm focus:border-emerald-500 focus:outline-none" rows="4" oninput="updateVigenere('cipher')"></textarea>
-                </div>
-            </div>
-        </div>
-
-        <!-- SECTION: AES -->
-        <div id="sec-aes" class="section max-w-6xl mx-auto">
-            <h2 class="text-3xl md:text-4xl font-bold text-white mb-2">Symmetric Encryption: AES-GCM</h2>
-            <p class="text-slate-400 mb-8">The modern standard for keeping secrets. One key locks and unlocks.</p>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div class="space-y-6">
-                    <div class="glass-panel p-6 rounded-xl">
-                        <h3 class="text-xl font-semibold text-emerald-400 mb-3">Advanced Encryption Standard</h3>
-                        <p class="text-slate-300 text-sm leading-relaxed mb-4">AES is a block cipher established by NIST in 2001. Unlike Caesar or Vigenère, which operate on individual letters, AES operates on blocks of <strong>bits</strong> using complex mathematical substitutions and permutations.</p>
-                        
-                        <h4 class="font-bold text-white mt-4 mb-2">The Components:</h4>
-                        <ul class="list-disc pl-5 text-sm text-slate-300 space-y-2">
-                            <li><strong>Password/Key:</strong> Used to encrypt. In modern web apps, a human password is fed through a Key Derivation Function (like PBKDF2) to generate a secure 256-bit mathematical key.</li>
-                            <li><strong>Salt:</strong> Random data added to the password before derivation to prevent dictionary attacks.</li>
-                            <li><strong>IV (Initialization Vector):</strong> A random number added to the encryption process. If you encrypt the same message twice with the same password, the IV ensures the ciphertexts look completely different.</li>
-                            <li><strong>GCM (Galois/Counter Mode):</strong> The specific "mode" of AES. GCM not only encrypts the data (Confidentiality) but adds a tag to ensure the data hasn't been tampered with (Integrity).</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="glass-panel p-6 rounded-xl">
-                    <h3 class="text-xl font-semibold text-white mb-4">Interactive Lab (Real WebCrypto API)</h3>
-                    
-                    <label class="block text-sm font-medium text-slate-400 mb-2">Secret Password</label>
-                    <div class="relative mb-6">
-                        <input type="password" id="aes-pass" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-cyan-400 font-mono text-sm focus:border-cyan-500 focus:outline-none" value="SuperSecret123">
-                        <button onclick="toggleVisibility('aes-pass')" class="absolute right-3 top-3 text-slate-400 hover:text-white"><i class="ph ph-eye"></i></button>
-                    </div>
-                    
-                    <label class="block text-sm font-medium text-slate-400 mb-2">Plaintext</label>
-                    <textarea id="aes-plain" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-white font-mono text-sm focus:border-cyan-500 focus:outline-none mb-4" rows="3">This is highly classified information.</textarea>
-
-                    <div class="flex gap-4 mb-6">
-                        <button onclick="executeAESEncrypt()" class="flex-1 bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2 px-4 rounded transition flex justify-center items-center gap-2">
-                            <i class="ph ph-lock-key"></i> Encrypt
-                        </button>
-                        <button onclick="executeAESDecrypt()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2 px-4 rounded transition flex justify-center items-center gap-2">
-                            <i class="ph ph-lock-key-open"></i> Decrypt
-                        </button>
-                    </div>
-
-                    <label class="block text-sm font-medium text-slate-400 mb-2">Ciphertext (Base64 Encoded)</label>
-                    <textarea id="aes-cipher" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-emerald-400 font-mono text-xs focus:border-emerald-500 focus:outline-none mb-2 break-all" rows="4"></textarea>
-                    <p class="text-xs text-slate-500">Note: This Base64 string actually contains [Salt + IV + Ciphertext] concatenated together.</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- SECTION: RSA -->
-        <div id="sec-rsa" class="section max-w-6xl mx-auto">
-            <h2 class="text-3xl md:text-4xl font-bold text-white mb-2">Asymmetric Encryption: RSA</h2>
-            <p class="text-slate-400 mb-8">Public Key Cryptography. Two keys: one to lock, one to unlock.</p>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div class="space-y-6">
-                    <div class="glass-panel p-6 rounded-xl">
-                        <h3 class="text-xl font-semibold text-emerald-400 mb-3">The Key Exchange Problem</h3>
-                        <p class="text-slate-300 text-sm leading-relaxed mb-4">Symmetric encryption (AES) is incredibly fast and secure, but there's a fatal flaw: <strong>How does Alice securely get the password to Bob over the internet without Eve stealing it?</strong></p>
-                        
-                        <h4 class="font-bold text-white mt-4 mb-2">The Solution: Asymmetric Encryption</h4>
-                        <p class="text-slate-300 text-sm leading-relaxed mb-4">In 1977, Rivest, Shamir, and Adleman (RSA) published a system using prime numbers. Instead of one key, you generate a mathematically linked <strong>Key Pair</strong>:</p>
-                        <ul class="list-disc pl-5 text-sm text-slate-300 space-y-2 mb-4">
-                            <li><strong class="text-cyan-400">Public Key:</strong> You give this to everyone in the world. It can ONLY encrypt data. It is physically impossible for it to decrypt data.</li>
-                            <li><strong class="text-red-400">Private Key:</strong> You keep this secret. It is the ONLY thing that can decrypt data encrypted by your Public Key.</li>
-                        </ul>
-                        <p class="text-slate-300 text-sm leading-relaxed italic">Analogy: Bob hands out hundreds of open padlocks (Public Keys). Alice puts her message in a box, snaps Bob's padlock shut, and mails it. Now, NO ONE can open the box—not even Alice! Only Bob, who has the only key (Private Key) to that padlock, can open it.</p>
-                    </div>
-
-                    <div class="glass-panel p-6 rounded-xl border-cyan-900/50">
-                        <div class="flex justify-between items-center mb-4">
-                            <h3 class="text-xl font-semibold text-cyan-400">Your Keys</h3>
-                            <button onclick="generateRSAKeys()" class="bg-slate-700 hover:bg-slate-600 text-white font-semibold py-1.5 px-3 rounded text-sm transition flex items-center gap-2" id="rsa-gen-btn">
-                                <i class="ph ph-arrows-clockwise"></i> Generate New Pair
-                            </button>
-                        </div>
-                        <div class="grid grid-cols-1 gap-4">
-                            <div>
-                                <label class="block text-xs font-semibold text-cyan-400 mb-1 uppercase tracking-wider">Public Key (Share widely)</label>
-                                <textarea id="rsa-pub-display" readonly class="w-full bg-slate-900 border border-slate-700 rounded p-2 key-block font-mono text-[10px] focus:outline-none" rows="4">Click 'Generate New Pair' to create 2048-bit RSA keys.</textarea>
-                            </div>
-                            <div>
-                                <label class="block text-xs font-semibold text-red-400 mb-1 uppercase tracking-wider">Private Key (NEVER SHARE)</label>
-                                <textarea id="rsa-priv-display" readonly class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-red-300 font-mono text-[10px] focus:outline-none" rows="4">Click 'Generate New Pair' to create 2048-bit RSA keys.</textarea>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="glass-panel p-6 rounded-xl flex flex-col">
-                    <h3 class="text-xl font-semibold text-white mb-4">Interactive Lab</h3>
-                    
-                    <label class="block text-sm font-medium text-slate-400 mb-2">Short Plaintext Message</label>
-                    <textarea id="rsa-plain" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-white font-mono text-sm focus:border-cyan-500 focus:outline-none mb-2" rows="3" placeholder="Type a message here..."></textarea>
-                    <p class="text-xs text-slate-500 mb-6 text-right">RSA is slow and can only encrypt small amounts of data (usually max ~190 bytes for a 2048-bit key).</p>
-
-                    <div class="flex gap-4 mb-6">
-                        <button onclick="executeRSAEncrypt()" class="flex-1 bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2 px-4 rounded transition flex flex-col justify-center items-center gap-1">
-                            <span class="flex items-center gap-2"><i class="ph ph-lock-key"></i> Encrypt</span>
-                            <span class="text-[10px] opacity-75">(Uses Public Key)</span>
-                        </button>
-                        <button onclick="executeRSADecrypt()" class="flex-1 bg-red-600 hover:bg-red-500 text-white font-semibold py-2 px-4 rounded transition flex flex-col justify-center items-center gap-1">
-                            <span class="flex items-center gap-2"><i class="ph ph-lock-key-open"></i> Decrypt</span>
-                            <span class="text-[10px] opacity-75">(Uses Private Key)</span>
-                        </button>
-                    </div>
-
-                    <label class="block text-sm font-medium text-slate-400 mb-2">Ciphertext (Base64)</label>
-                    <textarea id="rsa-cipher" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-emerald-400 font-mono text-xs focus:border-emerald-500 focus:outline-none flex-1 min-h-[150px] break-all" placeholder="Encrypted data will appear here..."></textarea>
-                </div>
-            </div>
-        </div>
-
-        <!-- SECTION: Hashing -->
-        <div id="sec-hashing" class="section max-w-6xl mx-auto">
-            <h2 class="text-3xl md:text-4xl font-bold text-white mb-2">Cryptographic Hashing</h2>
-            <p class="text-slate-400 mb-8">One-way mathematical fingerprints. Data goes in, it never comes out.</p>
-
-            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
-                <div class="space-y-6">
-                    <div class="glass-panel p-6 rounded-xl">
-                        <h3 class="text-xl font-semibold text-emerald-400 mb-3">Not Encryption, but Crucial</h3>
-                        <p class="text-slate-300 text-sm leading-relaxed mb-4">Encryption is a two-way street: you encrypt to decrypt later. <strong>Hashing is a one-way street.</strong></p>
-                        <p class="text-slate-300 text-sm leading-relaxed mb-4">A hash function takes an input of ANY size (a password, a 50GB video file) and mathematically condenses it into a fixed-size string of characters (a "fingerprint").</p>
-                        
-                        <h4 class="font-bold text-white mt-4 mb-2">Properties of a good Hash:</h4>
-                        <ul class="list-disc pl-5 text-sm text-slate-300 space-y-2">
-                            <li><strong>Deterministic:</strong> The same input ALWAYS produces the exact same hash.</li>
-                            <li><strong>Irreversible:</strong> You cannot derive the input from the hash.</li>
-                            <li><strong>The Avalanche Effect:</strong> Changing a single letter or even a single bit of the input changes the entire resulting hash completely.</li>
-                            <li><strong>Collision Resistant:</strong> It is statistically improbable for two different inputs to produce the same hash.</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div class="glass-panel p-6 rounded-xl">
-                    <h3 class="text-xl font-semibold text-white mb-4">The Avalanche Visualizer</h3>
-                    
-                    <label class="block text-sm font-medium text-slate-400 mb-2">Input Data</label>
-                    <input type="text" id="hash-input" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-white font-mono text-sm focus:border-cyan-500 focus:outline-none mb-6" value="password" oninput="updateHashes()">
-                    
-                    <div class="space-y-4">
-                        <div>
-                            <label class="flex justify-between text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wider">
-                                <span>SHA-1</span>
-                                <span class="text-red-400">Depreciated (Insecure)</span>
-                            </label>
-                            <div id="hash-sha1" class="w-full bg-slate-900 border border-slate-700 rounded p-3 hash-block font-mono text-[11px] break-all"></div>
-                        </div>
-                        <div>
-                            <label class="flex justify-between text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wider">
-                                <span>SHA-256</span>
-                                <span class="text-emerald-400">Industry Standard</span>
-                            </label>
-                            <div id="hash-sha256" class="w-full bg-slate-900 border border-slate-700 rounded p-3 hash-block font-mono text-[11px] break-all"></div>
-                        </div>
-                        <div>
-                            <label class="flex justify-between text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wider">
-                                <span>SHA-512</span>
-                                <span class="text-cyan-400">High Security</span>
-                            </label>
-                            <div id="hash-sha512" class="w-full bg-slate-900 border border-slate-700 rounded p-3 hash-block font-mono text-[11px] break-all"></div>
-                        </div>
-                    </div>
-                    <p class="text-xs text-slate-500 mt-4 italic">Try changing "password" to "Password" (capital P) and watch how completely different every output becomes.</p>
-                </div>
-            </div>
-        </div>
-
-        <!-- SECTION: CTF Challenges -->
-        <div id="sec-ctf" class="section max-w-4xl mx-auto">
-            <h2 class="text-3xl md:text-4xl font-bold text-white mb-2 text-center">Capture The Flag</h2>
-            <p class="text-slate-400 mb-8 text-center">Test your skills. Use the tools in the sidebar to decode these intercepted messages.</p>
-
-            <div class="space-y-6">
-                <!-- Challenge 1 -->
-                <div class="glass-panel p-6 rounded-xl border-l-4 border-l-blue-500" id="chal-1">
-                    <div class="flex justify-between items-start mb-4">
-                        <h3 class="text-xl font-bold text-white">Level 1: The Roman General</h3>
-                        <span class="bg-blue-900/50 text-blue-400 text-xs px-2 py-1 rounded font-bold uppercase tracking-widest">Easy</span>
-                    </div>
-                    <p class="text-slate-300 text-sm mb-4">We intercepted this message from an amateur hacker group. We suspect they are using the oldest trick in the book. Use the brute force tool to find the flag.</p>
-                    <div class="bg-slate-900 p-3 rounded font-mono text-emerald-400 text-sm mb-4 tracking-widest text-center border border-slate-700">
-                        IODJ{KHOOR_DJHQW}
-                    </div>
-                    <div class="flex gap-2">
-                        <input type="text" id="flag-1" placeholder="Enter decoded text here..." class="flex-1 bg-slate-900 border border-slate-700 rounded px-3 py-2 text-white text-sm focus:border-blue-500 focus:outline-none uppercase">
-                        <button onclick="checkFlag(1, 'FLAG{HELLO_AGENT}')" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded text-sm font-bold transition">Submit</button>
-                    </div>
-                </div>
-
-                <!-- Challenge 2 -->
-                <div class="glass-panel p-6 rounded-xl border-l-4 border-l-purple-500" id="chal-2">
-                    <div class="flex justify-between items-start mb-4">
-                        <h3 class="text-xl font-bold text-white">Level 2: Polyalphabetic Panic</h3>
-                        <span class="bg-purple-900/50 text-purple-400 text-xs px-2 py-1 rounded font-bold uppercase tracking-widest">Medium</span>
-                    </div>
-                    <p class="text-slate-300 text-sm mb-4">The adversary got slightly smarter. They used a Vigenère cipher. We managed to recover the keyword from their garbage bin: <strong>SECURE</strong>.</p>
-                    <div class="bg-slate-900 p-3 rounded font-mono text-emerald-400 text-sm mb-4 tracking-widest text-center border border-slate-700">
-                        XPER{TFRQ_TGLYVXZ}
-                    </div>
-                    <div class="flex gap-2">
-                        <input type="text" id="flag-2" placeholder="Enter decoded text here..." class="flex-1 bg-slate-900 border border-slate-700 rounded px-3 py-2 text-white text-sm focus:border-purple-500 focus:outline-none uppercase">
-                        <button onclick="checkFlag(2, 'FLAG{BANK_ROBBERY}')" class="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded text-sm font-bold transition">Submit</button>
-                    </div>
-                </div>
-
-                <!-- Challenge 3 -->
-                <div class="glass-panel p-6 rounded-xl border-l-4 border-l-red-500" id="chal-3">
-                    <div class="flex justify-between items-start mb-4">
-                        <h3 class="text-xl font-bold text-white">Level 3: Modern Data Extraction</h3>
-                        <span class="bg-red-900/50 text-red-400 text-xs px-2 py-1 rounded font-bold uppercase tracking-widest">Hard</span>
-                    </div>
-                    <p class="text-slate-300 text-sm mb-4">This file was downloaded from a secure server. It's AES-GCM encrypted. A note attached to it said: <em>"The password is the name of our solar system's star, all lowercase."</em></p>
-                    <textarea readonly class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-emerald-400 font-mono text-xs mb-4 h-20 break-all">xZtZc1y+j3V4D17/Zf+E4XbH8i4gD2T/1X0O1Qx7r2MhO4D5i5M2n0p9s1D/rY5X2E3P0F0I7H2Q5B9A0N1C8U6V</textarea>
-                    <p class="text-xs text-slate-500 mb-4">(Note: To make this workable in this lab, use the text below, which was generated with the actual lab's AES tool using the password "sun")</p>
-                    <div class="bg-slate-900 p-2 rounded font-mono text-cyan-400 text-[10px] mb-4 break-all border border-slate-700" id="chal3-base64">
-                        <!-- Will be populated via JS on load so it matches exactly -->
-                    </div>
-                    <div class="flex gap-2">
-                        <input type="text" id="flag-3" placeholder="Enter decrypted text..." class="flex-1 bg-slate-900 border border-slate-700 rounded px-3 py-2 text-white text-sm focus:border-red-500 focus:outline-none">
-                        <button onclick="checkFlag(3, 'FLAG{AES_IS_SECURE}')" class="bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded text-sm font-bold transition">Submit</button>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="mt-12 text-center text-slate-500 text-sm">
-                <p>Completed all challenges? You've proven you understand the fundamentals of Cryptography!</p>
-            </div>
-        </div>
-
-    </main>
-
-    <script>
-        // --- NAVIGATION STATE ---
-        const tabs = ['intro', 'caesar', 'vigenere', 'aes', 'rsa', 'hashing', 'ctf'];
-        let rsaKeyPair = null;
-
-        function switchTab(tabId) {
-            // Hide all
-            tabs.forEach(t => {
-                document.getElementById(`sec-${t}`).classList.remove('active');
-                document.getElementById(`nav-${t}`).classList.remove('active');
-            });
-            // Show target
-            document.getElementById(`sec-${tabId}`).classList.add('active');
-            document.getElementById(`nav-${tabId}`).classList.add('active');
-            window.scrollTo(0,0);
-        }
-
-        // --- TOAST NOTIFICATIONS ---
-        function showToast(msg, type = 'success') {
-            const toast = document.getElementById('toast');
-            toast.textContent = msg;
-            toast.className = `fixed bottom-4 right-4 px-6 py-3 rounded shadow-lg transition-opacity duration-300 z-50 text-white font-semibold ${type === 'error' ? 'bg-red-600' : 'bg-emerald-600'}`;
-            toast.style.opacity = '1';
-            setTimeout(() => { toast.style.opacity = '0'; }, 4000);
-        }
-
-        // --- UTILS ---
-        function toggleVisibility(id) {
-            const input = document.getElementById(id);
-            if (input.type === "password") {
-                input.type = "text";
             } else {
-                input.type = "password";
+                isPaletteDraggingSlider = false;
             }
         }
 
-        function bufferToBase64(buf) {
-            var binstr = Array.prototype.map.call(new Uint8Array(buf), function (ch) {
-                return String.fromCharCode(ch);
-            }).join('');
-            return btoa(binstr);
-        }
+        function handleGestures(handLandmarks) {
+            const thumbTip = handLandmarks[4];
+            const thumbIp = handLandmarks[3];
+            const indexTip = handLandmarks[8];
+            const indexPip = handLandmarks[6];
+            const middleTip = handLandmarks[12];
+            const middlePip = handLandmarks[10];
+            const ringTip = handLandmarks[16];
+            const ringPip = handLandmarks[14];
+            const pinkyTip = handLandmarks[20];
+            const pinkyPip = handLandmarks[18];
 
-        function base64ToBuffer(base64) {
-            var binstr = atob(base64);
-            var buf = new Uint8Array(binstr.length);
-            Array.prototype.forEach.call(binstr, function (ch, i) {
-                buf[i] = ch.charCodeAt(0);
-            });
-            return buf.buffer;
-        }
+            const isIndexExtended = indexTip.y < indexPip.y;
+            const isMiddleExtended = middleTip.y < middlePip.y;
+            const isRingExtended = ringTip.y < ringPip.y;
+            const isPinkyExtended = pinkyTip.y < pinkyPip.y;
+            
+            const isThumbExtended = (uploadedImage) 
+                ? thumbTip.x < thumbIp.x
+                : thumbTip.x > thumbIp.x;
+            
+            const now = Date.now();
+            const isShakaGesture = isThumbExtended && !isIndexExtended && !isMiddleExtended && !isRingExtended && isPinkyExtended;
 
-        // --- 1. CAESAR CIPHER LOGIC ---
-        function doCaesar(str, amount) {
-            if (amount < 0) return doCaesar(str, amount + 26);
-            let output = '';
-            for (let i = 0; i < str.length; i++) {
-                let c = str[i];
-                if (c.match(/[a-z]/i)) {
-                    let code = str.charCodeAt(i);
-                    if (code >= 65 && code <= 90) {
-                        c = String.fromCharCode(((code - 65 + amount) % 26) + 65);
-                    } else if (code >= 97 && code <= 122) {
-                        c = String.fromCharCode(((code - 97 + amount) % 26) + 97);
-                    }
+            if (pdfDoc && now - lastButtonPressTime > BUTTON_PRESS_COOLDOWN && !isShakaLocked) {
+                const isPalmForwardForShaka = (uploadedImage) 
+                    ? thumbTip.x < pinkyTip.x
+                    : thumbTip.x > pinkyTip.x;
+
+                if (isShakaGesture && isPalmForwardForShaka) {
+                    nextPageButton.click();
+                    lastButtonPressTime = now;
+                    showNotification('Next Page (Shaka)');
+                    return;
                 }
-                output += c;
+                
+                if (isShakaGesture && !isPalmForwardForShaka) {
+                    prevPageButton.click();
+                    lastButtonPressTime = now;
+                    showNotification('Previous Page (Reverse Shaka)');
+                    return;
+                }
             }
-            return output;
-        }
-
-        function updateCaesar(source = 'plain') {
-            const shift = parseInt(document.getElementById('caesar-shift').value);
-            document.getElementById('caesar-shift-val').textContent = shift;
             
-            if (source === 'plain') {
-                const plain = document.getElementById('caesar-plain').value;
-                document.getElementById('caesar-cipher').value = doCaesar(plain, shift);
-            } else {
-                const cipher = document.getElementById('caesar-cipher').value;
-                // Decrypt is just shift backward
-                document.getElementById('caesar-plain').value = doCaesar(cipher, (26 - shift) % 26);
-            }
-        }
+            const isAllFingersUp = isIndexExtended && isMiddleExtended && isRingExtended && isPinkyExtended;
+            const isSplitFinger = Math.abs(middleTip.x - ringTip.x) > 0.07;
+            const areFingersPaired = Math.abs(indexTip.x - middleTip.x) < 0.06 && Math.abs(ringTip.x - pinkyTip.x) < 0.06;
+            const isVulcanSalute = isAllFingersUp && isSplitFinger && areFingersPaired;
 
-        function runCaesarBruteForce() {
-            const cipher = document.getElementById('caesar-brute-input').value;
-            if(!cipher) {
-                showToast('Please input ciphertext to brute force.', 'error');
+            if (isVulcanSalute && now - lastButtonPressTime > BUTTON_PRESS_COOLDOWN) {
+                takeSnapshot();
+                lastButtonPressTime = now;
                 return;
             }
-            const resDiv = document.getElementById('caesar-brute-results');
-            resDiv.innerHTML = '';
-            resDiv.classList.remove('hidden');
 
-            const commonWords = ['the', 'and', 'are', 'you', 'that', 'with', 'this', 'have', 'from', 'agent', 'hello', 'flag'];
-            
-            for(let i=1; i<=25; i++) {
-                let dec = doCaesar(cipher, (26 - i) % 26);
-                let lowerDec = dec.toLowerCase();
-                let matchScore = commonWords.filter(w => lowerDec.includes(w)).length;
-                
-                let el = document.createElement('div');
-                el.className = `p-1.5 border-b border-slate-800 flex gap-2 ${matchScore > 0 ? 'bg-emerald-900/30 text-emerald-400 font-bold' : 'text-slate-400'}`;
-                el.innerHTML = `<span class="w-16 shrink-0 opacity-50">Shift ${i.toString().padStart(2, '0')}</span> <span>${dec}</span>`;
-                resDiv.appendChild(el);
-            }
-        }
+            const isFist = !isIndexExtended && !isMiddleExtended && !isRingExtended && !isPinkyExtended;
+            const drawGestureDistance = Math.hypot(indexTip.x - thumbTip.x, indexTip.y - thumbTip.y);
+            const isDrawingGesture = drawGestureDistance < 0.04;
+            const isMoveGesture = isIndexExtended && isMiddleExtended && !isRingExtended && !isPinkyExtended;
 
-        // --- 2. VIGENERE CIPHER LOGIC ---
-        function doVigenere(text, key, decrypt = false) {
-            let result = '';
-            let j = 0;
-            key = key.toUpperCase().replace(/[^A-Z]/g, '');
-            if(!key) return text;
-            
-            for (let i = 0; i < text.length; i++) {
-                let c = text[i];
-                if (c.match(/[a-z]/i)) {
-                    let isUpper = c === c.toUpperCase();
-                    let textChar = c.toUpperCase().charCodeAt(0) - 65;
-                    let keyChar = key[j % key.length].charCodeAt(0) - 65;
-                    let shifted;
-                    
-                    if (decrypt) {
-                        shifted = (textChar - keyChar + 26) % 26;
-                    } else {
-                        shifted = (textChar + keyChar) % 26;
-                    }
-                    
-                    result += String.fromCharCode(shifted + (isUpper ? 65 : 97));
-                    j++;
+            if (isFist) {
+                currentMode = 'erasing';
+                selectedPathIndex = -1;
+                if (lastMode === 'drawing' && currentPath.length > 0) {
+                    currentPath = [];
+                }
+
+                const palmCenterX = (handLandmarks[5].x + handLandmarks[9].x) / 2;
+                const palmCenterY = (handLandmarks[5].y + handLandmarks[9].y) / 2;
+                const eraserPos = {
+                    x: palmCenterX * canvasElement.width,
+                    y: palmCenterY * canvasElement.height
+                };
+
+                canvasCtx.fillStyle = eraserColor;
+                canvasCtx.beginPath();
+                canvasCtx.arc(eraserPos.x, eraserPos.y, eraserRadius, 0, 2 * Math.PI);
+                canvasCtx.fill();
+
+                allPaths = allPaths.filter(path =>
+                    !path.points.some(point =>
+                        Math.hypot(point.x - eraserPos.x, point.y - eraserPos.y) < eraserRadius
+                    )
+                );
+
+            } else if (isDrawingGesture && showHandLandmarks) {
+                currentMode = 'drawing';
+                selectedPathIndex = -1;
+                const fingerTipMidpoint = {
+                    x: ((indexTip.x + thumbTip.x) / 2) * canvasElement.width,
+                    y: ((indexTip.y + thumbTip.y) / 2) * canvasElement.height
+                };
+
+                if (!smoothedFingerTipPos || lastMode !== 'drawing') {
+                    smoothedFingerTipPos = fingerTipMidpoint;
                 } else {
-                    result += c;
+                    smoothedFingerTipPos.x = smoothedFingerTipPos.x * (1 - smoothingFactor) + fingerTipMidpoint.x * smoothingFactor;
+                    smoothedFingerTipPos.y = smoothedFingerTipPos.y * (1 - smoothingFactor) + fingerTipMidpoint.y * smoothingFactor;
                 }
-            }
-            return result;
-        }
 
-        function updateVigenere(source = 'plain') {
-            const key = document.getElementById('vigenere-key').value;
-            if (source === 'plain') {
-                const plain = document.getElementById('vigenere-plain').value;
-                document.getElementById('vigenere-cipher').value = doVigenere(plain, key, false);
+                if (lastMode !== 'drawing') {
+                    currentPath = [{...smoothedFingerTipPos}];
+                } else {
+                    currentPath.push({...smoothedFingerTipPos});
+                }
+            } else if (isMoveGesture) {
+                currentMode = 'moving';
+                const moveCenterPoint = {
+                    x: ((indexTip.x + middleTip.x) / 2) * canvasElement.width,
+                    y: ((indexTip.y + middleTip.y) / 2) * canvasElement.height
+                };
+
+                if (selectedPathIndex === -1) {
+                    for (let i = allPaths.length - 1; i >= 0; i--) {
+                        if (isPointNearPath(moveCenterPoint, allPaths[i], 30)) {
+                            selectedPathIndex = i;
+                            moveStartPoint = moveCenterPoint;
+                            initialSelectedPathState = JSON.parse(JSON.stringify(allPaths[i]));
+                            break;
+                        }
+                    }
+                } else {
+                    if (lastMode !== 'moving') {
+                        moveStartPoint = moveCenterPoint;
+                        initialSelectedPathState = JSON.parse(JSON.stringify(allPaths[selectedPathIndex]));
+                    } else {
+                        const deltaX = moveCenterPoint.x - moveStartPoint.x;
+                        const deltaY = moveCenterPoint.y - moveStartPoint.y;
+
+                        allPaths[selectedPathIndex] = {
+                            ...initialSelectedPathState,
+                            points: initialSelectedPathState.points.map(point => ({
+                                x: point.x + deltaX,
+                                y: point.y + deltaY
+                            }))
+                        };
+                    }
+                }
+
             } else {
-                const cipher = document.getElementById('vigenere-cipher').value;
-                document.getElementById('vigenere-plain').value = doVigenere(cipher, key, true);
-            }
-        }
-
-        // --- 3. AES-GCM LOGIC (WebCrypto API) ---
-        async function getAESKey(password, salt) {
-            const enc = new TextEncoder();
-            const keyMaterial = await window.crypto.subtle.importKey(
-                "raw", enc.encode(password), {name: "PBKDF2"}, false, ["deriveKey"]
-            );
-            return window.crypto.subtle.deriveKey(
-                {
-                    name: "PBKDF2",
-                    salt: salt,
-                    iterations: 100000,
-                    hash: "SHA-256"
-                },
-                keyMaterial,
-                { name: "AES-GCM", length: 256 },
-                false,
-                ["encrypt", "decrypt"]
-            );
-        }
-
-        async function executeAESEncrypt() {
-            try {
-                const password = document.getElementById('aes-pass').value;
-                const plaintext = document.getElementById('aes-plain').value;
-                if(!password || !plaintext) {
-                    showToast("Password and Plaintext are required.", "error"); return;
+                currentMode = 'idle';
+                if (lastMode === 'drawing') {
+                    if (currentPath.length > 1) {
+                        allPaths.push({ points: currentPath, color: drawingColor, width: drawingLineWidth });
+                    }
+                    currentPath = [];
+                } else if (lastMode === 'moving') {
+                    selectedPathIndex = -1;
+                    moveStartPoint = null;
+                    initialSelectedPathState = null;
                 }
 
-                const enc = new TextEncoder();
-                const salt = window.crypto.getRandomValues(new Uint8Array(16));
-                const iv = window.crypto.getRandomValues(new Uint8Array(12));
-                const key = await getAESKey(password, salt);
-
-                const ciphertextBuffer = await window.crypto.subtle.encrypt(
-                    { name: "AES-GCM", iv: iv },
-                    key,
-                    enc.encode(plaintext)
-                );
-
-                // Combine Salt (16) + IV (12) + Ciphertext
-                const combined = new Uint8Array(salt.length + iv.length + ciphertextBuffer.byteLength);
-                combined.set(salt, 0);
-                combined.set(iv, salt.length);
-                combined.set(new Uint8Array(ciphertextBuffer), salt.length + iv.length);
-
-                document.getElementById('aes-cipher').value = bufferToBase64(combined.buffer);
-                showToast("Encryption Successful!");
-            } catch (e) {
-                console.error(e);
-                showToast("Encryption failed. Check console.", "error");
-            }
-        }
-
-        async function executeAESDecrypt() {
-            try {
-                const password = document.getElementById('aes-pass').value;
-                const b64Ciphertext = document.getElementById('aes-cipher').value;
-                if(!password || !b64Ciphertext) {
-                    showToast("Password and Ciphertext are required.", "error"); return;
+                const cursorTarget = { x: indexTip.x * canvasElement.width, y: indexTip.y * canvasElement.height };
+                if (!smoothedFingerTipPos || lastMode !== 'idle') {
+                    smoothedFingerTipPos = cursorTarget;
+                } else {
+                    smoothedFingerTipPos.x = smoothedFingerTipPos.x * (1 - smoothingFactor) + cursorTarget.x * smoothingFactor;
+                    smoothedFingerTipPos.y = smoothedFingerTipPos.y * (1 - smoothingFactor) + cursorTarget.y * smoothingFactor;
                 }
-
-                const combinedBuffer = base64ToBuffer(b64Ciphertext);
-                const combined = new Uint8Array(combinedBuffer);
-
-                if (combined.length < 28) { // 16 salt + 12 iv
-                    showToast("Invalid ciphertext payload.", "error"); return;
-                }
-
-                const salt = combined.slice(0, 16);
-                const iv = combined.slice(16, 28);
-                const data = combined.slice(28);
-
-                const key = await getAESKey(password, salt);
-
-                const decryptedBuffer = await window.crypto.subtle.decrypt(
-                    { name: "AES-GCM", iv: iv },
-                    key,
-                    data
-                );
-
-                const dec = new TextDecoder();
-                document.getElementById('aes-plain').value = dec.decode(decryptedBuffer);
-                showToast("Decryption Successful!");
-            } catch (e) {
-                console.error(e);
-                showToast("Decryption failed! Incorrect password or corrupted data.", "error");
             }
+            lastMode = currentMode;
         }
 
-        // --- 4. RSA LOGIC (WebCrypto API) ---
-        async function formatPEM(keyBuffer, type) {
-            const b64 = bufferToBase64(keyBuffer);
-            const header = `-----BEGIN ${type} KEY-----\n`;
-            const footer = `\n-----END ${type} KEY-----`;
-            const formattedB64 = b64.match(/.{1,64}/g).join('\n');
-            return header + formattedB64 + footer;
-        }
 
-        async function generateRSAKeys() {
+        async function renderPdfPage(num) {
+            if (!pdfDoc || num < 1 || num > totalPages) return;
+            
             try {
-                const btn = document.getElementById('rsa-gen-btn');
-                btn.innerHTML = `<i class="ph ph-spinner animate-spin"></i> Generating...`;
-                btn.disabled = true;
+                const page = await pdfDoc.getPage(num);
+                const viewport = page.getViewport({ scale: 2.0 });
+                const tempCanvas = document.createElement('canvas');
+                const tempCtx = tempCanvas.getContext('2d');
+                tempCanvas.height = viewport.height;
+                tempCanvas.width = viewport.width;
 
-                rsaKeyPair = await window.crypto.subtle.generateKey(
-                    {
-                        name: "RSA-OAEP",
-                        modulusLength: 2048,
-                        publicExponent: new Uint8Array([1, 0, 1]),
-                        hash: "SHA-256"
-                    },
-                    true,
-                    ["encrypt", "decrypt"]
-                );
-
-                const pubExport = await window.crypto.subtle.exportKey("spki", rsaKeyPair.publicKey);
-                const privExport = await window.crypto.subtle.exportKey("pkcs8", rsaKeyPair.privateKey);
-
-                document.getElementById('rsa-pub-display').value = await formatPEM(pubExport, "PUBLIC");
-                document.getElementById('rsa-priv-display').value = await formatPEM(privExport, "PRIVATE");
+                await page.render({ canvasContext: tempCtx, viewport: viewport }).promise;
                 
-                showToast("New 2048-bit RSA Keys generated.");
-            } catch (e) {
-                console.error(e);
-                showToast("Failed to generate keys.", "error");
-            } finally {
-                const btn = document.getElementById('rsa-gen-btn');
-                btn.innerHTML = `<i class="ph ph-arrows-clockwise"></i> Generate New Pair`;
-                btn.disabled = false;
+                const img = new Image();
+                img.onload = () => {
+                    uploadedImage = img;
+                    allPaths = [];
+                    currentPath = [];
+                };
+                img.src = tempCanvas.toDataURL();
+                pageIndicator.textContent = `Page ${num} of ${totalPages}`;
+                
+                prevPageButton.disabled = num <= 1;
+                nextPageButton.disabled = num >= totalPages;
+                prevPageButton.classList.toggle('disabled-button', num <= 1);
+                nextPageButton.classList.toggle('disabled-button', num >= totalPages);
+
+            } catch(error) {
+                console.error("Failed to render PDF page:", error);
+                showNotification("Failed to render PDF page.");
             }
         }
 
-        async function executeRSAEncrypt() {
-            if (!rsaKeyPair) {
-                showToast("Please generate keys first!", "error"); return;
+        // --- Initialization and Event Listeners ---
+        const hands = new window.Hands({
+            locateFile: (file) => {
+                return `https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4/${file}`;
             }
-            const plaintext = document.getElementById('rsa-plain').value;
-            if(!plaintext) { showToast("Enter a message to encrypt.", "error"); return; }
-            
-            const enc = new TextEncoder();
-            const data = enc.encode(plaintext);
+        });
+        hands.setOptions({ maxNumHands: 1, modelComplexity: 1, minDetectionConfidence: 0.7, minTrackingConfidence: 0.7 });
+        hands.onResults(onResults);
+        const camera = new window.Camera(videoElement, { onFrame: async () => { await hands.send({ image: videoElement }); }, width: 1280, height: 720 });
+        camera.start();
 
-            // Basic check for RSA data limit (roughly 190 bytes for 2048 bit OAEP-SHA256)
-            if (data.length > 190) {
-                showToast("Message too long for 2048-bit RSA encryption.", "error"); return;
+        clearButton.addEventListener('click', () => {
+            if (isFullscreen) {
+                toggleFullscreen();
             }
+            fullscreenButton.classList.add('hidden');
+            allPaths = [];
+            currentPath = [];
+            uploadedImage = null;
+            pdfDoc = null;
+            fileUploadInput.value = '';
+            prevPageButton.classList.add('hidden');
+            nextPageButton.classList.add('hidden');
+            pageIndicator.classList.add('hidden');
+            clearCubeTexture(); // Clear the cube too
+        });
 
-            try {
-                const encryptedBuf = await window.crypto.subtle.encrypt(
-                    { name: "RSA-OAEP" },
-                    rsaKeyPair.publicKey,
-                    data
-                );
-                document.getElementById('rsa-cipher').value = bufferToBase64(encryptedBuf);
-                showToast("Encrypted with Public Key!");
-            } catch (e) {
-                console.error(e);
-                showToast("RSA Encryption failed.", "error");
-            }
-        }
+        snapshotButton.addEventListener('click', takeSnapshot);
 
-        async function executeRSADecrypt() {
-            if (!rsaKeyPair) {
-                showToast("Please generate keys first!", "error"); return;
-            }
-            const b64Ciphertext = document.getElementById('rsa-cipher').value;
-            if(!b64Ciphertext) { showToast("No ciphertext to decrypt.", "error"); return; }
+        fileUploadInput.addEventListener('change', (event) => {
+            const file = event.target.files[0];
+            if (!file) return;
 
-            try {
-                const encryptedBuf = base64ToBuffer(b64Ciphertext);
-                const decryptedBuf = await window.crypto.subtle.decrypt(
-                    { name: "RSA-OAEP" },
-                    rsaKeyPair.privateKey,
-                    encryptedBuf
-                );
-                const dec = new TextDecoder();
-                document.getElementById('rsa-plain').value = dec.decode(decryptedBuf);
-                showToast("Decrypted with Private Key!");
-            } catch (e) {
-                console.error(e);
-                showToast("RSA Decryption failed. Corrupted data?", "error");
-            }
-        }
+            fullscreenButton.classList.remove('hidden');
 
-        // --- 5. HASHING LOGIC ---
-        async function getHash(text, algo) {
-            const msgBuffer = new TextEncoder().encode(text);
-            const hashBuffer = await crypto.subtle.digest(algo, msgBuffer);
-            const hashArray = Array.from(new Uint8Array(hashBuffer));
-            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
-        }
+            allPaths = [];
+            currentPath = [];
+            pdfDoc = null;
+            uploadedImage = null;
 
-        async function updateHashes() {
-            const input = document.getElementById('hash-input').value;
-            
-            // Handle empty case instantly
-            if(!input) {
-                document.getElementById('hash-sha1').textContent = "";
-                document.getElementById('hash-sha256').textContent = "";
-                document.getElementById('hash-sha512').textContent = "";
-                return;
-            }
-
-            document.getElementById('hash-sha1').textContent = await getHash(input, 'SHA-1');
-            document.getElementById('hash-sha256').textContent = await getHash(input, 'SHA-256');
-            document.getElementById('hash-sha512').textContent = await getHash(input, 'SHA-512');
-        }
-
-        // --- 6. CTF LOGIC ---
-        function checkFlag(level, expectedFlag) {
-            const input = document.getElementById(`flag-${level}`).value.trim().toUpperCase();
-            if (input === expectedFlag) {
-                document.getElementById(`chal-${level}`).classList.remove('border-blue-500', 'border-purple-500', 'border-red-500');
-                document.getElementById(`chal-${level}`).classList.add('border-emerald-500', 'bg-emerald-900/10');
-                showToast(`Level ${level} Passed!`, 'success');
+            if (file.type.startsWith('image/')) {
+                prevPageButton.classList.add('hidden');
+                nextPageButton.classList.add('hidden');
+                pageIndicator.classList.add('hidden');
+                
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => { uploadedImage = img; };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            } else if (file.type === 'application/pdf') {
+                const reader = new FileReader();
+                reader.onload = async (e) => {
+                    try {
+                        const loadingTask = window.pdfjsLib.getDocument({ data: e.target.result });
+                        const pdf = await loadingTask.promise;
+                        pdfDoc = pdf;
+                        totalPages = pdf.numPages;
+                        currentPageNum = 1;
+                        await renderPdfPage(currentPageNum);
+                        prevPageButton.classList.remove('hidden');
+                        nextPageButton.classList.remove('hidden');
+                        pageIndicator.classList.remove('hidden');
+                    } catch (error) {
+                        console.error('Error loading PDF:', error);
+                        showNotification("Could not load the PDF file. It might be corrupted.");
+                    }
+                };
+                reader.readAsArrayBuffer(file);
             } else {
-                showToast("Incorrect Flag.", "error");
+                showNotification("Unsupported file-type. Please upload an image or PDF.");
             }
+        });
+
+        const closePaletteButton = document.getElementById('close-palette-btn');
+        const colorButtons = document.querySelectorAll('.color-option-btn');
+        const thicknessSlider = document.getElementById('thickness-slider');
+
+        function togglePalette() {
+            isPaletteOpen = !isPaletteOpen;
+            paletteMenu.classList.toggle('hidden', !isPaletteOpen);
         }
 
-        // --- INITIALIZATION ---
-        window.onload = async () => {
-            updateCaesar();
-            updateVigenere();
-            updateHashes();
+        closePaletteButton.addEventListener('click', togglePalette);
 
-            // Pre-generate a valid AES ciphertext for Challenge 3 so it's solveable with the provided tool
-            try {
-                const pass = "sun";
-                const text = "FLAG{AES_IS_SECURE}";
-                const enc = new TextEncoder();
-                const salt = window.crypto.getRandomValues(new Uint8Array(16));
-                const iv = window.crypto.getRandomValues(new Uint8Array(12));
-                const keyMaterial = await window.crypto.subtle.importKey(
-                    "raw", enc.encode(pass), {name: "PBKDF2"}, false, ["deriveKey"]
-                );
-                const key = await window.crypto.subtle.deriveKey(
-                    { name: "PBKDF2", salt: salt, iterations: 100000, hash: "SHA-256" },
-                    keyMaterial, { name: "AES-GCM", length: 256 }, false, ["encrypt", "decrypt"]
-                );
-                const ciphertextBuffer = await window.crypto.subtle.encrypt(
-                    { name: "AES-GCM", iv: iv }, key, enc.encode(text)
-                );
-                const combined = new Uint8Array(salt.length + iv.length + ciphertextBuffer.byteLength);
-                combined.set(salt, 0); combined.set(iv, salt.length); combined.set(new Uint8Array(ciphertextBuffer), salt.length + iv.length);
-                document.getElementById('chal3-base64').textContent = bufferToBase64(combined.buffer);
-            } catch(e) {
-                console.error("Failed to generate CTF3 ciphertext", e);
+        colorButtons.forEach(button => {
+            button.addEventListener('click', () => {
+                drawingColor = button.dataset.color;
+                colorButtons.forEach(btn => btn.classList.remove('ring-4', 'ring-black'));
+                button.classList.add('ring-4', 'ring-black');
+            });
+        });
+        
+        const defaultColorButton = document.querySelector(`.color-option-btn[data-color="${drawingColor}"]`);
+        if (defaultColorButton) {
+            defaultColorButton.classList.add('ring-4', 'ring-black');
+        }
+
+        thicknessSlider.addEventListener('input', (e) => {
+            drawingLineWidth = parseInt(e.target.value, 10);
+        });
+        
+        thicknessSlider.value = drawingLineWidth;
+
+
+        fullscreenButton.addEventListener('click', toggleFullscreen);
+
+        document.addEventListener('keydown', (event) => {
+            if (event.key === "Escape") {
+                if (isFullscreen) {
+                    toggleFullscreen();
+                }
+                if (isPaletteOpen) {
+                    togglePalette();
+                }
             }
-        };
 
+            if (event.key.toLowerCase() === 'p' && event.target.tagName !== 'INPUT') {
+                togglePalette();
+            }
+            
+            if (event.key.toLowerCase() === 'i' && event.target.tagName !== 'INPUT') {
+                showHandLandmarks = !showHandLandmarks;
+                showNotification(showHandLandmarks ? 'Showing Hand Landmarks' : 'Hiding Hand Landmarks');
+            }
+
+            if (event.key.toLowerCase() === 'o' && event.target.tagName !== 'INPUT') {
+                isShakaLocked = !isShakaLocked;
+                if (isShakaLocked) {
+                    showNotification('Page turn gestures LOCKED');
+                } else {
+                    showNotification('Page turn gestures UNLOCKED');
+                }
+            }
+
+            // NEW: Toggle 3D Cube with 'U'
+            if (event.key.toLowerCase() === 'u' && event.target.tagName !== 'INPUT') {
+                toggleCubeMode();
+            }
+        });
+
+        nextPageButton.addEventListener('click', () => {
+            if (currentPageNum >= totalPages) return;
+            currentPageNum++;
+            renderPdfPage(currentPageNum);
+        });
+
+        prevPageButton.addEventListener('click', () => {
+            if (currentPageNum <= 1) return;
+            currentPageNum--;
+            renderPdfPage(currentPageNum);
+        });
     </script>
 </body>
 </html>
