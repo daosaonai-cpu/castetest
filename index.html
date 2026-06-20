@@ -5,13 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Daily Work Tracker</title>
     
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     
-    <!-- Google Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -31,9 +28,7 @@
 </head>
 <body class="bg-[#F8F9FB] text-gray-800 h-screen flex overflow-hidden">
 
-    <!-- Sidebar -->
     <aside id="sidebar" class="w-[260px] bg-[#131B2A] text-white flex flex-col transition-all duration-300 ease-in-out shrink-0 z-20 relative">
-        <!-- Logo Area -->
         <div class="h-20 flex items-center justify-between px-6 border-b border-gray-800">
             <div id="logo-container" class="flex items-center gap-3 overflow-hidden">
                 <div class="relative flex items-center justify-center w-8 h-8 rounded-full bg-blue-500 shrink-0">
@@ -46,28 +41,23 @@
             </button>
         </div>
 
-        <!-- Navigation -->
         <nav class="flex-1 py-6 px-4 space-y-2">
-            <!-- Dashboard (Inactive) -->
             <a href="#" class="flex items-center gap-3 px-3 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-gray-800 transition-colors group">
                 <i data-lucide="layout-dashboard" class="w-5 h-5 shrink-0 group-hover:text-white"></i>
                 <span class="sidebar-text font-medium whitespace-nowrap">Dashboard</span>
             </a>
 
-            <!-- Add New Task (Active) -->
-            <a href="#" class="flex items-center gap-3 px-3 py-3 rounded-xl bg-white text-gray-900 shadow-sm transition-colors group">
+            <a href="#" id="nav-add-task" class="nav-link flex items-center gap-3 px-3 py-3 rounded-xl bg-white text-gray-900 shadow-sm transition-colors group">
                 <i data-lucide="plus-circle" class="w-5 h-5 shrink-0 text-gray-900"></i>
                 <span class="sidebar-text font-semibold whitespace-nowrap">Add New Task</span>
             </a>
 
-            <!-- Tasks List (Inactive) -->
-            <a href="#" class="flex items-center gap-3 px-3 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-gray-800 transition-colors group">
+            <a href="#" id="nav-task-list" class="nav-link flex items-center gap-3 px-3 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-gray-800 transition-colors group">
                 <i data-lucide="list" class="w-5 h-5 shrink-0 group-hover:text-white"></i>
                 <span class="sidebar-text font-medium whitespace-nowrap">Tasks List</span>
             </a>
         </nav>
 
-        <!-- Logout -->
         <div class="p-4 border-t border-gray-800">
             <a href="#" class="flex items-center gap-3 px-3 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-gray-800 transition-colors group">
                 <i data-lucide="log-out" class="w-5 h-5 shrink-0 group-hover:text-white"></i>
@@ -76,20 +66,17 @@
         </div>
     </aside>
 
-    <!-- Main Content Area -->
     <div class="flex-1 flex flex-col min-w-0">
         
-        <!-- Header -->
         <header class="h-20 bg-white border-b border-gray-200 flex items-center justify-between px-8 shrink-0">
             <div class="flex items-center gap-4">
                 <button id="expand-btn" class="p-2 rounded-lg text-gray-500 hover:bg-gray-100 hidden">
                     <i data-lucide="menu" class="w-6 h-6"></i>
                 </button>
-                <h1 class="text-xl font-semibold text-gray-900">Add New Task</h1>
+                <h1 id="page-title" class="text-xl font-semibold text-gray-900">Add New Task</h1>
             </div>
             
             <div class="flex items-center gap-6">
-                <!-- Search Bar -->
                 <div class="relative hidden md:block">
                     <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-[18px] h-[18px]"></i>
                     <input 
@@ -98,107 +85,84 @@
                         class="pl-10 pr-4 py-2 w-64 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
                     />
                 </div>
-                <!-- Notification Icon -->
                 <button class="text-gray-500 hover:text-gray-700 relative">
                     <i data-lucide="bell" class="w-[22px] h-[22px]"></i>
                     <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
                 </button>
-                <!-- Profile Placeholder -->
                 <div class="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold border border-indigo-200 cursor-pointer">
                     JD
                 </div>
             </div>
         </header>
 
-        <!-- Page Content -->
         <main class="flex-1 overflow-y-auto p-8">
             
-            <!-- Form Card -->
-            <div class="max-w-5xl mx-auto bg-white rounded-2xl shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] p-8 md:p-10">
+            <div id="view-add-task" class="max-w-5xl mx-auto bg-white rounded-2xl shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] p-8 md:p-10 block">
                 <h2 class="text-2xl font-bold text-gray-900 mb-8">Create New Task</h2>
                 
-                <form class="space-y-6" onsubmit="event.preventDefault();">
+                <form id="task-form" class="space-y-6">
                     
-                    <!-- Row 1: Times and Category -->
                     <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
                         
-                        <!-- Time Slot From -->
                         <div class="space-y-2">
                             <label class="block text-sm font-medium text-gray-700">Time Slot (From)</label>
                             <div class="relative">
                                 <input 
-                                    type="text" 
-                                    placeholder="hh:mm aa" 
+                                    type="time" 
+                                    id="time-from"
+                                    required
                                     class="w-full pl-4 pr-10 py-2.5 bg-white border border-gray-200 rounded-lg text-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
                                 />
                                 <i data-lucide="clock" class="w-[18px] h-[18px] absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"></i>
                             </div>
                         </div>
 
-                        <!-- Time Slot To -->
                         <div class="space-y-2">
                             <label class="block text-sm font-medium text-gray-700">Time Slot (To)</label>
                             <div class="relative">
                                 <input 
-                                    type="text" 
-                                    placeholder="hh:mm aa" 
+                                    type="time" 
+                                    id="time-to"
+                                    required
                                     class="w-full pl-4 pr-10 py-2.5 bg-white border border-gray-200 rounded-lg text-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
                                 />
                                 <i data-lucide="clock" class="w-[18px] h-[18px] absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"></i>
                             </div>
                         </div>
 
-                        <!-- Category -->
                         <div class="space-y-2">
                             <label class="block text-sm font-medium text-gray-700">Activity Category</label>
-                            <select class="custom-select w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg text-gray-500 text-sm appearance-none focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow cursor-pointer">
+                            <select id="task-category" required class="custom-select w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg text-gray-700 text-sm appearance-none focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow cursor-pointer">
                                 <option value="" disabled selected>Select category</option>
-                                <option value="development">Development</option>
-                                <option value="design">Design</option>
-                                <option value="meeting">Meeting</option>
-                                <option value="planning">Planning</option>
+                                <option value="Development">Development</option>
+                                <option value="Design">Design</option>
+                                <option value="Meeting">Meeting</option>
+                                <option value="Planning">Planning</option>
                             </select>
                         </div>
                     </div>
 
-                    <!-- Row 2: Outcome -->
                     <div class="space-y-2">
                         <label class="block text-sm font-medium text-gray-700">Outcome / Achievement</label>
                         <textarea 
+                            id="task-outcome"
                             rows="4"
+                            required
                             placeholder="What was achieved?"
                             class="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow resize-y"
                         ></textarea>
                     </div>
 
-                    <!-- Row 3: Remarks -->
                     <div class="space-y-2">
                         <label class="block text-sm font-medium text-gray-700">Remarks</label>
                         <textarea 
+                            id="task-remarks"
                             rows="3"
                             placeholder="Any additional remarks..."
                             class="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow resize-y"
                         ></textarea>
                     </div>
 
-                    <!-- Row 4: Attachments -->
-                    <div class="space-y-2">
-                        <label class="block text-sm font-medium text-gray-700">Attachments (Optional)</label>
-                        <div class="relative">
-                            <input 
-                                type="file" 
-                                class="block w-full text-sm text-gray-500
-                                file:mr-4 file:py-2 file:px-4
-                                file:rounded-md file:border file:border-gray-200
-                                file:text-sm file:font-medium
-                                file:bg-white file:text-gray-700
-                                hover:file:bg-gray-50 file:cursor-pointer
-                                border border-gray-200 rounded-lg p-2 bg-white cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                            />
-                        </div>
-                    </div>
-
-                    <!-- Action Button -->
                     <div class="pt-6 flex justify-end">
                         <button 
                             type="submit"
@@ -211,15 +175,42 @@
 
                 </form>
             </div>
+
+            <div id="view-task-list" class="max-w-6xl mx-auto hidden">
+                <div class="bg-white rounded-2xl shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] overflow-hidden">
+                    <div class="p-6 border-b border-gray-200 flex justify-between items-center bg-white">
+                        <h2 class="text-xl font-bold text-gray-900">Your Tasks</h2>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left border-collapse">
+                            <thead>
+                                <tr class="bg-gray-50 border-b border-gray-200 text-sm font-medium text-gray-500 uppercase tracking-wider">
+                                    <th class="px-6 py-4">Time</th>
+                                    <th class="px-6 py-4">Category</th>
+                                    <th class="px-6 py-4">Outcome</th>
+                                    <th class="px-6 py-4">Remarks</th>
+                                </tr>
+                            </thead>
+                            <tbody id="task-table-body" class="divide-y divide-gray-200 text-sm text-gray-700 bg-white">
+                                <tr>
+                                    <td colspan="4" class="px-6 py-8 text-center text-gray-500">
+                                        No tasks added yet. Create a new task to see it here!
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
         </main>
     </div>
 
-    <!-- Initialization Script -->
     <script>
         // Initialize Lucide Icons
         lucide.createIcons();
 
-        // Sidebar Toggle Logic
+        // ---- Sidebar Toggle Logic ----
         const sidebar = document.getElementById('sidebar');
         const collapseBtn = document.getElementById('collapse-btn');
         const expandBtn = document.getElementById('expand-btn');
@@ -259,6 +250,154 @@
 
         collapseBtn.addEventListener('click', toggleSidebar);
         expandBtn.addEventListener('click', toggleSidebar);
+
+        // ---- Task Management Logic ----
+        
+        let tasks = []; // Array to store task data
+
+        // DOM Elements for Navigation & Views
+        const navAddTask = document.getElementById('nav-add-task');
+        const navTaskList = document.getElementById('nav-task-list');
+        const viewAddTask = document.getElementById('view-add-task');
+        const viewTaskList = document.getElementById('view-task-list');
+        const pageTitle = document.getElementById('page-title');
+        
+        // Form & Table
+        const taskForm = document.getElementById('task-form');
+        const taskTableBody = document.getElementById('task-table-body');
+
+        // Function to switch active views
+        function switchView(viewName) {
+            // Reset nav styles
+            [navAddTask, navTaskList].forEach(nav => {
+                nav.classList.remove('bg-white', 'text-gray-900', 'shadow-sm');
+                nav.classList.add('text-gray-400', 'hover:text-white', 'hover:bg-gray-800');
+                nav.querySelector('i').classList.remove('text-gray-900');
+                nav.querySelector('i').classList.add('group-hover:text-white');
+                nav.querySelector('span').classList.remove('font-semibold');
+                nav.querySelector('span').classList.add('font-medium');
+            });
+
+            // Hide all views
+            viewAddTask.classList.add('hidden');
+            viewTaskList.classList.add('hidden');
+
+            if (viewName === 'add') {
+                viewAddTask.classList.remove('hidden');
+                pageTitle.textContent = 'Add New Task';
+                
+                // Set active nav styling
+                navAddTask.classList.add('bg-white', 'text-gray-900', 'shadow-sm');
+                navAddTask.classList.remove('text-gray-400', 'hover:text-white', 'hover:bg-gray-800');
+                navAddTask.querySelector('i').classList.add('text-gray-900');
+                navAddTask.querySelector('span').classList.add('font-semibold');
+            } else if (viewName === 'list') {
+                viewTaskList.classList.remove('hidden');
+                pageTitle.textContent = 'Tasks List';
+                
+                // Set active nav styling
+                navTaskList.classList.add('bg-white', 'text-gray-900', 'shadow-sm');
+                navTaskList.classList.remove('text-gray-400', 'hover:text-white', 'hover:bg-gray-800');
+                navTaskList.querySelector('i').classList.add('text-gray-900');
+                navTaskList.querySelector('span').classList.add('font-semibold');
+                
+                renderTasks(); // Update table when switching to this view
+            }
+        }
+
+        // Navigation Event Listeners
+        navAddTask.addEventListener('click', (e) => {
+            e.preventDefault();
+            switchView('add');
+        });
+
+        navTaskList.addEventListener('click', (e) => {
+            e.preventDefault();
+            switchView('list');
+        });
+
+        // Form Submit Handler
+        taskForm.addEventListener('submit', function(e) {
+            e.preventDefault(); // Prevent page reload
+
+            // Gather Data
+            const newTask = {
+                timeFrom: document.getElementById('time-from').value,
+                timeTo: document.getElementById('time-to').value,
+                category: document.getElementById('task-category').value,
+                outcome: document.getElementById('task-outcome').value,
+                remarks: document.getElementById('task-remarks').value || 'N/A'
+            };
+
+            // Format 24hr time to 12hr AM/PM for display
+            newTask.displayTime = formatTimeRange(newTask.timeFrom, newTask.timeTo);
+
+            // Add to array
+            tasks.push(newTask);
+
+            // Clear the form
+            taskForm.reset();
+
+            // Switch to Tasks List view to see the new task
+            switchView('list');
+        });
+
+        // Render Tasks to Table
+        function renderTasks() {
+            taskTableBody.innerHTML = ''; // Clear current rows
+
+            if (tasks.length === 0) {
+                taskTableBody.innerHTML = `
+                    <tr>
+                        <td colspan="4" class="px-6 py-8 text-center text-gray-500">
+                            No tasks added yet. Create a new task to see it here!
+                        </td>
+                    </tr>
+                `;
+                return;
+            }
+
+            tasks.forEach(task => {
+                // Determine Category Badge Color
+                let badgeColor = 'bg-gray-100 text-gray-800';
+                if (task.category === 'Development') badgeColor = 'bg-blue-100 text-blue-800';
+                if (task.category === 'Design') badgeColor = 'bg-purple-100 text-purple-800';
+                if (task.category === 'Meeting') badgeColor = 'bg-amber-100 text-amber-800';
+                if (task.category === 'Planning') badgeColor = 'bg-emerald-100 text-emerald-800';
+
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-50 transition-colors';
+                row.innerHTML = `
+                    <td class="px-6 py-4 whitespace-nowrap font-medium text-gray-900">${task.displayTime}</td>
+                    <td class="px-6 py-4 whitespace-nowrap">
+                        <span class="px-2.5 py-1 rounded-full text-xs font-medium ${badgeColor}">
+                            ${task.category}
+                        </span>
+                    </td>
+                    <td class="px-6 py-4"><div class="max-w-xs truncate" title="${task.outcome}">${task.outcome}</div></td>
+                    <td class="px-6 py-4"><div class="max-w-xs text-gray-500 truncate" title="${task.remarks}">${task.remarks}</div></td>
+                `;
+                taskTableBody.appendChild(row);
+            });
+            
+            // Re-initialize any new icons if we add them inside the table later
+            lucide.createIcons();
+        }
+
+        // Helper: Format Time Range
+        function formatTimeRange(start, end) {
+            const formatTime = (timeString) => {
+                if(!timeString) return '';
+                let [hours, minutes] = timeString.split(':');
+                hours = parseInt(hours);
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12;
+                hours = hours ? hours : 12; // the hour '0' should be '12'
+                return `${hours}:${minutes} ${ampm}`;
+            };
+            return `${formatTime(start)} - ${formatTime(end)}`;
+        }
+
     </script>
 </body>
 </html>
