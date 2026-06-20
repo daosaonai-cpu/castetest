@@ -1,225 +1,264 @@
-import React, { useState } from 'react';
-import { 
-  LayoutDashboard, 
-  PlusCircle, 
-  List, 
-  LogOut, 
-  ChevronLeft, 
-  Search, 
-  Bell, 
-  Clock, 
-  Save,
-  PieChart
-} from 'lucide-react';
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Daily Work Tracker</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+        }
+        /* Custom Select Arrow Styling */
+        .custom-select {
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%239ca3af%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E");
+            background-repeat: no-repeat;
+            background-position: right 12px center;
+            background-size: 16px 16px;
+        }
+    </style>
+</head>
+<body class="bg-[#F8F9FB] text-gray-800 h-screen flex overflow-hidden">
 
-export default function App() {
-  const [sidebarOpen, setSidebarOpen] = useState(true);
-
-  return (
-    <div className="flex h-screen bg-[#F8F9FB] font-sans text-gray-800">
-      
-      {/* Sidebar */}
-      <aside 
-        className={`${
-          sidebarOpen ? 'w-[260px]' : 'w-20'
-        } bg-[#131B2A] text-white flex flex-col transition-all duration-300 ease-in-out shrink-0`}
-      >
-        {/* Logo Area */}
-        <div className="h-20 flex items-center justify-between px-6 border-b border-gray-800">
-          <div className={`flex items-center gap-3 overflow-hidden ${!sidebarOpen && 'justify-center w-full'}`}>
-            <div className="relative flex items-center justify-center w-8 h-8 rounded-full bg-blue-500 shrink-0">
-              <PieChart size={18} className="text-white" />
+    <!-- Sidebar -->
+    <aside id="sidebar" class="w-[260px] bg-[#131B2A] text-white flex flex-col transition-all duration-300 ease-in-out shrink-0 z-20 relative">
+        <!-- Logo Area -->
+        <div class="h-20 flex items-center justify-between px-6 border-b border-gray-800">
+            <div id="logo-container" class="flex items-center gap-3 overflow-hidden">
+                <div class="relative flex items-center justify-center w-8 h-8 rounded-full bg-blue-500 shrink-0">
+                    <i data-lucide="pie-chart" class="w-[18px] h-[18px] text-white"></i>
+                </div>
+                <span id="brand-name" class="text-xl font-bold tracking-wide whitespace-nowrap">Trackbit</span>
             </div>
-            {sidebarOpen && (
-              <span className="text-xl font-bold tracking-wide whitespace-nowrap">Trackbit</span>
-            )}
-          </div>
-          {sidebarOpen && (
-            <button 
-              onClick={() => setSidebarOpen(false)}
-              className="p-1 rounded-full border border-gray-600 hover:bg-gray-800 text-gray-400 transition-colors"
-            >
-              <ChevronLeft size={16} />
+            <button id="collapse-btn" class="p-1 rounded-full border border-gray-600 hover:bg-gray-800 text-gray-400 transition-colors">
+                <i data-lucide="chevron-left" class="w-4 h-4"></i>
             </button>
-          )}
         </div>
 
-        {/* Navigation */}
-        <nav className="flex-1 py-6 px-4 space-y-2">
-          {/* Dashboard (Inactive) */}
-          <a href="#" className="flex items-center gap-3 px-3 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-gray-800 transition-colors group">
-            <LayoutDashboard size={20} className="shrink-0 group-hover:text-white" />
-            {sidebarOpen && <span className="font-medium whitespace-nowrap">Dashboard</span>}
-          </a>
+        <!-- Navigation -->
+        <nav class="flex-1 py-6 px-4 space-y-2">
+            <!-- Dashboard (Inactive) -->
+            <a href="#" class="flex items-center gap-3 px-3 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-gray-800 transition-colors group">
+                <i data-lucide="layout-dashboard" class="w-5 h-5 shrink-0 group-hover:text-white"></i>
+                <span class="sidebar-text font-medium whitespace-nowrap">Dashboard</span>
+            </a>
 
-          {/* Add New Task (Active) */}
-          <a href="#" className="flex items-center gap-3 px-3 py-3 rounded-xl bg-white text-gray-900 shadow-sm transition-colors group">
-            <PlusCircle size={20} className="shrink-0 text-gray-900" />
-            {sidebarOpen && <span className="font-semibold whitespace-nowrap">Add New Task</span>}
-          </a>
+            <!-- Add New Task (Active) -->
+            <a href="#" class="flex items-center gap-3 px-3 py-3 rounded-xl bg-white text-gray-900 shadow-sm transition-colors group">
+                <i data-lucide="plus-circle" class="w-5 h-5 shrink-0 text-gray-900"></i>
+                <span class="sidebar-text font-semibold whitespace-nowrap">Add New Task</span>
+            </a>
 
-          {/* Tasks List (Inactive) */}
-          <a href="#" className="flex items-center gap-3 px-3 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-gray-800 transition-colors group">
-            <List size={20} className="shrink-0 group-hover:text-white" />
-            {sidebarOpen && <span className="font-medium whitespace-nowrap">Tasks List</span>}
-          </a>
+            <!-- Tasks List (Inactive) -->
+            <a href="#" class="flex items-center gap-3 px-3 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-gray-800 transition-colors group">
+                <i data-lucide="list" class="w-5 h-5 shrink-0 group-hover:text-white"></i>
+                <span class="sidebar-text font-medium whitespace-nowrap">Tasks List</span>
+            </a>
         </nav>
 
-        {/* Logout */}
-        <div className="p-4 border-t border-gray-800">
-          <a href="#" className="flex items-center gap-3 px-3 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-gray-800 transition-colors group">
-            <LogOut size={20} className="shrink-0 group-hover:text-white" />
-            {sidebarOpen && <span className="font-medium whitespace-nowrap">Logout</span>}
-          </a>
+        <!-- Logout -->
+        <div class="p-4 border-t border-gray-800">
+            <a href="#" class="flex items-center gap-3 px-3 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-gray-800 transition-colors group">
+                <i data-lucide="log-out" class="w-5 h-5 shrink-0 group-hover:text-white"></i>
+                <span class="sidebar-text font-medium whitespace-nowrap">Logout</span>
+            </a>
         </div>
-      </aside>
+    </aside>
 
-      {/* Main Content Area */}
-      <div className="flex-1 flex flex-col min-w-0">
+    <!-- Main Content Area -->
+    <div class="flex-1 flex flex-col min-w-0">
         
-        {/* Header */}
-        <header className="h-20 bg-white border-b border-gray-200 flex items-center justify-between px-8 shrink-0">
-          <div className="flex items-center gap-4">
-            {!sidebarOpen && (
-              <button 
-                onClick={() => setSidebarOpen(true)}
-                className="p-2 rounded-lg text-gray-500 hover:bg-gray-100 lg:hidden block"
-              >
-                <PlusCircle size={24} />
-              </button>
-            )}
-            <h1 className="text-xl font-semibold text-gray-900">Add New Task</h1>
-          </div>
-          
-          <div className="flex items-center gap-6">
-            {/* Search Bar */}
-            <div className="relative hidden md:block">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" size={18} />
-              <input 
-                type="text" 
-                placeholder="Search..." 
-                className="pl-10 pr-4 py-2 w-64 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
-              />
+        <!-- Header -->
+        <header class="h-20 bg-white border-b border-gray-200 flex items-center justify-between px-8 shrink-0">
+            <div class="flex items-center gap-4">
+                <button id="expand-btn" class="p-2 rounded-lg text-gray-500 hover:bg-gray-100 hidden">
+                    <i data-lucide="menu" class="w-6 h-6"></i>
+                </button>
+                <h1 class="text-xl font-semibold text-gray-900">Add New Task</h1>
             </div>
-            {/* Notification Icon */}
-            <button className="text-gray-500 hover:text-gray-700 relative">
-              <Bell size={22} />
-              <span className="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
-            </button>
-            {/* Profile Placeholder */}
-            <div className="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold border border-indigo-200 cursor-pointer">
-              JD
+            
+            <div class="flex items-center gap-6">
+                <!-- Search Bar -->
+                <div class="relative hidden md:block">
+                    <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-[18px] h-[18px]"></i>
+                    <input 
+                        type="text" 
+                        placeholder="Search..." 
+                        class="pl-10 pr-4 py-2 w-64 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
+                    />
+                </div>
+                <!-- Notification Icon -->
+                <button class="text-gray-500 hover:text-gray-700 relative">
+                    <i data-lucide="bell" class="w-[22px] h-[22px]"></i>
+                    <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
+                </button>
+                <!-- Profile Placeholder -->
+                <div class="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold border border-indigo-200 cursor-pointer">
+                    JD
+                </div>
             </div>
-          </div>
         </header>
 
-        {/* Page Content */}
-        <main className="flex-1 overflow-y-auto p-8">
-          
-          {/* Form Card */}
-          <div className="max-w-5xl mx-auto bg-white rounded-2xl shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] p-8 md:p-10">
-            <h2 className="text-2xl font-bold text-gray-900 mb-8">Create New Task</h2>
+        <!-- Page Content -->
+        <main class="flex-1 overflow-y-auto p-8">
             
-            <form className="space-y-6">
-              
-              {/* Row 1: Times and Category */}
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+            <!-- Form Card -->
+            <div class="max-w-5xl mx-auto bg-white rounded-2xl shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] p-8 md:p-10">
+                <h2 class="text-2xl font-bold text-gray-900 mb-8">Create New Task</h2>
                 
-                {/* Time Slot From */}
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700">Time Slot (From)</label>
-                  <div className="relative">
-                    <input 
-                      type="text" 
-                      placeholder="hh:mm aa" 
-                      className="w-full pl-4 pr-10 py-2.5 bg-white border border-gray-200 rounded-lg text-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
-                    />
-                    <Clock size={18} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-                  </div>
-                </div>
+                <form class="space-y-6" onsubmit="event.preventDefault();">
+                    
+                    <!-- Row 1: Times and Category -->
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                        
+                        <!-- Time Slot From -->
+                        <div class="space-y-2">
+                            <label class="block text-sm font-medium text-gray-700">Time Slot (From)</label>
+                            <div class="relative">
+                                <input 
+                                    type="text" 
+                                    placeholder="hh:mm aa" 
+                                    class="w-full pl-4 pr-10 py-2.5 bg-white border border-gray-200 rounded-lg text-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
+                                />
+                                <i data-lucide="clock" class="w-[18px] h-[18px] absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                            </div>
+                        </div>
 
-                {/* Time Slot To */}
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700">Time Slot (To)</label>
-                  <div className="relative">
-                    <input 
-                      type="text" 
-                      placeholder="hh:mm aa" 
-                      className="w-full pl-4 pr-10 py-2.5 bg-white border border-gray-200 rounded-lg text-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
-                    />
-                    <Clock size={18} className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none" />
-                  </div>
-                </div>
+                        <!-- Time Slot To -->
+                        <div class="space-y-2">
+                            <label class="block text-sm font-medium text-gray-700">Time Slot (To)</label>
+                            <div class="relative">
+                                <input 
+                                    type="text" 
+                                    placeholder="hh:mm aa" 
+                                    class="w-full pl-4 pr-10 py-2.5 bg-white border border-gray-200 rounded-lg text-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
+                                />
+                                <i data-lucide="clock" class="w-[18px] h-[18px] absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"></i>
+                            </div>
+                        </div>
 
-                {/* Category */}
-                <div className="space-y-2">
-                  <label className="block text-sm font-medium text-gray-700">Activity Category</label>
-                  <select 
-                    className="w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg text-gray-500 text-sm appearance-none focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow cursor-pointer bg-[url('data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%239ca3af%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E')] bg-no-repeat bg-[position:right_12px_center] bg-[length:16px_16px]"
-                  >
-                    <option value="" disabled selected>Select category</option>
-                    <option value="development">Development</option>
-                    <option value="design">Design</option>
-                    <option value="meeting">Meeting</option>
-                    <option value="planning">Planning</option>
-                  </select>
-                </div>
-              </div>
+                        <!-- Category -->
+                        <div class="space-y-2">
+                            <label class="block text-sm font-medium text-gray-700">Activity Category</label>
+                            <select class="custom-select w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg text-gray-500 text-sm appearance-none focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow cursor-pointer">
+                                <option value="" disabled selected>Select category</option>
+                                <option value="development">Development</option>
+                                <option value="design">Design</option>
+                                <option value="meeting">Meeting</option>
+                                <option value="planning">Planning</option>
+                            </select>
+                        </div>
+                    </div>
 
-              {/* Row 2: Outcome */}
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">Outcome / Achievement</label>
-                <textarea 
-                  rows={4}
-                  placeholder="What was achieved?"
-                  className="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow resize-y"
-                />
-              </div>
+                    <!-- Row 2: Outcome -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">Outcome / Achievement</label>
+                        <textarea 
+                            rows="4"
+                            placeholder="What was achieved?"
+                            class="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow resize-y"
+                        ></textarea>
+                    </div>
 
-              {/* Row 3: Remarks */}
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">Remarks</label>
-                <textarea 
-                  rows={3}
-                  placeholder="Any additional remarks..."
-                  className="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow resize-y"
-                />
-              </div>
+                    <!-- Row 3: Remarks -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">Remarks</label>
+                        <textarea 
+                            rows="3"
+                            placeholder="Any additional remarks..."
+                            class="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow resize-y"
+                        ></textarea>
+                    </div>
 
-              {/* Row 4: Attachments */}
-              <div className="space-y-2">
-                <label className="block text-sm font-medium text-gray-700">Attachments (Optional)</label>
-                <div className="relative">
-                  {/* Styled File Input matching design */}
-                  <input 
-                    type="file" 
-                    className="block w-full text-sm text-gray-500
-                      file:mr-4 file:py-2 file:px-4
-                      file:rounded-md file:border file:border-gray-200
-                      file:text-sm file:font-medium
-                      file:bg-white file:text-gray-700
-                      hover:file:bg-gray-50 file:cursor-pointer
-                      border border-gray-200 rounded-lg p-2 bg-white cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                  />
-                </div>
-              </div>
+                    <!-- Row 4: Attachments -->
+                    <div class="space-y-2">
+                        <label class="block text-sm font-medium text-gray-700">Attachments (Optional)</label>
+                        <div class="relative">
+                            <input 
+                                type="file" 
+                                class="block w-full text-sm text-gray-500
+                                file:mr-4 file:py-2 file:px-4
+                                file:rounded-md file:border file:border-gray-200
+                                file:text-sm file:font-medium
+                                file:bg-white file:text-gray-700
+                                hover:file:bg-gray-50 file:cursor-pointer
+                                border border-gray-200 rounded-lg p-2 bg-white cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            />
+                        </div>
+                    </div>
 
-              {/* Action Button */}
-              <div className="pt-6 flex justify-end">
-                <button 
-                  type="button"
-                  className="flex items-center gap-2 px-8 py-3 bg-[#6C5DD3] hover:bg-[#5a4bc0] text-white font-medium rounded-lg transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#6C5DD3]"
-                >
-                  <Save size={18} />
-                  <span>Save Task</span>
-                </button>
-              </div>
+                    <!-- Action Button -->
+                    <div class="pt-6 flex justify-end">
+                        <button 
+                            type="submit"
+                            class="flex items-center gap-2 px-8 py-3 bg-[#6C5DD3] hover:bg-[#5a4bc0] text-white font-medium rounded-lg transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#6C5DD3]"
+                        >
+                            <i data-lucide="save" class="w-[18px] h-[18px]"></i>
+                            <span>Save Task</span>
+                        </button>
+                    </div>
 
-            </form>
-          </div>
+                </form>
+            </div>
         </main>
-
-      </div>
     </div>
-  );
-}
+
+    <!-- Initialization Script -->
+    <script>
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // Sidebar Toggle Logic
+        const sidebar = document.getElementById('sidebar');
+        const collapseBtn = document.getElementById('collapse-btn');
+        const expandBtn = document.getElementById('expand-btn');
+        const sidebarTexts = document.querySelectorAll('.sidebar-text');
+        const brandName = document.getElementById('brand-name');
+        const logoContainer = document.getElementById('logo-container');
+
+        let isSidebarOpen = true;
+
+        function toggleSidebar() {
+            isSidebarOpen = !isSidebarOpen;
+            
+            if (isSidebarOpen) {
+                // Expand Sidebar
+                sidebar.classList.remove('w-20');
+                sidebar.classList.add('w-[260px]');
+                
+                logoContainer.classList.remove('justify-center', 'w-full');
+                brandName.classList.remove('hidden');
+                collapseBtn.classList.remove('hidden');
+                expandBtn.classList.add('hidden');
+                
+                sidebarTexts.forEach(text => text.classList.remove('hidden'));
+            } else {
+                // Collapse Sidebar
+                sidebar.classList.remove('w-[260px]');
+                sidebar.classList.add('w-20');
+                
+                logoContainer.classList.add('justify-center', 'w-full');
+                brandName.classList.add('hidden');
+                collapseBtn.classList.add('hidden');
+                expandBtn.classList.remove('hidden');
+                
+                sidebarTexts.forEach(text => text.classList.add('hidden'));
+            }
+        }
+
+        collapseBtn.addEventListener('click', toggleSidebar);
+        expandBtn.addEventListener('click', toggleSidebar);
+    </script>
+</body>
+</html>
