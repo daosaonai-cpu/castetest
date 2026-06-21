@@ -3,418 +3,888 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Daily Work Tracker</title>
+    <title>CyberSec Workbench: Encryption & Decryption</title>
     
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     
-    <!-- Lucide Icons -->
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
     
     <!-- Google Fonts -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    
+    <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                        mono: ['Fira Code', 'monospace'],
+                    },
+                    colors: {
+                        slate: {
+                            850: '#151e2e',
+                            900: '#0f172a',
+                            950: '#020617',
+                        },
+                        cyan: {
+                            400: '#22d3ee',
+                            500: '#06b6d4',
+                        },
+                        emerald: {
+                            400: '#34d399',
+                            500: '#10b981',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #0f172a; }
+        ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #475569; }
+
+        .glass-panel {
+            background: rgba(30, 41, 59, 0.7);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(51, 65, 85, 0.5);
         }
-        /* Custom Select Arrow Styling */
-        .custom-select {
-            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2224%22%20height%3D%2224%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22none%22%20stroke%3D%22%239ca3af%22%20stroke-width%3D%222%22%20stroke-linecap%3D%22round%22%20stroke-linejoin%3D%22round%22%3E%3Cpolyline%20points%3D%226%209%2012%2015%2018%209%22%3E%3C%2Fpolyline%3E%3C%2Fsvg%3E");
-            background-repeat: no-repeat;
-            background-position: right 12px center;
-            background-size: 16px 16px;
+
+        .nav-item.active {
+            background-color: rgba(16, 185, 129, 0.1);
+            border-left: 4px solid #10b981;
+            color: #34d399;
         }
+
+        .section { display: none; }
+        .section.active { display: block; animation: fadeIn 0.3s ease-in-out; }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Syntax highlighting feel for keys */
+        .key-block { color: #86efac; }
+        .hash-block { color: #93c5fd; }
     </style>
 </head>
-<body class="bg-[#F8F9FB] text-gray-800 h-screen flex overflow-hidden">
+<body class="bg-slate-950 text-slate-300 h-screen flex flex-col md:flex-row overflow-hidden">
 
-    <!-- Sidebar -->
-    <aside id="sidebar" class="w-[260px] bg-[#131B2A] text-white flex flex-col transition-all duration-300 ease-in-out shrink-0 z-20 relative">
-        <!-- Logo Area -->
-        <div class="h-20 flex items-center justify-between px-6 border-b border-gray-800">
-            <div id="logo-container" class="flex items-center gap-3 overflow-hidden">
-                <div class="relative flex items-center justify-center w-8 h-8 rounded-full bg-blue-500 shrink-0">
-                    <i data-lucide="pie-chart" class="w-[18px] h-[18px] text-white"></i>
-                </div>
-                <span id="brand-name" class="text-xl font-bold tracking-wide whitespace-nowrap">Trackbit</span>
+    <!-- Toast Notification -->
+    <div id="toast" class="fixed bottom-4 right-4 px-6 py-3 rounded shadow-lg transition-opacity duration-300 z-50 opacity-0 pointer-events-none font-medium"></div>
+
+    <!-- Sidebar Navigation -->
+    <nav class="w-full md:w-72 bg-slate-900 border-b md:border-b-0 md:border-r border-slate-800 flex flex-col h-auto md:h-full z-10 shrink-0">
+        <div class="p-6 flex items-center gap-3 border-b border-slate-800">
+            <i class="ph ph-shield-check text-emerald-400 text-3xl"></i>
+            <div>
+                <h1 class="text-xl font-bold text-white tracking-tight">Encrypt<span class="text-emerald-400">-Decrypt</span></h1>
+                <p class="text-xs text-slate-500 uppercase tracking-wider">BANAJIT BORO</p>
             </div>
-            <button id="collapse-btn" class="p-1 rounded-full border border-gray-600 hover:bg-gray-800 text-gray-400 transition-colors">
-                <i data-lucide="chevron-left" class="w-4 h-4"></i>
+        </div>
+        
+        <div class="flex-1 overflow-y-auto py-4 flex md:flex-col gap-1 px-3 overflow-x-auto md:overflow-x-hidden">
+            <button onclick="switchTab('intro')" id="nav-intro" class="nav-item active flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors hover:bg-slate-800 whitespace-nowrap md:whitespace-normal">
+                <i class="ph ph-book-open text-lg"></i> Fundamentals
+            </button>
+            <div class="text-xs font-semibold text-slate-600 uppercase tracking-wider mt-4 mb-2 px-4 hidden md:block">Classical Ciphers</div>
+            <button onclick="switchTab('caesar')" id="nav-caesar" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors hover:bg-slate-800 whitespace-nowrap md:whitespace-normal">
+                <i class="ph ph-arrows-left-right text-lg"></i> Caesar Cipher
+            </button>
+            <button onclick="switchTab('vigenere')" id="nav-vigenere" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors hover:bg-slate-800 whitespace-nowrap md:whitespace-normal">
+                <i class="ph ph-grid-four text-lg"></i> Vigenère Cipher
+            </button>
+            <div class="text-xs font-semibold text-slate-600 uppercase tracking-wider mt-4 mb-2 px-4 hidden md:block">Modern Cryptography</div>
+            <button onclick="switchTab('aes')" id="nav-aes" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors hover:bg-slate-800 whitespace-nowrap md:whitespace-normal">
+                <i class="ph ph-lock-key text-lg"></i> Symmetric (AES)
+            </button>
+            <button onclick="switchTab('rsa')" id="nav-rsa" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors hover:bg-slate-800 whitespace-nowrap md:whitespace-normal">
+                <i class="ph ph-key text-lg"></i> Asymmetric (RSA)
+            </button>
+            <button onclick="switchTab('hashing')" id="nav-hashing" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors hover:bg-slate-800 whitespace-nowrap md:whitespace-normal">
+                <i class="ph ph-hash text-lg"></i> Hashing (SHA)
+            </button>
+            <div class="text-xs font-semibold text-slate-600 uppercase tracking-wider mt-4 mb-2 px-4 hidden md:block">Challenges</div>
+            <button onclick="switchTab('ctf')" id="nav-ctf" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors hover:bg-slate-800 whitespace-nowrap md:whitespace-normal">
+                <i class="ph ph-flag text-lg"></i> Capture The Flag
             </button>
         </div>
-
-        <!-- Navigation -->
-        <nav class="flex-1 py-6 px-4 space-y-2">
-            <!-- Dashboard (Inactive) -->
-            <a href="#" class="flex items-center gap-3 px-3 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-gray-800 transition-colors group">
-                <i data-lucide="layout-dashboard" class="w-5 h-5 shrink-0 group-hover:text-white"></i>
-                <span class="sidebar-text font-medium whitespace-nowrap">Dashboard</span>
-            </a>
-
-            <!-- Add New Task (Active) -->
-            <a href="#" id="nav-add-task" class="flex items-center gap-3 px-3 py-3 rounded-xl bg-white text-gray-900 shadow-sm transition-colors group">
-                <i data-lucide="plus-circle" class="w-5 h-5 shrink-0 text-gray-900"></i>
-                <span class="sidebar-text font-semibold whitespace-nowrap">Add New Task</span>
-            </a>
-
-            <!-- Tasks List (Inactive) -->
-            <a href="#" id="nav-task-list" class="flex items-center gap-3 px-3 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-gray-800 transition-colors group">
-                <i data-lucide="list" class="w-5 h-5 shrink-0 group-hover:text-white"></i>
-                <span class="sidebar-text font-medium whitespace-nowrap">Tasks List</span>
-            </a>
-        </nav>
-
-        <!-- Logout -->
-        <div class="p-4 border-t border-gray-800">
-            <a href="#" class="flex items-center gap-3 px-3 py-3 rounded-xl text-gray-400 hover:text-white hover:bg-gray-800 transition-colors group">
-                <i data-lucide="log-out" class="w-5 h-5 shrink-0 group-hover:text-white"></i>
-                <span class="sidebar-text font-medium whitespace-nowrap">Logout</span>
-            </a>
-        </div>
-    </aside>
+    </nav>
 
     <!-- Main Content Area -->
-    <div class="flex-1 flex flex-col min-w-0">
+    <main class="flex-1 overflow-y-auto bg-slate-950 p-4 md:p-8 relative">
         
-        <!-- Header -->
-        <header class="h-20 bg-white border-b border-gray-200 flex items-center justify-between px-8 shrink-0">
-            <div class="flex items-center gap-4">
-                <button id="expand-btn" class="p-2 rounded-lg text-gray-500 hover:bg-gray-100 hidden">
-                    <i data-lucide="menu" class="w-6 h-6"></i>
-                </button>
-                <h1 id="header-title" class="text-xl font-semibold text-gray-900">Add New Task</h1>
-            </div>
-            
-            <div class="flex items-center gap-6">
-                <!-- Search Bar -->
-                <div class="relative hidden md:block">
-                    <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 w-[18px] h-[18px]"></i>
-                    <input 
-                        type="text" 
-                        placeholder="Search..." 
-                        class="pl-10 pr-4 py-2 w-64 bg-gray-50 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all"
-                    />
-                </div>
-                <!-- Notification Icon -->
-                <button class="text-gray-500 hover:text-gray-700 relative">
-                    <i data-lucide="bell" class="w-[22px] h-[22px]"></i>
-                    <span class="absolute top-0 right-0 w-2 h-2 bg-red-500 rounded-full border-2 border-white"></span>
-                </button>
-                <!-- Profile Placeholder -->
-                <div class="w-9 h-9 rounded-full bg-indigo-100 flex items-center justify-center text-indigo-700 font-bold border border-indigo-200 cursor-pointer">
-                    JD
-                </div>
-            </div>
-        </header>
-
-        <!-- Page Content -->
-        <main class="flex-1 overflow-y-auto p-8">
-            
-            <!-- View: Add Task Form -->
-            <div id="view-add-task" class="max-w-5xl mx-auto bg-white rounded-2xl shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] p-8 md:p-10">
-                <h2 class="text-2xl font-bold text-gray-900 mb-8">Create New Task</h2>
-                
-                <form id="task-form" class="space-y-6">
+        <!-- SECTION: Fundamentals -->
+        <div id="sec-intro" class="section active max-w-5xl mx-auto">
+            <h2 class="text-3xl md:text-4xl font-bold text-white mb-6">The Foundations of Cryptography</h2>
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <div class="lg:col-span-2 space-y-6 text-slate-400 leading-relaxed">
+                    <p class="text-lg text-slate-300">Welcome to the Cybersecurity Workbench. Over the next hour, you will transform from a novice to someone who deeply understands how digital secrets are kept.</p>
                     
-                    <!-- Row 1: Times and Category -->
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="glass-panel p-6 rounded-xl">
+                        <h3 class="text-xl font-semibold text-emerald-400 mb-3">What is Cryptography?</h3>
+                        <p>Cryptography is the practice of securing communication in the presence of adversaries. The core components are:</p>
+                        <ul class="list-disc pl-5 mt-3 space-y-2">
+                            <li><strong class="text-white">Plaintext:</strong> The original, readable message.</li>
+                            <li><strong class="text-white">Ciphertext:</strong> The scrambled, unreadable output.</li>
+                            <li><strong class="text-white">Encryption:</strong> The algorithm that turns Plaintext into Ciphertext.</li>
+                            <li><strong class="text-white">Decryption:</strong> The reverse algorithm.</li>
+                            <li><strong class="text-white">Key:</strong> A secret piece of information that dictates exactly how the algorithm scrambles the data. Without the key, the algorithm is useless.</li>
+                        </ul>
+                    </div>
+
+                    <h3 class="text-2xl font-semibold text-white mt-8 mb-4">The Actors: Alice, Bob, and Eve</h3>
+                    <p>In cryptography, we traditionally use characters to explain scenarios:</p>
+                    <div class="flex flex-col md:flex-row gap-4 mt-4">
+                        <div class="flex-1 bg-slate-900 p-4 rounded border border-slate-700 text-center">
+                            <i class="ph ph-user text-3xl text-cyan-400 mb-2"></i>
+                            <h4 class="font-bold text-white">Alice</h4>
+                            <p class="text-sm">Wants to send a secret message to Bob.</p>
+                        </div>
+                        <div class="flex-1 bg-slate-900 p-4 rounded border border-slate-700 text-center">
+                            <i class="ph ph-user text-3xl text-emerald-400 mb-2"></i>
+                            <h4 class="font-bold text-white">Bob</h4>
+                            <p class="text-sm">Wants to read Alice's message securely.</p>
+                        </div>
+                        <div class="flex-1 bg-red-900/20 p-4 rounded border border-red-900/50 text-center">
+                            <i class="ph ph-detective text-3xl text-red-400 mb-2"></i>
+                            <h4 class="font-bold text-white">Eve</h4>
+                            <p class="text-sm">The eavesdropper intercepting the network.</p>
+                        </div>
+                    </div>
+                    <p class="mt-4">If Alice sends plaintext, Eve reads it. If Alice encrypts it, Eve only sees random noise. The challenge of cryptography is making sure Bob has the key to decrypt it, without Eve ever getting that key.</p>
+                </div>
+                
+                <div class="space-y-6">
+                    <div class="bg-gradient-to-br from-slate-800 to-slate-900 p-6 rounded-xl border border-slate-700">
+                        <h3 class="font-bold text-white mb-2">Your Mission</h3>
+                        <p class="text-sm text-slate-400 mb-4">Go through the sidebar modules one by one. Read the theory, play with the interactive tools, and understand the vulnerabilities.</p>
+                        <p class="text-sm text-slate-400 mb-4">Once you reach the <strong>Capture The Flag</strong> section, you will use the tools you've learned to decode hidden messages.</p>
+                        <button onclick="switchTab('caesar')" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2 px-4 rounded transition">Start with Caesar Cipher &rarr;</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION: Caesar -->
+        <div id="sec-caesar" class="section max-w-6xl mx-auto">
+            <h2 class="text-3xl md:text-4xl font-bold text-white mb-2">Caesar Cipher</h2>
+            <p class="text-slate-400 mb-8">The dawn of cryptography: Substitution Ciphers.</p>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="space-y-6">
+                    <div class="glass-panel p-6 rounded-xl">
+                        <h3 class="text-xl font-semibold text-emerald-400 mb-3">How it works</h3>
+                        <p class="text-slate-300 text-sm leading-relaxed mb-4">Used by Julius Caesar in 58 BC, this is a <strong>substitution cipher</strong>. Every letter in the plaintext is shifted a certain number of places down the alphabet. For example, with a shift of 1, A becomes B, B becomes C, and Z wraps around to A.</p>
+                        <p class="text-slate-300 text-sm leading-relaxed font-bold text-red-400">The Vulnerability: Frequency Analysis & Brute Force</p>
+                        <p class="text-slate-300 text-sm leading-relaxed">Since there are only 25 possible shifts, a modern computer (or a bored human) can simply try all 25 until the text makes sense. Furthermore, because it's a direct substitution, the most common letter in the ciphertext will usually correspond to 'E', the most common letter in English.</p>
+                    </div>
+
+                    <!-- Brute Force Tool -->
+                    <div class="glass-panel p-6 rounded-xl border-red-900/50 bg-red-900/10">
+                        <h3 class="text-xl font-semibold text-red-400 mb-3 flex items-center gap-2"><i class="ph ph-skull"></i> Brute Force Attacker</h3>
+                        <p class="text-sm text-slate-400 mb-4">Paste intercepted ciphertext here to instantly try all 25 possible keys. Green text indicates english dictionary matches.</p>
+                        <textarea id="caesar-brute-input" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-white font-mono text-sm focus:border-red-500 focus:outline-none mb-4" rows="2" placeholder="Paste intercepted text..."></textarea>
+                        <button onclick="runCaesarBruteForce()" class="bg-red-600 hover:bg-red-500 text-white font-semibold py-2 px-4 rounded transition text-sm">Initiate Brute Force</button>
                         
-                        <!-- Time Slot From -->
-                        <div class="space-y-2">
-                            <label class="block text-sm font-medium text-gray-700">Time Slot (From)</label>
-                            <div class="relative">
-                                <input 
-                                    type="text" 
-                                    id="time-from"
-                                    required
-                                    placeholder="hh:mm aa" 
-                                    class="w-full pl-4 pr-10 py-2.5 bg-white border border-gray-200 rounded-lg text-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
-                                />
-                                <i data-lucide="clock" class="w-[18px] h-[18px] absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"></i>
-                            </div>
-                        </div>
-
-                        <!-- Time Slot To -->
-                        <div class="space-y-2">
-                            <label class="block text-sm font-medium text-gray-700">Time Slot (To)</label>
-                            <div class="relative">
-                                <input 
-                                    type="text" 
-                                    id="time-to"
-                                    required
-                                    placeholder="hh:mm aa" 
-                                    class="w-full pl-4 pr-10 py-2.5 bg-white border border-gray-200 rounded-lg text-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow"
-                                />
-                                <i data-lucide="clock" class="w-[18px] h-[18px] absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"></i>
-                            </div>
-                        </div>
-
-                        <!-- Category -->
-                        <div class="space-y-2">
-                            <label class="block text-sm font-medium text-gray-700">Activity Category</label>
-                            <select id="category" required class="custom-select w-full px-4 py-2.5 bg-white border border-gray-200 rounded-lg text-gray-500 text-sm appearance-none focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow cursor-pointer">
-                                <option value="" disabled selected>Select category</option>
-                                <option value="Development">Development</option>
-                                <option value="Design">Design</option>
-                                <option value="Meeting">Meeting</option>
-                                <option value="Planning">Planning</option>
-                            </select>
+                        <div id="caesar-brute-results" class="mt-4 max-h-60 overflow-y-auto font-mono text-xs space-y-1 bg-slate-950 p-2 rounded hidden">
+                            <!-- Results inject here -->
                         </div>
                     </div>
+                </div>
 
-                    <!-- Row 2: Outcome -->
-                    <div class="space-y-2">
-                        <label class="block text-sm font-medium text-gray-700">Outcome / Achievement</label>
-                        <textarea 
-                            id="outcome"
-                            required
-                            rows="4"
-                            placeholder="What was achieved?"
-                            class="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow resize-y"
-                        ></textarea>
+                <div class="glass-panel p-6 rounded-xl">
+                    <h3 class="text-xl font-semibold text-white mb-4">Interactive Lab</h3>
+                    
+                    <label class="block text-sm font-medium text-slate-400 mb-2">Shift (Key): <span id="caesar-shift-val" class="text-cyan-400 font-bold">3</span></label>
+                    <input type="range" id="caesar-shift" min="1" max="25" value="3" class="w-full accent-cyan-500 mb-6" oninput="updateCaesar()">
+                    
+                    <label class="block text-sm font-medium text-slate-400 mb-2">Plaintext</label>
+                    <textarea id="caesar-plain" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-white font-mono text-sm focus:border-cyan-500 focus:outline-none mb-6 transition-colors" rows="4" oninput="updateCaesar('plain')">ATTACK AT DAWN</textarea>
+
+                    <div class="flex justify-center mb-6">
+                        <i class="ph ph-arrows-down-up text-3xl text-slate-600"></i>
                     </div>
 
-                    <!-- Row 3: Remarks -->
-                    <div class="space-y-2">
-                        <label class="block text-sm font-medium text-gray-700">Remarks</label>
-                        <textarea 
-                            id="remarks"
-                            rows="3"
-                            placeholder="Any additional remarks..."
-                            class="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-gray-700 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-transparent transition-shadow resize-y"
-                        ></textarea>
+                    <label class="block text-sm font-medium text-slate-400 mb-2">Ciphertext</label>
+                    <textarea id="caesar-cipher" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-emerald-400 font-mono text-sm focus:border-emerald-500 focus:outline-none transition-colors" rows="4" oninput="updateCaesar('cipher')"></textarea>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION: Vigenere -->
+        <div id="sec-vigenere" class="section max-w-6xl mx-auto">
+            <h2 class="text-3xl md:text-4xl font-bold text-white mb-2">Vigenère Cipher</h2>
+            <p class="text-slate-400 mb-8">The unbreakable cipher of the 16th century: Polyalphabetic Substitution.</p>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="space-y-6">
+                    <div class="glass-panel p-6 rounded-xl">
+                        <h3 class="text-xl font-semibold text-emerald-400 mb-3">How it works</h3>
+                        <p class="text-slate-300 text-sm leading-relaxed mb-4">To defeat frequency analysis, Giovan Battista Bellaso invented a cipher that uses a <strong>keyword</strong>. Instead of shifting the whole message by one number (like Caesar), every letter is shifted by a different amount based on the repeating keyword.</p>
+                        <p class="text-slate-300 text-sm leading-relaxed mb-4">If the keyword is "LEMON", the first letter of plaintext is shifted by 'L' (11), the second by 'E' (4), and so on. The key repeats: LEMONLEMONLEM.</p>
+                        <p class="text-slate-300 text-sm leading-relaxed font-bold text-red-400">The Vulnerability: Kasiski Examination</p>
+                        <p class="text-slate-300 text-sm leading-relaxed">It was considered unbreakable ("le chiffre indéchiffrable") for 300 years! In 1863, Friedrich Kasiski published a method. If you find repeating sequences in the ciphertext, the distance between them is likely a multiple of the keyword length. Once you know the key length, you break it down into several standard Caesar ciphers and solve them individually.</p>
+                    </div>
+                </div>
+
+                <div class="glass-panel p-6 rounded-xl">
+                    <h3 class="text-xl font-semibold text-white mb-4">Interactive Lab</h3>
+                    
+                    <label class="block text-sm font-medium text-slate-400 mb-2">Keyword</label>
+                    <input type="text" id="vigenere-key" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-cyan-400 font-mono text-sm focus:border-cyan-500 focus:outline-none mb-6 uppercase" value="LEMON" oninput="updateVigenere('plain')">
+                    
+                    <label class="block text-sm font-medium text-slate-400 mb-2">Plaintext</label>
+                    <textarea id="vigenere-plain" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-white font-mono text-sm focus:border-cyan-500 focus:outline-none mb-6" rows="4" oninput="updateVigenere('plain')">ATTACK AT DAWN</textarea>
+
+                    <div class="flex justify-center mb-6">
+                        <i class="ph ph-arrows-down-up text-3xl text-slate-600"></i>
                     </div>
 
-                    <!-- Row 4: Attachments -->
-                    <div class="space-y-2">
-                        <label class="block text-sm font-medium text-gray-700">Attachments (Optional)</label>
-                        <div class="relative">
-                            <input 
-                                type="file" 
-                                id="attachment"
-                                class="block w-full text-sm text-gray-500
-                                file:mr-4 file:py-2 file:px-4
-                                file:rounded-md file:border file:border-gray-200
-                                file:text-sm file:font-medium
-                                file:bg-white file:text-gray-700
-                                hover:file:bg-gray-50 file:cursor-pointer
-                                border border-gray-200 rounded-lg p-2 bg-white cursor-pointer focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                            />
-                        </div>
-                    </div>
+                    <label class="block text-sm font-medium text-slate-400 mb-2">Ciphertext</label>
+                    <textarea id="vigenere-cipher" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-emerald-400 font-mono text-sm focus:border-emerald-500 focus:outline-none" rows="4" oninput="updateVigenere('cipher')"></textarea>
+                </div>
+            </div>
+        </div>
 
-                    <!-- Action Button -->
-                    <div class="pt-6 flex justify-end">
-                        <button 
-                            type="submit"
-                            class="flex items-center gap-2 px-8 py-3 bg-[#6C5DD3] hover:bg-[#5a4bc0] text-white font-medium rounded-lg transition-colors shadow-sm focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#6C5DD3]"
-                        >
-                            <i data-lucide="save" class="w-[18px] h-[18px]"></i>
-                            <span>Save Task</span>
+        <!-- SECTION: AES -->
+        <div id="sec-aes" class="section max-w-6xl mx-auto">
+            <h2 class="text-3xl md:text-4xl font-bold text-white mb-2">Symmetric Encryption: AES-GCM</h2>
+            <p class="text-slate-400 mb-8">The modern standard for keeping secrets. One key locks and unlocks.</p>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="space-y-6">
+                    <div class="glass-panel p-6 rounded-xl">
+                        <h3 class="text-xl font-semibold text-emerald-400 mb-3">Advanced Encryption Standard</h3>
+                        <p class="text-slate-300 text-sm leading-relaxed mb-4">AES is a block cipher established by NIST in 2001. Unlike Caesar or Vigenère, which operate on individual letters, AES operates on blocks of <strong>bits</strong> using complex mathematical substitutions and permutations.</p>
+                        
+                        <h4 class="font-bold text-white mt-4 mb-2">The Components:</h4>
+                        <ul class="list-disc pl-5 text-sm text-slate-300 space-y-2">
+                            <li><strong>Password/Key:</strong> Used to encrypt. In modern web apps, a human password is fed through a Key Derivation Function (like PBKDF2) to generate a secure 256-bit mathematical key.</li>
+                            <li><strong>Salt:</strong> Random data added to the password before derivation to prevent dictionary attacks.</li>
+                            <li><strong>IV (Initialization Vector):</strong> A random number added to the encryption process. If you encrypt the same message twice with the same password, the IV ensures the ciphertexts look completely different.</li>
+                            <li><strong>GCM (Galois/Counter Mode):</strong> The specific "mode" of AES. GCM not only encrypts the data (Confidentiality) but adds a tag to ensure the data hasn't been tampered with (Integrity).</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="glass-panel p-6 rounded-xl">
+                    <h3 class="text-xl font-semibold text-white mb-4">Interactive Lab (Real WebCrypto API)</h3>
+                    
+                    <label class="block text-sm font-medium text-slate-400 mb-2">Secret Password</label>
+                    <div class="relative mb-6">
+                        <input type="password" id="aes-pass" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-cyan-400 font-mono text-sm focus:border-cyan-500 focus:outline-none" value="SuperSecret123">
+                        <button onclick="toggleVisibility('aes-pass')" class="absolute right-3 top-3 text-slate-400 hover:text-white"><i class="ph ph-eye"></i></button>
+                    </div>
+                    
+                    <label class="block text-sm font-medium text-slate-400 mb-2">Plaintext</label>
+                    <textarea id="aes-plain" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-white font-mono text-sm focus:border-cyan-500 focus:outline-none mb-4" rows="3">This is highly classified information.</textarea>
+
+                    <div class="flex gap-4 mb-6">
+                        <button onclick="executeAESEncrypt()" class="flex-1 bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2 px-4 rounded transition flex justify-center items-center gap-2">
+                            <i class="ph ph-lock-key"></i> Encrypt
+                        </button>
+                        <button onclick="executeAESDecrypt()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2 px-4 rounded transition flex justify-center items-center gap-2">
+                            <i class="ph ph-lock-key-open"></i> Decrypt
                         </button>
                     </div>
 
-                </form>
-            </div>
-
-            <!-- View: Task List -->
-            <div id="view-task-list" class="hidden max-w-5xl mx-auto bg-white rounded-2xl shadow-[0_2px_10px_-3px_rgba(6,81,237,0.1)] p-8 md:p-10">
-                <h2 class="text-2xl font-bold text-gray-900 mb-8">Tasks List</h2>
-                
-                <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse min-w-[700px]">
-                        <thead>
-                            <tr class="border-b border-gray-200 text-gray-500 text-sm">
-                                <th class="pb-3 font-medium w-1/5">Category</th>
-                                <th class="pb-3 font-medium w-1/5">Time Slot</th>
-                                <th class="pb-3 font-medium w-1/3">Outcome</th>
-                                <th class="pb-3 font-medium w-1/5">Remarks</th>
-                                <th class="pb-3 font-medium w-16 text-center">Action</th>
-                            </tr>
-                        </thead>
-                        <tbody id="task-list-body" class="text-sm text-gray-700">
-                            <!-- Tasks will be injected here -->
-                        </tbody>
-                    </table>
+                    <label class="block text-sm font-medium text-slate-400 mb-2">Ciphertext (Base64 Encoded)</label>
+                    <textarea id="aes-cipher" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-emerald-400 font-mono text-xs focus:border-emerald-500 focus:outline-none mb-2 break-all" rows="4"></textarea>
+                    <p class="text-xs text-slate-500">Note: This Base64 string actually contains [Salt + IV + Ciphertext] concatenated together.</p>
                 </div>
-                
-                <!-- Empty State -->
-                <div id="empty-state" class="text-center py-16 text-gray-500">
-                    <div class="flex justify-center mb-4 text-gray-300">
-                        <i data-lucide="inbox" class="w-16 h-16"></i>
+            </div>
+        </div>
+
+        <!-- SECTION: RSA -->
+        <div id="sec-rsa" class="section max-w-6xl mx-auto">
+            <h2 class="text-3xl md:text-4xl font-bold text-white mb-2">Asymmetric Encryption: RSA</h2>
+            <p class="text-slate-400 mb-8">Public Key Cryptography. Two keys: one to lock, one to unlock.</p>
+
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="space-y-6">
+                    <div class="glass-panel p-6 rounded-xl">
+                        <h3 class="text-xl font-semibold text-emerald-400 mb-3">The Key Exchange Problem</h3>
+                        <p class="text-slate-300 text-sm leading-relaxed mb-4">Symmetric encryption (AES) is incredibly fast and secure, but there's a fatal flaw: <strong>How does Alice securely get the password to Bob over the internet without Eve stealing it?</strong></p>
+                        
+                        <h4 class="font-bold text-white mt-4 mb-2">The Solution: Asymmetric Encryption</h4>
+                        <p class="text-slate-300 text-sm leading-relaxed mb-4">In 1977, Rivest, Shamir, and Adleman (RSA) published a system using prime numbers. Instead of one key, you generate a mathematically linked <strong>Key Pair</strong>:</p>
+                        <ul class="list-disc pl-5 text-sm text-slate-300 space-y-2 mb-4">
+                            <li><strong class="text-cyan-400">Public Key:</strong> You give this to everyone in the world. It can ONLY encrypt data. It is physically impossible for it to decrypt data.</li>
+                            <li><strong class="text-red-400">Private Key:</strong> You keep this secret. It is the ONLY thing that can decrypt data encrypted by your Public Key.</li>
+                        </ul>
+                        <p class="text-slate-300 text-sm leading-relaxed italic">Analogy: Bob hands out hundreds of open padlocks (Public Keys). Alice puts her message in a box, snaps Bob's padlock shut, and mails it. Now, NO ONE can open the box—not even Alice! Only Bob, who has the only key (Private Key) to that padlock, can open it.</p>
                     </div>
-                    <p class="text-lg font-medium text-gray-600">No tasks found</p>
-                    <p class="text-sm mt-1">Add a new task to get started.</p>
+
+                    <div class="glass-panel p-6 rounded-xl border-cyan-900/50">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 class="text-xl font-semibold text-cyan-400">Your Keys</h3>
+                            <button onclick="generateRSAKeys()" class="bg-slate-700 hover:bg-slate-600 text-white font-semibold py-1.5 px-3 rounded text-sm transition flex items-center gap-2" id="rsa-gen-btn">
+                                <i class="ph ph-arrows-clockwise"></i> Generate New Pair
+                            </button>
+                        </div>
+                        <div class="grid grid-cols-1 gap-4">
+                            <div>
+                                <label class="block text-xs font-semibold text-cyan-400 mb-1 uppercase tracking-wider">Public Key (Share widely)</label>
+                                <textarea id="rsa-pub-display" readonly class="w-full bg-slate-900 border border-slate-700 rounded p-2 key-block font-mono text-[10px] focus:outline-none" rows="4">Click 'Generate New Pair' to create 2048-bit RSA keys.</textarea>
+                            </div>
+                            <div>
+                                <label class="block text-xs font-semibold text-red-400 mb-1 uppercase tracking-wider">Private Key (NEVER SHARE)</label>
+                                <textarea id="rsa-priv-display" readonly class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-red-300 font-mono text-[10px] focus:outline-none" rows="4">Click 'Generate New Pair' to create 2048-bit RSA keys.</textarea>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="glass-panel p-6 rounded-xl flex flex-col">
+                    <h3 class="text-xl font-semibold text-white mb-4">Interactive Lab</h3>
+                    
+                    <label class="block text-sm font-medium text-slate-400 mb-2">Short Plaintext Message</label>
+                    <textarea id="rsa-plain" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-white font-mono text-sm focus:border-cyan-500 focus:outline-none mb-2" rows="3" placeholder="Type a message here..."></textarea>
+                    <p class="text-xs text-slate-500 mb-6 text-right">RSA is slow and can only encrypt small amounts of data (usually max ~190 bytes for a 2048-bit key).</p>
+
+                    <div class="flex gap-4 mb-6">
+                        <button onclick="executeRSAEncrypt()" class="flex-1 bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2 px-4 rounded transition flex flex-col justify-center items-center gap-1">
+                            <span class="flex items-center gap-2"><i class="ph ph-lock-key"></i> Encrypt</span>
+                            <span class="text-[10px] opacity-75">(Uses Public Key)</span>
+                        </button>
+                        <button onclick="executeRSADecrypt()" class="flex-1 bg-red-600 hover:bg-red-500 text-white font-semibold py-2 px-4 rounded transition flex flex-col justify-center items-center gap-1">
+                            <span class="flex items-center gap-2"><i class="ph ph-lock-key-open"></i> Decrypt</span>
+                            <span class="text-[10px] opacity-75">(Uses Private Key)</span>
+                        </button>
+                    </div>
+
+                    <label class="block text-sm font-medium text-slate-400 mb-2">Ciphertext (Base64)</label>
+                    <textarea id="rsa-cipher" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-emerald-400 font-mono text-xs focus:border-emerald-500 focus:outline-none flex-1 min-h-[150px] break-all" placeholder="Encrypted data will appear here..."></textarea>
                 </div>
             </div>
+        </div>
 
-        </main>
-    </div>
+        <!-- SECTION: Hashing -->
+        <div id="sec-hashing" class="section max-w-6xl mx-auto">
+            <h2 class="text-3xl md:text-4xl font-bold text-white mb-2">Cryptographic Hashing</h2>
+            <p class="text-slate-400 mb-8">One-way mathematical fingerprints. Data goes in, it never comes out.</p>
 
-    <!-- Initialization Script -->
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-8">
+                <div class="space-y-6">
+                    <div class="glass-panel p-6 rounded-xl">
+                        <h3 class="text-xl font-semibold text-emerald-400 mb-3">Not Encryption, but Crucial</h3>
+                        <p class="text-slate-300 text-sm leading-relaxed mb-4">Encryption is a two-way street: you encrypt to decrypt later. <strong>Hashing is a one-way street.</strong></p>
+                        <p class="text-slate-300 text-sm leading-relaxed mb-4">A hash function takes an input of ANY size (a password, a 50GB video file) and mathematically condenses it into a fixed-size string of characters (a "fingerprint").</p>
+                        
+                        <h4 class="font-bold text-white mt-4 mb-2">Properties of a good Hash:</h4>
+                        <ul class="list-disc pl-5 text-sm text-slate-300 space-y-2">
+                            <li><strong>Deterministic:</strong> The same input ALWAYS produces the exact same hash.</li>
+                            <li><strong>Irreversible:</strong> You cannot derive the input from the hash.</li>
+                            <li><strong>The Avalanche Effect:</strong> Changing a single letter or even a single bit of the input changes the entire resulting hash completely.</li>
+                            <li><strong>Collision Resistant:</strong> It is statistically improbable for two different inputs to produce the same hash.</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="glass-panel p-6 rounded-xl">
+                    <h3 class="text-xl font-semibold text-white mb-4">The Avalanche Visualizer</h3>
+                    
+                    <label class="block text-sm font-medium text-slate-400 mb-2">Input Data</label>
+                    <input type="text" id="hash-input" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-white font-mono text-sm focus:border-cyan-500 focus:outline-none mb-6" value="password" oninput="updateHashes()">
+                    
+                    <div class="space-y-4">
+                        <div>
+                            <label class="flex justify-between text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wider">
+                                <span>SHA-1</span>
+                                <span class="text-red-400">Depreciated (Insecure)</span>
+                            </label>
+                            <div id="hash-sha1" class="w-full bg-slate-900 border border-slate-700 rounded p-3 hash-block font-mono text-[11px] break-all"></div>
+                        </div>
+                        <div>
+                            <label class="flex justify-between text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wider">
+                                <span>SHA-256</span>
+                                <span class="text-emerald-400">Industry Standard</span>
+                            </label>
+                            <div id="hash-sha256" class="w-full bg-slate-900 border border-slate-700 rounded p-3 hash-block font-mono text-[11px] break-all"></div>
+                        </div>
+                        <div>
+                            <label class="flex justify-between text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wider">
+                                <span>SHA-512</span>
+                                <span class="text-cyan-400">High Security</span>
+                            </label>
+                            <div id="hash-sha512" class="w-full bg-slate-900 border border-slate-700 rounded p-3 hash-block font-mono text-[11px] break-all"></div>
+                        </div>
+                    </div>
+                    <p class="text-xs text-slate-500 mt-4 italic">Try changing "password" to "Password" (capital P) and watch how completely different every output becomes.</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- SECTION: CTF Challenges -->
+        <div id="sec-ctf" class="section max-w-4xl mx-auto">
+            <h2 class="text-3xl md:text-4xl font-bold text-white mb-2 text-center">Capture The Flag</h2>
+            <p class="text-slate-400 mb-8 text-center">Test your skills. Use the tools in the sidebar to decode these intercepted messages.</p>
+
+            <div class="space-y-6">
+                <!-- Challenge 1 -->
+                <div class="glass-panel p-6 rounded-xl border-l-4 border-l-blue-500" id="chal-1">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-xl font-bold text-white">Level 1: The Roman General</h3>
+                        <span class="bg-blue-900/50 text-blue-400 text-xs px-2 py-1 rounded font-bold uppercase tracking-widest">Easy</span>
+                    </div>
+                    <p class="text-slate-300 text-sm mb-4">We intercepted this message from an amateur hacker group. We suspect they are using the oldest trick in the book. Use the brute force tool to find the flag.</p>
+                    <div class="bg-slate-900 p-3 rounded font-mono text-emerald-400 text-sm mb-4 tracking-widest text-center border border-slate-700">
+                        IODJ{KHOOR_DJHQW}
+                    </div>
+                    <div class="flex gap-2">
+                        <input type="text" id="flag-1" placeholder="Enter decoded text here..." class="flex-1 bg-slate-900 border border-slate-700 rounded px-3 py-2 text-white text-sm focus:border-blue-500 focus:outline-none uppercase">
+                        <button onclick="checkFlag(1, 'FLAG{HELLO_AGENT}')" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded text-sm font-bold transition">Submit</button>
+                    </div>
+                </div>
+
+                <!-- Challenge 2 -->
+                <div class="glass-panel p-6 rounded-xl border-l-4 border-l-purple-500" id="chal-2">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-xl font-bold text-white">Level 2: Polyalphabetic Panic</h3>
+                        <span class="bg-purple-900/50 text-purple-400 text-xs px-2 py-1 rounded font-bold uppercase tracking-widest">Medium</span>
+                    </div>
+                    <p class="text-slate-300 text-sm mb-4">The adversary got slightly smarter. They used a Vigenère cipher. We managed to recover the keyword from their garbage bin: <strong>SECURE</strong>.</p>
+                    <div class="bg-slate-900 p-3 rounded font-mono text-emerald-400 text-sm mb-4 tracking-widest text-center border border-slate-700">
+                        XPER{TFRQ_TGLYVXZ}
+                    </div>
+                    <div class="flex gap-2">
+                        <input type="text" id="flag-2" placeholder="Enter decoded text here..." class="flex-1 bg-slate-900 border border-slate-700 rounded px-3 py-2 text-white text-sm focus:border-purple-500 focus:outline-none uppercase">
+                        <button onclick="checkFlag(2, 'FLAG{BANK_ROBBERY}')" class="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded text-sm font-bold transition">Submit</button>
+                    </div>
+                </div>
+
+                <!-- Challenge 3 -->
+                <div class="glass-panel p-6 rounded-xl border-l-4 border-l-red-500" id="chal-3">
+                    <div class="flex justify-between items-start mb-4">
+                        <h3 class="text-xl font-bold text-white">Level 3: Modern Data Extraction</h3>
+                        <span class="bg-red-900/50 text-red-400 text-xs px-2 py-1 rounded font-bold uppercase tracking-widest">Hard</span>
+                    </div>
+                    <p class="text-slate-300 text-sm mb-4">This file was downloaded from a secure server. It's AES-GCM encrypted. A note attached to it said: <em>"The password is the name of our solar system's star, all lowercase."</em></p>
+                    <textarea readonly class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-emerald-400 font-mono text-xs mb-4 h-20 break-all">xZtZc1y+j3V4D17/Zf+E4XbH8i4gD2T/1X0O1Qx7r2MhO4D5i5M2n0p9s1D/rY5X2E3P0F0I7H2Q5B9A0N1C8U6V</textarea>
+                    <p class="text-xs text-slate-500 mb-4">(Note: To make this workable in this lab, use the text below, which was generated with the actual lab's AES tool using the password "sun")</p>
+                    <div class="bg-slate-900 p-2 rounded font-mono text-cyan-400 text-[10px] mb-4 break-all border border-slate-700" id="chal3-base64">
+                        <!-- Will be populated via JS on load so it matches exactly -->
+                    </div>
+                    <div class="flex gap-2">
+                        <input type="text" id="flag-3" placeholder="Enter decrypted text..." class="flex-1 bg-slate-900 border border-slate-700 rounded px-3 py-2 text-white text-sm focus:border-red-500 focus:outline-none">
+                        <button onclick="checkFlag(3, 'FLAG{AES_IS_SECURE}')" class="bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded text-sm font-bold transition">Submit</button>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="mt-12 text-center text-slate-500 text-sm">
+                <p>Completed all challenges? You've proven you understand the fundamentals of Cryptography!</p>
+            </div>
+        </div>
+
+    </main>
+
     <script>
-        // Initialize Lucide Icons
-        lucide.createIcons();
+        // --- NAVIGATION STATE ---
+        const tabs = ['intro', 'caesar', 'vigenere', 'aes', 'rsa', 'hashing', 'ctf'];
+        let rsaKeyPair = null;
 
-        // Sidebar Toggle Logic
-        const sidebar = document.getElementById('sidebar');
-        const collapseBtn = document.getElementById('collapse-btn');
-        const expandBtn = document.getElementById('expand-btn');
-        const sidebarTexts = document.querySelectorAll('.sidebar-text');
-        const brandName = document.getElementById('brand-name');
-        const logoContainer = document.getElementById('logo-container');
+        function switchTab(tabId) {
+            // Hide all
+            tabs.forEach(t => {
+                document.getElementById(`sec-${t}`).classList.remove('active');
+                document.getElementById(`nav-${t}`).classList.remove('active');
+            });
+            // Show target
+            document.getElementById(`sec-${tabId}`).classList.add('active');
+            document.getElementById(`nav-${tabId}`).classList.add('active');
+            window.scrollTo(0,0);
+        }
 
-        let isSidebarOpen = true;
+        // --- TOAST NOTIFICATIONS ---
+        function showToast(msg, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.className = `fixed bottom-4 right-4 px-6 py-3 rounded shadow-lg transition-opacity duration-300 z-50 text-white font-semibold ${type === 'error' ? 'bg-red-600' : 'bg-emerald-600'}`;
+            toast.style.opacity = '1';
+            setTimeout(() => { toast.style.opacity = '0'; }, 4000);
+        }
 
-        function toggleSidebar() {
-            isSidebarOpen = !isSidebarOpen;
-            
-            if (isSidebarOpen) {
-                // Expand Sidebar
-                sidebar.classList.remove('w-20');
-                sidebar.classList.add('w-[260px]');
-                
-                logoContainer.classList.remove('justify-center', 'w-full');
-                brandName.classList.remove('hidden');
-                collapseBtn.classList.remove('hidden');
-                expandBtn.classList.add('hidden');
-                
-                sidebarTexts.forEach(text => text.classList.remove('hidden'));
+        // --- UTILS ---
+        function toggleVisibility(id) {
+            const input = document.getElementById(id);
+            if (input.type === "password") {
+                input.type = "text";
             } else {
-                // Collapse Sidebar
-                sidebar.classList.remove('w-[260px]');
-                sidebar.classList.add('w-20');
-                
-                logoContainer.classList.add('justify-center', 'w-full');
-                brandName.classList.add('hidden');
-                collapseBtn.classList.add('hidden');
-                expandBtn.classList.remove('hidden');
-                
-                sidebarTexts.forEach(text => text.classList.add('hidden'));
+                input.type = "password";
             }
         }
 
-        collapseBtn.addEventListener('click', toggleSidebar);
-        expandBtn.addEventListener('click', toggleSidebar);
+        function bufferToBase64(buf) {
+            var binstr = Array.prototype.map.call(new Uint8Array(buf), function (ch) {
+                return String.fromCharCode(ch);
+            }).join('');
+            return btoa(binstr);
+        }
 
-        // --- Tabs & Task List Logic ---
-        const navAddTask = document.getElementById('nav-add-task');
-        const navTaskList = document.getElementById('nav-task-list');
-        const viewAddTask = document.getElementById('view-add-task');
-        const viewTaskList = document.getElementById('view-task-list');
-        const headerTitle = document.getElementById('header-title');
-        const taskForm = document.getElementById('task-form');
-        const taskListBody = document.getElementById('task-list-body');
-        const emptyState = document.getElementById('empty-state');
+        function base64ToBuffer(base64) {
+            var binstr = atob(base64);
+            var buf = new Uint8Array(binstr.length);
+            Array.prototype.forEach.call(binstr, function (ch, i) {
+                buf[i] = ch.charCodeAt(0);
+            });
+            return buf.buffer;
+        }
 
-        // State array to hold tasks
-        let tasks = [];
+        // --- 1. CAESAR CIPHER LOGIC ---
+        function doCaesar(str, amount) {
+            if (amount < 0) return doCaesar(str, amount + 26);
+            let output = '';
+            for (let i = 0; i < str.length; i++) {
+                let c = str[i];
+                if (c.match(/[a-z]/i)) {
+                    let code = str.charCodeAt(i);
+                    if (code >= 65 && code <= 90) {
+                        c = String.fromCharCode(((code - 65 + amount) % 26) + 65);
+                    } else if (code >= 97 && code <= 122) {
+                        c = String.fromCharCode(((code - 97 + amount) % 26) + 97);
+                    }
+                }
+                output += c;
+            }
+            return output;
+        }
 
-        function switchTab(tab) {
-            if (tab === 'list') {
-                // Set List Tab Active
-                navTaskList.classList.remove('text-gray-400', 'hover:text-white', 'hover:bg-gray-800');
-                navTaskList.classList.add('bg-white', 'text-gray-900', 'shadow-sm');
-                navTaskList.querySelector('.lucide').classList.remove('group-hover:text-white');
-                navTaskList.querySelector('.lucide').classList.add('text-gray-900');
-
-                // Set Add Tab Inactive
-                navAddTask.classList.remove('bg-white', 'text-gray-900', 'shadow-sm');
-                navAddTask.classList.add('text-gray-400', 'hover:text-white', 'hover:bg-gray-800');
-                navAddTask.querySelector('.lucide').classList.remove('text-gray-900');
-                navAddTask.querySelector('.lucide').classList.add('group-hover:text-white');
-
-                // Toggle Views
-                viewAddTask.classList.add('hidden');
-                viewTaskList.classList.remove('hidden');
-                headerTitle.textContent = 'Tasks List';
-                
-                renderTasks();
+        function updateCaesar(source = 'plain') {
+            const shift = parseInt(document.getElementById('caesar-shift').value);
+            document.getElementById('caesar-shift-val').textContent = shift;
+            
+            if (source === 'plain') {
+                const plain = document.getElementById('caesar-plain').value;
+                document.getElementById('caesar-cipher').value = doCaesar(plain, shift);
             } else {
-                // Set Add Tab Active
-                navAddTask.classList.remove('text-gray-400', 'hover:text-white', 'hover:bg-gray-800');
-                navAddTask.classList.add('bg-white', 'text-gray-900', 'shadow-sm');
-                navAddTask.querySelector('.lucide').classList.remove('group-hover:text-white');
-                navAddTask.querySelector('.lucide').classList.add('text-gray-900');
-
-                // Set List Tab Inactive
-                navTaskList.classList.remove('bg-white', 'text-gray-900', 'shadow-sm');
-                navTaskList.classList.add('text-gray-400', 'hover:text-white', 'hover:bg-gray-800');
-                navTaskList.querySelector('.lucide').classList.remove('text-gray-900');
-                navTaskList.querySelector('.lucide').classList.add('group-hover:text-white');
-
-                // Toggle Views
-                viewTaskList.classList.add('hidden');
-                viewAddTask.classList.remove('hidden');
-                headerTitle.textContent = 'Add New Task';
+                const cipher = document.getElementById('caesar-cipher').value;
+                // Decrypt is just shift backward
+                document.getElementById('caesar-plain').value = doCaesar(cipher, (26 - shift) % 26);
             }
         }
 
-        navAddTask.addEventListener('click', (e) => {
-            e.preventDefault();
-            switchTab('add');
-        });
+        function runCaesarBruteForce() {
+            const cipher = document.getElementById('caesar-brute-input').value;
+            if(!cipher) {
+                showToast('Please input ciphertext to brute force.', 'error');
+                return;
+            }
+            const resDiv = document.getElementById('caesar-brute-results');
+            resDiv.innerHTML = '';
+            resDiv.classList.remove('hidden');
 
-        navTaskList.addEventListener('click', (e) => {
-            e.preventDefault();
-            switchTab('list');
-        });
-
-        taskForm.addEventListener('submit', (e) => {
-            e.preventDefault();
+            const commonWords = ['the', 'and', 'are', 'you', 'that', 'with', 'this', 'have', 'from', 'agent', 'hello', 'flag'];
             
-            const newTask = {
-                id: Date.now(),
-                timeFrom: document.getElementById('time-from').value,
-                timeTo: document.getElementById('time-to').value,
-                category: document.getElementById('category').value,
-                outcome: document.getElementById('outcome').value,
-                remarks: document.getElementById('remarks').value || 'N/A'
-            };
-
-            tasks.push(newTask);
-            taskForm.reset();
-            
-            // Switch to list view to show the newly added task
-            switchTab('list');
-        });
-
-        function renderTasks() {
-            taskListBody.innerHTML = '';
-            
-            if (tasks.length === 0) {
-                emptyState.classList.remove('hidden');
-            } else {
-                emptyState.classList.add('hidden');
+            for(let i=1; i<=25; i++) {
+                let dec = doCaesar(cipher, (26 - i) % 26);
+                let lowerDec = dec.toLowerCase();
+                let matchScore = commonWords.filter(w => lowerDec.includes(w)).length;
                 
-                tasks.forEach(task => {
-                    const tr = document.createElement('tr');
-                    tr.className = 'border-b border-gray-100 hover:bg-gray-50 transition-colors';
-                    tr.innerHTML = `
-                        <td class="py-4 font-medium text-[#6C5DD3]">${task.category}</td>
-                        <td class="py-4 text-gray-600 whitespace-nowrap">${task.timeFrom} - ${task.timeTo}</td>
-                        <td class="py-4 text-gray-700 pr-4">${task.outcome}</td>
-                        <td class="py-4 text-gray-500 pr-4 text-sm">${task.remarks}</td>
-                        <td class="py-4 text-center">
-                            <button onclick="deleteTask(${task.id})" class="text-red-400 hover:text-red-600 transition-colors p-1.5 rounded-md hover:bg-red-50" title="Delete Task">
-                                <i data-lucide="trash-2" class="w-[18px] h-[18px]"></i>
-                            </button>
-                        </td>
-                    `;
-                    taskListBody.appendChild(tr);
-                });
-                
-                // Render icons inside the dynamically created elements
-                lucide.createIcons();
+                let el = document.createElement('div');
+                el.className = `p-1.5 border-b border-slate-800 flex gap-2 ${matchScore > 0 ? 'bg-emerald-900/30 text-emerald-400 font-bold' : 'text-slate-400'}`;
+                el.innerHTML = `<span class="w-16 shrink-0 opacity-50">Shift ${i.toString().padStart(2, '0')}</span> <span>${dec}</span>`;
+                resDiv.appendChild(el);
             }
         }
 
-        window.deleteTask = function(id) {
-            tasks = tasks.filter(t => t.id !== id);
-            renderTasks();
+        // --- 2. VIGENERE CIPHER LOGIC ---
+        function doVigenere(text, key, decrypt = false) {
+            let result = '';
+            let j = 0;
+            key = key.toUpperCase().replace(/[^A-Z]/g, '');
+            if(!key) return text;
+            
+            for (let i = 0; i < text.length; i++) {
+                let c = text[i];
+                if (c.match(/[a-z]/i)) {
+                    let isUpper = c === c.toUpperCase();
+                    let textChar = c.toUpperCase().charCodeAt(0) - 65;
+                    let keyChar = key[j % key.length].charCodeAt(0) - 65;
+                    let shifted;
+                    
+                    if (decrypt) {
+                        shifted = (textChar - keyChar + 26) % 26;
+                    } else {
+                        shifted = (textChar + keyChar) % 26;
+                    }
+                    
+                    result += String.fromCharCode(shifted + (isUpper ? 65 : 97));
+                    j++;
+                } else {
+                    result += c;
+                }
+            }
+            return result;
+        }
+
+        function updateVigenere(source = 'plain') {
+            const key = document.getElementById('vigenere-key').value;
+            if (source === 'plain') {
+                const plain = document.getElementById('vigenere-plain').value;
+                document.getElementById('vigenere-cipher').value = doVigenere(plain, key, false);
+            } else {
+                const cipher = document.getElementById('vigenere-cipher').value;
+                document.getElementById('vigenere-plain').value = doVigenere(cipher, key, true);
+            }
+        }
+
+        // --- 3. AES-GCM LOGIC (WebCrypto API) ---
+        async function getAESKey(password, salt) {
+            const enc = new TextEncoder();
+            const keyMaterial = await window.crypto.subtle.importKey(
+                "raw", enc.encode(password), {name: "PBKDF2"}, false, ["deriveKey"]
+            );
+            return window.crypto.subtle.deriveKey(
+                {
+                    name: "PBKDF2",
+                    salt: salt,
+                    iterations: 100000,
+                    hash: "SHA-256"
+                },
+                keyMaterial,
+                { name: "AES-GCM", length: 256 },
+                false,
+                ["encrypt", "decrypt"]
+            );
+        }
+
+        async function executeAESEncrypt() {
+            try {
+                const password = document.getElementById('aes-pass').value;
+                const plaintext = document.getElementById('aes-plain').value;
+                if(!password || !plaintext) {
+                    showToast("Password and Plaintext are required.", "error"); return;
+                }
+
+                const enc = new TextEncoder();
+                const salt = window.crypto.getRandomValues(new Uint8Array(16));
+                const iv = window.crypto.getRandomValues(new Uint8Array(12));
+                const key = await getAESKey(password, salt);
+
+                const ciphertextBuffer = await window.crypto.subtle.encrypt(
+                    { name: "AES-GCM", iv: iv },
+                    key,
+                    enc.encode(plaintext)
+                );
+
+                // Combine Salt (16) + IV (12) + Ciphertext
+                const combined = new Uint8Array(salt.length + iv.length + ciphertextBuffer.byteLength);
+                combined.set(salt, 0);
+                combined.set(iv, salt.length);
+                combined.set(new Uint8Array(ciphertextBuffer), salt.length + iv.length);
+
+                document.getElementById('aes-cipher').value = bufferToBase64(combined.buffer);
+                showToast("Encryption Successful!");
+            } catch (e) {
+                console.error(e);
+                showToast("Encryption failed. Check console.", "error");
+            }
+        }
+
+        async function executeAESDecrypt() {
+            try {
+                const password = document.getElementById('aes-pass').value;
+                const b64Ciphertext = document.getElementById('aes-cipher').value;
+                if(!password || !b64Ciphertext) {
+                    showToast("Password and Ciphertext are required.", "error"); return;
+                }
+
+                const combinedBuffer = base64ToBuffer(b64Ciphertext);
+                const combined = new Uint8Array(combinedBuffer);
+
+                if (combined.length < 28) { // 16 salt + 12 iv
+                    showToast("Invalid ciphertext payload.", "error"); return;
+                }
+
+                const salt = combined.slice(0, 16);
+                const iv = combined.slice(16, 28);
+                const data = combined.slice(28);
+
+                const key = await getAESKey(password, salt);
+
+                const decryptedBuffer = await window.crypto.subtle.decrypt(
+                    { name: "AES-GCM", iv: iv },
+                    key,
+                    data
+                );
+
+                const dec = new TextDecoder();
+                document.getElementById('aes-plain').value = dec.decode(decryptedBuffer);
+                showToast("Decryption Successful!");
+            } catch (e) {
+                console.error(e);
+                showToast("Decryption failed! Incorrect password or corrupted data.", "error");
+            }
+        }
+
+        // --- 4. RSA LOGIC (WebCrypto API) ---
+        async function formatPEM(keyBuffer, type) {
+            const b64 = bufferToBase64(keyBuffer);
+            const header = `-----BEGIN ${type} KEY-----\n`;
+            const footer = `\n-----END ${type} KEY-----`;
+            const formattedB64 = b64.match(/.{1,64}/g).join('\n');
+            return header + formattedB64 + footer;
+        }
+
+        async function generateRSAKeys() {
+            try {
+                const btn = document.getElementById('rsa-gen-btn');
+                btn.innerHTML = `<i class="ph ph-spinner animate-spin"></i> Generating...`;
+                btn.disabled = true;
+
+                rsaKeyPair = await window.crypto.subtle.generateKey(
+                    {
+                        name: "RSA-OAEP",
+                        modulusLength: 2048,
+                        publicExponent: new Uint8Array([1, 0, 1]),
+                        hash: "SHA-256"
+                    },
+                    true,
+                    ["encrypt", "decrypt"]
+                );
+
+                const pubExport = await window.crypto.subtle.exportKey("spki", rsaKeyPair.publicKey);
+                const privExport = await window.crypto.subtle.exportKey("pkcs8", rsaKeyPair.privateKey);
+
+                document.getElementById('rsa-pub-display').value = await formatPEM(pubExport, "PUBLIC");
+                document.getElementById('rsa-priv-display').value = await formatPEM(privExport, "PRIVATE");
+                
+                showToast("New 2048-bit RSA Keys generated.");
+            } catch (e) {
+                console.error(e);
+                showToast("Failed to generate keys.", "error");
+            } finally {
+                const btn = document.getElementById('rsa-gen-btn');
+                btn.innerHTML = `<i class="ph ph-arrows-clockwise"></i> Generate New Pair`;
+                btn.disabled = false;
+            }
+        }
+
+        async function executeRSAEncrypt() {
+            if (!rsaKeyPair) {
+                showToast("Please generate keys first!", "error"); return;
+            }
+            const plaintext = document.getElementById('rsa-plain').value;
+            if(!plaintext) { showToast("Enter a message to encrypt.", "error"); return; }
+            
+            const enc = new TextEncoder();
+            const data = enc.encode(plaintext);
+
+            // Basic check for RSA data limit (roughly 190 bytes for 2048 bit OAEP-SHA256)
+            if (data.length > 190) {
+                showToast("Message too long for 2048-bit RSA encryption.", "error"); return;
+            }
+
+            try {
+                const encryptedBuf = await window.crypto.subtle.encrypt(
+                    { name: "RSA-OAEP" },
+                    rsaKeyPair.publicKey,
+                    data
+                );
+                document.getElementById('rsa-cipher').value = bufferToBase64(encryptedBuf);
+                showToast("Encrypted with Public Key!");
+            } catch (e) {
+                console.error(e);
+                showToast("RSA Encryption failed.", "error");
+            }
+        }
+
+        async function executeRSADecrypt() {
+            if (!rsaKeyPair) {
+                showToast("Please generate keys first!", "error"); return;
+            }
+            const b64Ciphertext = document.getElementById('rsa-cipher').value;
+            if(!b64Ciphertext) { showToast("No ciphertext to decrypt.", "error"); return; }
+
+            try {
+                const encryptedBuf = base64ToBuffer(b64Ciphertext);
+                const decryptedBuf = await window.crypto.subtle.decrypt(
+                    { name: "RSA-OAEP" },
+                    rsaKeyPair.privateKey,
+                    encryptedBuf
+                );
+                const dec = new TextDecoder();
+                document.getElementById('rsa-plain').value = dec.decode(decryptedBuf);
+                showToast("Decrypted with Private Key!");
+            } catch (e) {
+                console.error(e);
+                showToast("RSA Decryption failed. Corrupted data?", "error");
+            }
+        }
+
+        // --- 5. HASHING LOGIC ---
+        async function getHash(text, algo) {
+            const msgBuffer = new TextEncoder().encode(text);
+            const hashBuffer = await crypto.subtle.digest(algo, msgBuffer);
+            const hashArray = Array.from(new Uint8Array(hashBuffer));
+            return hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
+        }
+
+        async function updateHashes() {
+            const input = document.getElementById('hash-input').value;
+            
+            // Handle empty case instantly
+            if(!input) {
+                document.getElementById('hash-sha1').textContent = "";
+                document.getElementById('hash-sha256').textContent = "";
+                document.getElementById('hash-sha512').textContent = "";
+                return;
+            }
+
+            document.getElementById('hash-sha1').textContent = await getHash(input, 'SHA-1');
+            document.getElementById('hash-sha256').textContent = await getHash(input, 'SHA-256');
+            document.getElementById('hash-sha512').textContent = await getHash(input, 'SHA-512');
+        }
+
+        // --- 6. CTF LOGIC ---
+        function checkFlag(level, expectedFlag) {
+            const input = document.getElementById(`flag-${level}`).value.trim().toUpperCase();
+            if (input === expectedFlag) {
+                document.getElementById(`chal-${level}`).classList.remove('border-blue-500', 'border-purple-500', 'border-red-500');
+                document.getElementById(`chal-${level}`).classList.add('border-emerald-500', 'bg-emerald-900/10');
+                showToast(`Level ${level} Passed!`, 'success');
+            } else {
+                showToast("Incorrect Flag.", "error");
+            }
+        }
+
+        // --- INITIALIZATION ---
+        window.onload = async () => {
+            updateCaesar();
+            updateVigenere();
+            updateHashes();
+
+            // Pre-generate a valid AES ciphertext for Challenge 3 so it's solveable with the provided tool
+            try {
+                const pass = "sun";
+                const text = "FLAG{AES_IS_SECURE}";
+                const enc = new TextEncoder();
+                const salt = window.crypto.getRandomValues(new Uint8Array(16));
+                const iv = window.crypto.getRandomValues(new Uint8Array(12));
+                const keyMaterial = await window.crypto.subtle.importKey(
+                    "raw", enc.encode(pass), {name: "PBKDF2"}, false, ["deriveKey"]
+                );
+                const key = await window.crypto.subtle.deriveKey(
+                    { name: "PBKDF2", salt: salt, iterations: 100000, hash: "SHA-256" },
+                    keyMaterial, { name: "AES-GCM", length: 256 }, false, ["encrypt", "decrypt"]
+                );
+                const ciphertextBuffer = await window.crypto.subtle.encrypt(
+                    { name: "AES-GCM", iv: iv }, key, enc.encode(text)
+                );
+                const combined = new Uint8Array(salt.length + iv.length + ciphertextBuffer.byteLength);
+                combined.set(salt, 0); combined.set(iv, salt.length); combined.set(new Uint8Array(ciphertextBuffer), salt.length + iv.length);
+                document.getElementById('chal3-base64').textContent = bufferToBase64(combined.buffer);
+            } catch(e) {
+                console.error("Failed to generate CTF3 ciphertext", e);
+            }
         };
 
     </script>
