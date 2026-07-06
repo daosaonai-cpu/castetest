@@ -3,18 +3,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Indie Vibes Cam</title>
+    <title>Dreamy Vibes Cam</title>
     <style>
         :root {
-            --bg-color: #111;
-            --text-color: #f0f0f0;
-            --accent: #ff4757;
+            --bg-color: #1a1617;
+            --text-color: #f7e8e8;
+            --accent: #ff768b;
         }
 
         body {
             background-color: var(--bg-color);
             color: var(--text-color);
-            font-family: 'Courier New', Courier, monospace;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
             display: flex;
             flex-direction: column;
             align-items: center;
@@ -25,64 +25,72 @@
         }
 
         h1 {
-            font-weight: normal;
-            letter-spacing: 2px;
+            font-weight: 300;
+            letter-spacing: 4px;
             margin-bottom: 20px;
             text-transform: lowercase;
-            opacity: 0.8;
+            opacity: 0.9;
+            text-shadow: 0 0 10px rgba(255, 180, 180, 0.3);
         }
 
         .cam-container {
             position: relative;
-            border: 2px solid #333;
-            padding: 10px;
-            background: #000;
-            box-shadow: 0 0 20px rgba(0,0,0,0.8);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            background: #111;
+            border-radius: 4px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.5), 0 0 20px rgba(255, 180, 150, 0.1);
         }
 
-        /* The actual canvas where the magic happens */
         canvas {
             width: 100%;
             max-width: 800px;
             background-color: #222;
             display: block;
+            border-radius: 2px;
         }
 
         .controls {
-            margin-top: 20px;
+            margin-top: 25px;
             display: flex;
             gap: 15px;
             flex-wrap: wrap;
             justify-content: center;
+            z-index: 10; /* Keep above vignette */
         }
 
         button {
-            background: transparent;
+            background: rgba(255, 255, 255, 0.05);
             color: var(--text-color);
-            border: 1px solid var(--text-color);
-            padding: 10px 20px;
-            font-family: 'Courier New', Courier, monospace;
-            font-size: 16px;
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            padding: 12px 24px;
+            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            font-size: 14px;
+            letter-spacing: 2px;
             cursor: pointer;
             text-transform: uppercase;
-            letter-spacing: 1px;
-            transition: all 0.3s ease;
+            border-radius: 30px;
+            backdrop-filter: blur(5px);
+            transition: all 0.4s ease;
         }
 
         button:hover:not(:disabled) {
-            background: var(--text-color);
+            background: rgba(255, 255, 255, 0.9);
             color: var(--bg-color);
+            border-color: transparent;
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
         }
         
         button:disabled {
             cursor: not-allowed;
-            opacity: 0.5;
+            opacity: 0.4;
         }
 
         #recordBtn.recording {
             color: var(--accent);
             border-color: var(--accent);
-            animation: pulse 1.5s infinite;
+            background: rgba(255, 118, 139, 0.1);
+            animation: breathe 2s infinite ease-in-out;
         }
 
         #recordBtn.recording:hover {
@@ -90,13 +98,13 @@
             color: #fff;
         }
 
-        @keyframes pulse {
-            0% { box-shadow: 0 0 0 0 rgba(255, 71, 87, 0.4); }
-            70% { box-shadow: 0 0 0 10px rgba(255, 71, 87, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(255, 71, 87, 0); }
+        @keyframes breathe {
+            0% { box-shadow: 0 0 0 0 rgba(255, 118, 139, 0.4); }
+            50% { box-shadow: 0 0 0 15px rgba(255, 118, 139, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 118, 139, 0); }
         }
 
-        /* A subtle CRT scanline overlay effect for the app background */
+        /* Soft warm vignette overlay instead of harsh CRT lines */
         body::after {
             content: " ";
             display: block;
@@ -105,16 +113,15 @@
             left: 0;
             bottom: 0;
             right: 0;
-            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background: radial-gradient(circle, rgba(255,230,210,0.03) 0%, rgba(20,10,15,0.7) 100%);
             z-index: 2;
-            background-size: 100% 2px, 3px 100%;
             pointer-events: none;
         }
     </style>
 </head>
 <body>
 
-    <h1>// rec. vibes</h1>
+    <h1>cinematic // rec</h1>
 
     <div class="cam-container">
         <video id="rawVideo" autoplay muted playsinline style="display:none;"></video>
@@ -137,11 +144,9 @@
         let recordedChunks = [];
         let isRecording = false;
         let rawStream;
-        let currentFacingMode = 'user'; // Start with the front camera
+        let currentFacingMode = 'user';
 
-        // Initialize Webcam
         async function initCamera() {
-            // Stop any existing tracks before switching cameras
             if (rawStream) {
                 rawStream.getTracks().forEach(track => track.stop());
             }
@@ -157,7 +162,6 @@
                 video.onloadedmetadata = () => {
                     canvas.width = video.videoWidth;
                     canvas.height = video.videoHeight;
-                    // Only start the loop if it's not already running
                     if (!video.dataset.looping) {
                         video.dataset.looping = true;
                         requestAnimationFrame(drawFilteredFrame);
@@ -169,13 +173,12 @@
             }
         }
 
-        // The Aesthetic Filter Loop
         function drawFilteredFrame() {
             if (video.readyState === video.HAVE_ENOUGH_DATA) {
-                // 1. Apply the low-fi indie filter
-                ctx.filter = 'sepia(40%) contrast(130%) saturate(80%) brightness(95%) blur(0.5px)';
+                // 1. Dreamy Cinematic Filter:
+                // Boosted saturation for pastel colors, slight warmth (sepia), lower contrast for soft shadows, and a heavier blur for the "dreamy" bloom effect.
+                ctx.filter = 'saturate(130%) contrast(95%) brightness(110%) sepia(20%) hue-rotate(-5deg) blur(1.2px)';
                 
-                // If using the front camera, mirror the image horizontally so it acts like a mirror
                 if (currentFacingMode === 'user') {
                     ctx.save();
                     ctx.translate(canvas.width, 0);
@@ -186,35 +189,31 @@
                     ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
                 }
 
-                // 2. Reset filter so our text stays crisp
                 ctx.filter = 'none';
 
-                // 3. Add a retro glowing timestamp
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-                ctx.font = '24px "Courier New"';
-                ctx.shadowColor = "rgba(255,255,255,0.5)";
-                ctx.shadowBlur = 4;
+                // 3. Cinematic soft-glowing timestamp
+                ctx.fillStyle = 'rgba(255, 240, 235, 0.85)';
+                ctx.font = '300 22px "Helvetica Neue", Helvetica, Arial, sans-serif';
+                ctx.shadowColor = "rgba(255, 180, 150, 0.6)";
+                ctx.shadowBlur = 10; // Softer, wider glow
                 
                 const now = new Date();
-                const dateString = now.toLocaleDateString().replace(/\//g, '.');
-                const timeString = now.toLocaleTimeString();
+                const dateString = now.toLocaleDateString().replace(/\//g, ' . ');
+                const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
                 
-                // Draw blinking "REC" if recording
-                if (isRecording && Math.floor(Date.now() / 500) % 2 === 0) {
-                    ctx.fillStyle = '#ff4757';
-                    ctx.fillText('• REC', 30, 40);
+                if (isRecording && Math.floor(Date.now() / 800) % 2 === 0) {
+                    ctx.fillStyle = '#ff768b';
+                    ctx.fillText('● REC', 30, 45);
                 }
                 
-                ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
-                ctx.fillText(`${dateString} ${timeString}`, 30, canvas.height - 30);
-                ctx.shadowBlur = 0; // reset shadow
+                ctx.fillStyle = 'rgba(255, 240, 235, 0.85)';
+                ctx.fillText(`${dateString}   ${timeString}`, 30, canvas.height - 35);
+                ctx.shadowBlur = 0; 
             }
             
-            // Loop this function for every frame
             requestAnimationFrame(drawFilteredFrame);
         }
 
-        // Setup Recording Logic
         function toggleRecording() {
             if (!isRecording) {
                 startRecording();
@@ -226,16 +225,12 @@
         function startRecording() {
             recordedChunks = [];
             
-            // Capture the filtered visual stream from the canvas
-            const canvasStream = canvas.captureStream(30); // 30 fps
-            
-            // Grab the audio track from the raw webcam stream
+            const canvasStream = canvas.captureStream(30);
             const audioTracks = rawStream.getAudioTracks();
             if (audioTracks.length > 0) {
                 canvasStream.addTrack(audioTracks[0]);
             }
 
-            // Create media recorder
             mediaRecorder = new MediaRecorder(canvasStream, {
                 mimeType: 'video/webm; codecs=vp9'
             });
@@ -247,13 +242,12 @@
             };
 
             mediaRecorder.onstop = () => {
-                // Create a downloadable file
                 const blob = new Blob(recordedChunks, { type: 'video/webm' });
                 const url = URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.style.display = 'none';
                 a.href = url;
-                a.download = `indie-tape-${Date.now()}.webm`;
+                a.download = `dream-sequence-${Date.now()}.webm`;
                 document.body.appendChild(a);
                 a.click();
                 setTimeout(() => {
@@ -266,8 +260,6 @@
             isRecording = true;
             recordBtn.textContent = "Stop Recording";
             recordBtn.classList.add("recording");
-            
-            // Disable switching cameras while recording to prevent crashes
             switchBtn.disabled = true;
         }
 
@@ -276,12 +268,9 @@
             isRecording = false;
             recordBtn.textContent = "Start Recording";
             recordBtn.classList.remove("recording");
-            
-            // Re-enable camera switching
             switchBtn.disabled = false;
         }
 
-        // Toggle camera mode
         function switchCamera() {
             currentFacingMode = currentFacingMode === 'user' ? 'environment' : 'user';
             initCamera();
@@ -290,7 +279,6 @@
         recordBtn.addEventListener('click', toggleRecording);
         switchBtn.addEventListener('click', switchCamera);
 
-        // Boot it up
         initCamera();
     </script>
 </body>
