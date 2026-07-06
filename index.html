@@ -3,656 +3,295 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Computer Fundamentals: Core Components</title>
-    
-    <!-- Tailwind CSS for styling -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    
-    <!-- Font Awesome for Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-
-    <!-- Tailwind Config for Custom Colors/Fonts -->
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                    colors: {
-                        brand: {
-                            50: '#eff6ff',
-                            100: '#dbeafe',
-                            500: '#3b82f6',
-                            600: '#2563eb',
-                            900: '#1e3a8a',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-
+    <title>Indie Vibes Cam</title>
     <style>
-        /* Smooth scrolling and transitions */
+        :root {
+            --bg-color: #111;
+            --text-color: #f0f0f0;
+            --accent: #ff4757;
+        }
+
         body {
-            -webkit-font-smoothing: antialiased;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            font-family: 'Courier New', Courier, monospace;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            overflow: hidden;
         }
-        .fade-in {
-            animation: fadeIn 0.4s ease-in-out;
+
+        h1 {
+            font-weight: normal;
+            letter-spacing: 2px;
+            margin-bottom: 20px;
+            text-transform: lowercase;
+            opacity: 0.8;
         }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+
+        .cam-container {
+            position: relative;
+            border: 2px solid #333;
+            padding: 10px;
+            background: #000;
+            box-shadow: 0 0 20px rgba(0,0,0,0.8);
+        }
+
+        /* The actual canvas where the magic happens */
+        canvas {
+            width: 100%;
+            max-width: 800px;
+            background-color: #222;
+            display: block;
+        }
+
+        .controls {
+            margin-top: 20px;
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        button {
+            background: transparent;
+            color: var(--text-color);
+            border: 1px solid var(--text-color);
+            padding: 10px 20px;
+            font-family: 'Courier New', Courier, monospace;
+            font-size: 16px;
+            cursor: pointer;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            transition: all 0.3s ease;
+        }
+
+        button:hover:not(:disabled) {
+            background: var(--text-color);
+            color: var(--bg-color);
         }
         
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
-        }
-        ::-webkit-scrollbar-track {
-            background: #f1f5f9; 
-        }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1; 
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8; 
+        button:disabled {
+            cursor: not-allowed;
+            opacity: 0.5;
         }
 
-        .nav-item.active {
-            background-color: #eff6ff;
-            color: #2563eb;
-            border-right: 4px solid #2563eb;
-            font-weight: 600;
+        #recordBtn.recording {
+            color: var(--accent);
+            border-color: var(--accent);
+            animation: pulse 1.5s infinite;
+        }
+
+        #recordBtn.recording:hover {
+            background: var(--accent);
+            color: #fff;
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 71, 87, 0.4); }
+            70% { box-shadow: 0 0 0 10px rgba(255, 71, 87, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 71, 87, 0); }
+        }
+
+        /* A subtle CRT scanline overlay effect for the app background */
+        body::after {
+            content: " ";
+            display: block;
+            position: absolute;
+            top: 0;
+            left: 0;
+            bottom: 0;
+            right: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            z-index: 2;
+            background-size: 100% 2px, 3px 100%;
+            pointer-events: none;
         }
     </style>
 </head>
-<body class="bg-slate-50 text-slate-800 h-screen overflow-hidden flex flex-col md:flex-row">
+<body>
 
-    <!-- Mobile Header (Visible only on small screens) -->
-    <header class="md:hidden bg-white shadow-sm p-4 flex justify-between items-center z-20">
-        <div class="flex items-center gap-2 text-brand-600 font-bold text-lg">
-            <i class="fa-solid fa-computer"></i>
-            <span>CompFund</span>
-        </div>
-        <button id="mobile-menu-btn" class="text-slate-600 hover:text-brand-600 focus:outline-none">
-            <i class="fa-solid fa-bars text-2xl"></i>
-        </button>
-    </header>
+    <h1>// rec. vibes</h1>
 
-    <!-- Sidebar Navigation -->
-    <nav id="sidebar" class="bg-white w-full md:w-72 h-auto md:h-full flex-shrink-0 shadow-lg z-10 absolute md:relative transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out flex flex-col">
-        <div class="p-6 hidden md:flex items-center gap-3 border-b border-slate-100">
-            <div class="bg-brand-100 text-brand-600 p-3 rounded-xl">
-                <i class="fa-solid fa-laptop-code text-xl"></i>
-            </div>
-            <div>
-                <h1 class="font-bold text-lg leading-tight text-slate-900">PC Fundamentals</h1>
-                <p class="text-xs text-slate-500">Interactive Course</p>
-            </div>
-        </div>
+    <div class="cam-container">
+        <video id="rawVideo" autoplay muted playsinline style="display:none;"></video>
+        <canvas id="filterCanvas"></canvas>
+    </div>
 
-        <div class="flex-1 overflow-y-auto py-4">
-            <p class="px-6 text-xs font-semibold text-slate-400 uppercase tracking-wider mb-2">Modules</p>
-            <ul class="space-y-1">
-                <li>
-                    <button onclick="navigateTo('intro')" id="nav-intro" class="nav-item active w-full text-left px-6 py-3 text-slate-600 hover:bg-slate-50 transition-colors flex items-center gap-3">
-                        <i class="fa-solid fa-play w-5 text-center"></i> Introduction
-                    </button>
-                </li>
-                <li>
-                    <button onclick="navigateTo('cpu')" id="nav-cpu" class="nav-item w-full text-left px-6 py-3 text-slate-600 hover:bg-slate-50 transition-colors flex items-center gap-3">
-                        <i class="fa-solid fa-microchip w-5 text-center"></i> CPU
-                    </button>
-                </li>
-                <li>
-                    <button onclick="navigateTo('ram')" id="nav-ram" class="nav-item w-full text-left px-6 py-3 text-slate-600 hover:bg-slate-50 transition-colors flex items-center gap-3">
-                        <i class="fa-solid fa-memory w-5 text-center"></i> RAM
-                    </button>
-                </li>
-                <li>
-                    <button onclick="navigateTo('rom')" id="nav-rom" class="nav-item w-full text-left px-6 py-3 text-slate-600 hover:bg-slate-50 transition-colors flex items-center gap-3">
-                        <i class="fa-solid fa-sd-card w-5 text-center"></i> ROM
-                    </button>
-                </li>
-                <li>
-                    <button onclick="navigateTo('os')" id="nav-os" class="nav-item w-full text-left px-6 py-3 text-slate-600 hover:bg-slate-50 transition-colors flex items-center gap-3">
-                        <i class="fa-brands fa-windows w-5 text-center"></i> Operating System
-                    </button>
-                </li>
-                <li class="mt-4 border-t border-slate-100 pt-4">
-                    <button onclick="navigateTo('quiz')" id="nav-quiz" class="nav-item w-full text-left px-6 py-3 text-slate-600 hover:bg-slate-50 transition-colors flex items-center gap-3">
-                        <i class="fa-solid fa-clipboard-question w-5 text-center"></i> Knowledge Check
-                    </button>
-                </li>
-            </ul>
-        </div>
-        
-        <div class="p-6 border-t border-slate-100 bg-slate-50">
-            <div class="w-full bg-slate-200 rounded-full h-2.5 mb-2">
-                <div id="progress-bar" class="bg-brand-600 h-2.5 rounded-full transition-all duration-500" style="width: 16%"></div>
-            </div>
-            <p class="text-xs text-slate-500 text-center" id="progress-text">Module 1 of 6</p>
-        </div>
-    </nav>
+    <div class="controls">
+        <button id="recordBtn">Start Recording</button>
+        <button id="switchBtn">Switch Camera</button>
+    </div>
 
-    <!-- Main Content Area -->
-    <main class="flex-1 h-full overflow-y-auto relative bg-slate-50">
-        <div class="max-w-4xl mx-auto p-6 md:p-10 pb-24">
-            
-            <!-- SECTION: INTRO -->
-            <section id="sec-intro" class="content-section block fade-in">
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-8 md:p-12 text-center mb-8">
-                    <div class="inline-block bg-brand-100 text-brand-600 p-4 rounded-full mb-6">
-                        <i class="fa-solid fa-graduation-cap text-4xl"></i>
-                    </div>
-                    <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-4">Welcome to Computer Basics!</h2>
-                    <p class="text-lg text-slate-600 max-w-2xl mx-auto mb-8">
-                        Have you ever wondered what actually happens inside that metal box? In this mini-course, we'll demystify the four most important concepts of a computer system: the CPU, RAM, ROM, and the Operating System (OS).
-                    </p>
-                    <button onclick="navigateTo('cpu')" class="bg-brand-600 hover:bg-brand-700 text-white font-semibold py-3 px-8 rounded-xl shadow-md transition-colors duration-200 flex items-center gap-2 mx-auto">
-                        Start Learning <i class="fa-solid fa-arrow-right"></i>
-                    </button>
-                </div>
-
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-start gap-4">
-                        <div class="bg-blue-100 text-blue-600 p-3 rounded-lg"><i class="fa-solid fa-clock"></i></div>
-                        <div>
-                            <h3 class="font-bold text-slate-900">Duration</h3>
-                            <p class="text-slate-500 text-sm">~10 minutes</p>
-                        </div>
-                    </div>
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 flex items-start gap-4">
-                        <div class="bg-green-100 text-green-600 p-3 rounded-lg"><i class="fa-solid fa-bullseye"></i></div>
-                        <div>
-                            <h3 class="font-bold text-slate-900">Goal</h3>
-                            <p class="text-slate-500 text-sm">Understand core PC architecture without the jargon.</p>
-                        </div>
-                    </div>
-                </div>
-            </section>
-
-            <!-- SECTION: CPU -->
-            <section id="sec-cpu" class="content-section hidden fade-in">
-                <div class="flex items-center gap-4 mb-8">
-                    <div class="bg-blue-100 text-blue-600 p-4 rounded-2xl shadow-sm">
-                        <i class="fa-solid fa-microchip text-3xl"></i>
-                    </div>
-                    <div>
-                        <h2 class="text-3xl font-bold text-slate-900">CPU</h2>
-                        <p class="text-slate-500">Central Processing Unit</p>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 md:p-8 mb-8 relative overflow-hidden">
-                    <div class="absolute top-0 right-0 p-16 opacity-5 pointer-events-none">
-                        <i class="fa-solid fa-microchip text-9xl"></i>
-                    </div>
-                    
-                    <h3 class="text-xl font-bold text-slate-800 mb-4">The "Brain" of the Computer</h3>
-                    <p class="text-slate-600 mb-6 leading-relaxed">
-                        The CPU is the primary component of a computer that acts as its "brain." It is responsible for interpreting and executing most of the commands from the computer's other hardware and software. Everything you do on a computer, from typing a letter to playing a complex 3D game, requires the CPU to calculate millions of instructions per second.
-                    </p>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-                        <div class="bg-slate-50 p-5 rounded-xl border border-slate-200">
-                            <h4 class="font-bold text-brand-600 mb-2 flex items-center gap-2">
-                                <i class="fa-solid fa-bolt"></i> Clock Speed
-                            </h4>
-                            <p class="text-sm text-slate-600">Measured in Gigahertz (GHz). It dictates how many billions of instructions the CPU can process every second. Higher is generally faster.</p>
-                        </div>
-                        <div class="bg-slate-50 p-5 rounded-xl border border-slate-200">
-                            <h4 class="font-bold text-brand-600 mb-2 flex items-center gap-2">
-                                <i class="fa-solid fa-layer-group"></i> Cores
-                            </h4>
-                            <p class="text-sm text-slate-600">Think of cores as individual workers inside the CPU. A "Quad-core" CPU has four workers that can handle different tasks simultaneously.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-indigo-50 border-l-4 border-indigo-500 p-6 rounded-r-2xl mb-8">
-                    <h3 class="font-bold text-indigo-900 mb-2">🧠 The Office Analogy</h3>
-                    <p class="text-indigo-800 text-sm">
-                        If your computer was an office, the CPU is the <strong>Worker</strong> sitting at the desk. The faster the worker is (clock speed) and the more workers you have (cores), the more tasks get finished quickly.
-                    </p>
-                </div>
-                
-                <div class="flex justify-between mt-8">
-                    <button onclick="navigateTo('intro')" class="text-slate-500 hover:text-slate-800 font-medium px-4 py-2 transition-colors">
-                        <i class="fa-solid fa-arrow-left mr-2"></i> Back
-                    </button>
-                    <button onclick="navigateTo('ram')" class="bg-brand-600 hover:bg-brand-700 text-white font-medium px-6 py-2 rounded-lg shadow-sm transition-colors flex items-center">
-                        Next: RAM <i class="fa-solid fa-arrow-right ml-2"></i>
-                    </button>
-                </div>
-            </section>
-
-            <!-- SECTION: RAM -->
-            <section id="sec-ram" class="content-section hidden fade-in">
-                <div class="flex items-center gap-4 mb-8">
-                    <div class="bg-green-100 text-green-600 p-4 rounded-2xl shadow-sm">
-                        <i class="fa-solid fa-memory text-3xl"></i>
-                    </div>
-                    <div>
-                        <h2 class="text-3xl font-bold text-slate-900">RAM</h2>
-                        <p class="text-slate-500">Random Access Memory</p>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 md:p-8 mb-8">
-                    <h3 class="text-xl font-bold text-slate-800 mb-4">The "Short-term Memory"</h3>
-                    <p class="text-slate-600 mb-6 leading-relaxed">
-                        RAM is a super-fast type of memory that temporarily stores the information your computer is actively using right now. When you open a web browser, a game, or a document, it gets loaded into the RAM so the CPU can access it instantly.
-                    </p>
-                    
-                    <div class="flex flex-col md:flex-row gap-6 items-center bg-slate-50 rounded-xl p-6 border border-slate-200">
-                        <div class="text-center md:w-1/3">
-                            <i class="fa-solid fa-bolt text-yellow-500 text-5xl mb-3"></i>
-                            <h4 class="font-bold text-slate-800">Volatile Memory</h4>
-                        </div>
-                        <div class="md:w-2/3 text-sm text-slate-600">
-                            <strong>Important characteristic:</strong> RAM is volatile. This means it only holds data while the computer is turned on. The moment you turn off or restart your PC, everything in the RAM is wiped clean. This is why you must "Save" your work to the hard drive (permanent storage)!
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-emerald-50 border-l-4 border-emerald-500 p-6 rounded-r-2xl mb-8">
-                    <h3 class="font-bold text-emerald-900 mb-2">🪑 The Office Analogy</h3>
-                    <p class="text-emerald-800 text-sm">
-                        If the CPU is the worker, RAM is the <strong>Top of the Desk</strong>. <br><br>
-                        When you work, you pull files out of the filing cabinet (Hard Drive) and put them on your desk (RAM) for quick access. A bigger desk (more RAM) means you can have more documents (tabs, apps) open at once without clutter slowing you down!
-                    </p>
-                </div>
-
-                <div class="flex justify-between mt-8">
-                    <button onclick="navigateTo('cpu')" class="text-slate-500 hover:text-slate-800 font-medium px-4 py-2 transition-colors">
-                        <i class="fa-solid fa-arrow-left mr-2"></i> Back
-                    </button>
-                    <button onclick="navigateTo('rom')" class="bg-brand-600 hover:bg-brand-700 text-white font-medium px-6 py-2 rounded-lg shadow-sm transition-colors flex items-center">
-                        Next: ROM <i class="fa-solid fa-arrow-right ml-2"></i>
-                    </button>
-                </div>
-            </section>
-
-            <!-- SECTION: ROM -->
-            <section id="sec-rom" class="content-section hidden fade-in">
-                <div class="flex items-center gap-4 mb-8">
-                    <div class="bg-red-100 text-red-600 p-4 rounded-2xl shadow-sm">
-                        <i class="fa-solid fa-sd-card text-3xl"></i>
-                    </div>
-                    <div>
-                        <h2 class="text-3xl font-bold text-slate-900">ROM</h2>
-                        <p class="text-slate-500">Read-Only Memory</p>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 md:p-8 mb-8">
-                    <h3 class="text-xl font-bold text-slate-800 mb-4">The "Instincts"</h3>
-                    <p class="text-slate-600 mb-6 leading-relaxed">
-                        ROM is a type of memory containing hard-wired instructions that the computer needs to boot up and perform fundamental hardware checks. Unlike RAM, the data in ROM cannot be easily altered or overwritten (hence "Read-Only").
-                    </p>
-
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-8">
-                        <div class="bg-slate-50 p-5 rounded-xl border border-slate-200">
-                            <h4 class="font-bold text-red-600 mb-2 flex items-center gap-2">
-                                <i class="fa-solid fa-lock"></i> Non-Volatile
-                            </h4>
-                            <p class="text-sm text-slate-600">ROM retains its contents even when the computer's power is turned off. It keeps its memory permanently.</p>
-                        </div>
-                        <div class="bg-slate-50 p-5 rounded-xl border border-slate-200">
-                            <h4 class="font-bold text-red-600 mb-2 flex items-center gap-2">
-                                <i class="fa-solid fa-power-off"></i> The BIOS / UEFI
-                            </h4>
-                            <p class="text-sm text-slate-600">The most common example of ROM is the BIOS chip, which wakes up the hardware and tells it how to load the Operating System.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-rose-50 border-l-4 border-rose-500 p-6 rounded-r-2xl mb-8">
-                    <h3 class="font-bold text-rose-900 mb-2">📖 The Office Analogy</h3>
-                    <p class="text-rose-800 text-sm">
-                        ROM is like a permanent <strong>Rulebook or Employee Manual</strong> glued to the desk. The worker (CPU) reads it the moment they walk into the office to remember how to turn on the lights, unlock the cabinets, and start the day.
-                    </p>
-                </div>
-
-                <div class="flex justify-between mt-8">
-                    <button onclick="navigateTo('ram')" class="text-slate-500 hover:text-slate-800 font-medium px-4 py-2 transition-colors">
-                        <i class="fa-solid fa-arrow-left mr-2"></i> Back
-                    </button>
-                    <button onclick="navigateTo('os')" class="bg-brand-600 hover:bg-brand-700 text-white font-medium px-6 py-2 rounded-lg shadow-sm transition-colors flex items-center">
-                        Next: OS <i class="fa-solid fa-arrow-right ml-2"></i>
-                    </button>
-                </div>
-            </section>
-
-            <!-- SECTION: OS -->
-            <section id="sec-os" class="content-section hidden fade-in">
-                <div class="flex items-center gap-4 mb-8">
-                    <div class="bg-purple-100 text-purple-600 p-4 rounded-2xl shadow-sm">
-                        <i class="fa-solid fa-laptop-code text-3xl"></i>
-                    </div>
-                    <div>
-                        <h2 class="text-3xl font-bold text-slate-900">Operating System</h2>
-                        <p class="text-slate-500">The Ultimate Manager (Windows, macOS, Linux)</p>
-                    </div>
-                </div>
-
-                <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 md:p-8 mb-8">
-                    <h3 class="text-xl font-bold text-slate-800 mb-4">The Bridge Between Hardware and You</h3>
-                    <p class="text-slate-600 mb-6 leading-relaxed">
-                        An Operating System (OS) is the most important software that runs on a computer. It manages the computer's memory (RAM), processes (CPU), and all of its software and hardware. Without an OS, a computer is just a useless collection of metal and plastic.
-                    </p>
-                    
-                    <h4 class="font-bold text-slate-800 mb-4">What does it do?</h4>
-                    <ul class="space-y-3 mb-6">
-                        <li class="flex items-start gap-3">
-                            <i class="fa-solid fa-check text-green-500 mt-1"></i>
-                            <span class="text-sm text-slate-600"><strong>User Interface (UI):</strong> Gives you screens, icons, and menus instead of forcing you to type binary code to launch a program.</span>
-                        </li>
-                        <li class="flex items-start gap-3">
-                            <i class="fa-solid fa-check text-green-500 mt-1"></i>
-                            <span class="text-sm text-slate-600"><strong>Resource Management:</strong> Decides which application gets CPU time and how much RAM to allocate to your web browser vs. your background music.</span>
-                        </li>
-                        <li class="flex items-start gap-3">
-                            <i class="fa-solid fa-check text-green-500 mt-1"></i>
-                            <span class="text-sm text-slate-600"><strong>Hardware Translation:</strong> Uses "Drivers" to talk to your mouse, keyboard, printer, and screen so apps don't have to figure it out themselves.</span>
-                        </li>
-                    </ul>
-
-                    <div class="flex gap-4 justify-center py-4 border-t border-slate-100">
-                        <div class="text-center px-4">
-                            <i class="fa-brands fa-windows text-4xl text-blue-500 mb-2"></i>
-                            <p class="text-xs font-semibold text-slate-500">Windows</p>
-                        </div>
-                        <div class="text-center px-4">
-                            <i class="fa-brands fa-apple text-4xl text-slate-800 mb-2"></i>
-                            <p class="text-xs font-semibold text-slate-500">macOS</p>
-                        </div>
-                        <div class="text-center px-4">
-                            <i class="fa-brands fa-linux text-4xl text-yellow-600 mb-2"></i>
-                            <p class="text-xs font-semibold text-slate-500">Linux</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="bg-purple-50 border-l-4 border-purple-500 p-6 rounded-r-2xl mb-8">
-                    <h3 class="font-bold text-purple-900 mb-2">🏢 The Office Analogy</h3>
-                    <p class="text-purple-800 text-sm">
-                        The OS is the <strong>Office Manager</strong>. They don't do the actual math (CPU), and they aren't the desk (RAM), but they direct traffic, assign tasks to the worker, hire translators for external clients (printers/mice), and make sure the office doesn't burn down.
-                    </p>
-                </div>
-
-                <div class="flex justify-between mt-8">
-                    <button onclick="navigateTo('rom')" class="text-slate-500 hover:text-slate-800 font-medium px-4 py-2 transition-colors">
-                        <i class="fa-solid fa-arrow-left mr-2"></i> Back
-                    </button>
-                    <button onclick="navigateTo('quiz')" class="bg-brand-600 hover:bg-brand-700 text-white font-medium px-6 py-2 rounded-lg shadow-sm transition-colors flex items-center">
-                        Take Quiz <i class="fa-solid fa-check-double ml-2"></i>
-                    </button>
-                </div>
-            </section>
-
-            <!-- SECTION: QUIZ -->
-            <section id="sec-quiz" class="content-section hidden fade-in">
-                <div class="text-center mb-10">
-                    <h2 class="text-3xl md:text-4xl font-bold text-slate-900 mb-3">Knowledge Check</h2>
-                    <p class="text-slate-500">Test what you've learned in the previous modules.</p>
-                </div>
-
-                <div id="quiz-container" class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 md:p-10 max-w-2xl mx-auto">
-                    <!-- Quiz gets injected here via JS -->
-                </div>
-
-            </section>
-
-        </div>
-    </main>
-
-    <!-- JavaScript for Interactivity -->
     <script>
-        // --- Navigation Logic ---
-        const sections = ['intro', 'cpu', 'ram', 'rom', 'os', 'quiz'];
-        
-        function navigateTo(targetSection) {
-            // Hide all sections
-            sections.forEach(sec => {
-                document.getElementById(`sec-${sec}`).classList.add('hidden');
-                document.getElementById(`nav-${sec}`).classList.remove('active');
-            });
+        const video = document.getElementById('rawVideo');
+        const canvas = document.getElementById('filterCanvas');
+        const ctx = canvas.getContext('2d');
+        const recordBtn = document.getElementById('recordBtn');
+        const switchBtn = document.getElementById('switchBtn');
 
-            // Show target section
-            document.getElementById(`sec-${targetSection}`).classList.remove('hidden');
-            document.getElementById(`nav-${targetSection}`).classList.add('active');
+        let mediaRecorder;
+        let recordedChunks = [];
+        let isRecording = false;
+        let rawStream;
+        let currentFacingMode = 'user'; // Start with the front camera
 
-            // Update Progress bar
-            const index = sections.indexOf(targetSection);
-            const progress = ((index + 1) / sections.length) * 100;
-            document.getElementById('progress-bar').style.width = `${progress}%`;
-            document.getElementById('progress-text').innerText = `Module ${index + 1} of ${sections.length}`;
-
-            // Reset Quiz if navigating away and back to it
-            if(targetSection === 'quiz' && currentQuestionIndex === 0) {
-                renderQuiz();
+        // Initialize Webcam
+        async function initCamera() {
+            // Stop any existing tracks before switching cameras
+            if (rawStream) {
+                rawStream.getTracks().forEach(track => track.stop());
             }
 
-            // Close mobile menu if open
-            const sidebar = document.getElementById('sidebar');
-            if (!sidebar.classList.contains('-translate-x-full')) {
-                sidebar.classList.add('-translate-x-full');
-            }
-
-            // Scroll to top
-            document.querySelector('main').scrollTo({ top: 0, behavior: 'smooth' });
-        }
-
-        // --- Mobile Menu Toggle ---
-        document.getElementById('mobile-menu-btn').addEventListener('click', () => {
-            const sidebar = document.getElementById('sidebar');
-            sidebar.classList.toggle('-translate-x-full');
-        });
-
-
-        // --- Quiz Logic ---
-        const quizData = [
-            {
-                question: "Which component is considered the 'Brain' of the computer?",
-                options: ["RAM", "ROM", "CPU", "Hard Drive"],
-                correct: 2
-            },
-            {
-                question: "What happens to the data in RAM when the computer loses power?",
-                options: ["It is permanently saved", "It is erased immediately", "It moves to the ROM", "It uploads to the cloud"],
-                correct: 1
-            },
-            {
-                question: "Which component holds the fundamental instructions needed to boot up the computer (like the BIOS)?",
-                options: ["CPU", "RAM", "ROM", "Operating System"],
-                correct: 2
-            },
-            {
-                question: "In our office analogy, what does the Operating System (OS) represent?",
-                options: ["The Worker doing the math", "The Top of the Desk", "The Rulebook", "The Office Manager"],
-                correct: 3
-            },
-            {
-                question: "What does CPU stand for?",
-                options: ["Computer Processing Unit", "Central Processing Unit", "Core Performance Unit", "Control Panel Unit"],
-                correct: 1
-            },
-            {
-                question: "What unit is commonly used to measure a CPU's clock speed?",
-                options: ["Megabytes (MB)", "Gigahertz (GHz)", "Terabytes (TB)", "Kilowatts (kW)"],
-                correct: 1
-            },
-            {
-                question: "What do we call the individual 'workers' inside a CPU that allow it to handle different tasks simultaneously?",
-                options: ["Cores", "Threads", "Chips", "Transistors"],
-                correct: 0
-            },
-            {
-                question: "What does RAM stand for?",
-                options: ["Read Access Memory", "Rapid Action Memory", "Random Access Memory", "Run All Memory"],
-                correct: 2
-            },
-            {
-                question: "Why is RAM considered 'volatile' memory?",
-                options: ["It can explode if it gets too hot", "It permanently stores data", "It loses all data when the power is turned off", "It frequently changes its processing speed"],
-                correct: 2
-            },
-            {
-                question: "If you want to have many applications and browser tabs open at the same time without the computer slowing down, which component is most crucial?",
-                options: ["ROM", "CPU", "RAM", "BIOS"],
-                correct: 2
-            },
-            {
-                question: "What does ROM stand for?",
-                options: ["Read-Only Memory", "Random-Only Memory", "Run-On Memory", "Rapid-Overload Memory"],
-                correct: 0
-            },
-            {
-                question: "Which of the following statements is true about ROM?",
-                options: ["It acts as the 'Short-term Memory'", "It is non-volatile and keeps data without power", "It processes millions of instructions per second", "It is the primary place you save your Word documents"],
-                correct: 1
-            },
-            {
-                question: "What is a common example of software stored in ROM that wakes up the hardware when you press the power button?",
-                options: ["Windows 11", "Google Chrome", "The BIOS / UEFI", "Microsoft Word"],
-                correct: 2
-            },
-            {
-                question: "Which of these is NOT an Operating System?",
-                options: ["Windows", "macOS", "Linux", "Microsoft Office"],
-                correct: 3
-            },
-            {
-                question: "What is a primary function of an Operating System?",
-                options: ["Cooling down the CPU", "Managing hardware and software resources", "Providing permanent physical storage", "Boosting the internet speed"],
-                correct: 1
-            },
-            {
-                question: "What software acts as a 'translator' between the OS and physical hardware like a printer or a mouse?",
-                options: ["Drivers", "Browsers", "Cores", "Anti-virus"],
-                correct: 0
-            },
-            {
-                question: "In the office analogy, if RAM is the desk, what does the permanent storage (Hard Drive) represent?",
-                options: ["The Worker", "The Office Manager", "The Filing Cabinet", "The Telephone"],
-                correct: 2
-            },
-            {
-                question: "Which feature of the OS gives you screens, icons, and menus instead of forcing you to type binary code?",
-                options: ["Resource Management", "Hardware Translation", "Command Line", "User Interface (UI)"],
-                correct: 3
-            },
-            {
-                question: "If your computer was an office, what would the permanent Rulebook or Employee Manual represent?",
-                options: ["RAM", "ROM", "CPU", "OS"],
-                correct: 1
-            }
-        ];
-
-        let currentQuestionIndex = 0;
-        let score = 0;
-
-        function renderQuiz() {
-            const container = document.getElementById('quiz-container');
-            
-            if (currentQuestionIndex >= quizData.length) {
-                // Show Results
-                const pass = score >= Math.ceil(quizData.length * 0.7); // Requires a 70% score to pass
-                container.innerHTML = `
-                    <div class="text-center py-8 fade-in">
-                        <i class="fa-solid ${pass ? 'fa-trophy text-yellow-500' : 'fa-circle-xmark text-red-500'} text-6xl mb-4"></i>
-                        <h3 class="text-2xl font-bold text-slate-800 mb-2">Quiz Completed!</h3>
-                        <p class="text-lg text-slate-600 mb-6">You scored <strong class="text-brand-600 text-xl">${score} out of ${quizData.length}</strong>.</p>
-                        ${pass 
-                            ? `<p class="text-green-600 font-medium mb-8">Excellent job! You have a solid grasp of computer fundamentals.</p>` 
-                            : `<p class="text-rose-600 font-medium mb-8">Good try! Might be worth reviewing a couple of modules again.</p>`}
-                        
-                        <div class="flex justify-center gap-4">
-                            <button onclick="resetQuiz()" class="bg-slate-200 hover:bg-slate-300 text-slate-800 font-medium px-6 py-2 rounded-lg transition-colors">Retake Quiz</button>
-                            <button onclick="navigateTo('intro')" class="bg-brand-600 hover:bg-brand-700 text-white font-medium px-6 py-2 rounded-lg transition-colors">Back to Start</button>
-                        </div>
-                    </div>
-                `;
-                return;
-            }
-
-            const q = quizData[currentQuestionIndex];
-            
-            let optionsHtml = '';
-            q.options.forEach((opt, index) => {
-                optionsHtml += `
-                    <button onclick="checkAnswer(${index})" class="w-full text-left p-4 rounded-xl border border-slate-200 hover:border-brand-500 hover:bg-brand-50 transition-all duration-200 mb-3 group">
-                        <span class="inline-block w-8 h-8 rounded-full bg-slate-100 text-slate-500 text-center leading-8 mr-3 group-hover:bg-brand-500 group-hover:text-white transition-colors">${String.fromCharCode(65 + index)}</span>
-                        <span class="font-medium text-slate-700">${opt}</span>
-                    </button>
-                `;
-            });
-
-            container.innerHTML = `
-                <div class="fade-in">
-                    <div class="flex justify-between text-sm font-medium text-slate-400 mb-6 uppercase tracking-wide">
-                        <span>Question ${currentQuestionIndex + 1} of ${quizData.length}</span>
-                        <span>Score: ${score}</span>
-                    </div>
-                    <h3 class="text-xl font-bold text-slate-800 mb-6 leading-relaxed">${q.question}</h3>
-                    <div class="options-container">
-                        ${optionsHtml}
-                    </div>
-                </div>
-            `;
-        }
-
-        function checkAnswer(selectedIndex) {
-            const q = quizData[currentQuestionIndex];
-            const isCorrect = selectedIndex === q.correct;
-            
-            if (isCorrect) score++;
-
-            const container = document.getElementById('quiz-container');
-            const buttons = container.querySelectorAll('button');
-            
-            // Highlight correct/incorrect answers visually before moving on
-            buttons.forEach((btn, index) => {
-                btn.disabled = true; // Disable further clicking
-                btn.classList.remove('hover:border-brand-500', 'hover:bg-brand-50');
+            try {
+                const constraints = {
+                    video: { facingMode: currentFacingMode },
+                    audio: true
+                };
                 
-                if (index === q.correct) {
-                    btn.classList.add('bg-green-100', 'border-green-500', 'text-green-800');
-                    btn.querySelector('span:first-child').classList.add('bg-green-500', 'text-white');
-                } else if (index === selectedIndex && !isCorrect) {
-                    btn.classList.add('bg-red-100', 'border-red-500', 'text-red-800');
-                    btn.querySelector('span:first-child').classList.add('bg-red-500', 'text-white');
+                rawStream = await navigator.mediaDevices.getUserMedia(constraints);
+                video.srcObject = rawStream;
+                video.onloadedmetadata = () => {
+                    canvas.width = video.videoWidth;
+                    canvas.height = video.videoHeight;
+                    // Only start the loop if it's not already running
+                    if (!video.dataset.looping) {
+                        video.dataset.looping = true;
+                        requestAnimationFrame(drawFilteredFrame);
+                    }
+                };
+            } catch (err) {
+                alert("Could not access camera. Make sure you are on HTTPS or localhost, and allowed permissions.");
+                console.error(err);
+            }
+        }
+
+        // The Aesthetic Filter Loop
+        function drawFilteredFrame() {
+            if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                // 1. Apply the low-fi indie filter
+                ctx.filter = 'sepia(40%) contrast(130%) saturate(80%) brightness(95%) blur(0.5px)';
+                
+                // If using the front camera, mirror the image horizontally so it acts like a mirror
+                if (currentFacingMode === 'user') {
+                    ctx.save();
+                    ctx.translate(canvas.width, 0);
+                    ctx.scale(-1, 1);
+                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+                    ctx.restore();
+                } else {
+                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
                 }
+
+                // 2. Reset filter so our text stays crisp
+                ctx.filter = 'none';
+
+                // 3. Add a retro glowing timestamp
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+                ctx.font = '24px "Courier New"';
+                ctx.shadowColor = "rgba(255,255,255,0.5)";
+                ctx.shadowBlur = 4;
+                
+                const now = new Date();
+                const dateString = now.toLocaleDateString().replace(/\//g, '.');
+                const timeString = now.toLocaleTimeString();
+                
+                // Draw blinking "REC" if recording
+                if (isRecording && Math.floor(Date.now() / 500) % 2 === 0) {
+                    ctx.fillStyle = '#ff4757';
+                    ctx.fillText('• REC', 30, 40);
+                }
+                
+                ctx.fillStyle = 'rgba(255, 255, 255, 0.8)';
+                ctx.fillText(`${dateString} ${timeString}`, 30, canvas.height - 30);
+                ctx.shadowBlur = 0; // reset shadow
+            }
+            
+            // Loop this function for every frame
+            requestAnimationFrame(drawFilteredFrame);
+        }
+
+        // Setup Recording Logic
+        function toggleRecording() {
+            if (!isRecording) {
+                startRecording();
+            } else {
+                stopRecording();
+            }
+        }
+
+        function startRecording() {
+            recordedChunks = [];
+            
+            // Capture the filtered visual stream from the canvas
+            const canvasStream = canvas.captureStream(30); // 30 fps
+            
+            // Grab the audio track from the raw webcam stream
+            const audioTracks = rawStream.getAudioTracks();
+            if (audioTracks.length > 0) {
+                canvasStream.addTrack(audioTracks[0]);
+            }
+
+            // Create media recorder
+            mediaRecorder = new MediaRecorder(canvasStream, {
+                mimeType: 'video/webm; codecs=vp9'
             });
 
-            // Wait a moment then move to next question
-            setTimeout(() => {
-                currentQuestionIndex++;
-                renderQuiz();
-            }, 1200);
+            mediaRecorder.ondataavailable = (event) => {
+                if (event.data.size > 0) {
+                    recordedChunks.push(event.data);
+                }
+            };
+
+            mediaRecorder.onstop = () => {
+                // Create a downloadable file
+                const blob = new Blob(recordedChunks, { type: 'video/webm' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.style.display = 'none';
+                a.href = url;
+                a.download = `indie-tape-${Date.now()}.webm`;
+                document.body.appendChild(a);
+                a.click();
+                setTimeout(() => {
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                }, 100);
+            };
+
+            mediaRecorder.start();
+            isRecording = true;
+            recordBtn.textContent = "Stop Recording";
+            recordBtn.classList.add("recording");
+            
+            // Disable switching cameras while recording to prevent crashes
+            switchBtn.disabled = true;
         }
 
-        function resetQuiz() {
-            currentQuestionIndex = 0;
-            score = 0;
-            renderQuiz();
+        function stopRecording() {
+            mediaRecorder.stop();
+            isRecording = false;
+            recordBtn.textContent = "Start Recording";
+            recordBtn.classList.remove("recording");
+            
+            // Re-enable camera switching
+            switchBtn.disabled = false;
         }
 
-        // Initialize Course
-        document.addEventListener('DOMContentLoaded', () => {
-            // Set initial state
-            navigateTo('intro');
-            renderQuiz();
-        });
+        // Toggle camera mode
+        function switchCamera() {
+            currentFacingMode = currentFacingMode === 'user' ? 'environment' : 'user';
+            initCamera();
+        }
 
+        recordBtn.addEventListener('click', toggleRecording);
+        switchBtn.addEventListener('click', switchCamera);
+
+        // Boot it up
+        initCamera();
     </script>
 </body>
 </html>
