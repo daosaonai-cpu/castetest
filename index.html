@@ -2,284 +2,444 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dreamy Vibes Cam</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Aesthetic Music Video Cam</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        :root {
-            --bg-color: #1a1617;
-            --text-color: #f7e8e8;
-            --accent: #ff768b;
+        /* Custom scrollbar for filter selection */
+        .no-scrollbar::-webkit-scrollbar {
+            display: none;
         }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-color);
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            min-height: 100vh;
-            margin: 0;
-            overflow: hidden;
-        }
-
-        h1 {
-            font-weight: 300;
-            letter-spacing: 4px;
-            margin-bottom: 20px;
-            text-transform: lowercase;
-            opacity: 0.9;
-            text-shadow: 0 0 10px rgba(255, 180, 180, 0.3);
-        }
-
-        .cam-container {
-            position: relative;
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 15px;
-            background: #111;
-            border-radius: 4px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5), 0 0 20px rgba(255, 180, 150, 0.1);
-        }
-
-        canvas {
-            width: 100%;
-            max-width: 800px;
-            background-color: #222;
-            display: block;
-            border-radius: 2px;
-        }
-
-        .controls {
-            margin-top: 25px;
-            display: flex;
-            gap: 15px;
-            flex-wrap: wrap;
-            justify-content: center;
-            z-index: 10; /* Keep above vignette */
-        }
-
-        button {
-            background: rgba(255, 255, 255, 0.05);
-            color: var(--text-color);
-            border: 1px solid rgba(255, 255, 255, 0.3);
-            padding: 12px 24px;
-            font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif;
-            font-size: 14px;
-            letter-spacing: 2px;
-            cursor: pointer;
-            text-transform: uppercase;
-            border-radius: 30px;
-            backdrop-filter: blur(5px);
-            transition: all 0.4s ease;
-        }
-
-        button:hover:not(:disabled) {
-            background: rgba(255, 255, 255, 0.9);
-            color: var(--bg-color);
-            border-color: transparent;
-            box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+        .no-scrollbar {
+            -ms-overflow-style: none;
+            scrollbar-width: none;
         }
         
-        button:disabled {
-            cursor: not-allowed;
-            opacity: 0.4;
+        /* Pulse animation for recording dot */
+        @keyframes pulse-red {
+            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
+            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
+            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
         }
-
-        #recordBtn.recording {
-            color: var(--accent);
-            border-color: var(--accent);
-            background: rgba(255, 118, 139, 0.1);
-            animation: breathe 2s infinite ease-in-out;
-        }
-
-        #recordBtn.recording:hover {
-            background: var(--accent);
-            color: #fff;
-        }
-
-        @keyframes breathe {
-            0% { box-shadow: 0 0 0 0 rgba(255, 118, 139, 0.4); }
-            50% { box-shadow: 0 0 0 15px rgba(255, 118, 139, 0); }
-            100% { box-shadow: 0 0 0 0 rgba(255, 118, 139, 0); }
-        }
-
-        /* Soft warm vignette overlay instead of harsh CRT lines */
-        body::after {
-            content: " ";
-            display: block;
-            position: absolute;
-            top: 0;
-            left: 0;
-            bottom: 0;
-            right: 0;
-            background: radial-gradient(circle, rgba(255,230,210,0.03) 0%, rgba(20,10,15,0.7) 100%);
-            z-index: 2;
-            pointer-events: none;
+        .recording-pulse {
+            animation: pulse-red 1.5s infinite;
         }
     </style>
 </head>
-<body>
+<body class="bg-black text-white h-screen w-full overflow-hidden flex flex-col font-sans select-none">
 
-    <h1>cinematic // rec</h1>
+    <!-- Main Viewport -->
+    <main class="relative flex-1 w-full h-full flex flex-col justify-end bg-zinc-900">
+        
+        <!-- Hidden Video Element (Source) -->
+        <video id="raw-video" class="hidden" autoplay playsinline muted></video>
+        
+        <!-- Visible Canvas Element (Processed Output) -->
+        <canvas id="processed-canvas" class="absolute inset-0 w-full h-full object-cover z-0"></canvas>
 
-    <div class="cam-container">
-        <video id="rawVideo" autoplay muted playsinline style="display:none;"></video>
-        <canvas id="filterCanvas"></canvas>
-    </div>
+        <!-- Top Status Bar -->
+        <div class="absolute top-0 inset-x-0 p-6 flex justify-between items-center z-20 bg-gradient-to-b from-black/60 to-transparent">
+            <div id="recording-indicator" class="hidden flex items-center space-x-2 bg-black/50 px-3 py-1.5 rounded-full backdrop-blur-sm border border-red-500/30">
+                <div class="w-3 h-3 rounded-full bg-red-500 recording-pulse"></div>
+                <span id="recording-time" class="text-sm font-mono tracking-wider font-semibold text-red-50">00:00</span>
+            </div>
+            <div class="flex-1"></div> <!-- Spacer -->
+            <button id="switch-cam-btn" class="p-3 bg-black/40 backdrop-blur-md rounded-full text-white hover:bg-white/20 transition active:scale-95 border border-white/10">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M20 16.2A9 9 0 0 0 4 12"/>
+                    <path d="m16 12 4 4.2 4-4.2"/>
+                    <path d="M4 7.8A9 9 0 0 0 20 12"/>
+                    <path d="m8 12-4-4.2-4 4.2"/>
+                </svg>
+            </button>
+        </div>
 
-    <div class="controls">
-        <button id="recordBtn">Start Recording</button>
-        <button id="switchBtn">Switch Camera</button>
-    </div>
+        <!-- Start Overlay (Before Permissions) -->
+        <div id="start-overlay" class="absolute inset-0 z-50 bg-black flex flex-col items-center justify-center p-6 text-center">
+            <h1 class="text-4xl font-black mb-2 tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-violet-500">AESTHETIC CAM</h1>
+            <p class="text-zinc-400 mb-8 max-w-sm">Allow camera and microphone access to start recording your music video.</p>
+            <button id="start-btn" class="px-8 py-4 bg-white text-black font-bold rounded-full hover:scale-105 transition shadow-[0_0_20px_rgba(255,255,255,0.3)] active:scale-95">
+                Launch Camera
+            </button>
+        </div>
+
+        <!-- Controls UI -->
+        <div class="relative z-20 pb-8 pt-24 bg-gradient-to-t from-black via-black/80 to-transparent flex flex-col gap-6">
+            
+            <!-- Filters Carousel -->
+            <div class="w-full overflow-x-auto no-scrollbar px-6 flex gap-3 snap-x pointer-events-auto">
+                <!-- Filters injected via JS -->
+                <div id="filter-container" class="flex gap-3 pb-2"></div>
+            </div>
+
+            <!-- Action Buttons -->
+            <div class="flex items-center justify-center gap-8 px-8 pointer-events-auto">
+                <button id="download-btn" class="p-4 rounded-full bg-zinc-800/80 text-zinc-400 backdrop-blur-md hidden hover:text-white transition active:scale-95 border border-white/5">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                </button>
+
+                <button id="record-btn" class="relative group w-20 h-20 flex items-center justify-center disabled:opacity-50">
+                    <div class="absolute inset-0 border-4 border-white rounded-full opacity-80 group-active:scale-95 transition-transform duration-200"></div>
+                    <div id="record-inner" class="w-14 h-14 bg-red-500 rounded-full group-active:scale-90 transition-all duration-200 shadow-[0_0_15px_rgba(239,68,68,0.6)]"></div>
+                </button>
+
+                <div class="w-[56px] hidden sm:block"></div> <!-- Spacer for balance -->
+            </div>
+        </div>
+    </main>
 
     <script>
-        const video = document.getElementById('rawVideo');
-        const canvas = document.getElementById('filterCanvas');
-        const ctx = canvas.getContext('2d');
-        const recordBtn = document.getElementById('recordBtn');
-        const switchBtn = document.getElementById('switchBtn');
+        // DOM Elements
+        const rawVideo = document.getElementById('raw-video');
+        const canvas = document.getElementById('processed-canvas');
+        const ctx = canvas.getContext('2d', { willReadFrequently: true });
+        const startBtn = document.getElementById('start-btn');
+        const startOverlay = document.getElementById('start-overlay');
+        const recordBtn = document.getElementById('record-btn');
+        const recordInner = document.getElementById('record-inner');
+        const switchCamBtn = document.getElementById('switch-cam-btn');
+        const filterContainer = document.getElementById('filter-container');
+        const recordingIndicator = document.getElementById('recording-indicator');
+        const recordingTimeEl = document.getElementById('recording-time');
+        const downloadBtn = document.getElementById('download-btn');
 
-        let mediaRecorder;
+        // State
+        let stream = null;
+        let mediaRecorder = null;
         let recordedChunks = [];
         let isRecording = false;
-        let rawStream;
-        let currentFacingMode = 'user';
+        let currentFacingMode = 'user'; // 'user' (front) or 'environment' (back)
+        let animationFrameId = null;
+        let currentFilter = 'none';
+        let recordingStartTime = 0;
+        let recordingInterval = null;
+        let lastBlobUrl = null;
 
+        // Pre-generate noise canvas for Vintage filter to save performance
+        const noiseCanvas = document.createElement('canvas');
+        const noiseCtx = noiseCanvas.getContext('2d');
+        let isNoiseGenerated = false;
+
+        function generateNoise(width, height) {
+            if (isNoiseGenerated && noiseCanvas.width === width) return;
+            noiseCanvas.width = width;
+            noiseCanvas.height = height;
+            const imageData = noiseCtx.createImageData(width, height);
+            const data = imageData.data;
+            for (let i = 0; i < data.length; i += 4) {
+                const val = Math.random() * 255;
+                data[i] = val;
+                data[i + 1] = val;
+                data[i + 2] = val;
+                data[i + 3] = 40; // Alpha
+            }
+            noiseCtx.putImageData(imageData, 0, 0);
+            isNoiseGenerated = true;
+        }
+
+        // Filters Configuration
+        const filters = [
+            { id: 'none', name: 'Raw', bg: 'bg-zinc-700' },
+            { id: 'vhs-glitch', name: 'Lo-Fi Glitch', bg: 'bg-gradient-to-br from-red-600 to-blue-600' },
+            { id: 'vintage-film', name: 'Vintage Tape', bg: 'bg-gradient-to-br from-amber-700 to-orange-900' },
+            { id: 'dreamy', name: 'Dream State', bg: 'bg-gradient-to-br from-blue-300 to-purple-300' },
+            { id: 'pink-punk', name: 'Pink Punk', bg: 'bg-gradient-to-br from-pink-500 to-violet-900' }
+        ];
+
+        // Render Filter Buttons
+        filters.forEach(filter => {
+            const btn = document.createElement('button');
+            btn.className = `snap-center shrink-0 w-24 h-32 rounded-xl flex items-end p-3 transition border-2 ${filter.id === currentFilter ? 'border-white scale-105 shadow-lg' : 'border-transparent scale-100 opacity-60'} ${filter.bg} relative overflow-hidden`;
+            
+            // Add gradient overlay to make text readable
+            btn.innerHTML = `
+                <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
+                <span class="relative z-10 text-xs font-bold text-white text-left leading-tight drop-shadow-md">${filter.name}</span>
+            `;
+            
+            btn.onclick = () => {
+                currentFilter = filter.id;
+                // Update UI selection state
+                Array.from(filterContainer.children).forEach(child => {
+                    child.classList.remove('border-white', 'scale-105', 'shadow-lg');
+                    child.classList.add('border-transparent', 'scale-100', 'opacity-60');
+                });
+                btn.classList.remove('border-transparent', 'scale-100', 'opacity-60');
+                btn.classList.add('border-white', 'scale-105', 'shadow-lg');
+            };
+            filterContainer.appendChild(btn);
+        });
+
+        // Initialize Camera
         async function initCamera() {
-            if (rawStream) {
-                rawStream.getTracks().forEach(track => track.stop());
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
             }
 
             try {
-                const constraints = {
-                    video: { facingMode: currentFacingMode },
-                    audio: true
-                };
+                stream = await navigator.mediaDevices.getUserMedia({
+                    video: { facingMode: currentFacingMode, width: { ideal: 1280 }, height: { ideal: 720 } },
+                    audio: { echoCancellation: false, noiseSuppression: false } // Best for music video raw audio
+                });
                 
-                rawStream = await navigator.mediaDevices.getUserMedia(constraints);
-                video.srcObject = rawStream;
-                video.onloadedmetadata = () => {
-                    canvas.width = video.videoWidth;
-                    canvas.height = video.videoHeight;
-                    if (!video.dataset.looping) {
-                        video.dataset.looping = true;
-                        requestAnimationFrame(drawFilteredFrame);
+                rawVideo.srcObject = stream;
+                
+                rawVideo.onloadedmetadata = () => {
+                    rawVideo.play();
+                    // Set canvas dimensions to match video to preserve quality for recording
+                    canvas.width = rawVideo.videoWidth;
+                    canvas.height = rawVideo.videoHeight;
+                    generateNoise(canvas.width, canvas.height);
+                    
+                    if (!animationFrameId) {
+                        drawFrame();
                     }
+                    startOverlay.classList.add('hidden');
                 };
             } catch (err) {
-                alert("Could not access camera. Make sure you are on HTTPS or localhost, and allowed permissions.");
-                console.error(err);
+                console.error("Error accessing camera: ", err);
+                alert("Could not access camera/microphone. Please ensure permissions are granted.");
             }
         }
 
-        function drawFilteredFrame() {
-            if (video.readyState === video.HAVE_ENOUGH_DATA) {
-                // 1. Dreamy Cinematic Filter:
-                // Boosted saturation for pastel colors, slight warmth (sepia), lower contrast for soft shadows, and a heavier blur for the "dreamy" bloom effect.
-                ctx.filter = 'saturate(130%) contrast(95%) brightness(110%) sepia(20%) hue-rotate(-5deg) blur(1.2px)';
-                
-                if (currentFacingMode === 'user') {
-                    ctx.save();
-                    ctx.translate(canvas.width, 0);
-                    ctx.scale(-1, 1);
-                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                    ctx.restore();
-                } else {
-                    ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
-                }
-
-                ctx.filter = 'none';
-
-                // 3. Cinematic soft-glowing timestamp
-                ctx.fillStyle = 'rgba(255, 240, 235, 0.85)';
-                ctx.font = '300 22px "Helvetica Neue", Helvetica, Arial, sans-serif';
-                ctx.shadowColor = "rgba(255, 180, 150, 0.6)";
-                ctx.shadowBlur = 10; // Softer, wider glow
-                
-                const now = new Date();
-                const dateString = now.toLocaleDateString().replace(/\//g, ' . ');
-                const timeString = now.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
-                
-                if (isRecording && Math.floor(Date.now() / 800) % 2 === 0) {
-                    ctx.fillStyle = '#ff768b';
-                    ctx.fillText('● REC', 30, 45);
-                }
-                
-                ctx.fillStyle = 'rgba(255, 240, 235, 0.85)';
-                ctx.fillText(`${dateString}   ${timeString}`, 30, canvas.height - 35);
-                ctx.shadowBlur = 0; 
-            }
-            
-            requestAnimationFrame(drawFilteredFrame);
-        }
-
-        function toggleRecording() {
-            if (!isRecording) {
-                startRecording();
-            } else {
-                stopRecording();
-            }
-        }
-
-        function startRecording() {
-            recordedChunks = [];
-            
-            const canvasStream = canvas.captureStream(30);
-            const audioTracks = rawStream.getAudioTracks();
-            if (audioTracks.length > 0) {
-                canvasStream.addTrack(audioTracks[0]);
-            }
-
-            mediaRecorder = new MediaRecorder(canvasStream, {
-                mimeType: 'video/webm; codecs=vp9'
-            });
-
-            mediaRecorder.ondataavailable = (event) => {
-                if (event.data.size > 0) {
-                    recordedChunks.push(event.data);
-                }
-            };
-
-            mediaRecorder.onstop = () => {
-                const blob = new Blob(recordedChunks, { type: 'video/webm' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.style.display = 'none';
-                a.href = url;
-                a.download = `dream-sequence-${Date.now()}.webm`;
-                document.body.appendChild(a);
-                a.click();
-                setTimeout(() => {
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
-                }, 100);
-            };
-
-            mediaRecorder.start();
-            isRecording = true;
-            recordBtn.textContent = "Stop Recording";
-            recordBtn.classList.add("recording");
-            switchBtn.disabled = true;
-        }
-
-        function stopRecording() {
-            mediaRecorder.stop();
-            isRecording = false;
-            recordBtn.textContent = "Start Recording";
-            recordBtn.classList.remove("recording");
-            switchBtn.disabled = false;
-        }
-
-        function switchCamera() {
+        // Camera Switch Logic
+        switchCamBtn.addEventListener('click', () => {
             currentFacingMode = currentFacingMode === 'user' ? 'environment' : 'user';
             initCamera();
+            // Rotate animation for button
+            switchCamBtn.style.transform = `rotate(${currentFacingMode === 'user' ? '0' : '180'}deg)`;
+            setTimeout(() => switchCamBtn.style.transform = '', 300);
+        });
+
+        // Start App
+        startBtn.addEventListener('click', initCamera);
+
+        // Core Render Loop
+        function drawFrame() {
+            if (rawVideo.paused || rawVideo.ended) {
+                animationFrameId = requestAnimationFrame(drawFrame);
+                return;
+            }
+
+            const w = canvas.width;
+            const h = canvas.height;
+            const ctx = canvas.getContext('2d');
+            
+            // Reset state
+            ctx.filter = 'none';
+            ctx.globalAlpha = 1.0;
+            ctx.globalCompositeOperation = 'source-over';
+
+            // Base Draw (Mirror if front camera)
+            ctx.save();
+            if (currentFacingMode === 'user') {
+                ctx.translate(w, 0);
+                ctx.scale(-1, 1);
+            }
+
+            // Apply specific filters
+            switch (currentFilter) {
+                case 'none':
+                    ctx.drawImage(rawVideo, 0, 0, w, h);
+                    break;
+
+                case 'vintage-film':
+                    // Warm, low contrast base
+                    ctx.filter = 'sepia(0.6) contrast(1.1) brightness(0.9) saturate(0.8)';
+                    ctx.drawImage(rawVideo, 0, 0, w, h);
+                    ctx.filter = 'none';
+                    
+                    // Add noise overlay
+                    const xOff = Math.floor(Math.random() * 100) - 50;
+                    const yOff = Math.floor(Math.random() * 100) - 50;
+                    ctx.globalCompositeOperation = 'overlay';
+                    ctx.drawImage(noiseCanvas, xOff, yOff, w, h);
+                    
+                    // Add Vignette (Dark edges)
+                    ctx.globalCompositeOperation = 'multiply';
+                    const grd = ctx.createRadialGradient(w/2, h/2, h*0.4, w/2, h/2, h*0.8);
+                    grd.addColorStop(0, 'rgba(0,0,0,0)');
+                    grd.addColorStop(1, 'rgba(0,0,0,0.7)');
+                    ctx.fillStyle = grd;
+                    ctx.fillRect(0, 0, w, h);
+                    break;
+
+                case 'dreamy':
+                    // High brightness, low saturation
+                    ctx.filter = 'contrast(1.1) brightness(1.2) saturate(0.7)';
+                    ctx.drawImage(rawVideo, 0, 0, w, h);
+                    
+                    // Bloom/Glow effect by layering blurred version over it
+                    ctx.globalAlpha = 0.6;
+                    ctx.filter = 'blur(12px) contrast(1.3) brightness(1.1)';
+                    ctx.globalCompositeOperation = 'screen';
+                    ctx.drawImage(rawVideo, 0, 0, w, h);
+                    break;
+
+                case 'pink-punk':
+                    // Deep contrast, neon magenta hue shift
+                    ctx.filter = 'hue-rotate(-40deg) saturate(2.5) contrast(1.3) brightness(0.85)';
+                    ctx.drawImage(rawVideo, 0, 0, w, h);
+                    
+                    // Subtle glitch lines
+                    if (Math.random() > 0.8) {
+                        ctx.fillStyle = 'rgba(255, 0, 150, 0.2)';
+                        ctx.fillRect(0, Math.random() * h, w, 4);
+                    }
+                    break;
+
+                case 'vhs-glitch':
+                    // Base high contrast
+                    ctx.filter = 'saturate(1.2) contrast(1.2)';
+                    ctx.drawImage(rawVideo, 0, 0, w, h);
+                    ctx.filter = 'none';
+
+                    // 1. Random Slices (Image tearing)
+                    if (Math.random() > 0.8) {
+                        const sliceY = Math.random() * h;
+                        const sliceH = Math.random() * (h * 0.1) + 10;
+                        const offset = (Math.random() - 0.5) * (w * 0.1);
+                        ctx.drawImage(rawVideo, 0, sliceY, w, sliceH, offset, sliceY, w, sliceH);
+                    }
+
+                    // 2. Chromatic Aberration (RGB Shift trick)
+                    if (Math.random() > 0.7) {
+                        ctx.globalCompositeOperation = 'screen';
+                        
+                        // Red shift
+                        ctx.fillStyle = 'rgba(255,0,0,0.2)';
+                        ctx.fillRect(0,0,w,h);
+                        ctx.globalAlpha = 0.5;
+                        ctx.drawImage(rawVideo, 8, 0, w, h);
+                        
+                        // Blue shift
+                        ctx.fillStyle = 'rgba(0,0,255,0.2)';
+                        ctx.fillRect(0,0,w,h);
+                        ctx.drawImage(rawVideo, -8, 0, w, h);
+                    }
+
+                    // 3. Scanlines
+                    ctx.globalAlpha = 1.0;
+                    ctx.globalCompositeOperation = 'source-over';
+                    ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
+                    for(let i=0; i<h; i+=6) {
+                        ctx.fillRect(0, i, w, 2);
+                    }
+                    
+                    // 4. Occasional static band
+                    if (Math.random() > 0.95) {
+                        ctx.globalCompositeOperation = 'overlay';
+                        ctx.drawImage(noiseCanvas, 0, Math.random() * h, w, 100);
+                    }
+                    break;
+            }
+            ctx.restore();
+
+            animationFrameId = requestAnimationFrame(drawFrame);
+        }
+
+        // Formatting Timer
+        function formatTime(seconds) {
+            const m = Math.floor(seconds / 60).toString().padStart(2, '0');
+            const s = (seconds % 60).toString().padStart(2, '0');
+            return `${m}:${s}`;
+        }
+
+        // Recording Logic
+        function toggleRecording() {
+            if (!stream) return;
+
+            if (isRecording) {
+                // Stop Recording
+                mediaRecorder.stop();
+                isRecording = false;
+                
+                // Update UI
+                recordInner.classList.remove('rounded-md');
+                recordInner.classList.add('rounded-full');
+                recordingIndicator.classList.add('hidden');
+                switchCamBtn.classList.remove('hidden');
+                clearInterval(recordingInterval);
+                
+            } else {
+                // Start Recording
+                recordedChunks = [];
+                
+                // Combine Canvas Video Stream with Mic Audio Stream
+                const canvasStream = canvas.captureStream(30); // 30 FPS
+                const audioTracks = stream.getAudioTracks();
+                
+                if (audioTracks.length > 0) {
+                    canvasStream.addTrack(audioTracks[0]);
+                }
+
+                // Check supported formats
+                const options = { mimeType: 'video/webm;codecs=vp9,opus' };
+                if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+                    options.mimeType = 'video/webm;codecs=vp8,opus';
+                    if (!MediaRecorder.isTypeSupported(options.mimeType)) {
+                        options.mimeType = 'video/webm';
+                    }
+                }
+
+                mediaRecorder = new MediaRecorder(canvasStream, options);
+
+                mediaRecorder.ondataavailable = (event) => {
+                    if (event.data.size > 0) {
+                        recordedChunks.push(event.data);
+                    }
+                };
+
+                mediaRecorder.onstop = () => {
+                    const blob = new Blob(recordedChunks, { type: options.mimeType });
+                    if (lastBlobUrl) URL.revokeObjectURL(lastBlobUrl);
+                    lastBlobUrl = URL.createObjectURL(blob);
+                    
+                    // Show download button
+                    downloadBtn.classList.remove('hidden');
+                    
+                    // Auto-trigger download
+                    triggerDownload(lastBlobUrl);
+                };
+
+                mediaRecorder.start();
+                isRecording = true;
+                
+                // Update UI
+                recordInner.classList.remove('rounded-full');
+                recordInner.classList.add('rounded-md'); // Square stop button shape
+                recordingIndicator.classList.remove('hidden');
+                switchCamBtn.classList.add('hidden'); // Hide cam switch while recording
+                downloadBtn.classList.add('hidden');
+                
+                // Timer
+                recordingStartTime = Date.now();
+                recordingTimeEl.innerText = "00:00";
+                recordingInterval = setInterval(() => {
+                    const seconds = Math.floor((Date.now() - recordingStartTime) / 1000);
+                    recordingTimeEl.innerText = formatTime(seconds);
+                }, 1000);
+            }
+        }
+
+        function triggerDownload(url) {
+            const a = document.createElement('a');
+            a.style.display = 'none';
+            a.href = url;
+            a.download = `MV_Take_${Date.now()}.webm`;
+            document.body.appendChild(a);
+            a.click();
+            setTimeout(() => {
+                document.body.removeChild(a);
+            }, 100);
         }
 
         recordBtn.addEventListener('click', toggleRecording);
-        switchBtn.addEventListener('click', switchCamera);
+        
+        downloadBtn.addEventListener('click', () => {
+            if (lastBlobUrl) triggerDownload(lastBlobUrl);
+        });
 
-        initCamera();
     </script>
 </body>
 </html>
