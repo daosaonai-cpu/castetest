@@ -2,444 +2,838 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Aesthetic Music Video Cam</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Computer Science 101: CPU & OS Fundamentals</title>
+    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <style>
-        /* Custom scrollbar for filter selection */
-        .no-scrollbar::-webkit-scrollbar {
-            display: none;
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            900: '#1e3a8a',
+                        }
+                    }
+                }
+            }
         }
-        .no-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        .fade-in { animation: fadeIn 0.4s ease-in-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
         
-        /* Pulse animation for recording dot */
-        @keyframes pulse-red {
-            0% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0.7); }
-            70% { transform: scale(1); box-shadow: 0 0 0 10px rgba(239, 68, 68, 0); }
-            100% { transform: scale(0.95); box-shadow: 0 0 0 0 rgba(239, 68, 68, 0); }
+        /* Interactive cycle animation classes */
+        .cycle-active {
+            background-color: #3b82f6;
+            color: white;
+            transform: scale(1.05);
+            box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.5);
+            border-color: #2563eb;
         }
-        .recording-pulse {
-            animation: pulse-red 1.5s infinite;
+        .cycle-inactive {
+            background-color: white;
+            color: #4b5563;
+            border-color: #e5e7eb;
         }
+        
+        /* Scrollbar styling for sidebar */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
-<body class="bg-black text-white h-screen w-full overflow-hidden flex flex-col font-sans select-none">
+<body class="bg-gray-50 text-gray-800 h-screen overflow-hidden flex flex-col md:flex-row">
 
-    <!-- Main Viewport -->
-    <main class="relative flex-1 w-full h-full flex flex-col justify-end bg-zinc-900">
-        
-        <!-- Hidden Video Element (Source) -->
-        <video id="raw-video" class="hidden" autoplay playsinline muted></video>
-        
-        <!-- Visible Canvas Element (Processed Output) -->
-        <canvas id="processed-canvas" class="absolute inset-0 w-full h-full object-cover z-0"></canvas>
+    <!-- Mobile Header -->
+    <header class="md:hidden bg-brand-900 text-white p-4 flex justify-between items-center z-20 shadow-md">
+        <div class="font-bold text-lg flex items-center gap-2">
+            <i class="fa-solid fa-microchip"></i> CS 101
+        </div>
+        <button id="mobile-menu-btn" class="text-white hover:text-brand-100 focus:outline-none">
+            <i class="fa-solid fa-bars text-2xl"></i>
+        </button>
+    </header>
 
-        <!-- Top Status Bar -->
-        <div class="absolute top-0 inset-x-0 p-6 flex justify-between items-center z-20 bg-gradient-to-b from-black/60 to-transparent">
-            <div id="recording-indicator" class="hidden flex items-center space-x-2 bg-black/50 px-3 py-1.5 rounded-full backdrop-blur-sm border border-red-500/30">
-                <div class="w-3 h-3 rounded-full bg-red-500 recording-pulse"></div>
-                <span id="recording-time" class="text-sm font-mono tracking-wider font-semibold text-red-50">00:00</span>
+    <!-- Sidebar Navigation -->
+    <aside id="sidebar" class="bg-white border-r border-gray-200 w-full md:w-72 h-full absolute md:relative z-10 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out flex flex-col">
+        <div class="p-6 hidden md:block bg-brand-900 text-white">
+            <h1 class="text-xl font-bold flex items-center gap-2">
+                <i class="fa-solid fa-microchip"></i> CS 101 Course
+            </h1>
+            <p class="text-brand-100 text-sm mt-1">CPU & OS Fundamentals</p>
+        </div>
+        
+        <div class="p-4 border-b border-gray-100">
+            <div class="w-full bg-gray-200 rounded-full h-2.5 mb-1">
+                <div id="progress-bar" class="bg-brand-500 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
             </div>
-            <div class="flex-1"></div> <!-- Spacer -->
-            <button id="switch-cam-btn" class="p-3 bg-black/40 backdrop-blur-md rounded-full text-white hover:bg-white/20 transition active:scale-95 border border-white/10">
-                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M20 16.2A9 9 0 0 0 4 12"/>
-                    <path d="m16 12 4 4.2 4-4.2"/>
-                    <path d="M4 7.8A9 9 0 0 0 20 12"/>
-                    <path d="m8 12-4-4.2-4 4.2"/>
-                </svg>
-            </button>
+            <p id="progress-text" class="text-xs text-gray-500 text-right">0% Completed</p>
         </div>
 
-        <!-- Start Overlay (Before Permissions) -->
-        <div id="start-overlay" class="absolute inset-0 z-50 bg-black flex flex-col items-center justify-center p-6 text-center">
-            <h1 class="text-4xl font-black mb-2 tracking-tighter text-transparent bg-clip-text bg-gradient-to-r from-pink-500 to-violet-500">AESTHETIC CAM</h1>
-            <p class="text-zinc-400 mb-8 max-w-sm">Allow camera and microphone access to start recording your music video.</p>
-            <button id="start-btn" class="px-8 py-4 bg-white text-black font-bold rounded-full hover:scale-105 transition shadow-[0_0_20px_rgba(255,255,255,0.3)] active:scale-95">
-                Launch Camera
-            </button>
+        <nav id="nav-menu" class="flex-1 overflow-y-auto p-4 space-y-1">
+            <!-- Navigation items injected via JS -->
+        </nav>
+        
+        <div class="p-4 border-t border-gray-200 text-xs text-gray-400 text-center">
+            Interactive Web Course
         </div>
+    </aside>
 
-        <!-- Controls UI -->
-        <div class="relative z-20 pb-8 pt-24 bg-gradient-to-t from-black via-black/80 to-transparent flex flex-col gap-6">
-            
-            <!-- Filters Carousel -->
-            <div class="w-full overflow-x-auto no-scrollbar px-6 flex gap-3 snap-x pointer-events-auto">
-                <!-- Filters injected via JS -->
-                <div id="filter-container" class="flex gap-3 pb-2"></div>
-            </div>
-
-            <!-- Action Buttons -->
-            <div class="flex items-center justify-center gap-8 px-8 pointer-events-auto">
-                <button id="download-btn" class="p-4 rounded-full bg-zinc-800/80 text-zinc-400 backdrop-blur-md hidden hover:text-white transition active:scale-95 border border-white/5">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
-                </button>
-
-                <button id="record-btn" class="relative group w-20 h-20 flex items-center justify-center disabled:opacity-50">
-                    <div class="absolute inset-0 border-4 border-white rounded-full opacity-80 group-active:scale-95 transition-transform duration-200"></div>
-                    <div id="record-inner" class="w-14 h-14 bg-red-500 rounded-full group-active:scale-90 transition-all duration-200 shadow-[0_0_15px_rgba(239,68,68,0.6)]"></div>
-                </button>
-
-                <div class="w-[56px] hidden sm:block"></div> <!-- Spacer for balance -->
-            </div>
+    <!-- Main Content Area -->
+    <main class="flex-1 h-full overflow-y-auto relative">
+        <div id="main-content" class="max-w-4xl mx-auto p-6 md:p-10 pb-24 fade-in">
+            <!-- Content injected via JS -->
+        </div>
+        
+        <!-- Navigation Buttons -->
+        <div class="fixed bottom-0 left-0 md:left-72 right-0 bg-white border-t border-gray-200 p-4 px-6 md:px-10 flex justify-between items-center z-10">
+            <button id="prev-btn" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors">
+                <i class="fa-solid fa-arrow-left"></i> Previous
+            </button>
+            <button id="next-btn" class="px-4 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors shadow-sm">
+                Next <i class="fa-solid fa-arrow-right"></i>
+            </button>
         </div>
     </main>
 
-    <script>
-        // DOM Elements
-        const rawVideo = document.getElementById('raw-video');
-        const canvas = document.getElementById('processed-canvas');
-        const ctx = canvas.getContext('2d', { willReadFrequently: true });
-        const startBtn = document.getElementById('start-btn');
-        const startOverlay = document.getElementById('start-overlay');
-        const recordBtn = document.getElementById('record-btn');
-        const recordInner = document.getElementById('record-inner');
-        const switchCamBtn = document.getElementById('switch-cam-btn');
-        const filterContainer = document.getElementById('filter-container');
-        const recordingIndicator = document.getElementById('recording-indicator');
-        const recordingTimeEl = document.getElementById('recording-time');
-        const downloadBtn = document.getElementById('download-btn');
+    <!-- Overlay for mobile sidebar -->
+    <div id="sidebar-overlay" class="fixed inset-0 bg-gray-800 bg-opacity-50 z-0 hidden md:hidden"></div>
 
-        // State
-        let stream = null;
-        let mediaRecorder = null;
-        let recordedChunks = [];
-        let isRecording = false;
-        let currentFacingMode = 'user'; // 'user' (front) or 'environment' (back)
-        let animationFrameId = null;
-        let currentFilter = 'none';
-        let recordingStartTime = 0;
-        let recordingInterval = null;
-        let lastBlobUrl = null;
+<script>
+// --- Course Content Data ---
+const courseModules = [
+    {
+        id: 'intro',
+        title: 'Introduction',
+        icon: 'fa-info-circle',
+        content: `
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">Welcome to CS 101</h2>
+            <p class="text-lg text-gray-600 mb-6">In this crash course, you will learn the fundamental building blocks of modern computing: the Central Processing Unit (CPU) and the Operating System (OS).</p>
+            
+            <div class="bg-brand-50 border border-brand-100 rounded-xl p-6 mb-8">
+                <h3 class="text-xl font-semibold text-brand-900 mb-3 flex items-center gap-2">
+                    <i class="fa-solid fa-bullseye"></i> Learning Objectives
+                </h3>
+                <ul class="space-y-3 text-brand-800">
+                    <li class="flex items-start gap-3">
+                        <i class="fa-solid fa-check-circle mt-1 text-brand-500"></i>
+                        <span>Understand what a CPU is and its internal components.</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <i class="fa-solid fa-check-circle mt-1 text-brand-500"></i>
+                        <span>Explain the Fetch-Decode-Execute cycle.</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <i class="fa-solid fa-check-circle mt-1 text-brand-500"></i>
+                        <span>Discover the role of an Operating System.</span>
+                    </li>
+                    <li class="flex items-start gap-3">
+                        <i class="fa-solid fa-check-circle mt-1 text-brand-500"></i>
+                        <span>Learn how an OS manages memory and processes.</span>
+                    </li>
+                </ul>
+            </div>
+            
+            <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Circuit Board" class="rounded-xl shadow-md w-full h-64 object-cover mb-6">
+            <p class="text-gray-600">Click the <strong>Next</strong> button below to begin your journey into the heart of the computer.</p>
+        `
+    },
+    {
+        id: 'cpu-basics',
+        title: '1. CPU Architecture',
+        icon: 'fa-microchip',
+        content: `
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">The Brain: CPU Architecture</h2>
+            <p class="text-gray-600 mb-6">The Central Processing Unit (CPU) is often called the "brain" of the computer. It executes instructions that make up computer programs. Let's look inside.</p>
+            
+            <div class="mb-8 p-6 bg-white border border-gray-200 rounded-xl shadow-sm">
+                <h3 class="text-center font-bold text-gray-800 mb-6 text-xl">Inside the CPU</h3>
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                    <!-- ALU -->
+                    <div class="bg-blue-50 border-2 border-blue-200 rounded-lg p-4 text-center hover:shadow-md transition-shadow">
+                        <i class="fa-solid fa-calculator text-3xl text-blue-500 mb-2"></i>
+                        <h4 class="font-bold text-blue-900">ALU</h4>
+                        <p class="text-xs text-blue-700 mt-1">Arithmetic Logic Unit. Performs all math and logical operations (e.g., addition, comparisons).</p>
+                    </div>
+                    <!-- Control Unit -->
+                    <div class="bg-purple-50 border-2 border-purple-200 rounded-lg p-4 text-center hover:shadow-md transition-shadow">
+                        <i class="fa-solid fa-network-wired text-3xl text-purple-500 mb-2"></i>
+                        <h4 class="font-bold text-purple-900">Control Unit</h4>
+                        <p class="text-xs text-purple-700 mt-1">Directs the operation of the processor. It tells the ALU, memory, and I/O devices how to respond to instructions.</p>
+                    </div>
+                    <!-- Registers -->
+                    <div class="bg-green-50 border-2 border-green-200 rounded-lg p-4 text-center hover:shadow-md transition-shadow">
+                        <i class="fa-solid fa-database text-3xl text-green-500 mb-2"></i>
+                        <h4 class="font-bold text-green-900">Registers</h4>
+                        <p class="text-xs text-green-700 mt-1">Tiny, super-fast storage locations directly inside the CPU used to hold temporary data and instructions currently being processed.</p>
+                    </div>
+                    <!-- Cache -->
+                    <div class="bg-orange-50 border-2 border-orange-200 rounded-lg p-4 text-center hover:shadow-md transition-shadow">
+                        <i class="fa-solid fa-bolt text-3xl text-orange-500 mb-2"></i>
+                        <h4 class="font-bold text-orange-900">Cache Memory</h4>
+                        <p class="text-xs text-orange-700 mt-1">A small amount of high-speed memory placed close to the CPU to store frequently used data, speeding up access compared to main RAM.</p>
+                    </div>
+                </div>
+            </div>
 
-        // Pre-generate noise canvas for Vintage filter to save performance
-        const noiseCanvas = document.createElement('canvas');
-        const noiseCtx = noiseCanvas.getContext('2d');
-        let isNoiseGenerated = false;
+            <h3 class="text-xl font-bold text-gray-900 mb-2">Clock Speed</h3>
+            <p class="text-gray-600">The CPU operates based on an internal clock. The "Clock Speed" (measured in GHz, Gigahertz) dictates how many cycles the CPU can execute per second. A 3.0 GHz processor ticks 3 billion times per second!</p>
+        `
+    },
+    {
+        id: 'instruction-cycle',
+        title: '2. The Instruction Cycle',
+        icon: 'fa-sync',
+        content: `
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">The Fetch-Decode-Execute Cycle</h2>
+            <p class="text-gray-600 mb-6">Everything a computer does is just the CPU rapidly repeating a simple three-step loop called the Instruction Cycle.</p>
+            
+            <!-- Interactive Diagram -->
+            <div class="bg-gray-900 rounded-xl p-8 mb-8 relative overflow-hidden">
+                <div class="absolute top-4 right-4 flex items-center gap-2">
+                    <span class="text-gray-400 text-sm">Simulator</span>
+                    <button id="play-cycle" class="text-green-400 hover:text-green-300 focus:outline-none">
+                        <i class="fa-solid fa-play-circle text-2xl"></i>
+                    </button>
+                    <button id="pause-cycle" class="text-red-400 hover:text-red-300 focus:outline-none hidden">
+                        <i class="fa-solid fa-pause-circle text-2xl"></i>
+                    </button>
+                </div>
+                
+                <h3 class="text-center font-bold text-white mb-10 text-xl tracking-wider">CPU CYCLE</h3>
+                
+                <div class="flex flex-col md:flex-row justify-center items-center gap-6 relative z-10">
+                    
+                    <div id="step-fetch" class="cycle-inactive border-2 rounded-full w-32 h-32 flex flex-col items-center justify-center text-center transition-all duration-300">
+                        <i class="fa-solid fa-download text-2xl mb-1"></i>
+                        <span class="font-bold">1. FETCH</span>
+                    </div>
+                    
+                    <div class="hidden md:block text-gray-500"><i class="fa-solid fa-arrow-right text-2xl"></i></div>
+                    <div class="md:hidden text-gray-500"><i class="fa-solid fa-arrow-down text-2xl"></i></div>
+                    
+                    <div id="step-decode" class="cycle-inactive border-2 rounded-full w-32 h-32 flex flex-col items-center justify-center text-center transition-all duration-300">
+                        <i class="fa-solid fa-microscope text-2xl mb-1"></i>
+                        <span class="font-bold">2. DECODE</span>
+                    </div>
 
-        function generateNoise(width, height) {
-            if (isNoiseGenerated && noiseCanvas.width === width) return;
-            noiseCanvas.width = width;
-            noiseCanvas.height = height;
-            const imageData = noiseCtx.createImageData(width, height);
-            const data = imageData.data;
-            for (let i = 0; i < data.length; i += 4) {
-                const val = Math.random() * 255;
-                data[i] = val;
-                data[i + 1] = val;
-                data[i + 2] = val;
-                data[i + 3] = 40; // Alpha
+                    <div class="hidden md:block text-gray-500"><i class="fa-solid fa-arrow-right text-2xl"></i></div>
+                    <div class="md:hidden text-gray-500"><i class="fa-solid fa-arrow-down text-2xl"></i></div>
+
+                    <div id="step-execute" class="cycle-inactive border-2 rounded-full w-32 h-32 flex flex-col items-center justify-center text-center transition-all duration-300">
+                        <i class="fa-solid fa-bolt text-2xl mb-1"></i>
+                        <span class="font-bold">3. EXECUTE</span>
+                    </div>
+                </div>
+                
+                <div id="cycle-description" class="mt-10 text-center text-brand-100 h-16 flex items-center justify-center border-t border-gray-700 pt-4">
+                    Press Play to simulate the CPU cycle.
+                </div>
+            </div>
+
+            <div class="space-y-4">
+                <div class="flex gap-4">
+                    <div class="bg-blue-100 text-blue-800 font-bold w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0">1</div>
+                    <div>
+                        <h4 class="font-bold text-gray-900">Fetch</h4>
+                        <p class="text-gray-600">The Control Unit grabs the next instruction from the main memory (RAM) and places it into an instruction register.</p>
+                    </div>
+                </div>
+                <div class="flex gap-4">
+                    <div class="bg-purple-100 text-purple-800 font-bold w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0">2</div>
+                    <div>
+                        <h4 class="font-bold text-gray-900">Decode</h4>
+                        <p class="text-gray-600">The Control Unit analyzes the instruction to determine what needs to be done (e.g., is it an add command? A load command?).</p>
+                    </div>
+                </div>
+                <div class="flex gap-4">
+                    <div class="bg-green-100 text-green-800 font-bold w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0">3</div>
+                    <div>
+                        <h4 class="font-bold text-gray-900">Execute</h4>
+                        <p class="text-gray-600">The command is performed. This might involve routing data to the ALU to perform a math calculation, or storing data back into memory.</p>
+                    </div>
+                </div>
+            </div>
+        `
+    },
+    {
+        id: 'os-basics',
+        title: '3. Introduction to OS',
+        icon: 'fa-laptop-code',
+        content: `
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">The Conductor: Operating Systems</h2>
+            <p class="text-gray-600 mb-6">Without an Operating System (OS), your computer hardware is just a useless brick of silicon and metal. The OS is the software that manages the hardware and software resources.</p>
+            
+            <!-- Layer Diagram -->
+            <div class="mb-10 px-4">
+                <h3 class="text-center font-bold text-gray-600 mb-4 text-sm uppercase tracking-widest">The Computing Stack</h3>
+                <div class="flex flex-col gap-2 max-w-sm mx-auto">
+                    <div class="bg-indigo-100 border-2 border-indigo-300 text-indigo-900 font-bold text-center py-4 rounded-t-lg shadow-sm">
+                        <i class="fa-solid fa-user mb-1"></i><br>User
+                    </div>
+                    <div class="bg-blue-100 border-2 border-blue-300 text-blue-900 font-bold text-center py-4 shadow-sm">
+                        <i class="fa-solid fa-gamepad mb-1"></i><br>Applications (Web Browser, Games)
+                    </div>
+                    <div class="bg-green-500 border-2 border-green-600 text-white font-bold text-center py-6 shadow-md transform scale-105 z-10 relative">
+                        <i class="fa-brands fa-linux mb-1 mr-1"></i>
+                        <i class="fa-brands fa-windows mb-1 mr-1"></i>
+                        <i class="fa-brands fa-apple mb-1"></i><br>
+                        OPERATING SYSTEM (The Kernel)
+                    </div>
+                    <div class="bg-gray-700 border-2 border-gray-800 text-gray-100 font-bold text-center py-4 rounded-b-lg shadow-sm">
+                        <i class="fa-solid fa-memory mb-1"></i><br>Hardware (CPU, RAM, Disks)
+                    </div>
+                </div>
+            </div>
+
+            <h3 class="text-xl font-bold text-gray-900 mb-3">Two Main Jobs of an OS:</h3>
+            <div class="grid md:grid-cols-2 gap-6 mb-6">
+                <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+                    <div class="text-brand-500 mb-3"><i class="fa-solid fa-sitemap text-2xl"></i></div>
+                    <h4 class="font-bold text-gray-800 mb-2">1. Resource Manager</h4>
+                    <p class="text-sm text-gray-600">It acts as a referee, allocating CPU time, memory space, and hardware access (like printers or network cards) fairly among all the programs competing for them.</p>
+                </div>
+                <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
+                    <div class="text-brand-500 mb-3"><i class="fa-solid fa-mask text-2xl"></i></div>
+                    <h4 class="font-bold text-gray-800 mb-2">2. Hardware Abstraction</h4>
+                    <p class="text-sm text-gray-600">It provides a clean, standard interface for software developers. A programmer writing a game doesn't need to know the exact model of your hard drive; the OS handles the complex read/write operations.</p>
+                </div>
+            </div>
+        `
+    },
+    {
+        id: 'processes',
+        title: '4. Process Management',
+        icon: 'fa-tasks',
+        content: `
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">Juggling Tasks: Process Management</h2>
+            <p class="text-gray-600 mb-6">A "Process" is simply a program in execution. Right now, your OS is running dozens or hundreds of processes simultaneously (your browser, background updates, antivirus).</p>
+            
+            <h3 class="text-xl font-bold text-gray-900 mb-4">Process States</h3>
+            <p class="text-gray-600 mb-6">As a process moves through the computer system, it changes state. The OS uses a "scheduler" to rapidly switch the CPU between these processes, creating the illusion of true multitasking.</p>
+
+            <div class="bg-slate-50 border border-slate-200 p-6 rounded-xl overflow-x-auto mb-8">
+                <!-- Process State Diagram via CSS/HTML -->
+                <div class="min-w-[600px] flex justify-between items-center relative py-10">
+                    
+                    <!-- Lines connecting blocks -->
+                    <div class="absolute top-1/2 left-[10%] right-[10%] h-0.5 bg-gray-300 z-0 transform -translate-y-1/2"></div>
+                    
+                    <div class="relative z-10 flex flex-col items-center">
+                        <div class="bg-white border-2 border-gray-400 font-bold px-4 py-2 rounded-full shadow-sm mb-2">New</div>
+                        <i class="fa-solid fa-arrow-right text-gray-400"></i>
+                    </div>
+                    
+                    <div class="relative z-10 flex flex-col items-center">
+                        <div class="bg-yellow-100 border-2 border-yellow-400 text-yellow-800 font-bold px-4 py-2 rounded-full shadow-sm mb-2">Ready</div>
+                        <div class="text-xs text-gray-500 w-24 text-center absolute -top-8">Waiting for CPU</div>
+                    </div>
+
+                    <div class="relative z-10 flex items-center justify-center text-gray-400 gap-2">
+                        <i class="fa-solid fa-arrow-right-arrow-left text-xl"></i>
+                    </div>
+                    
+                    <div class="relative z-10 flex flex-col items-center">
+                        <div class="bg-green-100 border-2 border-green-500 text-green-800 font-bold px-4 py-2 rounded-full shadow-md mb-2 transform scale-110">Running</div>
+                        <div class="text-xs text-green-600 w-24 text-center absolute -top-8 font-semibold">Has the CPU!</div>
+                    </div>
+                    
+                    <div class="relative z-10 flex flex-col items-center">
+                        <i class="fa-solid fa-arrow-right text-gray-400 mb-2"></i>
+                        <div class="bg-red-100 border-2 border-red-400 text-red-800 font-bold px-4 py-2 rounded-full shadow-sm">Terminated</div>
+                    </div>
+                </div>
+                
+                <!-- Waiting State block below -->
+                <div class="flex justify-center mt-4">
+                    <div class="relative z-10 flex flex-col items-center w-64 text-center">
+                        <div class="text-xs text-gray-500 mb-2">I/O Request (e.g. waiting for keyboard)</div>
+                        <i class="fa-solid fa-arrow-down text-gray-400 mb-2"></i>
+                        <div class="bg-blue-100 border-2 border-blue-400 text-blue-800 font-bold px-6 py-2 rounded-full shadow-sm mb-2">Waiting / Blocked</div>
+                        <i class="fa-solid fa-arrow-up text-gray-400 mt-2"></i>
+                        <div class="text-xs text-gray-500 mt-1">I/O Completed (Returns to Ready)</div>
+                    </div>
+                </div>
+            </div>
+            
+            <p class="text-sm text-gray-500 italic bg-white p-4 border-l-4 border-brand-500 shadow-sm rounded-r-lg">
+                <strong>Did you know?</strong> Context Switching is the process of storing the state of the current running process so it can be paused, and loading the state of the next process to run. This happens millions of times a second!
+            </p>
+        `
+    },
+    {
+        id: 'memory',
+        title: '5. Memory Management',
+        icon: 'fa-memory',
+        content: `
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">Finding Space: Memory Management</h2>
+            <p class="text-gray-600 mb-6">RAM (Random Access Memory) is fast, but volatile and limited. The OS must track which parts of memory are currently being used, and by whom, while preventing apps from interfering with each other.</p>
+            
+            <div class="grid md:grid-cols-2 gap-8 mb-8">
+                <div>
+                    <h3 class="text-xl font-bold text-brand-700 mb-2">Virtual Memory</h3>
+                    <p class="text-gray-600 text-sm mb-4">When your physical RAM runs out, the OS fakes having more RAM by temporarily saving inactive data to a hidden file on your hard drive (called the Page File or Swap Space). This allows you to run huge programs, though it slows things down.</p>
+                    
+                    <h3 class="text-xl font-bold text-brand-700 mb-2">Paging</h3>
+                    <p class="text-gray-600 text-sm">The OS divides memory into equal-sized chunks called <strong>Pages</strong>. Instead of storing a program continuously in RAM, it scatters pages wherever there is free space, using a "Page Table" to map everything out.</p>
+                </div>
+                
+                <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-inner flex justify-center items-center">
+                    <div class="w-full">
+                        <div class="text-xs font-bold text-gray-400 uppercase tracking-widest text-center mb-2">Physical RAM Layout</div>
+                        <div class="border-2 border-gray-800 rounded flex flex-col overflow-hidden shadow-lg h-64">
+                            <div class="bg-gray-800 text-white text-xs font-bold p-2 text-center h-1/6 flex items-center justify-center">OS Kernel Space</div>
+                            <div class="bg-blue-400 text-white text-xs font-bold p-2 text-center h-[16%] flex items-center justify-center border-b border-gray-300">App A - Page 1</div>
+                            <div class="bg-green-400 text-white text-xs font-bold p-2 text-center h-[16%] flex items-center justify-center border-b border-gray-300">App B - Page 1</div>
+                            <div class="bg-blue-400 text-white text-xs font-bold p-2 text-center h-[16%] flex items-center justify-center border-b border-gray-300">App A - Page 2</div>
+                            <div class="bg-gray-100 text-gray-400 text-xs font-bold p-2 text-center h-[16%] flex items-center justify-center border-b border-gray-300 border-dashed">Free Space</div>
+                            <div class="bg-green-400 text-white text-xs font-bold p-2 text-center h-[16%] flex items-center justify-center">App B - Page 2</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `
+    },
+    {
+        id: 'threads',
+        title: '6. Threads & Concurrency',
+        icon: 'fa-code-branch',
+        content: `
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">Doing More at Once: Threads</h2>
+            <p class="text-gray-600 mb-6">While a <strong>Process</strong> is an executing program, a <strong>Thread</strong> is the smallest sequence of instructions that the OS can manage. Think of a process as a factory, and threads as the individual workers inside that factory.</p>
+            
+            <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-6 mb-8 flex flex-col md:flex-row gap-6 items-center">
+                <div class="flex-1">
+                    <h3 class="text-xl font-bold text-indigo-900 mb-2">Multithreading</h3>
+                    <p class="text-indigo-800 text-sm">A single process (like your web browser) can have multiple threads. One thread might handle playing a YouTube video, another downloads a file in the background, and a third listens to your mouse clicks. They all share the same memory (the process's RAM), making them very fast to switch between.</p>
+                </div>
+                <div class="text-indigo-400 text-6xl">
+                    <i class="fa-solid fa-users-gear"></i>
+                </div>
+            </div>
+
+            <h3 class="text-xl font-bold text-gray-900 mb-2">The Danger: Deadlocks</h3>
+            <p class="text-gray-600 mb-4">Because threads share memory, they can accidentally step on each other's toes. If Thread A locks a file and waits for Thread B, but Thread B is waiting for Thread A, neither can proceed. This is called a <strong>Deadlock</strong>, and the OS has to step in to fix it (usually by crashing or terminating one of them!).</p>
+        `
+    },
+    {
+        id: 'file-systems',
+        title: '7. Storage & File Systems',
+        icon: 'fa-hard-drive',
+        content: `
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">Long-Term Memory: Storage & File Systems</h2>
+            <p class="text-gray-600 mb-6">RAM is "volatile"—it forgets everything when the power goes off. To save data permanently, the computer uses non-volatile storage. The OS uses a <strong>File System</strong> to organize these billions of bytes into folders and files.</p>
+            
+            <div class="grid md:grid-cols-2 gap-6 mb-8">
+                <div class="bg-white border-2 border-gray-200 rounded-xl p-5 shadow-sm text-center">
+                    <i class="fa-solid fa-database text-4xl text-gray-500 mb-3"></i>
+                    <h4 class="font-bold text-gray-800">Hard Disk Drive (HDD)</h4>
+                    <p class="text-sm text-gray-600 mt-2">Uses spinning magnetic platters and a physical read/write head. Cheaper for massive storage, but much slower because of physical moving parts.</p>
+                </div>
+                <div class="bg-white border-2 border-brand-200 rounded-xl p-5 shadow-sm text-center relative overflow-hidden">
+                    <div class="absolute -right-4 -top-4 bg-brand-500 text-white text-xs font-bold px-6 py-1 transform rotate-45">Fast!</div>
+                    <i class="fa-solid fa-memory text-4xl text-brand-500 mb-3"></i>
+                    <h4 class="font-bold text-gray-800">Solid State Drive (SSD)</h4>
+                    <p class="text-sm text-gray-600 mt-2">Uses flash memory chips (like a giant USB drive). No moving parts means it can read and write data almost instantly.</p>
+                </div>
+            </div>
+
+            <h3 class="text-xl font-bold text-gray-900 mb-2">How the OS finds your files</h3>
+            <p class="text-gray-600">The File System (like NTFS on Windows or ext4 on Linux) keeps a massive hidden index or "table of contents". When you open "cat_video.mp4", the OS looks up the file name in the index, finds the exact physical blocks on the SSD where the data lives, and sends it to RAM.</p>
+        `
+    },
+    {
+        id: 'io-interrupts',
+        title: '8. I/O & Interrupts',
+        icon: 'fa-plug',
+        content: `
+            <h2 class="text-3xl font-bold text-gray-900 mb-4">Talking to the Outside World: I/O</h2>
+            <p class="text-gray-600 mb-6">Input/Output (I/O) devices (keyboards, mice, monitors, network cards) move data into and out of the computer. But how does the CPU know you just pressed a key?</p>
+            
+            <div class="bg-red-50 border-l-4 border-red-500 p-6 rounded-r-xl mb-8">
+                <h3 class="text-xl font-bold text-red-900 mb-2 flex items-center gap-2">
+                    <i class="fa-solid fa-hand text-red-600"></i> The Power of Interrupts
+                </h3>
+                <p class="text-red-800 mb-4">Instead of the CPU constantly asking the keyboard "Did you press a key? How about now? Now?" (which is called <em>Polling</em> and wastes huge amounts of CPU time), modern computers use <strong>Interrupts</strong>.</p>
+                
+                <ul class="space-y-2 text-sm text-red-700">
+                    <li><strong>1.</strong> The CPU works normally on your game or video.</li>
+                    <li><strong>2.</strong> You press the 'Spacebar'.</li>
+                    <li><strong>3.</strong> The keyboard hardware sends an electronic "Interrupt Signal" directly to the CPU.</li>
+                    <li><strong>4.</strong> The CPU pauses its current task, saves its state, and runs a tiny piece of OS code called an <em>Interrupt Handler</em> to process the key press.</li>
+                    <li><strong>5.</strong> The CPU resumes its original task.</li>
+                </ul>
+            </div>
+        `
+    },
+    {
+        id: 'quiz',
+        title: '9. Knowledge Check',
+        icon: 'fa-clipboard-list',
+        content: `
+            <h2 class="text-3xl font-bold text-gray-900 mb-2">Knowledge Check</h2>
+            <p class="text-gray-600 mb-8">Test what you've learned. Select the best answer for each question.</p>
+            
+            <div id="quiz-container" class="space-y-6">
+                <!-- Quiz dynamically generated by JS -->
+            </div>
+            
+            <div id="quiz-results" class="hidden mt-8 p-6 bg-green-50 border border-green-200 rounded-xl text-center">
+                <i class="fa-solid fa-trophy text-5xl text-yellow-500 mb-4"></i>
+                <h3 class="text-2xl font-bold text-green-900 mb-2">Course Complete!</h3>
+                <p class="text-lg text-green-800 mb-4">You scored <span id="score-display" class="font-bold text-2xl"></span></p>
+                <button onclick="resetCourse()" class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium">Review Course</button>
+            </div>
+        `
+    }
+];
+
+const quizQuestions = [
+    {
+        q: "Which CPU component performs mathematical calculations?",
+        options: ["Control Unit", "Cache", "ALU (Arithmetic Logic Unit)", "Registers"],
+        answer: 2
+    },
+    {
+        q: "What is the correct order of the instruction cycle?",
+        options: ["Execute, Decode, Fetch", "Fetch, Decode, Execute", "Decode, Fetch, Execute", "Fetch, Execute, Decode"],
+        answer: 1
+    },
+    {
+        q: "Which of these is NOT a primary function of an Operating System?",
+        options: ["Hardware Abstraction", "Rendering 3D Graphics for games", "Process Management", "Memory Management"],
+        answer: 1
+    },
+    {
+        q: "In Process Management, what state is a process in when it is waiting for an I/O event like a keyboard click?",
+        options: ["Running", "Ready", "Terminated", "Waiting/Blocked"],
+        answer: 3
+    },
+    {
+        q: "What mechanism does an OS use to fake having more RAM by using the hard drive?",
+        options: ["Cache Memory", "Virtual Memory", "Clock Speed", "Context Switching"],
+        answer: 1
+    },
+    {
+        q: "What is the primary difference between a Process and a Thread?",
+        options: ["Threads are hardware, processes are software", "A process is a program in execution; a thread is a smaller task within that process", "Threads cannot share memory, processes can", "Processes run on the GPU, threads run on the CPU"],
+        answer: 1
+    },
+    {
+        q: "How does the CPU efficiently detect that a user has pressed a key on the keyboard?",
+        options: ["By using Polling to check the keyboard every millisecond", "By asking the RAM", "By receiving an Interrupt signal from the hardware", "By relying on the ALU to calculate the keystroke"],
+        answer: 2
+    },
+    {
+        q: "Which type of long-term storage uses no moving parts and relies on flash memory?",
+        options: ["Hard Disk Drive (HDD)", "Solid State Drive (SSD)", "Magnetic Tape", "Optical CD-ROM"],
+        answer: 1
+    }
+];
+
+// --- State Variables ---
+let currentModuleIndex = 0;
+let userAnswers = new Array(quizQuestions.length).fill(null);
+let animationInterval = null;
+
+// --- DOM Elements ---
+const navMenu = document.getElementById('nav-menu');
+const mainContent = document.getElementById('main-content');
+const prevBtn = document.getElementById('prev-btn');
+const nextBtn = document.getElementById('next-btn');
+const progressBar = document.getElementById('progress-bar');
+const progressText = document.getElementById('progress-text');
+const mobileMenuBtn = document.getElementById('mobile-menu-btn');
+const sidebar = document.getElementById('sidebar');
+const sidebarOverlay = document.getElementById('sidebar-overlay');
+
+// --- Initialization ---
+function init() {
+    renderSidebar();
+    loadModule(0);
+    setupEventListeners();
+}
+
+// --- Render Functions ---
+function renderSidebar() {
+    navMenu.innerHTML = '';
+    courseModules.forEach((module, index) => {
+        const isActive = index === currentModuleIndex;
+        const btn = document.createElement('button');
+        btn.className = `w-full text-left px-4 py-3 rounded-lg flex items-center gap-3 transition-colors ${isActive ? 'bg-brand-50 text-brand-700 font-medium border-l-4 border-brand-600' : 'text-gray-600 hover:bg-gray-50 border-l-4 border-transparent'}`;
+        btn.innerHTML = `<i class="fa-solid ${module.icon} w-5 text-center ${isActive ? 'text-brand-600' : 'text-gray-400'}"></i> <span>${module.title}</span>`;
+        btn.onclick = () => loadModule(index);
+        navMenu.appendChild(btn);
+    });
+    
+    // Update progress
+    const progress = ((currentModuleIndex) / (courseModules.length - 1)) * 100;
+    progressBar.style.width = `${progress}%`;
+    progressText.innerText = `${Math.round(progress)}% Completed`;
+}
+
+function loadModule(index) {
+    if (index < 0 || index >= courseModules.length) return;
+    
+    // Cleanup previous module specifics (like animations)
+    stopCycleAnimation();
+    
+    currentModuleIndex = index;
+    const module = courseModules[index];
+    
+    // Update Content
+    mainContent.innerHTML = module.content;
+    
+    // Trigger fade-in animation
+    mainContent.classList.remove('fade-in');
+    void mainContent.offsetWidth; // trigger reflow
+    mainContent.classList.add('fade-in');
+    
+    // Update Buttons
+    prevBtn.disabled = index === 0;
+    
+    if (index === courseModules.length - 1) {
+        nextBtn.innerHTML = 'Finish <i class="fa-solid fa-flag-checkered"></i>';
+        nextBtn.classList.replace('bg-brand-600', 'bg-green-600');
+        nextBtn.classList.replace('hover:bg-brand-700', 'hover:bg-green-700');
+        renderQuiz();
+    } else {
+        nextBtn.innerHTML = 'Next <i class="fa-solid fa-arrow-right"></i>';
+        nextBtn.classList.replace('bg-green-600', 'bg-brand-600');
+        nextBtn.classList.replace('hover:bg-green-700', 'hover:bg-brand-700');
+    }
+    
+    // Specific module setups
+    if (module.id === 'instruction-cycle') {
+        setupCycleAnimation();
+    }
+    
+    // Update UI
+    renderSidebar();
+    closeMobileMenu();
+    window.scrollTo(0, 0);
+    mainContent.parentElement.scrollTo(0, 0);
+}
+
+// --- Interactive Animations (Module 2) ---
+function setupCycleAnimation() {
+    const playBtn = document.getElementById('play-cycle');
+    const pauseBtn = document.getElementById('pause-cycle');
+    if (!playBtn) return;
+    
+    playBtn.addEventListener('click', () => {
+        playBtn.classList.add('hidden');
+        pauseBtn.classList.remove('hidden');
+        startCycleAnimation();
+    });
+    
+    pauseBtn.addEventListener('click', () => {
+        pauseBtn.classList.add('hidden');
+        playBtn.classList.remove('hidden');
+        stopCycleAnimation();
+    });
+}
+
+function startCycleAnimation() {
+    const steps = ['fetch', 'decode', 'execute'];
+    const descriptions = [
+        "Grabbing instruction from RAM...",
+        "Decoding instruction to figure out what to do...",
+        "Executing math/logic and saving result!"
+    ];
+    let stepIndex = 0;
+    
+    const descEl = document.getElementById('cycle-description');
+    
+    // Immediate first step
+    runStep();
+    
+    animationInterval = setInterval(runStep, 1500);
+    
+    function runStep() {
+        // Reset all
+        steps.forEach(s => {
+            const el = document.getElementById(`step-${s}`);
+            if(el) {
+                el.classList.remove('cycle-active');
+                el.classList.add('cycle-inactive');
             }
-            noiseCtx.putImageData(imageData, 0, 0);
-            isNoiseGenerated = true;
-        }
-
-        // Filters Configuration
-        const filters = [
-            { id: 'none', name: 'Raw', bg: 'bg-zinc-700' },
-            { id: 'vhs-glitch', name: 'Lo-Fi Glitch', bg: 'bg-gradient-to-br from-red-600 to-blue-600' },
-            { id: 'vintage-film', name: 'Vintage Tape', bg: 'bg-gradient-to-br from-amber-700 to-orange-900' },
-            { id: 'dreamy', name: 'Dream State', bg: 'bg-gradient-to-br from-blue-300 to-purple-300' },
-            { id: 'pink-punk', name: 'Pink Punk', bg: 'bg-gradient-to-br from-pink-500 to-violet-900' }
-        ];
-
-        // Render Filter Buttons
-        filters.forEach(filter => {
-            const btn = document.createElement('button');
-            btn.className = `snap-center shrink-0 w-24 h-32 rounded-xl flex items-end p-3 transition border-2 ${filter.id === currentFilter ? 'border-white scale-105 shadow-lg' : 'border-transparent scale-100 opacity-60'} ${filter.bg} relative overflow-hidden`;
-            
-            // Add gradient overlay to make text readable
-            btn.innerHTML = `
-                <div class="absolute inset-0 bg-gradient-to-t from-black/80 to-transparent"></div>
-                <span class="relative z-10 text-xs font-bold text-white text-left leading-tight drop-shadow-md">${filter.name}</span>
-            `;
-            
-            btn.onclick = () => {
-                currentFilter = filter.id;
-                // Update UI selection state
-                Array.from(filterContainer.children).forEach(child => {
-                    child.classList.remove('border-white', 'scale-105', 'shadow-lg');
-                    child.classList.add('border-transparent', 'scale-100', 'opacity-60');
-                });
-                btn.classList.remove('border-transparent', 'scale-100', 'opacity-60');
-                btn.classList.add('border-white', 'scale-105', 'shadow-lg');
-            };
-            filterContainer.appendChild(btn);
         });
-
-        // Initialize Camera
-        async function initCamera() {
-            if (stream) {
-                stream.getTracks().forEach(track => track.stop());
-            }
-
-            try {
-                stream = await navigator.mediaDevices.getUserMedia({
-                    video: { facingMode: currentFacingMode, width: { ideal: 1280 }, height: { ideal: 720 } },
-                    audio: { echoCancellation: false, noiseSuppression: false } // Best for music video raw audio
-                });
-                
-                rawVideo.srcObject = stream;
-                
-                rawVideo.onloadedmetadata = () => {
-                    rawVideo.play();
-                    // Set canvas dimensions to match video to preserve quality for recording
-                    canvas.width = rawVideo.videoWidth;
-                    canvas.height = rawVideo.videoHeight;
-                    generateNoise(canvas.width, canvas.height);
-                    
-                    if (!animationFrameId) {
-                        drawFrame();
-                    }
-                    startOverlay.classList.add('hidden');
-                };
-            } catch (err) {
-                console.error("Error accessing camera: ", err);
-                alert("Could not access camera/microphone. Please ensure permissions are granted.");
-            }
-        }
-
-        // Camera Switch Logic
-        switchCamBtn.addEventListener('click', () => {
-            currentFacingMode = currentFacingMode === 'user' ? 'environment' : 'user';
-            initCamera();
-            // Rotate animation for button
-            switchCamBtn.style.transform = `rotate(${currentFacingMode === 'user' ? '0' : '180'}deg)`;
-            setTimeout(() => switchCamBtn.style.transform = '', 300);
-        });
-
-        // Start App
-        startBtn.addEventListener('click', initCamera);
-
-        // Core Render Loop
-        function drawFrame() {
-            if (rawVideo.paused || rawVideo.ended) {
-                animationFrameId = requestAnimationFrame(drawFrame);
-                return;
-            }
-
-            const w = canvas.width;
-            const h = canvas.height;
-            const ctx = canvas.getContext('2d');
-            
-            // Reset state
-            ctx.filter = 'none';
-            ctx.globalAlpha = 1.0;
-            ctx.globalCompositeOperation = 'source-over';
-
-            // Base Draw (Mirror if front camera)
-            ctx.save();
-            if (currentFacingMode === 'user') {
-                ctx.translate(w, 0);
-                ctx.scale(-1, 1);
-            }
-
-            // Apply specific filters
-            switch (currentFilter) {
-                case 'none':
-                    ctx.drawImage(rawVideo, 0, 0, w, h);
-                    break;
-
-                case 'vintage-film':
-                    // Warm, low contrast base
-                    ctx.filter = 'sepia(0.6) contrast(1.1) brightness(0.9) saturate(0.8)';
-                    ctx.drawImage(rawVideo, 0, 0, w, h);
-                    ctx.filter = 'none';
-                    
-                    // Add noise overlay
-                    const xOff = Math.floor(Math.random() * 100) - 50;
-                    const yOff = Math.floor(Math.random() * 100) - 50;
-                    ctx.globalCompositeOperation = 'overlay';
-                    ctx.drawImage(noiseCanvas, xOff, yOff, w, h);
-                    
-                    // Add Vignette (Dark edges)
-                    ctx.globalCompositeOperation = 'multiply';
-                    const grd = ctx.createRadialGradient(w/2, h/2, h*0.4, w/2, h/2, h*0.8);
-                    grd.addColorStop(0, 'rgba(0,0,0,0)');
-                    grd.addColorStop(1, 'rgba(0,0,0,0.7)');
-                    ctx.fillStyle = grd;
-                    ctx.fillRect(0, 0, w, h);
-                    break;
-
-                case 'dreamy':
-                    // High brightness, low saturation
-                    ctx.filter = 'contrast(1.1) brightness(1.2) saturate(0.7)';
-                    ctx.drawImage(rawVideo, 0, 0, w, h);
-                    
-                    // Bloom/Glow effect by layering blurred version over it
-                    ctx.globalAlpha = 0.6;
-                    ctx.filter = 'blur(12px) contrast(1.3) brightness(1.1)';
-                    ctx.globalCompositeOperation = 'screen';
-                    ctx.drawImage(rawVideo, 0, 0, w, h);
-                    break;
-
-                case 'pink-punk':
-                    // Deep contrast, neon magenta hue shift
-                    ctx.filter = 'hue-rotate(-40deg) saturate(2.5) contrast(1.3) brightness(0.85)';
-                    ctx.drawImage(rawVideo, 0, 0, w, h);
-                    
-                    // Subtle glitch lines
-                    if (Math.random() > 0.8) {
-                        ctx.fillStyle = 'rgba(255, 0, 150, 0.2)';
-                        ctx.fillRect(0, Math.random() * h, w, 4);
-                    }
-                    break;
-
-                case 'vhs-glitch':
-                    // Base high contrast
-                    ctx.filter = 'saturate(1.2) contrast(1.2)';
-                    ctx.drawImage(rawVideo, 0, 0, w, h);
-                    ctx.filter = 'none';
-
-                    // 1. Random Slices (Image tearing)
-                    if (Math.random() > 0.8) {
-                        const sliceY = Math.random() * h;
-                        const sliceH = Math.random() * (h * 0.1) + 10;
-                        const offset = (Math.random() - 0.5) * (w * 0.1);
-                        ctx.drawImage(rawVideo, 0, sliceY, w, sliceH, offset, sliceY, w, sliceH);
-                    }
-
-                    // 2. Chromatic Aberration (RGB Shift trick)
-                    if (Math.random() > 0.7) {
-                        ctx.globalCompositeOperation = 'screen';
-                        
-                        // Red shift
-                        ctx.fillStyle = 'rgba(255,0,0,0.2)';
-                        ctx.fillRect(0,0,w,h);
-                        ctx.globalAlpha = 0.5;
-                        ctx.drawImage(rawVideo, 8, 0, w, h);
-                        
-                        // Blue shift
-                        ctx.fillStyle = 'rgba(0,0,255,0.2)';
-                        ctx.fillRect(0,0,w,h);
-                        ctx.drawImage(rawVideo, -8, 0, w, h);
-                    }
-
-                    // 3. Scanlines
-                    ctx.globalAlpha = 1.0;
-                    ctx.globalCompositeOperation = 'source-over';
-                    ctx.fillStyle = 'rgba(0, 0, 0, 0.15)';
-                    for(let i=0; i<h; i+=6) {
-                        ctx.fillRect(0, i, w, 2);
-                    }
-                    
-                    // 4. Occasional static band
-                    if (Math.random() > 0.95) {
-                        ctx.globalCompositeOperation = 'overlay';
-                        ctx.drawImage(noiseCanvas, 0, Math.random() * h, w, 100);
-                    }
-                    break;
-            }
-            ctx.restore();
-
-            animationFrameId = requestAnimationFrame(drawFrame);
-        }
-
-        // Formatting Timer
-        function formatTime(seconds) {
-            const m = Math.floor(seconds / 60).toString().padStart(2, '0');
-            const s = (seconds % 60).toString().padStart(2, '0');
-            return `${m}:${s}`;
-        }
-
-        // Recording Logic
-        function toggleRecording() {
-            if (!stream) return;
-
-            if (isRecording) {
-                // Stop Recording
-                mediaRecorder.stop();
-                isRecording = false;
-                
-                // Update UI
-                recordInner.classList.remove('rounded-md');
-                recordInner.classList.add('rounded-full');
-                recordingIndicator.classList.add('hidden');
-                switchCamBtn.classList.remove('hidden');
-                clearInterval(recordingInterval);
-                
-            } else {
-                // Start Recording
-                recordedChunks = [];
-                
-                // Combine Canvas Video Stream with Mic Audio Stream
-                const canvasStream = canvas.captureStream(30); // 30 FPS
-                const audioTracks = stream.getAudioTracks();
-                
-                if (audioTracks.length > 0) {
-                    canvasStream.addTrack(audioTracks[0]);
-                }
-
-                // Check supported formats
-                const options = { mimeType: 'video/webm;codecs=vp9,opus' };
-                if (!MediaRecorder.isTypeSupported(options.mimeType)) {
-                    options.mimeType = 'video/webm;codecs=vp8,opus';
-                    if (!MediaRecorder.isTypeSupported(options.mimeType)) {
-                        options.mimeType = 'video/webm';
-                    }
-                }
-
-                mediaRecorder = new MediaRecorder(canvasStream, options);
-
-                mediaRecorder.ondataavailable = (event) => {
-                    if (event.data.size > 0) {
-                        recordedChunks.push(event.data);
-                    }
-                };
-
-                mediaRecorder.onstop = () => {
-                    const blob = new Blob(recordedChunks, { type: options.mimeType });
-                    if (lastBlobUrl) URL.revokeObjectURL(lastBlobUrl);
-                    lastBlobUrl = URL.createObjectURL(blob);
-                    
-                    // Show download button
-                    downloadBtn.classList.remove('hidden');
-                    
-                    // Auto-trigger download
-                    triggerDownload(lastBlobUrl);
-                };
-
-                mediaRecorder.start();
-                isRecording = true;
-                
-                // Update UI
-                recordInner.classList.remove('rounded-full');
-                recordInner.classList.add('rounded-md'); // Square stop button shape
-                recordingIndicator.classList.remove('hidden');
-                switchCamBtn.classList.add('hidden'); // Hide cam switch while recording
-                downloadBtn.classList.add('hidden');
-                
-                // Timer
-                recordingStartTime = Date.now();
-                recordingTimeEl.innerText = "00:00";
-                recordingInterval = setInterval(() => {
-                    const seconds = Math.floor((Date.now() - recordingStartTime) / 1000);
-                    recordingTimeEl.innerText = formatTime(seconds);
-                }, 1000);
-            }
-        }
-
-        function triggerDownload(url) {
-            const a = document.createElement('a');
-            a.style.display = 'none';
-            a.href = url;
-            a.download = `MV_Take_${Date.now()}.webm`;
-            document.body.appendChild(a);
-            a.click();
-            setTimeout(() => {
-                document.body.removeChild(a);
-            }, 100);
-        }
-
-        recordBtn.addEventListener('click', toggleRecording);
         
-        downloadBtn.addEventListener('click', () => {
-            if (lastBlobUrl) triggerDownload(lastBlobUrl);
-        });
+        // Set active
+        const activeEl = document.getElementById(`step-${steps[stepIndex]}`);
+        if(activeEl) {
+            activeEl.classList.remove('cycle-inactive');
+            activeEl.classList.add('cycle-active');
+            if(descEl) descEl.innerText = descriptions[stepIndex];
+        }
+        
+        stepIndex = (stepIndex + 1) % steps.length;
+    }
+}
 
-    </script>
+function stopCycleAnimation() {
+    if (animationInterval) {
+        clearInterval(animationInterval);
+        animationInterval = null;
+    }
+    const descEl = document.getElementById('cycle-description');
+    if(descEl) descEl.innerText = "Simulation paused.";
+    
+    ['fetch', 'decode', 'execute'].forEach(s => {
+        const el = document.getElementById(`step-${s}`);
+        if(el) {
+            el.classList.remove('cycle-active');
+            el.classList.add('cycle-inactive');
+        }
+    });
+}
+
+// --- Quiz Logic ---
+function renderQuiz() {
+    const container = document.getElementById('quiz-container');
+    container.innerHTML = '';
+    
+    quizQuestions.forEach((q, qIndex) => {
+        const qDiv = document.createElement('div');
+        qDiv.className = 'bg-white p-6 rounded-xl border border-gray-200 shadow-sm';
+        
+        const qTitle = document.createElement('h3');
+        qTitle.className = 'font-bold text-gray-900 mb-4';
+        qTitle.innerText = `${qIndex + 1}. ${q.q}`;
+        qDiv.appendChild(qTitle);
+        
+        const optionsDiv = document.createElement('div');
+        optionsDiv.className = 'space-y-2';
+        
+        q.options.forEach((opt, optIndex) => {
+            const label = document.createElement('label');
+            const isSelected = userAnswers[qIndex] === optIndex;
+            label.className = `block p-3 rounded-lg border cursor-pointer transition-colors flex items-center gap-3 ${isSelected ? 'bg-brand-50 border-brand-500' : 'bg-gray-50 border-gray-200 hover:bg-gray-100'}`;
+            
+            label.innerHTML = `
+                <input type="radio" name="q${qIndex}" value="${optIndex}" class="w-4 h-4 text-brand-600 focus:ring-brand-500" ${isSelected ? 'checked' : ''} onchange="selectAnswer(${qIndex}, ${optIndex})">
+                <span class="text-gray-700">${opt}</span>
+            `;
+            optionsDiv.appendChild(label);
+        });
+        
+        qDiv.appendChild(optionsDiv);
+        container.appendChild(qDiv);
+    });
+    
+    const submitBtn = document.createElement('button');
+    submitBtn.innerText = 'Submit Answers';
+    submitBtn.className = 'w-full py-3 mt-4 bg-brand-600 text-white rounded-lg hover:bg-brand-700 font-bold transition-colors';
+    submitBtn.onclick = evaluateQuiz;
+    container.appendChild(submitBtn);
+}
+
+// Attach to global window to allow inline onclick firing
+window.selectAnswer = function(qIndex, optIndex) {
+    userAnswers[qIndex] = optIndex;
+    renderQuiz(); // re-render to update UI selection states
+}
+
+function evaluateQuiz() {
+    // Check if all answered
+    if (userAnswers.includes(null)) {
+        // Find custom UI way instead of alert
+        const btn = document.querySelector('#quiz-container button');
+        const oldText = btn.innerText;
+        btn.innerText = "Please answer all questions!";
+        btn.classList.replace('bg-brand-600', 'bg-red-500');
+        setTimeout(() => {
+            btn.innerText = oldText;
+            btn.classList.replace('bg-red-500', 'bg-brand-600');
+        }, 2000);
+        return;
+    }
+    
+    let score = 0;
+    userAnswers.forEach((ans, index) => {
+        if (ans === quizQuestions[index].answer) {
+            score++;
+        }
+    });
+    
+    document.getElementById('quiz-container').style.display = 'none';
+    const resultsDiv = document.getElementById('quiz-results');
+    resultsDiv.style.display = 'block';
+    resultsDiv.classList.add('fade-in');
+    
+    document.getElementById('score-display').innerText = `${score} / ${quizQuestions.length}`;
+}
+
+window.resetCourse = function() {
+    userAnswers.fill(null);
+    loadModule(0);
+}
+
+// --- Event Listeners ---
+function setupEventListeners() {
+    prevBtn.addEventListener('click', () => {
+        if (currentModuleIndex > 0) loadModule(currentModuleIndex - 1);
+    });
+    
+    nextBtn.addEventListener('click', () => {
+        if (currentModuleIndex < courseModules.length - 1) {
+            loadModule(currentModuleIndex + 1);
+        } else {
+            // If on last page, it acts as finish, maybe jump to quiz results if not submitted
+            const quizContainer = document.getElementById('quiz-container');
+            if(quizContainer && quizContainer.style.display !== 'none') {
+                 // highlight submit button
+                 const subBtn = quizContainer.querySelector('button');
+                 if(subBtn) {
+                     subBtn.classList.add('ring-4', 'ring-brand-300');
+                     setTimeout(()=>subBtn.classList.remove('ring-4', 'ring-brand-300'), 1000);
+                 }
+            }
+        }
+    });
+
+    mobileMenuBtn.addEventListener('click', toggleMobileMenu);
+    sidebarOverlay.addEventListener('click', closeMobileMenu);
+}
+
+function toggleMobileMenu() {
+    const isClosed = sidebar.classList.contains('-translate-x-full');
+    if (isClosed) {
+        sidebar.classList.remove('-translate-x-full');
+        sidebarOverlay.classList.remove('hidden');
+    } else {
+        closeMobileMenu();
+    }
+}
+
+function closeMobileMenu() {
+    sidebar.classList.add('-translate-x-full');
+    sidebarOverlay.classList.add('hidden');
+}
+
+// --- Boot ---
+document.addEventListener('DOMContentLoaded', init);
+
+</script>
 </body>
 </html>
