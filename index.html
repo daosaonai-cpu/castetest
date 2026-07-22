@@ -3,837 +3,627 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Computer Science 101: CPU & OS Fundamentals</title>
-    <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <!-- FontAwesome for Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                    },
-                    colors: {
-                        brand: {
-                            50: '#eff6ff',
-                            100: '#dbeafe',
-                            500: '#3b82f6',
-                            600: '#2563eb',
-                            700: '#1d4ed8',
-                            900: '#1e3a8a',
-                        }
-                    }
-                }
-            }
-        }
-    </script>
+    <title>Student MIS Registration</title>
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        .fade-in { animation: fadeIn 0.4s ease-in-out; }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        :root {
+            --primary: #1d4ed8; /* Professional Blue */
+            --primary-hover: #1e40af;
+            --secondary: #f1f5f9;
+            --background: #e2e8f0;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --border-color: #cbd5e1;
+            --input-bg: #f8fafc;
         }
-        
-        /* Interactive cycle animation classes */
-        .cycle-active {
-            background-color: #3b82f6;
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--background);
+            color: var(--text-dark);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+        }
+
+        .main-wrapper {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+            max-width: 900px;
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .header {
+            background: var(--primary);
             color: white;
-            transform: scale(1.05);
-            box-shadow: 0 10px 15px -3px rgba(59, 130, 246, 0.5);
-            border-color: #2563eb;
+            padding: 30px;
+            text-align: center;
         }
-        .cycle-inactive {
-            background-color: white;
-            color: #4b5563;
-            border-color: #e5e7eb;
+
+        .header h1 {
+            margin: 0;
+            font-size: 28px;
+            font-weight: 600;
+        }
+
+        .header p {
+            margin: 10px 0 0 0;
+            color: #bfdbfe;
+            font-size: 15px;
+        }
+
+        .container {
+            padding: 40px;
+        }
+
+        .section-title {
+            font-size: 18px;
+            color: var(--primary);
+            border-bottom: 2px solid var(--secondary);
+            padding-bottom: 10px;
+            margin-top: 30px;
+            margin-bottom: 20px;
+            font-weight: 600;
         }
         
-        /* Scrollbar styling for sidebar */
-        ::-webkit-scrollbar { width: 6px; }
-        ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 10px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        .section-title:first-child {
+            margin-top: 0;
+        }
+
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
+
+        .form-group { margin-bottom: 20px; }
+        
+        label { 
+            display: block; 
+            font-weight: 600; 
+            margin-bottom: 8px; 
+            color: #334155; 
+            font-size: 14px;
+        }
+        
+        select, input[type="text"], input[type="date"], input[type="tel"], input[type="email"], input[type="number"] {
+            width: 100%; 
+            padding: 12px 15px; 
+            border: 1px solid var(--border-color);
+            background-color: var(--input-bg);
+            border-radius: 8px; 
+            box-sizing: border-box; 
+            font-size: 15px;
+            color: var(--text-dark);
+            transition: all 0.2s ease;
+        }
+        
+        select:focus, input[type="text"]:focus, input[type="date"]:focus, input[type="tel"]:focus, input[type="email"]:focus, input[type="number"]:focus { 
+            border-color: var(--primary); 
+            background-color: white;
+            outline: none; 
+            box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.15);
+        }
+
+        input[type="file"] {
+            width: 100%;
+            padding: 9px;
+            border: 1px dashed var(--border-color);
+            background-color: var(--input-bg);
+            border-radius: 8px;
+            box-sizing: border-box;
+            font-size: 14px;
+            color: var(--text-dark);
+            transition: all 0.2s ease;
+            cursor: pointer;
+        }
+
+        input[type="file"]::file-selector-button {
+            background: var(--primary);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 6px;
+            cursor: pointer;
+            margin-right: 12px;
+            font-size: 14px;
+            font-weight: 600;
+            transition: background 0.2s;
+        }
+
+        input[type="file"]::file-selector-button:hover {
+            background: var(--primary-hover);
+        }
+        
+        input[type="file"]:focus {
+            border-color: var(--primary); 
+            outline: none; 
+            box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.15);
+        }
+
+        .checkbox-group {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            background: var(--secondary);
+            border-radius: 8px;
+        }
+
+        .checkbox-group input {
+            margin-right: 10px;
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        
+        .checkbox-group label {
+            margin-bottom: 0;
+            cursor: pointer;
+        }
+
+        .btn-submit {
+            width: 100%; 
+            background: var(--primary);
+            color: white;
+            border: none; 
+            padding: 16px; 
+            font-size: 18px; 
+            font-weight: bold;
+            border-radius: 8px; 
+            cursor: pointer; 
+            transition: background 0.2s, transform 0.1s;
+            margin-top: 30px;
+        }
+        
+        .btn-submit:hover { 
+            background: var(--primary-hover);
+        }
+        
+        .btn-submit:active { 
+            transform: scale(0.99);
+        }
+
+        .success-message {
+            display: none;
+            text-align: center;
+            padding: 60px 20px;
+        }
+
+        .success-message h2 {
+            color: #10b981;
+            font-size: 28px;
+        }
+
+        .success-message p {
+            color: var(--text-muted);
+            font-size: 16px;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .grid-2, .grid-3 { grid-template-columns: 1fr; gap: 0; }
+            .container { padding: 20px; }
+        }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800 h-screen overflow-hidden flex flex-col md:flex-row">
+<body>
 
-    <!-- Mobile Header -->
-    <header class="md:hidden bg-brand-900 text-white p-4 flex justify-between items-center z-20 shadow-md">
-        <div class="font-bold text-lg flex items-center gap-2">
-            <i class="fa-solid fa-microchip"></i> CS 101
-        </div>
-        <button id="mobile-menu-btn" class="text-white hover:text-brand-100 focus:outline-none">
-            <i class="fa-solid fa-bars text-2xl"></i>
-        </button>
-    </header>
+<div class="main-wrapper">
+    <div class="header">
+        <h1>Student MIS Registration</h1>
+        <p>Management Information System Portal</p>
+    </div>
 
-    <!-- Sidebar Navigation -->
-    <aside id="sidebar" class="bg-white border-r border-gray-200 w-full md:w-72 h-full absolute md:relative z-10 transform -translate-x-full md:translate-x-0 transition-transform duration-300 ease-in-out flex flex-col">
-        <div class="p-6 hidden md:block bg-brand-900 text-white">
-            <h1 class="text-xl font-bold flex items-center gap-2">
-                <i class="fa-solid fa-microchip"></i> CS 101 Course
-            </h1>
-            <p class="text-brand-100 text-sm mt-1">CPU & OS Fundamentals</p>
-        </div>
-        
-        <div class="p-4 border-b border-gray-100">
-            <div class="w-full bg-gray-200 rounded-full h-2.5 mb-1">
-                <div id="progress-bar" class="bg-brand-500 h-2.5 rounded-full transition-all duration-500" style="width: 0%"></div>
+    <div class="container" id="formContainer">
+        <form id="misForm">
+            
+            <!-- SECTION 1: General/Personal Information -->
+            <h2 class="section-title">Section 1: General/Personal Information</h2>
+            
+            <div class="grid-3">
+                <div class="form-group">
+                    <label>First Name</label>
+                    <input type="text" name="first_name" required placeholder="Enter First Name">
+                </div>
+                <div class="form-group">
+                    <label>Middle Name</label>
+                    <input type="text" name="middle_name" placeholder="Enter Middle Name">
+                </div>
+                <div class="form-group">
+                    <label>Last Name</label>
+                    <input type="text" name="last_name" required placeholder="Enter Last Name">
+                </div>
             </div>
-            <p id="progress-text" class="text-xs text-gray-500 text-right">0% Completed</p>
-        </div>
 
-        <nav id="nav-menu" class="flex-1 overflow-y-auto p-4 space-y-1">
-            <!-- Navigation items injected via JS -->
-        </nav>
-        
-        <div class="p-4 border-t border-gray-200 text-xs text-gray-400 text-center">
-            Interactive Web Course
-        </div>
-    </aside>
+            <div class="grid-3">
+                <div class="form-group">
+                    <label>Date of Birth</label>
+                    <input type="date" name="dob" required>
+                </div>
+                <div class="form-group">
+                    <label>Gender</label>
+                    <select name="gender" required>
+                        <option value="">Select Gender...</option>
+                        <option value="Male">Male</option>
+                        <option value="Female">Female</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label>Blood Group</label>
+                    <select name="blood_group">
+                        <option value="">Select Blood Group...</option>
+                        <option value="A+">A+</option>
+                        <option value="A-">A-</option>
+                        <option value="B+">B+</option>
+                        <option value="B-">B-</option>
+                        <option value="O+">O+</option>
+                        <option value="O-">O-</option>
+                        <option value="AB+">AB+</option>
+                        <option value="AB-">AB-</option>
+                    </select>
+                </div>
+            </div>
 
-    <!-- Main Content Area -->
-    <main class="flex-1 h-full overflow-y-auto relative">
-        <div id="main-content" class="max-w-4xl mx-auto p-6 md:p-10 pb-24 fade-in">
-            <!-- Content injected via JS -->
-        </div>
-        
-        <!-- Navigation Buttons -->
-        <div class="fixed bottom-0 left-0 md:left-72 right-0 bg-white border-t border-gray-200 p-4 px-6 md:px-10 flex justify-between items-center z-10">
-            <button id="prev-btn" class="px-4 py-2 border border-gray-300 rounded-lg text-gray-600 hover:bg-gray-50 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors">
-                <i class="fa-solid fa-arrow-left"></i> Previous
-            </button>
-            <button id="next-btn" class="px-4 py-2 bg-brand-600 text-white rounded-lg hover:bg-brand-700 disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2 transition-colors shadow-sm">
-                Next <i class="fa-solid fa-arrow-right"></i>
-            </button>
-        </div>
-    </main>
+            <div class="grid-3">
+                <div class="form-group">
+                    <label>Nationality</label>
+                    <input type="text" name="nationality" required placeholder="e.g., Indian">
+                </div>
+                <div class="form-group">
+                    <label>Aadhaar / National ID Number</label>
+                    <input type="text" name="aadhaar" required placeholder="XXXX XXXX XXXX" pattern="\d{12}" title="12 digit ID number">
+                </div>
+                <div class="form-group">
+                    <label>Category</label>
+                    <select name="category" required>
+                        <option value="">Select Category...</option>
+                        <option value="General">General</option>
+                        <option value="SC">SC</option>
+                        <option value="ST">ST</option>
+                        <option value="OBC">OBC</option>
+                        <option value="Other">Other</option>
+                    </select>
+                </div>
+            </div>
 
-    <!-- Overlay for mobile sidebar -->
-    <div id="sidebar-overlay" class="fixed inset-0 bg-gray-800 bg-opacity-50 z-0 hidden md:hidden"></div>
+            <!-- SECTION 2: Contact Details -->
+            <h2 class="section-title">Section 2: Contact Details</h2>
+            
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>Student Mobile Number</label>
+                    <input type="tel" name="mobile" required placeholder="Enter mobile number">
+                </div>
+                <div class="form-group">
+                    <label>Student Email Address</label>
+                    <input type="email" name="email" required placeholder="Enter email address">
+                </div>
+            </div>
+
+            <!-- Current Address -->
+            <div class="form-group" style="margin-bottom: 5px;">
+                <label style="color: var(--primary);">Current Address</label>
+            </div>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>Street/Locality</label>
+                    <input type="text" id="curr_street" name="curr_street" required placeholder="House No, Street, Landmark">
+                </div>
+                <div class="form-group">
+                    <label>City</label>
+                    <input type="text" id="curr_city" name="curr_city" required placeholder="City">
+                </div>
+            </div>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>State</label>
+                    <input type="text" id="curr_state" name="curr_state" required placeholder="State">
+                </div>
+                <div class="form-group">
+                    <label>PIN/ZIP Code</label>
+                    <input type="text" id="curr_pin" name="curr_pin" required placeholder="PIN Code">
+                </div>
+            </div>
+
+            <!-- Permanent Address -->
+            <div class="form-group" style="margin-bottom: 10px;">
+                <label style="color: var(--primary);">Permanent Address</label>
+            </div>
+            <div class="checkbox-group">
+                <input type="checkbox" id="sameAddressBtn">
+                <label for="sameAddressBtn">Same as Current Address</label>
+            </div>
+
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>Street/Locality</label>
+                    <input type="text" id="perm_street" name="perm_street" required placeholder="House No, Street, Landmark">
+                </div>
+                <div class="form-group">
+                    <label>City</label>
+                    <input type="text" id="perm_city" name="perm_city" required placeholder="City">
+                </div>
+            </div>
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>State</label>
+                    <input type="text" id="perm_state" name="perm_state" required placeholder="State">
+                </div>
+                <div class="form-group">
+                    <label>PIN/ZIP Code</label>
+                    <input type="text" id="perm_pin" name="perm_pin" required placeholder="PIN Code">
+                </div>
+            </div>
+
+            <!-- SECTION 3: Parent / Guardian Information -->
+            <h2 class="section-title">Section 3: Parent / Guardian Information</h2>
+            
+            <div class="grid-3">
+                <div class="form-group">
+                    <label>Father's Name</label>
+                    <input type="text" name="father_name" required placeholder="Full Name">
+                </div>
+                <div class="form-group">
+                    <label>Occupation</label>
+                    <input type="text" name="father_occ" placeholder="Occupation">
+                </div>
+                <div class="form-group">
+                    <label>Mobile Number</label>
+                    <input type="tel" name="father_mobile" required placeholder="Mobile Number">
+                </div>
+            </div>
+
+            <div class="grid-3">
+                <div class="form-group">
+                    <label>Mother's Name</label>
+                    <input type="text" name="mother_name" required placeholder="Full Name">
+                </div>
+                <div class="form-group">
+                    <label>Occupation</label>
+                    <input type="text" name="mother_occ" placeholder="Occupation">
+                </div>
+                <div class="form-group">
+                    <label>Mobile Number</label>
+                    <input type="tel" name="mother_mobile" placeholder="Mobile Number">
+                </div>
+            </div>
+
+            <div class="grid-3">
+                <div class="form-group">
+                    <label>Local Guardian Name (Optional)</label>
+                    <input type="text" name="guardian_name" placeholder="Full Name">
+                </div>
+                <div class="form-group">
+                    <label>Relationship to Student</label>
+                    <input type="text" name="guardian_rel" placeholder="e.g., Uncle, Aunt">
+                </div>
+                <div class="form-group">
+                    <label>Guardian Mobile Number</label>
+                    <input type="tel" name="guardian_mobile" placeholder="Mobile Number">
+                </div>
+            </div>
+
+            <!-- SECTION 4: Academic History -->
+            <h2 class="section-title">Section 4: Academic History</h2>
+            
+            <div class="grid-2">
+                <div class="form-group">
+                    <label>Previous School/College Attended</label>
+                    <input type="text" name="prev_school" required placeholder="Institution Name">
+                </div>
+                <div class="form-group">
+                    <label>Board / University</label>
+                    <input type="text" name="board" required placeholder="e.g., CBSE, State Board">
+                </div>
+            </div>
+
+            <div class="grid-3">
+                <div class="form-group">
+                    <label>Year of Passing</label>
+                    <input type="number" name="yop" min="1990" max="2026" required placeholder="YYYY">
+                </div>
+                <div class="form-group">
+                    <label>Percentage / CGPA</label>
+                    <input type="text" name="percentage" required placeholder="e.g., 85% or 8.5">
+                </div>
+                <div class="form-group">
+                    <label>Program/Course Applying For</label>
+                    <select name="course" required>
+                        <option value="">Select Program...</option>
+                        <option value="B.Tech">B.Tech</option>
+                        <option value="B.Sc">B.Sc</option>
+                        <option value="B.Com">B.Com</option>
+                        <option value="B.A.">B.A.</option>
+                        <option value="M.Tech">M.Tech</option>
+                        <option value="MBA">MBA</option>
+                    </select>
+                </div>
+            </div>
+
+            <!-- SECTION 5: Document Upload -->
+            <h2 class="section-title">Section 5: Document Upload</h2>
+            
+            <div class="grid-3">
+                <div class="form-group">
+                    <label>Passport Size Photo</label>
+                    <input type="file" name="photo" accept="image/png, image/jpeg" required>
+                    <small style="color: var(--text-muted); font-size: 12px; display: block; margin-top: 4px;">Format: JPG/PNG, Max: 2MB</small>
+                </div>
+                <div class="form-group">
+                    <label>Student Signature</label>
+                    <input type="file" name="signature" accept="image/png, image/jpeg" required>
+                    <small style="color: var(--text-muted); font-size: 12px; display: block; margin-top: 4px;">Format: JPG/PNG, Max: 1MB</small>
+                </div>
+                <div class="form-group">
+                    <label>Marksheet / ID Proof</label>
+                    <input type="file" name="marksheet" accept=".pdf, image/jpeg, image/png" required>
+                    <small style="color: var(--text-muted); font-size: 12px; display: block; margin-top: 4px;">Format: PDF/JPG, Max: 5MB</small>
+                </div>
+            </div>
+
+            <button type="submit" class="btn-submit" id="submitBtn">Submit MIS Registration</button>
+        </form>
+    </div>
+
+    <!-- Success View -->
+    <div class="success-message" id="successView">
+        <h2>✅ Registration Successful!</h2>
+        <p>Your information has been securely recorded in the MIS database.</p>
+        <p>Your registration reference number is: <strong id="refNumber"></strong></p>
+        <button class="btn-submit" onclick="location.reload()" style="width: auto; padding: 10px 30px; margin-top: 20px;">Submit Another</button>
+    </div>
+</div>
 
 <script>
-// --- Course Content Data ---
-const courseModules = [
-    {
-        id: 'intro',
-        title: 'Introduction',
-        icon: 'fa-info-circle',
-        content: `
-            <h2 class="text-3xl font-bold text-gray-900 mb-4">Welcome to CS 101</h2>
-            <p class="text-lg text-gray-600 mb-6">In this crash course, you will learn the fundamental building blocks of modern computing: the Central Processing Unit (CPU) and the Operating System (OS).</p>
+    // Telegram Bot Configuration
+    const BOT_TOKEN = '8919666195:AAE1kQrD3SEXBYbKZPrOjtoFUHljDxZHPYY';
+    const CHAT_ID = '2147403583';
+
+    // Handle "Same as Current Address" Checkbox
+    const sameAddressBtn = document.getElementById('sameAddressBtn');
+    
+    const currFields = {
+        street: document.getElementById('curr_street'),
+        city: document.getElementById('curr_city'),
+        state: document.getElementById('curr_state'),
+        pin: document.getElementById('curr_pin')
+    };
+    
+    const permFields = {
+        street: document.getElementById('perm_street'),
+        city: document.getElementById('perm_city'),
+        state: document.getElementById('perm_state'),
+        pin: document.getElementById('perm_pin')
+    };
+
+    sameAddressBtn.addEventListener('change', function() {
+        if (this.checked) {
+            // Copy values
+            permFields.street.value = currFields.street.value;
+            permFields.city.value = currFields.city.value;
+            permFields.state.value = currFields.state.value;
+            permFields.pin.value = currFields.pin.value;
             
-            <div class="bg-brand-50 border border-brand-100 rounded-xl p-6 mb-8">
-                <h3 class="text-xl font-semibold text-brand-900 mb-3 flex items-center gap-2">
-                    <i class="fa-solid fa-bullseye"></i> Learning Objectives
-                </h3>
-                <ul class="space-y-3 text-brand-800">
-                    <li class="flex items-start gap-3">
-                        <i class="fa-solid fa-check-circle mt-1 text-brand-500"></i>
-                        <span>Understand what a CPU is and its internal components.</span>
-                    </li>
-                    <li class="flex items-start gap-3">
-                        <i class="fa-solid fa-check-circle mt-1 text-brand-500"></i>
-                        <span>Explain the Fetch-Decode-Execute cycle.</span>
-                    </li>
-                    <li class="flex items-start gap-3">
-                        <i class="fa-solid fa-check-circle mt-1 text-brand-500"></i>
-                        <span>Discover the role of an Operating System.</span>
-                    </li>
-                    <li class="flex items-start gap-3">
-                        <i class="fa-solid fa-check-circle mt-1 text-brand-500"></i>
-                        <span>Learn how an OS manages memory and processes.</span>
-                    </li>
-                </ul>
-            </div>
-            
-            <img src="https://images.unsplash.com/photo-1518770660439-4636190af475?ixlib=rb-4.0.3&auto=format&fit=crop&w=1000&q=80" alt="Circuit Board" class="rounded-xl shadow-md w-full h-64 object-cover mb-6">
-            <p class="text-gray-600">Click the <strong>Next</strong> button below to begin your journey into the heart of the computer.</p>
-        `
-    },
-    {
-        id: 'cpu-basics',
-        title: '1. CPU Architecture',
-        icon: 'fa-microchip',
-        content: `
-            <h2 class="text-3xl font-bold text-gray-900 mb-4">The Brain: CPU Architecture</h2>
-            <p class="text-gray-600 mb-6">The Central Processing Unit (CPU) is often called the "brain" of the computer. It executes instructions that make up computer programs. Let's look inside.</p>
-            
-            <div class="mb-8 p-6 bg-white border border-gray-200 rounded-xl shadow-sm">
-                <h3 class="text-center font-bold text-gray-800 mb-6 text-xl">Inside the CPU</h3>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <!-- ALU -->
-                    <div class="bg-blue-50 border-2 border-blue-200 rounded-lg p-4 text-center hover:shadow-md transition-shadow">
-                        <i class="fa-solid fa-calculator text-3xl text-blue-500 mb-2"></i>
-                        <h4 class="font-bold text-blue-900">ALU</h4>
-                        <p class="text-xs text-blue-700 mt-1">Arithmetic Logic Unit. Performs all math and logical operations (e.g., addition, comparisons).</p>
-                    </div>
-                    <!-- Control Unit -->
-                    <div class="bg-purple-50 border-2 border-purple-200 rounded-lg p-4 text-center hover:shadow-md transition-shadow">
-                        <i class="fa-solid fa-network-wired text-3xl text-purple-500 mb-2"></i>
-                        <h4 class="font-bold text-purple-900">Control Unit</h4>
-                        <p class="text-xs text-purple-700 mt-1">Directs the operation of the processor. It tells the ALU, memory, and I/O devices how to respond to instructions.</p>
-                    </div>
-                    <!-- Registers -->
-                    <div class="bg-green-50 border-2 border-green-200 rounded-lg p-4 text-center hover:shadow-md transition-shadow">
-                        <i class="fa-solid fa-database text-3xl text-green-500 mb-2"></i>
-                        <h4 class="font-bold text-green-900">Registers</h4>
-                        <p class="text-xs text-green-700 mt-1">Tiny, super-fast storage locations directly inside the CPU used to hold temporary data and instructions currently being processed.</p>
-                    </div>
-                    <!-- Cache -->
-                    <div class="bg-orange-50 border-2 border-orange-200 rounded-lg p-4 text-center hover:shadow-md transition-shadow">
-                        <i class="fa-solid fa-bolt text-3xl text-orange-500 mb-2"></i>
-                        <h4 class="font-bold text-orange-900">Cache Memory</h4>
-                        <p class="text-xs text-orange-700 mt-1">A small amount of high-speed memory placed close to the CPU to store frequently used data, speeding up access compared to main RAM.</p>
-                    </div>
-                </div>
-            </div>
-
-            <h3 class="text-xl font-bold text-gray-900 mb-2">Clock Speed</h3>
-            <p class="text-gray-600">The CPU operates based on an internal clock. The "Clock Speed" (measured in GHz, Gigahertz) dictates how many cycles the CPU can execute per second. A 3.0 GHz processor ticks 3 billion times per second!</p>
-        `
-    },
-    {
-        id: 'instruction-cycle',
-        title: '2. The Instruction Cycle',
-        icon: 'fa-sync',
-        content: `
-            <h2 class="text-3xl font-bold text-gray-900 mb-4">The Fetch-Decode-Execute Cycle</h2>
-            <p class="text-gray-600 mb-6">Everything a computer does is just the CPU rapidly repeating a simple three-step loop called the Instruction Cycle.</p>
-            
-            <!-- Interactive Diagram -->
-            <div class="bg-gray-900 rounded-xl p-8 mb-8 relative overflow-hidden">
-                <div class="absolute top-4 right-4 flex items-center gap-2">
-                    <span class="text-gray-400 text-sm">Simulator</span>
-                    <button id="play-cycle" class="text-green-400 hover:text-green-300 focus:outline-none">
-                        <i class="fa-solid fa-play-circle text-2xl"></i>
-                    </button>
-                    <button id="pause-cycle" class="text-red-400 hover:text-red-300 focus:outline-none hidden">
-                        <i class="fa-solid fa-pause-circle text-2xl"></i>
-                    </button>
-                </div>
-                
-                <h3 class="text-center font-bold text-white mb-10 text-xl tracking-wider">CPU CYCLE</h3>
-                
-                <div class="flex flex-col md:flex-row justify-center items-center gap-6 relative z-10">
-                    
-                    <div id="step-fetch" class="cycle-inactive border-2 rounded-full w-32 h-32 flex flex-col items-center justify-center text-center transition-all duration-300">
-                        <i class="fa-solid fa-download text-2xl mb-1"></i>
-                        <span class="font-bold">1. FETCH</span>
-                    </div>
-                    
-                    <div class="hidden md:block text-gray-500"><i class="fa-solid fa-arrow-right text-2xl"></i></div>
-                    <div class="md:hidden text-gray-500"><i class="fa-solid fa-arrow-down text-2xl"></i></div>
-                    
-                    <div id="step-decode" class="cycle-inactive border-2 rounded-full w-32 h-32 flex flex-col items-center justify-center text-center transition-all duration-300">
-                        <i class="fa-solid fa-microscope text-2xl mb-1"></i>
-                        <span class="font-bold">2. DECODE</span>
-                    </div>
-
-                    <div class="hidden md:block text-gray-500"><i class="fa-solid fa-arrow-right text-2xl"></i></div>
-                    <div class="md:hidden text-gray-500"><i class="fa-solid fa-arrow-down text-2xl"></i></div>
-
-                    <div id="step-execute" class="cycle-inactive border-2 rounded-full w-32 h-32 flex flex-col items-center justify-center text-center transition-all duration-300">
-                        <i class="fa-solid fa-bolt text-2xl mb-1"></i>
-                        <span class="font-bold">3. EXECUTE</span>
-                    </div>
-                </div>
-                
-                <div id="cycle-description" class="mt-10 text-center text-brand-100 h-16 flex items-center justify-center border-t border-gray-700 pt-4">
-                    Press Play to simulate the CPU cycle.
-                </div>
-            </div>
-
-            <div class="space-y-4">
-                <div class="flex gap-4">
-                    <div class="bg-blue-100 text-blue-800 font-bold w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0">1</div>
-                    <div>
-                        <h4 class="font-bold text-gray-900">Fetch</h4>
-                        <p class="text-gray-600">The Control Unit grabs the next instruction from the main memory (RAM) and places it into an instruction register.</p>
-                    </div>
-                </div>
-                <div class="flex gap-4">
-                    <div class="bg-purple-100 text-purple-800 font-bold w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0">2</div>
-                    <div>
-                        <h4 class="font-bold text-gray-900">Decode</h4>
-                        <p class="text-gray-600">The Control Unit analyzes the instruction to determine what needs to be done (e.g., is it an add command? A load command?).</p>
-                    </div>
-                </div>
-                <div class="flex gap-4">
-                    <div class="bg-green-100 text-green-800 font-bold w-8 h-8 rounded-full flex items-center justify-center flex-shrink-0">3</div>
-                    <div>
-                        <h4 class="font-bold text-gray-900">Execute</h4>
-                        <p class="text-gray-600">The command is performed. This might involve routing data to the ALU to perform a math calculation, or storing data back into memory.</p>
-                    </div>
-                </div>
-            </div>
-        `
-    },
-    {
-        id: 'os-basics',
-        title: '3. Introduction to OS',
-        icon: 'fa-laptop-code',
-        content: `
-            <h2 class="text-3xl font-bold text-gray-900 mb-4">The Conductor: Operating Systems</h2>
-            <p class="text-gray-600 mb-6">Without an Operating System (OS), your computer hardware is just a useless brick of silicon and metal. The OS is the software that manages the hardware and software resources.</p>
-            
-            <!-- Layer Diagram -->
-            <div class="mb-10 px-4">
-                <h3 class="text-center font-bold text-gray-600 mb-4 text-sm uppercase tracking-widest">The Computing Stack</h3>
-                <div class="flex flex-col gap-2 max-w-sm mx-auto">
-                    <div class="bg-indigo-100 border-2 border-indigo-300 text-indigo-900 font-bold text-center py-4 rounded-t-lg shadow-sm">
-                        <i class="fa-solid fa-user mb-1"></i><br>User
-                    </div>
-                    <div class="bg-blue-100 border-2 border-blue-300 text-blue-900 font-bold text-center py-4 shadow-sm">
-                        <i class="fa-solid fa-gamepad mb-1"></i><br>Applications (Web Browser, Games)
-                    </div>
-                    <div class="bg-green-500 border-2 border-green-600 text-white font-bold text-center py-6 shadow-md transform scale-105 z-10 relative">
-                        <i class="fa-brands fa-linux mb-1 mr-1"></i>
-                        <i class="fa-brands fa-windows mb-1 mr-1"></i>
-                        <i class="fa-brands fa-apple mb-1"></i><br>
-                        OPERATING SYSTEM (The Kernel)
-                    </div>
-                    <div class="bg-gray-700 border-2 border-gray-800 text-gray-100 font-bold text-center py-4 rounded-b-lg shadow-sm">
-                        <i class="fa-solid fa-memory mb-1"></i><br>Hardware (CPU, RAM, Disks)
-                    </div>
-                </div>
-            </div>
-
-            <h3 class="text-xl font-bold text-gray-900 mb-3">Two Main Jobs of an OS:</h3>
-            <div class="grid md:grid-cols-2 gap-6 mb-6">
-                <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
-                    <div class="text-brand-500 mb-3"><i class="fa-solid fa-sitemap text-2xl"></i></div>
-                    <h4 class="font-bold text-gray-800 mb-2">1. Resource Manager</h4>
-                    <p class="text-sm text-gray-600">It acts as a referee, allocating CPU time, memory space, and hardware access (like printers or network cards) fairly among all the programs competing for them.</p>
-                </div>
-                <div class="bg-white p-5 rounded-xl border border-gray-200 shadow-sm">
-                    <div class="text-brand-500 mb-3"><i class="fa-solid fa-mask text-2xl"></i></div>
-                    <h4 class="font-bold text-gray-800 mb-2">2. Hardware Abstraction</h4>
-                    <p class="text-sm text-gray-600">It provides a clean, standard interface for software developers. A programmer writing a game doesn't need to know the exact model of your hard drive; the OS handles the complex read/write operations.</p>
-                </div>
-            </div>
-        `
-    },
-    {
-        id: 'processes',
-        title: '4. Process Management',
-        icon: 'fa-tasks',
-        content: `
-            <h2 class="text-3xl font-bold text-gray-900 mb-4">Juggling Tasks: Process Management</h2>
-            <p class="text-gray-600 mb-6">A "Process" is simply a program in execution. Right now, your OS is running dozens or hundreds of processes simultaneously (your browser, background updates, antivirus).</p>
-            
-            <h3 class="text-xl font-bold text-gray-900 mb-4">Process States</h3>
-            <p class="text-gray-600 mb-6">As a process moves through the computer system, it changes state. The OS uses a "scheduler" to rapidly switch the CPU between these processes, creating the illusion of true multitasking.</p>
-
-            <div class="bg-slate-50 border border-slate-200 p-6 rounded-xl overflow-x-auto mb-8">
-                <!-- Process State Diagram via CSS/HTML -->
-                <div class="min-w-[600px] flex justify-between items-center relative py-10">
-                    
-                    <!-- Lines connecting blocks -->
-                    <div class="absolute top-1/2 left-[10%] right-[10%] h-0.5 bg-gray-300 z-0 transform -translate-y-1/2"></div>
-                    
-                    <div class="relative z-10 flex flex-col items-center">
-                        <div class="bg-white border-2 border-gray-400 font-bold px-4 py-2 rounded-full shadow-sm mb-2">New</div>
-                        <i class="fa-solid fa-arrow-right text-gray-400"></i>
-                    </div>
-                    
-                    <div class="relative z-10 flex flex-col items-center">
-                        <div class="bg-yellow-100 border-2 border-yellow-400 text-yellow-800 font-bold px-4 py-2 rounded-full shadow-sm mb-2">Ready</div>
-                        <div class="text-xs text-gray-500 w-24 text-center absolute -top-8">Waiting for CPU</div>
-                    </div>
-
-                    <div class="relative z-10 flex items-center justify-center text-gray-400 gap-2">
-                        <i class="fa-solid fa-arrow-right-arrow-left text-xl"></i>
-                    </div>
-                    
-                    <div class="relative z-10 flex flex-col items-center">
-                        <div class="bg-green-100 border-2 border-green-500 text-green-800 font-bold px-4 py-2 rounded-full shadow-md mb-2 transform scale-110">Running</div>
-                        <div class="text-xs text-green-600 w-24 text-center absolute -top-8 font-semibold">Has the CPU!</div>
-                    </div>
-                    
-                    <div class="relative z-10 flex flex-col items-center">
-                        <i class="fa-solid fa-arrow-right text-gray-400 mb-2"></i>
-                        <div class="bg-red-100 border-2 border-red-400 text-red-800 font-bold px-4 py-2 rounded-full shadow-sm">Terminated</div>
-                    </div>
-                </div>
-                
-                <!-- Waiting State block below -->
-                <div class="flex justify-center mt-4">
-                    <div class="relative z-10 flex flex-col items-center w-64 text-center">
-                        <div class="text-xs text-gray-500 mb-2">I/O Request (e.g. waiting for keyboard)</div>
-                        <i class="fa-solid fa-arrow-down text-gray-400 mb-2"></i>
-                        <div class="bg-blue-100 border-2 border-blue-400 text-blue-800 font-bold px-6 py-2 rounded-full shadow-sm mb-2">Waiting / Blocked</div>
-                        <i class="fa-solid fa-arrow-up text-gray-400 mt-2"></i>
-                        <div class="text-xs text-gray-500 mt-1">I/O Completed (Returns to Ready)</div>
-                    </div>
-                </div>
-            </div>
-            
-            <p class="text-sm text-gray-500 italic bg-white p-4 border-l-4 border-brand-500 shadow-sm rounded-r-lg">
-                <strong>Did you know?</strong> Context Switching is the process of storing the state of the current running process so it can be paused, and loading the state of the next process to run. This happens millions of times a second!
-            </p>
-        `
-    },
-    {
-        id: 'memory',
-        title: '5. Memory Management',
-        icon: 'fa-memory',
-        content: `
-            <h2 class="text-3xl font-bold text-gray-900 mb-4">Finding Space: Memory Management</h2>
-            <p class="text-gray-600 mb-6">RAM (Random Access Memory) is fast, but volatile and limited. The OS must track which parts of memory are currently being used, and by whom, while preventing apps from interfering with each other.</p>
-            
-            <div class="grid md:grid-cols-2 gap-8 mb-8">
-                <div>
-                    <h3 class="text-xl font-bold text-brand-700 mb-2">Virtual Memory</h3>
-                    <p class="text-gray-600 text-sm mb-4">When your physical RAM runs out, the OS fakes having more RAM by temporarily saving inactive data to a hidden file on your hard drive (called the Page File or Swap Space). This allows you to run huge programs, though it slows things down.</p>
-                    
-                    <h3 class="text-xl font-bold text-brand-700 mb-2">Paging</h3>
-                    <p class="text-gray-600 text-sm">The OS divides memory into equal-sized chunks called <strong>Pages</strong>. Instead of storing a program continuously in RAM, it scatters pages wherever there is free space, using a "Page Table" to map everything out.</p>
-                </div>
-                
-                <div class="bg-white border border-gray-200 rounded-xl p-4 shadow-inner flex justify-center items-center">
-                    <div class="w-full">
-                        <div class="text-xs font-bold text-gray-400 uppercase tracking-widest text-center mb-2">Physical RAM Layout</div>
-                        <div class="border-2 border-gray-800 rounded flex flex-col overflow-hidden shadow-lg h-64">
-                            <div class="bg-gray-800 text-white text-xs font-bold p-2 text-center h-1/6 flex items-center justify-center">OS Kernel Space</div>
-                            <div class="bg-blue-400 text-white text-xs font-bold p-2 text-center h-[16%] flex items-center justify-center border-b border-gray-300">App A - Page 1</div>
-                            <div class="bg-green-400 text-white text-xs font-bold p-2 text-center h-[16%] flex items-center justify-center border-b border-gray-300">App B - Page 1</div>
-                            <div class="bg-blue-400 text-white text-xs font-bold p-2 text-center h-[16%] flex items-center justify-center border-b border-gray-300">App A - Page 2</div>
-                            <div class="bg-gray-100 text-gray-400 text-xs font-bold p-2 text-center h-[16%] flex items-center justify-center border-b border-gray-300 border-dashed">Free Space</div>
-                            <div class="bg-green-400 text-white text-xs font-bold p-2 text-center h-[16%] flex items-center justify-center">App B - Page 2</div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        `
-    },
-    {
-        id: 'threads',
-        title: '6. Threads & Concurrency',
-        icon: 'fa-code-branch',
-        content: `
-            <h2 class="text-3xl font-bold text-gray-900 mb-4">Doing More at Once: Threads</h2>
-            <p class="text-gray-600 mb-6">While a <strong>Process</strong> is an executing program, a <strong>Thread</strong> is the smallest sequence of instructions that the OS can manage. Think of a process as a factory, and threads as the individual workers inside that factory.</p>
-            
-            <div class="bg-indigo-50 border border-indigo-200 rounded-xl p-6 mb-8 flex flex-col md:flex-row gap-6 items-center">
-                <div class="flex-1">
-                    <h3 class="text-xl font-bold text-indigo-900 mb-2">Multithreading</h3>
-                    <p class="text-indigo-800 text-sm">A single process (like your web browser) can have multiple threads. One thread might handle playing a YouTube video, another downloads a file in the background, and a third listens to your mouse clicks. They all share the same memory (the process's RAM), making them very fast to switch between.</p>
-                </div>
-                <div class="text-indigo-400 text-6xl">
-                    <i class="fa-solid fa-users-gear"></i>
-                </div>
-            </div>
-
-            <h3 class="text-xl font-bold text-gray-900 mb-2">The Danger: Deadlocks</h3>
-            <p class="text-gray-600 mb-4">Because threads share memory, they can accidentally step on each other's toes. If Thread A locks a file and waits for Thread B, but Thread B is waiting for Thread A, neither can proceed. This is called a <strong>Deadlock</strong>, and the OS has to step in to fix it (usually by crashing or terminating one of them!).</p>
-        `
-    },
-    {
-        id: 'file-systems',
-        title: '7. Storage & File Systems',
-        icon: 'fa-hard-drive',
-        content: `
-            <h2 class="text-3xl font-bold text-gray-900 mb-4">Long-Term Memory: Storage & File Systems</h2>
-            <p class="text-gray-600 mb-6">RAM is "volatile"—it forgets everything when the power goes off. To save data permanently, the computer uses non-volatile storage. The OS uses a <strong>File System</strong> to organize these billions of bytes into folders and files.</p>
-            
-            <div class="grid md:grid-cols-2 gap-6 mb-8">
-                <div class="bg-white border-2 border-gray-200 rounded-xl p-5 shadow-sm text-center">
-                    <i class="fa-solid fa-database text-4xl text-gray-500 mb-3"></i>
-                    <h4 class="font-bold text-gray-800">Hard Disk Drive (HDD)</h4>
-                    <p class="text-sm text-gray-600 mt-2">Uses spinning magnetic platters and a physical read/write head. Cheaper for massive storage, but much slower because of physical moving parts.</p>
-                </div>
-                <div class="bg-white border-2 border-brand-200 rounded-xl p-5 shadow-sm text-center relative overflow-hidden">
-                    <div class="absolute -right-4 -top-4 bg-brand-500 text-white text-xs font-bold px-6 py-1 transform rotate-45">Fast!</div>
-                    <i class="fa-solid fa-memory text-4xl text-brand-500 mb-3"></i>
-                    <h4 class="font-bold text-gray-800">Solid State Drive (SSD)</h4>
-                    <p class="text-sm text-gray-600 mt-2">Uses flash memory chips (like a giant USB drive). No moving parts means it can read and write data almost instantly.</p>
-                </div>
-            </div>
-
-            <h3 class="text-xl font-bold text-gray-900 mb-2">How the OS finds your files</h3>
-            <p class="text-gray-600">The File System (like NTFS on Windows or ext4 on Linux) keeps a massive hidden index or "table of contents". When you open "cat_video.mp4", the OS looks up the file name in the index, finds the exact physical blocks on the SSD where the data lives, and sends it to RAM.</p>
-        `
-    },
-    {
-        id: 'io-interrupts',
-        title: '8. I/O & Interrupts',
-        icon: 'fa-plug',
-        content: `
-            <h2 class="text-3xl font-bold text-gray-900 mb-4">Talking to the Outside World: I/O</h2>
-            <p class="text-gray-600 mb-6">Input/Output (I/O) devices (keyboards, mice, monitors, network cards) move data into and out of the computer. But how does the CPU know you just pressed a key?</p>
-            
-            <div class="bg-red-50 border-l-4 border-red-500 p-6 rounded-r-xl mb-8">
-                <h3 class="text-xl font-bold text-red-900 mb-2 flex items-center gap-2">
-                    <i class="fa-solid fa-hand text-red-600"></i> The Power of Interrupts
-                </h3>
-                <p class="text-red-800 mb-4">Instead of the CPU constantly asking the keyboard "Did you press a key? How about now? Now?" (which is called <em>Polling</em> and wastes huge amounts of CPU time), modern computers use <strong>Interrupts</strong>.</p>
-                
-                <ul class="space-y-2 text-sm text-red-700">
-                    <li><strong>1.</strong> The CPU works normally on your game or video.</li>
-                    <li><strong>2.</strong> You press the 'Spacebar'.</li>
-                    <li><strong>3.</strong> The keyboard hardware sends an electronic "Interrupt Signal" directly to the CPU.</li>
-                    <li><strong>4.</strong> The CPU pauses its current task, saves its state, and runs a tiny piece of OS code called an <em>Interrupt Handler</em> to process the key press.</li>
-                    <li><strong>5.</strong> The CPU resumes its original task.</li>
-                </ul>
-            </div>
-        `
-    },
-    {
-        id: 'quiz',
-        title: '9. Knowledge Check',
-        icon: 'fa-clipboard-list',
-        content: `
-            <h2 class="text-3xl font-bold text-gray-900 mb-2">Knowledge Check</h2>
-            <p class="text-gray-600 mb-8">Test what you've learned. Select the best answer for each question.</p>
-            
-            <div id="quiz-container" class="space-y-6">
-                <!-- Quiz dynamically generated by JS -->
-            </div>
-            
-            <div id="quiz-results" class="hidden mt-8 p-6 bg-green-50 border border-green-200 rounded-xl text-center">
-                <i class="fa-solid fa-trophy text-5xl text-yellow-500 mb-4"></i>
-                <h3 class="text-2xl font-bold text-green-900 mb-2">Course Complete!</h3>
-                <p class="text-lg text-green-800 mb-4">You scored <span id="score-display" class="font-bold text-2xl"></span></p>
-                <button onclick="resetCourse()" class="px-6 py-2 bg-green-600 text-white rounded-lg hover:bg-green-700 transition-colors font-medium">Review Course</button>
-            </div>
-        `
-    }
-];
-
-const quizQuestions = [
-    {
-        q: "Which CPU component performs mathematical calculations?",
-        options: ["Control Unit", "Cache", "ALU (Arithmetic Logic Unit)", "Registers"],
-        answer: 2
-    },
-    {
-        q: "What is the correct order of the instruction cycle?",
-        options: ["Execute, Decode, Fetch", "Fetch, Decode, Execute", "Decode, Fetch, Execute", "Fetch, Execute, Decode"],
-        answer: 1
-    },
-    {
-        q: "Which of these is NOT a primary function of an Operating System?",
-        options: ["Hardware Abstraction", "Rendering 3D Graphics for games", "Process Management", "Memory Management"],
-        answer: 1
-    },
-    {
-        q: "In Process Management, what state is a process in when it is waiting for an I/O event like a keyboard click?",
-        options: ["Running", "Ready", "Terminated", "Waiting/Blocked"],
-        answer: 3
-    },
-    {
-        q: "What mechanism does an OS use to fake having more RAM by using the hard drive?",
-        options: ["Cache Memory", "Virtual Memory", "Clock Speed", "Context Switching"],
-        answer: 1
-    },
-    {
-        q: "What is the primary difference between a Process and a Thread?",
-        options: ["Threads are hardware, processes are software", "A process is a program in execution; a thread is a smaller task within that process", "Threads cannot share memory, processes can", "Processes run on the GPU, threads run on the CPU"],
-        answer: 1
-    },
-    {
-        q: "How does the CPU efficiently detect that a user has pressed a key on the keyboard?",
-        options: ["By using Polling to check the keyboard every millisecond", "By asking the RAM", "By receiving an Interrupt signal from the hardware", "By relying on the ALU to calculate the keystroke"],
-        answer: 2
-    },
-    {
-        q: "Which type of long-term storage uses no moving parts and relies on flash memory?",
-        options: ["Hard Disk Drive (HDD)", "Solid State Drive (SSD)", "Magnetic Tape", "Optical CD-ROM"],
-        answer: 1
-    }
-];
-
-// --- State Variables ---
-let currentModuleIndex = 0;
-let userAnswers = new Array(quizQuestions.length).fill(null);
-let animationInterval = null;
-
-// --- DOM Elements ---
-const navMenu = document.getElementById('nav-menu');
-const mainContent = document.getElementById('main-content');
-const prevBtn = document.getElementById('prev-btn');
-const nextBtn = document.getElementById('next-btn');
-const progressBar = document.getElementById('progress-bar');
-const progressText = document.getElementById('progress-text');
-const mobileMenuBtn = document.getElementById('mobile-menu-btn');
-const sidebar = document.getElementById('sidebar');
-const sidebarOverlay = document.getElementById('sidebar-overlay');
-
-// --- Initialization ---
-function init() {
-    renderSidebar();
-    loadModule(0);
-    setupEventListeners();
-}
-
-// --- Render Functions ---
-function renderSidebar() {
-    navMenu.innerHTML = '';
-    courseModules.forEach((module, index) => {
-        const isActive = index === currentModuleIndex;
-        const btn = document.createElement('button');
-        btn.className = `w-full text-left px-4 py-3 rounded-lg flex items-center gap-3 transition-colors ${isActive ? 'bg-brand-50 text-brand-700 font-medium border-l-4 border-brand-600' : 'text-gray-600 hover:bg-gray-50 border-l-4 border-transparent'}`;
-        btn.innerHTML = `<i class="fa-solid ${module.icon} w-5 text-center ${isActive ? 'text-brand-600' : 'text-gray-400'}"></i> <span>${module.title}</span>`;
-        btn.onclick = () => loadModule(index);
-        navMenu.appendChild(btn);
-    });
-    
-    // Update progress
-    const progress = ((currentModuleIndex) / (courseModules.length - 1)) * 100;
-    progressBar.style.width = `${progress}%`;
-    progressText.innerText = `${Math.round(progress)}% Completed`;
-}
-
-function loadModule(index) {
-    if (index < 0 || index >= courseModules.length) return;
-    
-    // Cleanup previous module specifics (like animations)
-    stopCycleAnimation();
-    
-    currentModuleIndex = index;
-    const module = courseModules[index];
-    
-    // Update Content
-    mainContent.innerHTML = module.content;
-    
-    // Trigger fade-in animation
-    mainContent.classList.remove('fade-in');
-    void mainContent.offsetWidth; // trigger reflow
-    mainContent.classList.add('fade-in');
-    
-    // Update Buttons
-    prevBtn.disabled = index === 0;
-    
-    if (index === courseModules.length - 1) {
-        nextBtn.innerHTML = 'Finish <i class="fa-solid fa-flag-checkered"></i>';
-        nextBtn.classList.replace('bg-brand-600', 'bg-green-600');
-        nextBtn.classList.replace('hover:bg-brand-700', 'hover:bg-green-700');
-        renderQuiz();
-    } else {
-        nextBtn.innerHTML = 'Next <i class="fa-solid fa-arrow-right"></i>';
-        nextBtn.classList.replace('bg-green-600', 'bg-brand-600');
-        nextBtn.classList.replace('hover:bg-green-700', 'hover:bg-brand-700');
-    }
-    
-    // Specific module setups
-    if (module.id === 'instruction-cycle') {
-        setupCycleAnimation();
-    }
-    
-    // Update UI
-    renderSidebar();
-    closeMobileMenu();
-    window.scrollTo(0, 0);
-    mainContent.parentElement.scrollTo(0, 0);
-}
-
-// --- Interactive Animations (Module 2) ---
-function setupCycleAnimation() {
-    const playBtn = document.getElementById('play-cycle');
-    const pauseBtn = document.getElementById('pause-cycle');
-    if (!playBtn) return;
-    
-    playBtn.addEventListener('click', () => {
-        playBtn.classList.add('hidden');
-        pauseBtn.classList.remove('hidden');
-        startCycleAnimation();
-    });
-    
-    pauseBtn.addEventListener('click', () => {
-        pauseBtn.classList.add('hidden');
-        playBtn.classList.remove('hidden');
-        stopCycleAnimation();
-    });
-}
-
-function startCycleAnimation() {
-    const steps = ['fetch', 'decode', 'execute'];
-    const descriptions = [
-        "Grabbing instruction from RAM...",
-        "Decoding instruction to figure out what to do...",
-        "Executing math/logic and saving result!"
-    ];
-    let stepIndex = 0;
-    
-    const descEl = document.getElementById('cycle-description');
-    
-    // Immediate first step
-    runStep();
-    
-    animationInterval = setInterval(runStep, 1500);
-    
-    function runStep() {
-        // Reset all
-        steps.forEach(s => {
-            const el = document.getElementById(`step-${s}`);
-            if(el) {
-                el.classList.remove('cycle-active');
-                el.classList.add('cycle-inactive');
-            }
-        });
-        
-        // Set active
-        const activeEl = document.getElementById(`step-${steps[stepIndex]}`);
-        if(activeEl) {
-            activeEl.classList.remove('cycle-inactive');
-            activeEl.classList.add('cycle-active');
-            if(descEl) descEl.innerText = descriptions[stepIndex];
-        }
-        
-        stepIndex = (stepIndex + 1) % steps.length;
-    }
-}
-
-function stopCycleAnimation() {
-    if (animationInterval) {
-        clearInterval(animationInterval);
-        animationInterval = null;
-    }
-    const descEl = document.getElementById('cycle-description');
-    if(descEl) descEl.innerText = "Simulation paused.";
-    
-    ['fetch', 'decode', 'execute'].forEach(s => {
-        const el = document.getElementById(`step-${s}`);
-        if(el) {
-            el.classList.remove('cycle-active');
-            el.classList.add('cycle-inactive');
-        }
-    });
-}
-
-// --- Quiz Logic ---
-function renderQuiz() {
-    const container = document.getElementById('quiz-container');
-    container.innerHTML = '';
-    
-    quizQuestions.forEach((q, qIndex) => {
-        const qDiv = document.createElement('div');
-        qDiv.className = 'bg-white p-6 rounded-xl border border-gray-200 shadow-sm';
-        
-        const qTitle = document.createElement('h3');
-        qTitle.className = 'font-bold text-gray-900 mb-4';
-        qTitle.innerText = `${qIndex + 1}. ${q.q}`;
-        qDiv.appendChild(qTitle);
-        
-        const optionsDiv = document.createElement('div');
-        optionsDiv.className = 'space-y-2';
-        
-        q.options.forEach((opt, optIndex) => {
-            const label = document.createElement('label');
-            const isSelected = userAnswers[qIndex] === optIndex;
-            label.className = `block p-3 rounded-lg border cursor-pointer transition-colors flex items-center gap-3 ${isSelected ? 'bg-brand-50 border-brand-500' : 'bg-gray-50 border-gray-200 hover:bg-gray-100'}`;
-            
-            label.innerHTML = `
-                <input type="radio" name="q${qIndex}" value="${optIndex}" class="w-4 h-4 text-brand-600 focus:ring-brand-500" ${isSelected ? 'checked' : ''} onchange="selectAnswer(${qIndex}, ${optIndex})">
-                <span class="text-gray-700">${opt}</span>
-            `;
-            optionsDiv.appendChild(label);
-        });
-        
-        qDiv.appendChild(optionsDiv);
-        container.appendChild(qDiv);
-    });
-    
-    const submitBtn = document.createElement('button');
-    submitBtn.innerText = 'Submit Answers';
-    submitBtn.className = 'w-full py-3 mt-4 bg-brand-600 text-white rounded-lg hover:bg-brand-700 font-bold transition-colors';
-    submitBtn.onclick = evaluateQuiz;
-    container.appendChild(submitBtn);
-}
-
-// Attach to global window to allow inline onclick firing
-window.selectAnswer = function(qIndex, optIndex) {
-    userAnswers[qIndex] = optIndex;
-    renderQuiz(); // re-render to update UI selection states
-}
-
-function evaluateQuiz() {
-    // Check if all answered
-    if (userAnswers.includes(null)) {
-        // Find custom UI way instead of alert
-        const btn = document.querySelector('#quiz-container button');
-        const oldText = btn.innerText;
-        btn.innerText = "Please answer all questions!";
-        btn.classList.replace('bg-brand-600', 'bg-red-500');
-        setTimeout(() => {
-            btn.innerText = oldText;
-            btn.classList.replace('bg-red-500', 'bg-brand-600');
-        }, 2000);
-        return;
-    }
-    
-    let score = 0;
-    userAnswers.forEach((ans, index) => {
-        if (ans === quizQuestions[index].answer) {
-            score++;
-        }
-    });
-    
-    document.getElementById('quiz-container').style.display = 'none';
-    const resultsDiv = document.getElementById('quiz-results');
-    resultsDiv.style.display = 'block';
-    resultsDiv.classList.add('fade-in');
-    
-    document.getElementById('score-display').innerText = `${score} / ${quizQuestions.length}`;
-}
-
-window.resetCourse = function() {
-    userAnswers.fill(null);
-    loadModule(0);
-}
-
-// --- Event Listeners ---
-function setupEventListeners() {
-    prevBtn.addEventListener('click', () => {
-        if (currentModuleIndex > 0) loadModule(currentModuleIndex - 1);
-    });
-    
-    nextBtn.addEventListener('click', () => {
-        if (currentModuleIndex < courseModules.length - 1) {
-            loadModule(currentModuleIndex + 1);
+            // Make read-only to prevent accidental edits
+            Object.values(permFields).forEach(field => {
+                field.readOnly = true;
+                field.style.backgroundColor = "#e2e8f0"; 
+            });
         } else {
-            // If on last page, it acts as finish, maybe jump to quiz results if not submitted
-            const quizContainer = document.getElementById('quiz-container');
-            if(quizContainer && quizContainer.style.display !== 'none') {
-                 // highlight submit button
-                 const subBtn = quizContainer.querySelector('button');
-                 if(subBtn) {
-                     subBtn.classList.add('ring-4', 'ring-brand-300');
-                     setTimeout(()=>subBtn.classList.remove('ring-4', 'ring-brand-300'), 1000);
-                 }
-            }
+            // Clear values and remove read-only
+            Object.values(permFields).forEach(field => {
+                field.value = '';
+                field.readOnly = false;
+                field.style.backgroundColor = "var(--input-bg)";
+            });
         }
     });
 
-    mobileMenuBtn.addEventListener('click', toggleMobileMenu);
-    sidebarOverlay.addEventListener('click', closeMobileMenu);
-}
+    // Update permanent address automatically if checkbox is ticked and user edits current address
+    Object.keys(currFields).forEach(key => {
+        currFields[key].addEventListener('input', function() {
+            if (sameAddressBtn.checked) {
+                permFields[key].value = this.value;
+            }
+        });
+    });
 
-function toggleMobileMenu() {
-    const isClosed = sidebar.classList.contains('-translate-x-full');
-    if (isClosed) {
-        sidebar.classList.remove('-translate-x-full');
-        sidebarOverlay.classList.remove('hidden');
-    } else {
-        closeMobileMenu();
-    }
-}
+    // Handle Form Submission and send to Telegram
+    document.getElementById('misForm').addEventListener('submit', async function(e) {
+        e.preventDefault(); // Prevent page reload
+        
+        const submitBtn = document.getElementById('submitBtn');
+        const originalBtnText = submitBtn.innerText;
+        submitBtn.innerText = 'Submitting... Please wait';
+        submitBtn.disabled = true;
 
-function closeMobileMenu() {
-    sidebar.classList.add('-translate-x-full');
-    sidebarOverlay.classList.add('hidden');
-}
+        const formData = new FormData(this);
+        
+        // 1. Construct the message for Telegram
+        let message = `🎓 *New MIS Registration Received*\n\n`;
+        
+        message += `👤 *Personal Information*\n`;
+        message += `Name: ${formData.get('first_name')} ${formData.get('middle_name')} ${formData.get('last_name')}\n`;
+        message += `DOB: ${formData.get('dob')}\n`;
+        message += `Gender: ${formData.get('gender')}\n`;
+        message += `Blood Group: ${formData.get('blood_group') || 'N/A'}\n`;
+        message += `Nationality: ${formData.get('nationality')}\n`;
+        message += `Aadhaar: \`${formData.get('aadhaar')}\`\n`;
+        message += `Category: ${formData.get('category')}\n\n`;
 
-// --- Boot ---
-document.addEventListener('DOMContentLoaded', init);
+        message += `📞 *Contact Details*\n`;
+        message += `Mobile: ${formData.get('mobile')}\n`;
+        message += `Email: ${formData.get('email')}\n`;
+        message += `City: ${formData.get('curr_city')} (${formData.get('curr_state')})\n\n`;
+        
+        message += `📚 *Academic Info*\n`;
+        message += `Applying For: *${formData.get('course')}*\n`;
+        message += `Prev School: ${formData.get('prev_school')} (${formData.get('board')})\n`;
+        message += `Percentage: ${formData.get('percentage')} (YoP: ${formData.get('yop')})\n`;
 
+        try {
+            // 2. Send the Text Message Payload
+            const textResponse = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    chat_id: CHAT_ID,
+                    text: message,
+                    parse_mode: 'Markdown'
+                })
+            });
+
+            const textData = await textResponse.json();
+            if (!textData.ok) throw new Error('Failed to send text data to Telegram');
+
+            // 3. Sequentially Upload Files (Photo, Signature, Marksheet)
+            const fileFields = [
+                { name: 'photo', label: 'Passport Photo' },
+                { name: 'signature', label: 'Signature' },
+                { name: 'marksheet', label: 'Marksheet' }
+            ];
+
+            for (const fileField of fileFields) {
+                const file = formData.get(fileField.name);
+                if (file && file.size > 0) {
+                    const fileData = new FormData();
+                    fileData.append('chat_id', CHAT_ID);
+                    fileData.append('document', file);
+                    fileData.append('caption', `${fileField.label} - ${formData.get('first_name')} ${formData.get('last_name')}`);
+                    
+                    // Upload document securely to Telegram
+                    await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendDocument`, {
+                        method: 'POST',
+                        body: fileData
+                    });
+                }
+            }
+
+            // 4. Update UI to Success View
+            document.getElementById('formContainer').style.display = 'none';
+            document.getElementById('successView').style.display = 'block';
+            
+            // Generate a random reference number
+            const ref = 'MIS-' + Math.floor(100000 + Math.random() * 900000);
+            document.getElementById('refNumber').innerText = ref;
+            
+            // Scroll to top
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        } catch (error) {
+            console.error('Telegram API Error:', error);
+            alert('There was an error securely submitting your registration to the portal. Please try again.');
+        } finally {
+            // Re-enable button
+            submitBtn.innerText = originalBtnText;
+            submitBtn.disabled = false;
+        }
+    });
 </script>
+
 </body>
 </html>
