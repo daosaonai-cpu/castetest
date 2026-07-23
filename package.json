@@ -1,0 +1,30 @@
+{
+  "name": "student-mis",
+  "version": "1.0.0",
+  "description": "Student MIS Registration portal — Express + EJS with server-side Telegram delivery",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "keywords": [
+    "student",
+    "mis",
+    "registration",
+    "express",
+    "telegram"
+  ],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "axios": "^1.7.7",
+    "dotenv": "^16.4.5",
+    "ejs": "^3.1.10",
+    "express": "^4.21.0",
+    "form-data": "^4.0.0",
+    "multer": "^2.2.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.4"
+  }
+}
