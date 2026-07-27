@@ -28,7 +28,7 @@
         <!-- Header -->
         <header class="text-center mb-8">
             <h1 class="text-3xl font-bold text-indigo-700 mb-2">NIELIT O-Level (M1-R5)</h1>
-            <p class="text-slate-600 font-medium italic">Unit 2: Introduction to Operating System - MCQ Practice</p>
+            <p class="text-slate-600 font-medium italic">Unit 2: Introduction to Operating System - 100 MCQ Practice</p>
             <div class="mt-4 flex justify-center gap-4">
                 <span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-sm font-semibold border border-indigo-200">
                     Questions: <span id="current-count">0</span> / <span id="total-count">0</span>
@@ -52,7 +52,7 @@
                 </div>
                 <h2 class="text-2xl font-bold mb-4">Ready to test your knowledge?</h2>
                 <p class="text-slate-600 mb-8 max-w-md mx-auto">
-                    This test covers Platform Types, User Interface, System Customization, File Management, and Program/Device settings as per the NIELIT O-Level syllabus.
+                    This comprehensive 100-question test covers Platform Types, User Interface, System Customization, File Management, and Program/Device settings as per the NIELIT O-Level syllabus.
                 </p>
                 <button onclick="startQuiz()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-xl font-bold text-lg shadow-lg transform active:scale-95 transition">
                     Start MCQ Test
@@ -94,7 +94,7 @@
 
     <script>
         const questions = [
-            // Platform & Core Concepts (1-15)
+            // Original Questions (1-25)
             {
                 q: "What is the primary objective of an Operating System?",
                 a: ["To write computer programs", "To make computer hardware easy to use", "To design web pages", "To perform calculation only"],
@@ -125,7 +125,6 @@
                 c: 1,
                 e: "Multi-user OS supports multiple users simultaneously."
             },
-            // UI & Taskbar (16-30)
             {
                 q: "The horizontal bar at the bottom of the Windows desktop is called?",
                 a: ["Status bar", "Scroll bar", "Taskbar", "Menu bar"],
@@ -156,7 +155,6 @@
                 c: 2,
                 e: "Icons are visual representations of objects in a GUI."
             },
-            // File Management (31-50)
             {
                 q: "What is the maximum character limit for a file name in Windows usually?",
                 a: ["255 characters", "100 characters", "8 characters", "512 characters"],
@@ -187,7 +185,6 @@
                 c: 1,
                 e: "It displays the directory path of the folder currently being viewed."
             },
-            // System Settings & Customization (51-70)
             {
                 q: "Which utility is used to change system settings like date, time, and background?",
                 a: ["MS Word", "Control Panel / Settings", "Task Manager", "Disk Cleanup"],
@@ -218,7 +215,6 @@
                 c: 1,
                 e: "This section in settings ensures programs are installed or uninstalled correctly."
             },
-            // Program & Device Management (71-85)
             {
                 q: "Sharing a printer over a network allows:",
                 a: ["Only one user to print", "Multiple users to print on the same hardware", "The printer to work without ink", "The printer to scan automatically"],
@@ -249,36 +245,457 @@
                 c: 1,
                 e: ".zip or .rar are common compression formats."
             },
-            // Advanced & Miscellaneous (86-100)
+
+            // Study Guide Added Questions (26-100)
             {
-                q: "Which OS is based on the Linux kernel?",
-                a: ["Windows 11", "Android", "MS-DOS", "MacOS"],
+                q: "What is the primary system software that manages computer hardware and software resources?",
+                a: ["Application Software", "Operating System", "Firmware", "Utility Programs"],
                 c: 1,
-                e: "Android is built on top of the Linux kernel."
+                e: "An Operating System (OS) is the primary system software that manages computer hardware, software resources, and provides common services for computer programs[cite: 1]."
             },
             {
-                q: "The first screen that appears after the computer is booted is the:",
-                a: ["Application window", "Desktop", "Taskbar", "Control Panel"],
-                c: 1,
-                e: "The Desktop is the main workspace of the OS."
-            },
-            {
-                q: "Which of the following is a text-based operating system?",
-                a: ["Windows", "MacOS", "MS-DOS", "Android"],
+                q: "Which component of the OS operates at a low level and directly interacts with the hardware?",
+                a: ["The Shell", "The Desktop", "The Kernel", "The User Interface"],
                 c: 2,
-                e: "MS-DOS is a Command Line Interface (CLI) based OS."
+                e: "The Kernel is the core component of the OS that operates at a low level, directly interacting with the hardware[cite: 1]."
             },
             {
-                q: "A shortcut is represented by which visual marker on the icon?",
-                a: ["A small red cross", "A small arrow", "A bold border", "A yellow star"],
-                c: 1,
-                e: "Shortcut icons usually have a small curved arrow in the bottom-left corner."
+                q: "What acts as the interface between the user and the kernel?",
+                a: ["The Shell", "The CPU", "The RAM", "The Bootloader"],
+                c: 0,
+                e: "The Shell is the interface between the user and the kernel, interpreting user commands[cite: 1]."
             },
             {
-                q: "What is the shortcut for 'Rename' a selected file?",
-                a: ["F1", "F2", "F3", "F4"],
+                q: "How does the shell translate user commands for the kernel?",
+                a: ["Via hardware interrupts", "Via system calls", "Via network protocols", "Via memory leaks"],
                 c: 1,
-                e: "F2 is commonly used to rename files or folders in Windows."
+                e: "The shell interprets user commands and translates them into system calls that the kernel can understand[cite: 1]."
+            },
+            {
+                q: "Which OS function is responsible for allocating CPU time to different processes?",
+                a: ["File Management", "Security", "Device Management", "Process Management"],
+                c: 3,
+                e: "Process Management allocates CPU time to different processes, ensuring smooth multitasking[cite: 1]."
+            },
+            {
+                q: "When physical RAM is exhausted, what does the OS utilize to keep applications running?",
+                a: ["Virtual memory", "CMOS memory", "Flash storage", "L1 Cache"],
+                c: 0,
+                e: "Memory Management involves utilizing virtual memory when physical RAM is exhausted[cite: 1]."
+            },
+            {
+                q: "Which function maintains file system integrity and organizes data into directories?",
+                a: ["Memory Management", "File Management", "Device Management", "Process Management"],
+                c: 1,
+                e: "File Management organizes data into files and directories, manages storage space, and maintains file system integrity[cite: 1]."
+            },
+            {
+                q: "What does the OS use to facilitate communication between peripheral devices and the system?",
+                a: ["System calls", "Network cables", "Device Drivers", "Kernel extensions"],
+                c: 2,
+                e: "Device Management facilitates communication between peripheral devices and the system via drivers[cite: 1]."
+            },
+            {
+                q: "Enforcing passwords and data encryption falls under which OS function?",
+                a: ["Process Management", "Security and Access Control", "Device Management", "File Management"],
+                c: 1,
+                e: "Security and Access Control involves enforcing user permissions, passwords, and data encryption[cite: 1]."
+            },
+            {
+                q: "Without an OS, what would every application need to do?",
+                a: ["Run entirely in the cloud", "Write its own UI and low-level hardware code", "Bypass the CPU", "Use only external storage"],
+                c: 1,
+                e: "Without an OS, every application would need its own UI and code to handle low-level hardware operations like disk writing[cite: 1]."
+            },
+            {
+                q: "Which Operating System dominates the PC market and is highly compatible with commercial software?",
+                a: ["macOS", "Linux", "Microsoft Windows", "Unix"],
+                c: 2,
+                e: "Microsoft Windows dominates the PC market and is highly compatible with commercial software and gaming[cite: 1]."
+            },
+            {
+                q: "What is the underlying architecture of Microsoft Windows?",
+                a: ["Linux Kernel", "Darwin Kernel", "Windows NT Kernel", "Unix"],
+                c: 2,
+                e: "Microsoft Windows is based on the proprietary Windows NT Kernel[cite: 1]."
+            },
+            {
+                q: "What is the default file system used by Microsoft Windows?",
+                a: ["ext4", "APFS", "NTFS", "FAT32"],
+                c: 2,
+                e: "The default file system for Microsoft Windows is NTFS[cite: 1]."
+            },
+            {
+                q: "How does Windows store its system configurations?",
+                a: ["In plain text files", "In the Registry", "In the APFS volume", "In the CMOS battery"],
+                c: 1,
+                e: "Microsoft Windows uses a Registry for system configurations[cite: 1]."
+            },
+            {
+                q: "Which Operating System is known for its hardware optimization on Apple Silicon?",
+                a: ["Windows", "Linux", "macOS", "Android"],
+                c: 2,
+                e: "macOS is known for stability, security, and hardware optimization, particularly with Apple Silicon[cite: 1]."
+            },
+            {
+                q: "What is the default file system for macOS?",
+                a: ["NTFS", "APFS", "ext4", "HFS+"],
+                c: 1,
+                e: "The default file system for macOS is APFS[cite: 1]."
+            },
+            {
+                q: "Which of the following is an open-source OS favored by developers and servers?",
+                a: ["macOS", "iOS", "Windows", "Linux"],
+                c: 3,
+                e: "Linux relies on an open-source kernel and is highly customizable, favored by developers and servers[cite: 1]."
+            },
+            {
+                q: "Ubuntu, Debian, and Fedora are distributions of which Operating System?",
+                a: ["Windows", "Linux", "macOS", "Unix"],
+                c: 1,
+                e: "Distributions of Linux include Ubuntu, Debian, and Fedora[cite: 1]."
+            },
+            {
+                q: "What is a common file system used in Linux?",
+                a: ["ext4", "NTFS", "APFS", "exFAT"],
+                c: 0,
+                e: "A common file system used in Linux environments is ext4[cite: 1]."
+            },
+            {
+                q: "Which mobile operating system allows for the side-loading of apps (APKs)?",
+                a: ["iOS", "iPadOS", "Android", "Windows Phone"],
+                c: 2,
+                e: "Android is an open-source ecosystem that allows side-loading of apps via APKs[cite: 1]."
+            },
+            {
+                q: "Android is developed by Google and based on which kernel?",
+                a: ["Windows NT", "Darwin", "Linux Kernel", "Unix"],
+                c: 2,
+                e: "Android is developed by Google and is based on the Linux Kernel[cite: 1]."
+            },
+            {
+                q: "Which mobile OS operates as a closed ecosystem strictly curated via an App Store?",
+                a: ["Android", "Symbian", "iOS/iPadOS", "HarmonyOS"],
+                c: 2,
+                e: "iOS/iPadOS is a closed ecosystem where apps are strictly curated via the App Store[cite: 1]."
+            },
+            {
+                q: "What does a CLI (Command Line Interface) require the user to do?",
+                a: ["Click on icons", "Memorize and type commands", "Use a mouse", "Swipe on a touchscreen"],
+                c: 1,
+                e: "CLI requires typing commands to interact with the OS, meaning users must memorize commands[cite: 1]."
+            },
+            {
+                q: "Which of the following is an example of a Command Line Interface?",
+                a: ["Windows Desktop", "macOS Finder", "Linux Terminal", "iOS Home Screen"],
+                c: 2,
+                e: "Examples of a CLI include MS-DOS, Command Prompt, and the Linux Terminal[cite: 1]."
+            },
+            {
+                q: "What does the WIMP acronym stand for in a Graphical User Interface?",
+                a: ["Windows, Icons, Menus, Pointers", "Web, Internet, Mouse, Protocol", "Windows, Internet, Menus, Pages", "Wireless, Icons, Media, Pointers"],
+                c: 0,
+                e: "GUI uses visual indicators like windows, icons, menus, and pointers (WIMP)[cite: 1]."
+            },
+            {
+                q: "In a GUI workspace, what is considered the 'root workspace'?",
+                a: ["The Taskbar", "The Desktop", "The Control Panel", "The File Explorer"],
+                c: 1,
+                e: "The Desktop is the root workspace, which can contain files, folders, and program shortcuts[cite: 1]."
+            },
+            {
+                q: "Where is the Desktop folder typically located in a Windows file system?",
+                a: ["C:\\Desktop", "C:\\Windows\\Desktop", "C:\\Users\\Username\\Desktop", "D:\\Desktop"],
+                c: 2,
+                e: "The Desktop is visually above the root file system but usually located at C:\\Users\\Username\\Desktop in Windows[cite: 1]."
+            },
+            {
+                q: "Which GUI element serves as the anchor of the desktop experience and houses the Start Button?",
+                a: ["The System Tray", "The Taskbar", "The Quick Launch", "The Desktop"],
+                c: 1,
+                e: "The Taskbar acts as the anchor of the desktop experience[cite: 1]."
+            },
+            {
+                q: "What provides access to all programs, system settings, and power options?",
+                a: ["System Tray", "Quick Launch", "Start Button", "Icons"],
+                c: 2,
+                e: "The Start Button provides access to all programs, system settings, and power options[cite: 1]."
+            },
+            {
+                q: "Which UI element offers single-click access to frequently used software?",
+                a: ["System Tray", "Start Button", "Quick Launch / Pinned Apps", "Background wallpaper"],
+                c: 2,
+                e: "Quick Launch or Pinned Apps provide single-click access to frequently used software[cite: 1]."
+            },
+            {
+                q: "Where does the OS display background processes, network status, and the system clock?",
+                a: ["Start Menu", "System Tray (Notification Area)", "Quick Launch", "Desktop Icons"],
+                c: 1,
+                e: "The System Tray (Notification Area) displays background processes, network status, volume, and the system clock[cite: 1]."
+            },
+            {
+                q: "Which mouse setting is most useful for ergonomic adjustments, such as for left-handed users?",
+                a: ["Scroll Wheel lines", "Pointer Precision", "Button Mapping", "Double-click speed"],
+                c: 2,
+                e: "Button Mapping allows switching left/right functions, which is useful for ergonomic adjustments[cite: 1]."
+            },
+            {
+                q: "What does enabling 'Enhance pointer precision' actually do?",
+                a: ["Increases the laser brightness", "Turns on mouse acceleration", "Slows down the mouse permanently", "Inverts the Y-axis"],
+                c: 1,
+                e: "Enabling 'Enhance pointer precision' turns on mouse acceleration, adjusting cursor distance dynamically based on physical mouse speed[cite: 1]."
+            },
+            {
+                q: "Which setting dictates how many lines of text move per physical click of the mouse?",
+                a: ["Button Mapping", "Enhance Pointer Precision", "Scroll Wheel configuration", "DPI settings"],
+                c: 2,
+                e: "The Scroll Wheel setting determines how many lines of text scroll per physical click[cite: 1]."
+            },
+            {
+                q: "What term describes the absolute number of pixels on a screen (e.g., 3840x2160)?",
+                a: ["Refresh Rate", "Display Scaling", "Resolution", "Aspect Ratio"],
+                c: 2,
+                e: "Resolution is the absolute number of pixels on a display[cite: 1]."
+            },
+            {
+                q: "Because 4K screens can make text unreadable, what OS feature enlarges UI elements without losing sharpness?",
+                a: ["Magnifier tool", "Display Scaling", "Lowering Resolution", "Increasing Refresh Rate"],
+                c: 1,
+                e: "OS Display Scaling (e.g., 125% or 150%) enlarges text and UI elements without losing sharpness on high-resolution displays[cite: 1]."
+            },
+            {
+                q: "What is the Refresh Rate of a monitor measured in?",
+                a: ["Pixels", "Hertz (Hz)", "Megabytes (MB)", "Frames"],
+                c: 1,
+                e: "Refresh Rate is measured in Hertz (Hz)[cite: 1]."
+            },
+            {
+                q: "What does the Refresh Rate determine?",
+                a: ["How many pixels are on the screen", "How fast the mouse moves", "How many times per second the screen updates", "How large the text is"],
+                c: 2,
+                e: "The Refresh Rate determines how many times per second the screen updates[cite: 1]."
+            },
+            {
+                q: "What keeps the system date and time running when the computer is powered off?",
+                a: ["The CPU cache", "The hard drive", "A CMOS battery on the motherboard", "The RAM"],
+                c: 2,
+                e: "The system date/time relies on a CMOS battery on the motherboard to keep time when powered off[cite: 1]."
+            },
+            {
+                q: "What does NTP stand for in the context of synchronizing the OS clock?",
+                a: ["Network Time Protocol", "National Time Program", "Node Transfer Protocol", "New Time Precision"],
+                c: 0,
+                e: "NTP stands for Network Time Protocol, which syncs the OS time with an internet server[cite: 1]."
+            },
+            {
+                q: "Why is a highly accurate system clock crucial for modern web browsing?",
+                a: ["To play videos smoothly", "To maintain cryptographic accuracy required for secure HTTPS", "To download files faster", "To keep the screen from freezing"],
+                c: 1,
+                e: "The OS syncs with an NTP server to maintain the cryptographic accuracy required for secure web browsing via HTTPS[cite: 1]."
+            },
+            {
+                q: "Installing software usually involves writing configurations to which Windows component?",
+                a: ["The CMOS battery", "The BIOS", "The Windows Registry", "The Taskbar"],
+                c: 2,
+                e: "Installing software unpacks executable files and writes configurations to the OS, such as the Windows Registry[cite: 1]."
+            },
+            {
+                q: "Which of the following are common software installation executable files for Windows?",
+                a: [".dmg and .sh", ".exe and .msi", ".txt and .pdf", ".sys and .dll"],
+                c: 1,
+                e: "Execution of a setup file uses formats like .exe or .msi in Windows[cite: 1]."
+            },
+            {
+                q: "Which file format is commonly used to install software on macOS?",
+                a: [".msi", ".bat", ".dmg", ".apk"],
+                c: 2,
+                e: "The macOS equivalent for a setup file is a .dmg format[cite: 1]."
+            },
+            {
+                q: "Why should users avoid simply deleting an application's folder to remove it?",
+                a: ["It saves too much disk space", "It leaves behind broken registry keys, services, and unlinked shortcuts", "It deletes the entire operating system", "It causes the screen resolution to drop"],
+                c: 1,
+                e: "Deleting the application folder leaves behind broken registry keys, background services, and unlinked shortcuts, leading to system degradation[cite: 1]."
+            },
+            {
+                q: "What is the proper method to remove software from an OS?",
+                a: ["Drag the icon to the Recycle Bin", "Use the built-in 'Add/Remove Programs' feature", "Format the hard drive", "Press Delete on the desktop icon"],
+                c: 1,
+                e: "Users must crucially use the built-in 'Add/Remove Programs' feature for proper uninstallation[cite: 1]."
+            },
+            {
+                q: "What specialized software translates OS document rendering into hardware-specific instructions for printing?",
+                a: ["Spooler", "Compiler", "Printer Driver", "Shell"],
+                c: 2,
+                e: "Printers require drivers—specialized software that translates OS document rendering into hardware-specific instructions[cite: 1]."
+            },
+            {
+                q: "How do local printers typically connect to a computer?",
+                a: ["Via IP address", "Via Ethernet", "Via USB", "Via NTP"],
+                c: 2,
+                e: "Local printers typically connect via USB[cite: 1]."
+            },
+            {
+                q: "How are network printers typically identified on a network?",
+                a: ["By their USB port", "By an assigned IP address", "By their physical size", "By their MAC address only"],
+                c: 1,
+                e: "Network printers connect via Ethernet or Wi-Fi and are assigned an IP address[cite: 1]."
+            },
+            {
+                q: "What is the temporary memory queue that holds print jobs called?",
+                a: ["The Registry", "The Spooler", "The Kernel", "The Driver"],
+                c: 1,
+                e: "When a user prints a document, the OS sends it to a temporary memory queue called a 'Spooler'[cite: 1]."
+            },
+            {
+                q: "What is the primary benefit of print spooling?",
+                a: ["It saves ink", "It prints in higher resolution", "It allows the user to continue working while the printer processes data", "It prevents paper jams"],
+                c: 2,
+                e: "The temporary memory queue (Spooler) allows the user to continue working while the slower printer processes the data[cite: 1]."
+            },
+            {
+                q: "When a computer broadcasts a locally connected USB printer over the LAN, it is acting as a:",
+                a: ["Print Server", "Web Server", "Database Server", "File Server"],
+                c: 0,
+                e: "An OS can act as a print server, broadcasting a locally connected USB printer over the LAN so other computers can use it[cite: 1]."
+            },
+            {
+                q: "Operating Systems manage files using what kind of structure?",
+                a: ["A flat list", "A hierarchical, tree-like structure", "A random arrangement", "A circular web"],
+                c: 1,
+                e: "Operating Systems use hierarchical, tree-like structures to manage files[cite: 1]."
+            },
+            {
+                q: "What is the top-most folder in a file system called?",
+                a: ["The Home Directory", "The Desktop", "The Root Directory", "The System Tray"],
+                c: 2,
+                e: "The top-most folder in a file system is called the Root Directory[cite: 1]."
+            },
+            {
+                q: "How is the root directory represented in Windows?",
+                a: ["/", "~", "C:\\", "/root"],
+                c: 2,
+                e: "In Windows, the root directory is typically represented as C:\\[cite: 1]."
+            },
+            {
+                q: "How is the root directory represented in Linux and macOS?",
+                a: ["C:\\", "/", "D:\\", "//"],
+                c: 1,
+                e: "In Linux/macOS, the root directory is represented by a forward slash (/)[cite: 1]."
+            },
+            {
+                q: "What defines a file's complete location starting from the root directory?",
+                a: ["Relative path", "File extension", "Absolute path", "Metadata"],
+                c: 2,
+                e: "An Absolute Path is the complete string defining a file's location from the root (e.g., C:\\Users\\Admin...)[cite: 1]."
+            },
+            {
+                q: "Which of the following extensions indicates an archived or compressed file?",
+                a: [".bat", ".html", ".dll", ".zip"],
+                c: 3,
+                e: "Extensions like .zip, .rar, and .tar.gz are used for archives and compressed files[cite: 1]."
+            },
+            {
+                q: "What is the purpose of compressing files into formats like .rar or .tar.gz?",
+                a: ["To make them execute faster", "To bundle multiple files into one and reduce file size", "To change their icons", "To upload them to a printer"],
+                c: 1,
+                e: "Archives bundle multiple files into one and reduce file size via compression algorithms[cite: 1]."
+            },
+            {
+                q: "Which of the following extensions indicates a file that contains code the OS will execute?",
+                a: [".txt", ".sh", ".zip", ".sys"],
+                c: 1,
+                e: "Executable/Script extensions like .exe, .bat, .sh, and .msi contain code that the OS executes[cite: 1]."
+            },
+            {
+                q: "Why do executable files pose a high security risk?",
+                a: ["They take up too much RAM", "They can run code if downloaded from untrusted sources", "They cannot be deleted", "They format the hard drive automatically"],
+                c: 1,
+                e: "Executables contain code that the OS executes, posing a high security risk if downloaded from untrusted sources[cite: 1]."
+            },
+            {
+                q: "Files with .html, .css, and .js extensions belong to which category?",
+                a: ["System Files", "Web Technologies", "Executables", "Archives"],
+                c: 1,
+                e: "Files like .html, .css, and .js are categorized as Web Technologies[cite: 1]."
+            },
+            {
+                q: "What software is required to render and display .html and .js files?",
+                a: ["A web browser", "A text editor", "A media player", "A zip extractor"],
+                c: 0,
+                e: "Web Technologies are rendered by web browsers to display and interact with web pages[cite: 1]."
+            },
+            {
+                q: "Which of the following represents a critical OS system file extension?",
+                a: [".mp3", ".sys", ".docx", ".tar"],
+                c: 1,
+                e: "System files use extensions like .sys, .dll, and .ini, which are critical OS files[cite: 1]."
+            },
+            {
+                q: "What does the abbreviation DLL stand for in Windows system files?",
+                a: ["Dynamic Link Library", "Data Logic Layer", "Direct Line Link", "Downloadable Local Logic"],
+                c: 0,
+                e: "DLL stands for Dynamic Link Library[cite: 1]."
+            },
+            {
+                q: "What is the primary function of a .dll file?",
+                a: ["To compress large directories", "To allow multiple programs to share code", "To change the desktop wallpaper", "To execute malicious scripts"],
+                c: 1,
+                e: "A .dll file allows multiple programs to share code efficiently[cite: 1]."
+            },
+            {
+                q: "Creation date, modification date, size, and owner are all examples of a file's:",
+                a: ["Executables", "Metadata", "Registry keys", "System calls"],
+                c: 1,
+                e: "Every file possesses metadata stored by the OS, including creation date, modification date, size, and owner[cite: 1]."
+            },
+            {
+                q: "Which file permission allows a user to open and view the file but not change it?",
+                a: ["Write (W)", "Read (R)", "Execute (X)", "Delete (D)"],
+                c: 1,
+                e: "Read (R) permission dictates that the user can open and view the file[cite: 1]."
+            },
+            {
+                q: "Which file permission allows a user to modify the contents of a file?",
+                a: ["Read (R)", "Write (W)", "Execute (X)", "Archive (A)"],
+                c: 1,
+                e: "Write (W) permission allows the user to modify the contents of the file[cite: 1]."
+            },
+            {
+                q: "Which file permission allows a user to run the file as a program?",
+                a: ["Read (R)", "Write (W)", "Execute (X)", "System (S)"],
+                c: 2,
+                e: "Execute (X) permission means the user can run the file as a program[cite: 1]."
+            },
+            {
+                q: "Which UI paradigm is highly resource-efficient and powerful for scripting?",
+                a: ["WIMP", "GUI", "CLI", "Desktop"],
+                c: 2,
+                e: "The Command Line Interface (CLI) is highly resource-efficient and powerful for scripting[cite: 1]."
+            },
+            {
+                q: "Which OS platform strictly prioritizes user privacy and battery management?",
+                a: ["Android", "Windows", "Linux", "iOS/iPadOS"],
+                c: 3,
+                e: "iOS/iPadOS prioritizes user privacy and battery management[cite: 1]."
+            },
+            {
+                q: "Which of the following accurately describes an Absolute Path?",
+                a: ["C:\\Users\\Admin\\Documents\\report.docx", "Documents\\report.docx", "report.docx", "\\Admin\\report"],
+                c: 0,
+                e: "An Absolute Path is the complete string defining location from the root, such as C:\\Users\\Admin\\Documents\\report.docx[cite: 1]."
+            },
+            {
+                q: "Which Linux kernel-based operating system is characterized by massive hardware variety?",
+                a: ["iOS", "macOS", "Windows NT", "Android"],
+                c: 3,
+                e: "Android is based on the Linux kernel and features a massive hardware variety[cite: 1]."
+            },
+            {
+                q: "What happens if a user bypasses 'Add/Remove Programs' and deletes an application folder manually?",
+                a: ["The application is cleanly uninstalled", "System degradation due to unlinked shortcuts and services", "The OS automatically cleans the registry", "The RAM is permanently damaged"],
+                c: 1,
+                e: "Deleting the folder directly leaves behind broken registry keys and background services, leading to system degradation[cite: 1]."
             }
         ];
 
@@ -286,7 +703,6 @@
         let score = 0;
         let answered = false;
 
-        // Automatically set the total count in the UI based on actual array length
         document.getElementById('total-count').innerText = questions.length;
 
         function startQuiz() {
@@ -314,7 +730,6 @@
             document.getElementById('explanation-box').classList.add('hidden');
             document.getElementById('next-btn').classList.add('hidden');
             
-            // Update Progress
             const progress = ((currentQuestion + 1) / questions.length) * 100;
             document.getElementById('progress-bar').style.width = `${progress}%`;
             answered = false;
@@ -338,7 +753,6 @@
                 btn.querySelector('span:first-child').classList.replace('bg-slate-100', 'bg-rose-500');
                 btn.querySelector('span:first-child').classList.replace('text-slate-500', 'text-white');
                 
-                // Highlight correct one
                 const correctBtn = allBtns[q.c];
                 correctBtn.classList.add('border-emerald-500', 'bg-emerald-50');
             }
