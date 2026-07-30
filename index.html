@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IoT 100 MCQ Quiz & Registration</title>
+    <title>IoT Subjective Exam</title>
     <style>
         body {
             font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
@@ -11,7 +11,7 @@
             color: #333;
             display: flex;
             justify-content: center;
-            align-items: center;
+            align-items: flex-start;
             min-height: 100vh;
             margin: 0;
             padding: 20px;
@@ -22,8 +22,9 @@
             border-radius: 12px;
             box-shadow: 0 8px 24px rgba(0,0,0,0.1);
             width: 100%;
-            max-width: 650px;
+            max-width: 750px;
             padding: 30px;
+            margin-top: 20px;
         }
         h1, h2 {
             text-align: center;
@@ -47,88 +48,91 @@
             font-weight: 600;
             color: #34495e;
         }
-        input, textarea {
+        input[type="text"] {
             width: 100%;
             padding: 12px;
             border: 1px solid #cbd3da;
             border-radius: 6px;
             box-sizing: border-box;
-            font-size: 14px;
-        }
-        
-        /* Quiz Styles */
-        #quiz-area {
-            display: none;
-        }
-        .progress-bar {
-            width: 100%;
-            height: 8px;
-            background: #ecf0f1;
-            border-radius: 4px;
-            margin-bottom: 20px;
-            overflow: hidden;
-        }
-        .progress-fill {
-            height: 100%;
-            background: #3498db;
-            width: 0%;
-            transition: width 0.3s;
-        }
-        .question-number {
-            font-size: 14px;
-            color: #7f8c8d;
-            margin-bottom: 10px;
-            font-weight: 600;
-        }
-        .question-text {
-            font-size: 18px;
-            margin-bottom: 20px;
-            line-height: 1.5;
-            font-weight: 500;
-        }
-        .options {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        .option {
-            padding: 14px 18px;
-            background: #f8f9fa;
-            border: 2px solid #e9ecef;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s ease-in-out;
             font-size: 16px;
         }
-        .option:hover:not(.disabled) {
-            background: #e2e6ea;
-            border-color: #cbd3da;
+        
+        /* Exam Styles */
+        #exam-section {
+            display: none;
         }
-        .option.correct {
-            background: #d4edda;
-            border-color: #28a745;
-            color: #155724;
+        .instructions {
+            background-color: #e8f4fd;
+            border-left: 4px solid #3498db;
+            padding: 15px;
+            margin-bottom: 25px;
+            border-radius: 4px;
+            font-size: 15px;
+            line-height: 1.5;
         }
-        .option.wrong {
-            background: #f8d7da;
-            border-color: #dc3545;
-            color: #721c24;
+        .questions-list {
+            margin-bottom: 30px;
+            padding-left: 20px;
         }
-        .option.disabled {
-            cursor: not-allowed;
+        .questions-list li {
+            margin-bottom: 15px;
+            font-size: 16px;
+            line-height: 1.4;
+            font-weight: 500;
+            color: #2c3e50;
         }
         
+        /* Camera & Upload Area */
+        .action-area {
+            background: #f8f9fa;
+            border: 2px dashed #cbd3da;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        .action-area h3 {
+            margin-top: 0;
+            color: #2c3e50;
+            font-size: 18px;
+        }
+        #video-container {
+            width: 100%;
+            max-width: 400px;
+            margin: 0 auto 15px auto;
+            border-radius: 8px;
+            overflow: hidden;
+            background: #000;
+            display: none;
+        }
+        video, #photo-preview {
+            width: 100%;
+            display: block;
+            border-radius: 8px;
+        }
+        #photo-preview {
+            display: none;
+            max-width: 400px;
+            margin: 0 auto 15px auto;
+            border: 2px solid #28a745;
+        }
+        .action-area input[type="file"] {
+            display: block;
+            margin: 10px auto;
+            font-size: 16px;
+        }
+
         /* Buttons */
         .btn {
             display: block;
             width: 100%;
-            padding: 16px;
-            margin-top: 25px;
+            padding: 14px;
+            margin-top: 10px;
             background: #3498db;
             color: #fff;
             border: none;
             border-radius: 8px;
-            font-size: 18px;
+            font-size: 16px;
             font-weight: bold;
             cursor: pointer;
             transition: background 0.3s;
@@ -140,28 +144,30 @@
             background: #bdc3c7;
             cursor: not-allowed;
         }
+        .btn-secondary {
+            background: #6c757d;
+        }
+        .btn-secondary:hover:not(:disabled) {
+            background: #5a6268;
+        }
 
-        /* Score Area */
-        #score-area {
+        /* Status Messages */
+        #loading-msg {
+            display: none;
+            text-align: center;
+            color: #f39c12;
+            font-weight: bold;
+            margin-top: 15px;
+            font-size: 16px;
+        }
+        #success-section {
             display: none;
             text-align: center;
         }
-        .score-text {
-            font-size: 28px;
-            font-weight: bold;
+        .success-icon {
+            font-size: 50px;
+            color: #28a745;
             margin-bottom: 10px;
-            color: #2c3e50;
-        }
-        .score-feedback {
-            font-size: 18px;
-            color: #7f8c8d;
-            margin-bottom: 30px;
-        }
-        #loading-msg {
-            display: none;
-            color: #f39c12;
-            font-weight: bold;
-            margin-bottom: 15px;
         }
     </style>
 </head>
@@ -171,331 +177,232 @@
     
     <!-- REGISTRATION FORM SECTION -->
     <div id="form-section">
-        <h2>Student Registration</h2>
-        <p style="text-align: center; color: #7f8c8d; margin-bottom: 20px;">Please fill in your details to begin the 100 MCQ IoT Quiz.</p>
-        
-        <div class="form-group"><label>Name</label><input type="text" id="name" required></div>
-        <div class="form-group"><label>Roll No.</label><input type="text" id="roll" required></div>
-        <div class="form-group"><label>Institute Name</label><input type="text" id="institute" required></div>
-        <div class="form-group"><label>Department</label><input type="text" id="department" required></div>
-        <div class="form-group"><label>Semester</label><input type="text" id="semester" required></div>
-        <div class="form-group"><label>State</label><input type="text" id="state" required></div>
-        <div class="form-group"><label>Phone Number</label><input type="tel" id="phone" required></div>
-        <div class="form-group"><label>Address</label><textarea id="address" rows="3" required></textarea></div>
-        
-        <button class="btn" onclick="startQuiz()">Start Quiz</button>
+        <h2>Student Login</h2>
+        <div class="form-group">
+            <label>Full Name</label>
+            <input type="text" id="name" placeholder="Enter your full name" required>
+        </div>
+        <button class="btn" onclick="startExam()">View Questions & Start</button>
     </div>
 
-    <!-- QUIZ SECTION -->
-    <div id="quiz-area">
-        <h1>IoT Master Quiz</h1>
-        <div class="progress-bar">
-            <div class="progress-fill" id="progress"></div>
+    <!-- EXAM SECTION -->
+    <div id="exam-section">
+        <h1>IoT Subjective Examination</h1>
+        
+        <div class="instructions">
+            <strong>Instructions:</strong> Read the questions carefully. Write your answers on a blank sheet of paper. You must take a live photo of yourself and upload your answer sheet before submitting.
         </div>
-        <div class="question-number" id="question-number">Question 1 of 100</div>
-        <div class="question-text" id="question-text">Loading question...</div>
-        <div class="options" id="options-container">
-            <!-- Options injected by JS -->
+
+        <ol class="questions-list">
+            <li>Define the Internet of Things (IoT) and explain its primary architecture.</li>
+            <li>What are the key differences between IoT and traditional M2M (Machine-to-Machine) communication?</li>
+            <li>Discuss the role of sensors and actuators in an IoT ecosystem, providing real-world examples.</li>
+            <li>Explain the concept of Edge Computing and discuss why it is critical for IoT applications.</li>
+            <li>Compare and contrast MQTT and CoAP protocols in the context of IoT data transmission.</li>
+            <li>Describe the primary security challenges and vulnerabilities associated with consumer IoT devices.</li>
+            <li>How is the IPv6 protocol beneficial for the massive expansion of the Internet of Things?</li>
+            <li>Discuss a practical application of IoT in Smart Agriculture and its benefits to farmers.</li>
+            <li>What is a "Digital Twin"? Explain its significance and use cases in the Industrial IoT (IIoT).</li>
+            <li>Explain the role of Cloud Computing in processing, analyzing, and storing massive IoT datasets.</li>
+            <li>Write a short note on Low Power Wide Area Networks (LPWAN) and provide one real-world example of its use.</li>
+            <li>Discuss the data privacy concerns and ethical implications related to wearable IoT health devices.</li>
+            <li>How does IoT contribute to the development of Smart Cities? Provide at least two distinct examples.</li>
+            <li>What are the common power management strategies used to extend the battery life of remote IoT sensors?</li>
+            <li>Briefly explain the future trends of combining IoT with Artificial Intelligence (AIoT).</li>
+        </ol>
+
+        <!-- Live Photo Capture Area -->
+        <div class="action-area">
+            <h3>Step 1: Identity Verification</h3>
+            <p style="font-size: 14px; color: #7f8c8d; margin-top:0;">Please take a clear live photo of yourself.</p>
+            
+            <div id="video-container">
+                <video id="video" autoplay playsinline></video>
+            </div>
+            <img id="photo-preview" alt="Live Photo Preview">
+            <canvas id="canvas" style="display:none;"></canvas>
+            
+            <button class="btn btn-secondary" id="start-cam-btn" onclick="startCamera()">Turn on Camera</button>
+            <button class="btn" id="capture-btn" style="display:none;" onclick="takePhoto()">Capture Photo</button>
+            <button class="btn btn-secondary" id="retake-btn" style="display:none;" onclick="retakePhoto()">Retake Photo</button>
         </div>
-        <button class="btn" id="next-btn" disabled>Next Question</button>
+
+        <!-- File Upload Area -->
+        <div class="action-area">
+            <h3>Step 2: Upload Answer Sheet</h3>
+            <p style="font-size: 14px; color: #7f8c8d; margin-top:0;">Upload a clear image or PDF of your written answers.</p>
+            <input type="file" id="answer-file" accept="image/*,application/pdf">
+        </div>
+
+        <button class="btn" id="submit-btn" onclick="submitExam()" style="background-color: #28a745;">Submit Examination</button>
+        <div id="loading-msg">Uploading data... Please wait and do not close this window.</div>
     </div>
 
-    <!-- SCORE & SUBMISSION SECTION -->
-    <div id="score-area">
-        <h2 id="score-title">Quiz Completed!</h2>
-        <div id="loading-msg">Submitting your results to the server... Please wait.</div>
-        <div class="score-text" id="score-text">You scored 0 out of 100!</div>
-        <div class="score-feedback" id="score-feedback"></div>
+    <!-- SUCCESS SECTION -->
+    <div id="success-section">
+        <div class="success-icon">✔</div>
+        <h2>Submission Successful!</h2>
+        <p style="color: #7f8c8d; font-size: 16px;">Your live photo and answer sheet have been securely submitted.</p>
+        <button class="btn" style="margin-top: 30px;" onclick="window.location.reload()">Return Home</button>
     </div>
 
 </div>
 
 <script>
-    // ---------------------------------------------------------
-    // 1. DATA INITIALIZATION
-    // ---------------------------------------------------------
-    let userData = {};
-    let currentQuestionIndex = 0;
-    let score = 0;
-    let hasAnswered = false;
+    let userName = "";
+    let capturedBlob = null; // Stores the image data
+    let videoStream = null;
 
-    // 100 IoT Questions Array
-    const quizData = [
-        { q: "What does IoT stand for?", o: ["Internet of Technology", "Internet of Things", "Intranet of Things", "Internet of Topology"], a: 1 },
-        { q: "Who coined the term 'Internet of Things'?", o: ["Kevin Ashton", "Tim Berners-Lee", "Vint Cerf", "Elon Musk"], a: 0 },
-        { q: "Which of the following is an essential component of an IoT system?", o: ["Sensors", "Printers", "Monitors", "Keyboards"], a: 0 },
-        { q: "Which protocol is a lightweight messaging protocol commonly used in IoT?", o: ["HTTP", "MQTT", "FTP", "SMTP"], a: 1 },
-        { q: "What does MQTT stand for?", o: ["Message Queue Telemetry Transport", "Multi Queue Transmission Telemetry", "Message Query Time Transport", "Micro Query Telemetry Transmission"], a: 0 },
-        { q: "Which of these is a widely used microcontroller board for IoT prototypes?", o: ["Nvidia RTX", "Arduino", "Intel Core i9", "AMD Ryzen"], a: 1 },
-        { q: "What does CoAP stand for in IoT?", o: ["Constrained Application Protocol", "Computer Application Protocol", "Control and Analytics Protocol", "Centralized Application Process"], a: 0 },
-        { q: "Which wireless technology provides the longest range for IoT devices?", o: ["Bluetooth", "Wi-Fi", "LoRaWAN", "Zigbee"], a: 2 },
-        { q: "What is the primary function of a sensor in IoT?", o: ["Process data", "Store data", "Collect physical data", "Display data"], a: 2 },
-        { q: "What is the primary function of an actuator in IoT?", o: ["Measure temperature", "Convert electrical signals into physical action", "Send emails", "Store cloud data"], a: 1 },
-        { q: "Which topology is heavily used by Zigbee networks?", o: ["Star", "Ring", "Mesh", "Bus"], a: 2 },
-        { q: "Which network layer protocol is standard for the Internet and IoT?", o: ["IPv4/IPv6", "IPX", "AppleTalk", "NetBIOS"], a: 0 },
-        { q: "What is Edge Computing in IoT?", o: ["Computing at the center of the cloud", "Computing near the source of data", "Using old computers", "Cloud storage"], a: 1 },
-        { q: "What does IIoT stand for?", o: ["Internal Internet of Things", "Industrial Internet of Things", "International Internet of Things", "Integrated Internet of Things"], a: 1 },
-        { q: "Which of these is a major security challenge in IoT?", o: ["High power consumption", "Default/weak passwords on devices", "Too many standards", "Fast data speeds"], a: 1 },
-        { q: "What is a 'Gateway' in an IoT architecture?", o: ["A physical door", "A device bridging local IoT networks to the cloud", "A sensor", "A database"], a: 1 },
-        { q: "Which cloud service model is most associated with IoT data storage?", o: ["IaaS", "PaaS", "SaaS", "DBaaS"], a: 1 },
-        { q: "RFID stands for:", o: ["Radio Frequency Identification", "Radio Frequency Internet Device", "Range Frequency ID", "Remote Fast ID"], a: 0 },
-        { q: "Which of the following operates at 2.4 GHz?", o: ["AM Radio", "Bluetooth", "LoRa", "NFC"], a: 1 },
-        { q: "What does API stand for?", o: ["Application Programming Interface", "Automated Program Integration", "Application Protocol Interface", "Automated Protocol Interface"], a: 0 },
-        { q: "Which of the following is NOT an IoT platform?", o: ["AWS IoT Core", "Microsoft Azure IoT", "Google Chrome", "ThingSpeak"], a: 2 },
-        { q: "IPv6 was introduced primarily to solve which problem for IoT?", o: ["Speed", "IP Address Exhaustion", "Security", "Cost"], a: 1 },
-        { q: "Which is an example of a Smart Home IoT device?", o: ["A standard mechanical lock", "A smart thermostat (e.g., Nest)", "A landline telephone", "A gas stove"], a: 1 },
-        { q: "What is the maximum range of standard Bluetooth (Class 2)?", o: ["1 meter", "10 meters", "100 meters", "1000 meters"], a: 1 },
-        { q: "Which communication model involves a broker?", o: ["Request/Response", "Publish/Subscribe", "Push/Pull", "Exclusive Pair"], a: 1 },
-        { q: "In MQTT, devices that send data to the broker are called:", o: ["Subscribers", "Servers", "Publishers", "Clients"], a: 2 },
-        { q: "Which of these is a short-range wireless technology requiring devices to be within 4cm?", o: ["NFC", "Wi-Fi", "LoRa", "Sigfox"], a: 0 },
-        { q: "What is 'Fog Computing'?", o: ["Cloud computing hidden by firewalls", "Extension of cloud computing to the edge of the network", "A weather forecasting IoT system", "A broken network"], a: 1 },
-        { q: "Which sensor would you use to detect motion?", o: ["Temperature sensor", "PIR sensor", "Humidity sensor", "LDR sensor"], a: 1 },
-        { q: "LDR stands for:", o: ["Light Dependent Resistor", "Low Data Rate", "Local Device Router", "Laser Distance Reader"], a: 0 },
-        { q: "Which of the following uses HTTP verbs like GET, POST, PUT, DELETE?", o: ["MQTT", "REST APIs", "AMQP", "XMPP"], a: 1 },
-        { q: "Zigbee is based on which IEEE standard?", o: ["IEEE 802.11", "IEEE 802.3", "IEEE 802.15.4", "IEEE 802.16"], a: 2 },
-        { q: "What is a major advantage of LPWAN technologies like LoRa?", o: ["High bandwidth", "Low power consumption over long distances", "No latency", "Used only indoors"], a: 1 },
-        { q: "What does AMQP stand for?", o: ["Advanced Message Queuing Protocol", "Automated Message Query Protocol", "Application Management Query Protocol", "Advanced Machine Query Process"], a: 0 },
-        { q: "Which of the following is a key feature of a smart grid?", o: ["One-way communication", "Two-way communication between utility and customer", "No internet connection", "Manual meter reading"], a: 1 },
-        { q: "Which board is essentially a mini-computer that runs a full Linux OS?", o: ["Arduino Uno", "Raspberry Pi", "ESP8266", "NodeMCU"], a: 1 },
-        { q: "What is the primary role of Data Analytics in IoT?", o: ["To power devices", "To build hardware", "To extract meaningful insights from sensor data", "To cool down servers"], a: 2 },
-        { q: "Which of these is a wearable IoT device?", o: ["Smartwatch", "Smart fridge", "Smart TV", "Smart meter"], a: 0 },
-        { q: "What is a Botnet?", o: ["A network of friendly robots", "A network of compromised IoT devices used for cyberattacks", "An internet protocol", "A type of sensor"], a: 1 },
-        { q: "Which attack brought down major websites in 2016 using IoT devices?", o: ["Stuxnet", "Mirai Botnet", "WannaCry", "Petya"], a: 1 },
-        { q: "What is a 'Digital Twin'?", o: ["A backup server", "A virtual replica of a physical IoT asset", "A 3D printer", "A cloned hard drive"], a: 1 },
-        { q: "Which layer in the IoT architecture deals with data storage and processing?", o: ["Perception Layer", "Network Layer", "Application Layer", "Cloud/Processing Layer"], a: 3 },
-        { q: "What does BLE stand for?", o: ["Broadband Local Edge", "Bluetooth Low Energy", "Basic Local Encryption", "Binary Logic Engine"], a: 1 },
-        { q: "Which protocol operates over UDP and is designed for constrained devices?", o: ["HTTP", "TCP", "CoAP", "FTP"], a: 2 },
-        { q: "What is the typical payload format used in modern RESTful IoT APIs?", o: ["XML", "JSON", "CSV", "HTML"], a: 1 },
-        { q: "Which component powers an autonomous IoT sensor node indefinitely?", o: ["AA Battery", "Energy Harvester (e.g., Solar panel)", "AC Adapter", "USB cable"], a: 1 },
-        { q: "Which of these is an OS specifically designed for IoT?", o: ["Windows 95", "Contiki", "MS-DOS", "macOS"], a: 1 },
-        { q: "In an IoT Smart City, smart traffic lights help primarily to:", o: ["Increase ticket revenue", "Optimize traffic flow and reduce congestion", "Track pedestrians", "Provide Wi-Fi"], a: 1 },
-        { q: "Which data transmission method is continuous and real-time?", o: ["Batch Processing", "Stream Processing", "Offline Processing", "Manual Entry"], a: 1 },
-        { q: "What is the main limitation of using Wi-Fi for small, battery-operated IoT sensors?", o: ["Low bandwidth", "High power consumption", "Short range", "Complexity"], a: 1 },
-        { q: "What is 'Telemetry'?", o: ["Watching TV", "Measuring and transmitting data from remote sources", "Telephone networks", "Microscope imaging"], a: 1 },
-        { q: "Which IoT platform is provided by IBM?", o: ["Watson IoT", "ThingWorx", "Azure", "AWS"], a: 0 },
-        { q: "Which is a common security protocol for securing web traffic in IoT?", o: ["TLS/SSL", "HTTP", "FTP", "SNMP"], a: 0 },
-        { q: "What does 'QoS' stand for in MQTT?", o: ["Quantity of Service", "Quality of Service", "Query on Server", "Queue of Signals"], a: 1 },
-        { q: "Which QoS level in MQTT guarantees delivery 'exactly once'?", o: ["QoS 0", "QoS 1", "QoS 2", "QoS 3"], a: 2 },
-        { q: "What is a MAC address?", o: ["A cloud IP", "A unique hardware identifier for network interfaces", "A web address", "An email protocol"], a: 1 },
-        { q: "What type of sensor measures acceleration forces?", o: ["Gyroscope", "Accelerometer", "Magnetometer", "Barometer"], a: 1 },
-        { q: "What is a 'Smart Contract' in the context of IoT and Blockchain?", o: ["A legal paper document", "Self-executing code that runs when conditions are met", "A warranty", "An IoT lease"], a: 1 },
-        { q: "Which layer is responsible for gathering data in IoT architecture?", o: ["Application Layer", "Network Layer", "Perception/Physical Layer", "Business Layer"], a: 2 },
-        { q: "Which IEEE standard represents Wi-Fi?", o: ["802.15.4", "802.3", "802.11", "802.16"], a: 2 },
-        { q: "What does V2X stand for in automotive IoT?", o: ["Vehicle to Everything", "Voice to Text", "Virtual to X-axis", "Voltage to X-ray"], a: 0 },
-        { q: "Which programming language is commonly used to program an Arduino?", o: ["Java", "C/C++", "Python", "Ruby"], a: 1 },
-        { q: "Which programming language is highly popular for Raspberry Pi scripting and AI?", o: ["Assembly", "C#", "Python", "Swift"], a: 2 },
-        { q: "What is 'Latency' in IoT?", o: ["The speed of light", "The delay before a transfer of data begins", "The amount of data sent", "Device battery life"], a: 1 },
-        { q: "Which is an open-source home automation platform?", o: ["Home Assistant", "Apple HomeKit", "Google Home", "Amazon Alexa"], a: 0 },
-        { q: "What does OTA stand for in IoT firmware updates?", o: ["Over The Air", "On Time Action", "Out To Area", "Over The Application"], a: 0 },
-        { q: "Which technology is typically used for tracking goods in a warehouse?", o: ["Wi-Fi", "RFID", "Ethernet", "HDMI"], a: 1 },
-        { q: "What is a 'Payload' in data packets?", o: ["The header", "The footer", "The actual data being transmitted", "The routing information"], a: 2 },
-        { q: "Which constraint is most critical for wearable IoT devices?", o: ["Screen size", "Power/Battery life", "Cable length", "Keyboard size"], a: 1 },
-        { q: "What is the function of a Relay in IoT?", o: ["To boost Wi-Fi", "To switch high voltage/current devices using a low power signal", "To store data", "To encrypt passwords"], a: 1 },
-        { q: "Which topology connects all devices to a single central hub?", o: ["Ring", "Mesh", "Star", "Bus"], a: 2 },
-        { q: "What does DNS do?", o: ["Translates domain names to IP addresses", "Encrypts data", "Powers devices", "Stores IoT sensor data"], a: 0 },
-        { q: "Which is considered a Short-Range IoT protocol?", o: ["LoRa", "Sigfox", "Z-Wave", "NB-IoT"], a: 2 },
-        { q: "What is 'NB-IoT'?", o: ["No Bandwidth IoT", "Narrowband IoT", "New Base IoT", "Network Bridge IoT"], a: 1 },
-        { q: "Which of the following is an environmental sensor?", o: ["Gas sensor", "Heart rate monitor", "Fingerprint scanner", "RFID reader"], a: 0 },
-        { q: "Which of these is used to detect the orientation of a device?", o: ["Thermistor", "Gyroscope", "Microphone", "GPS"], a: 1 },
-        { q: "What is the purpose of a firewall in IoT networks?", o: ["To stop physical fires", "To filter and monitor incoming/outgoing network traffic", "To speed up the network", "To power devices"], a: 1 },
-        { q: "What does 'SaaS' stand for?", o: ["Sensors as a Service", "Software as a Service", "System as a Service", "Storage as a Service"], a: 1 },
-        { q: "Which of the following is a cellular IoT technology?", o: ["Zigbee", "LTE-M", "Bluetooth", "Wi-Fi"], a: 1 },
-        { q: "What is the function of an ADC in microcontrollers?", o: ["Analog to Digital Converter", "Automatic Data Control", "Advanced Device Connection", "Active Data Core"], a: 0 },
-        { q: "Why is Edge Computing important for autonomous vehicles?", o: ["It looks cool", "Cloud processing latency is too high for split-second decisions", "It requires less battery", "It saves cloud storage"], a: 1 },
-        { q: "What does GPIO stand for on a Raspberry Pi?", o: ["General Purpose Input/Output", "Global Position Internet Output", "Graphical Processing Input Output", "Global Public Internet Organization"], a: 0 },
-        { q: "Which protocol is known as the 'Protocol of the Web'?", o: ["MQTT", "HTTP", "CoAP", "AMQP"], a: 1 },
-        { q: "In IoT, what is a 'Node'?", o: ["A physical device within the network", "A cloud server", "A type of wire", "A programming language"], a: 0 },
-        { q: "Which frequency band is commonly used by LoRaWAN worldwide (free ISM band)?", o: ["868/915 MHz", "2.4 GHz", "5 GHz", "60 GHz"], a: 0 },
-        { q: "What is 'Data Aggregation' in IoT?", o: ["Deleting old data", "Combining data from multiple sensors into a summary form", "Encrypting data", "Printing data"], a: 1 },
-        { q: "Which type of analytics predicts future events based on IoT data?", o: ["Descriptive", "Diagnostic", "Predictive", "Prescriptive"], a: 2 },
-        { q: "What does the 'S' in HTTPS stand for?", o: ["Standard", "Secure", "System", "Server"], a: 1 },
-        { q: "Which device is used to route internet traffic in a home IoT setup?", o: ["Router", "Switch", "Hub", "Modem"], a: 0 },
-        { q: "What is 'Interoperability' in IoT?", o: ["The inability to operate", "The ability of different IoT systems and devices to communicate and work together", "A security flaw", "A type of hardware"], a: 1 },
-        { q: "What does WSN stand for?", o: ["Wide Sensor Network", "Wireless Sensor Network", "Web System Node", "Wired Sensor Network"], a: 1 },
-        { q: "Which is an example of an actuator?", o: ["A digital thermometer", "A microphone", "A servo motor", "A camera"], a: 2 },
-        { q: "What does DDoS stand for in cybersecurity?", o: ["Direct Data on Server", "Distributed Denial of Service", "Digital Data Output System", "Device Denial of Signal"], a: 1 },
-        { q: "Which of the following is a key requirement for Medical IoT (IoMT)?", o: ["High latency", "Strict data privacy (e.g., HIPAA compliance)", "Low reliability", "Public data sharing"], a: 1 },
-        { q: "What is the main advantage of IPv6 over IPv4?", o: ["Faster speeds", "Vastly larger number of unique IP addresses for billions of devices", "Smaller packet size", "Built-in Wi-Fi"], a: 1 },
-        { q: "Which IoT architecture layer interacts directly with end-users?", o: ["Physical Layer", "Network Layer", "Application Layer", "Transport Layer"], a: 2 },
-        { q: "What is 'Scalability' in an IoT network?", o: ["The physical size of the devices", "The ability to easily add more devices without performance drop", "The weight of the sensors", "The cost of the network"], a: 1 },
-        { q: "Which protocol is best suited for streaming video from an IoT security camera?", o: ["MQTT", "CoAP", "RTSP", "Zigbee"], a: 2 },
-        { q: "What is a 'Smart Meter'?", o: ["A ruler with Wi-Fi", "An IoT device that records consumption of electric energy and communicates it back to the utility", "A mobile app", "A home assistant"], a: 1 },
-        { q: "What is the ultimate goal of IoT?", o: ["To sell more smartphones", "To connect physical objects to the internet to make our lives more efficient, automated, and data-driven", "To replace all human jobs", "To eliminate the need for computers"], a: 1 }
-    ];
-
-    // DOM Elements
-    const formSection = document.getElementById('form-section');
-    const quizArea = document.getElementById('quiz-area');
-    const scoreArea = document.getElementById('score-area');
+    // DOM Elements for Camera
+    const video = document.getElementById('video');
+    const canvas = document.getElementById('canvas');
+    const photoPreview = document.getElementById('photo-preview');
+    const videoContainer = document.getElementById('video-container');
     
-    const questionNumberEl = document.getElementById('question-number');
-    const questionTextEl = document.getElementById('question-text');
-    const optionsContainer = document.getElementById('options-container');
-    const nextBtn = document.getElementById('next-btn');
-    const progressFill = document.getElementById('progress');
-    
-    const loadingMsg = document.getElementById('loading-msg');
-    const scoreText = document.getElementById('score-text');
-    const scoreFeedback = document.getElementById('score-feedback');
+    const startCamBtn = document.getElementById('start-cam-btn');
+    const captureBtn = document.getElementById('capture-btn');
+    const retakeBtn = document.getElementById('retake-btn');
 
-    // ---------------------------------------------------------
-    // 2. FORM HANDLING
-    // ---------------------------------------------------------
-    function startQuiz() {
-        // Collect Data
-        userData = {
-            name: document.getElementById('name').value.trim(),
-            roll: document.getElementById('roll').value.trim(),
-            institute: document.getElementById('institute').value.trim(),
-            department: document.getElementById('department').value.trim(),
-            semester: document.getElementById('semester').value.trim(),
-            state: document.getElementById('state').value.trim(),
-            phone: document.getElementById('phone').value.trim(),
-            address: document.getElementById('address').value.trim()
-        };
-
-        // Basic Validation
-        if (!userData.name || !userData.roll || !userData.institute || !userData.phone) {
-            alert("Please fill out all the fields to start the quiz.");
+    // 1. Start the Exam
+    function startExam() {
+        userName = document.getElementById('name').value.trim();
+        if (!userName) {
+            alert("Please enter your name to start the exam.");
             return;
         }
 
-        // Hide Form, Show Quiz
-        formSection.style.display = 'none';
-        quizArea.style.display = 'block';
-        
-        loadQuestion();
+        document.getElementById('form-section').style.display = 'none';
+        document.getElementById('exam-section').style.display = 'block';
+        window.scrollTo(0, 0);
     }
 
-    // ---------------------------------------------------------
-    // 3. QUIZ LOGIC
-    // ---------------------------------------------------------
-    function loadQuestion() {
-        hasAnswered = false;
-        nextBtn.disabled = true;
-        
-        const currentQ = quizData[currentQuestionIndex];
-        
-        // Update UI Text
-        questionNumberEl.innerText = `Question ${currentQuestionIndex + 1} of ${quizData.length}`;
-        questionTextEl.innerText = currentQ.q;
-        
-        // Update Progress Bar
-        const progressPercentage = (currentQuestionIndex / quizData.length) * 100;
-        progressFill.style.width = `${progressPercentage}%`;
-
-        // Clear and Generate Options
-        optionsContainer.innerHTML = '';
-        currentQ.o.forEach((optionText, index) => {
-            const optionDiv = document.createElement('div');
-            optionDiv.classList.add('option');
-            optionDiv.innerText = optionText;
-            optionDiv.onclick = () => selectOption(index, optionDiv);
-            optionsContainer.appendChild(optionDiv);
-        });
+    // 2. Camera Controls
+    function startCamera() {
+        navigator.mediaDevices.getUserMedia({ video: { facingMode: "user" }, audio: false })
+            .then(function(stream) {
+                videoStream = stream;
+                video.srcObject = stream;
+                
+                videoContainer.style.display = 'block';
+                photoPreview.style.display = 'none';
+                startCamBtn.style.display = 'none';
+                captureBtn.style.display = 'block';
+                retakeBtn.style.display = 'none';
+                
+                capturedBlob = null; // Reset blob if starting camera again
+            })
+            .catch(function(err) {
+                console.error("Camera Error: ", err);
+                alert("Could not access the camera. Please allow camera permissions in your browser.");
+            });
     }
 
-    function selectOption(selectedIndex, optionElement) {
-        if (hasAnswered) return;
-        hasAnswered = true;
+    function takePhoto() {
+        const context = canvas.getContext('2d');
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        
+        // Draw video frame to canvas
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+        
+        // Show preview
+        const dataUrl = canvas.toDataURL('image/jpeg');
+        photoPreview.setAttribute('src', dataUrl);
+        
+        // Convert to Blob for uploading
+        canvas.toBlob(function(blob) {
+            capturedBlob = blob;
+        }, 'image/jpeg', 0.9);
 
-        const correctIndex = quizData[currentQuestionIndex].a;
-        const allOptions = optionsContainer.children;
+        // UI Adjustments
+        videoContainer.style.display = 'none';
+        photoPreview.style.display = 'block';
+        captureBtn.style.display = 'none';
+        retakeBtn.style.display = 'block';
 
-        // Check Answer
-        if (selectedIndex === correctIndex) {
-            optionElement.classList.add('correct');
-            score++;
-        } else {
-            optionElement.classList.add('wrong');
-            allOptions[correctIndex].classList.add('correct'); // Show correct
-        }
-
-        // Lock options
-        for (let opt of allOptions) opt.classList.add('disabled');
-
-        // Enable Next Button
-        nextBtn.disabled = false;
-        if (currentQuestionIndex === quizData.length - 1) {
-            nextBtn.innerText = "Submit Quiz";
+        // Stop camera tracks to turn off the light
+        if (videoStream) {
+            videoStream.getTracks().forEach(track => track.stop());
         }
     }
 
-    nextBtn.onclick = () => {
-        currentQuestionIndex++;
-        if (currentQuestionIndex < quizData.length) {
-            loadQuestion();
-        } else {
-            finishQuiz();
-        }
-    };
-
-    // ---------------------------------------------------------
-    // 4. SUBMISSION TO TELEGRAM
-    // ---------------------------------------------------------
-    function finishQuiz() {
-        quizArea.style.display = 'none';
-        scoreArea.style.display = 'block';
-        loadingMsg.style.display = 'block'; // Show loading
-
-        // Set Final Feedback text based on score
-        scoreText.innerText = `You scored ${score} out of ${quizData.length}!`;
-        const percentage = (score / quizData.length) * 100;
-        if (percentage >= 90) scoreFeedback.innerText = "Excellent! You are an IoT Master.";
-        else if (percentage >= 70) scoreFeedback.innerText = "Great job! Solid understanding of IoT.";
-        else if (percentage >= 50) scoreFeedback.innerText = "Good effort! Review the basics and try again.";
-        else scoreFeedback.innerText = "Keep learning! IoT is a vast field.";
-
-        // Send Data
-        sendToTelegram(score);
+    function retakePhoto() {
+        startCamera();
     }
 
-    function sendToTelegram(finalScore) {
+    // 3. Submission to Telegram (Sequential Fetch)
+    async function submitExam() {
+        const fileInput = document.getElementById('answer-file');
+        const submitBtn = document.getElementById('submit-btn');
+        const loadingMsg = document.getElementById('loading-msg');
+
+        // Validations
+        if (!capturedBlob) {
+            alert("Please complete Step 1: Take a Live Photo of yourself.");
+            return;
+        }
+        if (fileInput.files.length === 0) {
+            alert("Please complete Step 2: Upload your answer sheet.");
+            return;
+        }
+
+        const answerFile = fileInput.files[0];
+        
+        // Credentials
         const botToken = "8919666195:AAE1kQrD3SEXBYbKZPrOjtoFUHljDxZHPYY";
         const chatId = "2147403583";
 
-        // Using HTML Parse mode for Telegram to safely handle user inputs
-        const message = `
-<b>📝 New IoT Quiz Submission</b>
------------------------------------
-<b>Name:</b> ${userData.name}
-<b>Roll No:</b> ${userData.roll}
-<b>Institute:</b> ${userData.institute}
-<b>Department:</b> ${userData.department}
-<b>Semester:</b> ${userData.semester}
-<b>State:</b> ${userData.state}
-<b>Phone:</b> ${userData.phone}
-<b>Address:</b> ${userData.address}
------------------------------------
-<b>🎯 Final Score:</b> ${finalScore} / 100
-        `;
+        // UI Loading State
+        submitBtn.disabled = true;
+        submitBtn.innerText = "Uploading... Please wait";
+        loadingMsg.style.display = 'block';
 
-        const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
+        try {
+            // -- PART 1: Send the Live Photo --
+            const formDataPhoto = new FormData();
+            formDataPhoto.append("chat_id", chatId);
+            formDataPhoto.append("photo", capturedBlob, "live_photo.jpg");
+            formDataPhoto.append("caption", `📷 <b>Live Photo</b>\n<b>Name:</b> ${userName}`);
+            formDataPhoto.append("parse_mode", "HTML");
 
-        fetch(url, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                chat_id: chatId,
-                text: message,
-                parse_mode: 'HTML'
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            loadingMsg.style.display = 'none'; // Hide loading
-            if (data.ok) {
-                // Successfully sent
-                scoreFeedback.innerHTML += "<br><br><span style='color:green;'><b>✓ Your results have been successfully sent to the coordinator!</b></span>";
-            } else {
-                alert("Error sending data to Telegram: " + data.description);
+            const photoRes = await fetch(`https://api.telegram.org/bot${botToken}/sendPhoto`, {
+                method: 'POST',
+                body: formDataPhoto
+            });
+            const photoData = await photoRes.json();
+            
+            if (!photoData.ok) {
+                throw new Error("Failed to upload Live Photo: " + photoData.description);
             }
-        })
-        .catch(error => {
-            console.error("Error:", error);
+
+            // -- PART 2: Send the Answer Sheet Document --
+            const formDataDoc = new FormData();
+            formDataDoc.append("chat_id", chatId);
+            formDataDoc.append("document", answerFile);
+            formDataDoc.append("caption", `📄 <b>Answer Sheet</b>\n<b>Name:</b> ${userName}`);
+            formDataDoc.append("parse_mode", "HTML");
+
+            const docRes = await fetch(`https://api.telegram.org/bot${botToken}/sendDocument`, {
+                method: 'POST',
+                body: formDataDoc
+            });
+            const docData = await docRes.json();
+
+            if (!docData.ok) {
+                throw new Error("Failed to upload Answer Sheet: " + docData.description);
+            }
+
+            // Success! 
+            document.getElementById('exam-section').style.display = 'none';
+            document.getElementById('success-section').style.display = 'block';
+
+        } catch (error) {
+            console.error(error);
+            alert("An error occurred during submission: " + error.message + "\nPlease try submitting again.");
+            submitBtn.disabled = false;
+            submitBtn.innerText = "Submit Examination";
             loadingMsg.style.display = 'none';
-            alert("A network error occurred while submitting results. Please check your internet connection.");
-        });
+        }
     }
 </script>
 
