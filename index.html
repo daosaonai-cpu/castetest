@@ -3,788 +3,501 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>NIELIT O-Level OS Quiz Master</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+    <title>IoT 100 MCQ Quiz & Registration</title>
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
-        body { font-family: 'Inter', sans-serif; }
-        .glass-card {
-            background: rgba(255, 255, 255, 0.95);
-            backdrop-filter: blur(10px);
-            border: 1px solid rgba(229, 231, 235, 0.5);
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f0f4f8;
+            color: #333;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
         }
-        .option-btn {
-            transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+        .container {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 8px 24px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 650px;
+            padding: 30px;
         }
-        .progress-bar-fill {
-            transition: width 0.4s ease-out;
+        h1, h2 {
+            text-align: center;
+            color: #2c3e50;
+            margin-top: 0;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #ecf0f1;
+            padding-bottom: 15px;
+        }
+        
+        /* Form Styles */
+        #form-section {
+            display: block;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: 600;
+            color: #34495e;
+        }
+        input, textarea {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid #cbd3da;
+            border-radius: 6px;
+            box-sizing: border-box;
+            font-size: 14px;
+        }
+        
+        /* Quiz Styles */
+        #quiz-area {
+            display: none;
+        }
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #ecf0f1;
+            border-radius: 4px;
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+        .progress-fill {
+            height: 100%;
+            background: #3498db;
+            width: 0%;
+            transition: width 0.3s;
+        }
+        .question-number {
+            font-size: 14px;
+            color: #7f8c8d;
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        .question-text {
+            font-size: 18px;
+            margin-bottom: 20px;
+            line-height: 1.5;
+            font-weight: 500;
+        }
+        .options {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+        .option {
+            padding: 14px 18px;
+            background: #f8f9fa;
+            border: 2px solid #e9ecef;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease-in-out;
+            font-size: 16px;
+        }
+        .option:hover:not(.disabled) {
+            background: #e2e6ea;
+            border-color: #cbd3da;
+        }
+        .option.correct {
+            background: #d4edda;
+            border-color: #28a745;
+            color: #155724;
+        }
+        .option.wrong {
+            background: #f8d7da;
+            border-color: #dc3545;
+            color: #721c24;
+        }
+        .option.disabled {
+            cursor: not-allowed;
+        }
+        
+        /* Buttons */
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 16px;
+            margin-top: 25px;
+            background: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 18px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .btn:hover:not(:disabled) {
+            background: #2980b9;
+        }
+        .btn:disabled {
+            background: #bdc3c7;
+            cursor: not-allowed;
+        }
+
+        /* Score Area */
+        #score-area {
+            display: none;
+            text-align: center;
+        }
+        .score-text {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 10px;
+            color: #2c3e50;
+        }
+        .score-feedback {
+            font-size: 18px;
+            color: #7f8c8d;
+            margin-bottom: 30px;
+        }
+        #loading-msg {
+            display: none;
+            color: #f39c12;
+            font-weight: bold;
+            margin-bottom: 15px;
         }
     </style>
 </head>
-<body class="bg-slate-50 min-h-screen text-slate-800">
+<body>
 
-    <div id="app" class="max-w-4xl mx-auto px-4 py-8">
-        <!-- Header -->
-        <header class="text-center mb-8">
-            <h1 class="text-3xl font-bold text-indigo-700 mb-2">NIELIT O-Level (M1-R5)</h1>
-            <p class="text-slate-600 font-medium italic">Unit 2: Introduction to Operating System - 100 MCQ Practice</p>
-            <div class="mt-4 flex justify-center gap-4">
-                <span class="bg-indigo-100 text-indigo-700 px-3 py-1 rounded-full text-sm font-semibold border border-indigo-200">
-                    Questions: <span id="current-count">0</span> / <span id="total-count">0</span>
-                </span>
-                <span class="bg-emerald-100 text-emerald-700 px-3 py-1 rounded-full text-sm font-semibold border border-emerald-200">
-                    Score: <span id="score">0</span>
-                </span>
-            </div>
-        </header>
-
-        <!-- Progress Bar -->
-        <div class="w-full bg-slate-200 h-2 rounded-full mb-8 overflow-hidden">
-            <div id="progress-bar" class="progress-bar-fill h-full bg-indigo-500 w-0"></div>
-        </div>
-
-        <!-- Main Quiz Area -->
-        <div id="quiz-container" class="glass-card rounded-2xl shadow-xl p-6 md:p-10 min-h-[400px]">
-            <div id="welcome-screen" class="text-center py-10">
-                <div class="mb-6">
-                    <i class="fas fa-book-open text-6xl text-indigo-500"></i>
-                </div>
-                <h2 class="text-2xl font-bold mb-4">Ready to test your knowledge?</h2>
-                <p class="text-slate-600 mb-8 max-w-md mx-auto">
-                    This comprehensive 100-question test covers Platform Types, User Interface, System Customization, File Management, and Program/Device settings as per the NIELIT O-Level syllabus.
-                </p>
-                <button onclick="startQuiz()" class="bg-indigo-600 hover:bg-indigo-700 text-white px-8 py-3 rounded-xl font-bold text-lg shadow-lg transform active:scale-95 transition">
-                    Start MCQ Test
-                </button>
-            </div>
-
-            <div id="question-screen" class="hidden">
-                <div class="mb-8">
-                    <h3 id="question-text" class="text-xl md:text-2xl font-semibold leading-snug"></h3>
-                </div>
-                <div id="options-grid" class="grid grid-cols-1 gap-4">
-                    <!-- Options will be injected here -->
-                </div>
-                <div id="explanation-box" class="hidden mt-6 p-4 rounded-xl bg-slate-100 border-l-4 border-indigo-500">
-                    <p class="text-sm font-medium text-slate-500 mb-1 uppercase tracking-wider">Explanation</p>
-                    <p id="explanation-text" class="text-slate-700"></p>
-                </div>
-                <div class="mt-8 flex justify-end">
-                    <button id="next-btn" onclick="nextQuestion()" class="hidden bg-indigo-600 hover:bg-indigo-700 text-white px-6 py-2 rounded-lg font-semibold shadow-md">
-                        Next Question <i class="fas fa-arrow-right ml-2"></i>
-                    </button>
-                </div>
-            </div>
-
-            <div id="result-screen" class="hidden text-center py-10">
-                <h2 class="text-4xl font-black text-indigo-800 mb-2">Quiz Complete!</h2>
-                <p class="text-xl text-slate-600 mb-6" id="final-stats"></p>
-                <div class="flex justify-center mb-8">
-                    <div id="score-circle" class="w-32 h-32 rounded-full border-8 border-indigo-500 flex items-center justify-center text-3xl font-bold text-indigo-700">
-                        85%
-                    </div>
-                </div>
-                <button onclick="location.reload()" class="bg-slate-800 text-white px-8 py-3 rounded-xl font-bold shadow-lg hover:bg-slate-900 transition">
-                    Restart Practice
-                </button>
-            </div>
-        </div>
+<div class="container">
+    
+    <!-- REGISTRATION FORM SECTION -->
+    <div id="form-section">
+        <h2>Student Registration</h2>
+        <p style="text-align: center; color: #7f8c8d; margin-bottom: 20px;">Please fill in your details to begin the 100 MCQ IoT Quiz.</p>
+        
+        <div class="form-group"><label>Name</label><input type="text" id="name" required></div>
+        <div class="form-group"><label>Roll No.</label><input type="text" id="roll" required></div>
+        <div class="form-group"><label>Institute Name</label><input type="text" id="institute" required></div>
+        <div class="form-group"><label>Department</label><input type="text" id="department" required></div>
+        <div class="form-group"><label>Semester</label><input type="text" id="semester" required></div>
+        <div class="form-group"><label>State</label><input type="text" id="state" required></div>
+        <div class="form-group"><label>Phone Number</label><input type="tel" id="phone" required></div>
+        <div class="form-group"><label>Address</label><textarea id="address" rows="3" required></textarea></div>
+        
+        <button class="btn" onclick="startQuiz()">Start Quiz</button>
     </div>
 
-    <script>
-        const questions = [
-            // Original Questions (1-25)
-            {
-                q: "What is the primary objective of an Operating System?",
-                a: ["To write computer programs", "To make computer hardware easy to use", "To design web pages", "To perform calculation only"],
-                c: 1,
-                e: "The primary goal of an OS is to act as an interface between the user and hardware, making the system convenient to use."
-            },
-            {
-                q: "Which of the following is an example of an Open Source Operating System?",
-                a: ["Windows 10", "MacOS", "Linux", "iOS"],
-                c: 2,
-                e: "Linux is open-source, meaning its source code is available for anyone to study and modify."
-            },
-            {
-                q: "Which OS is specifically designed for mobile devices?",
-                a: ["Windows Server", "Android", "Unix", "MS-DOS"],
-                c: 1,
-                e: "Android and iOS are the most popular mobile operating systems."
-            },
-            {
-                q: "The process of starting or restarting a computer is known as:",
-                a: ["Exit", "Shut down", "Booting", "Processing"],
-                c: 2,
-                e: "Booting is the process of loading the OS from storage to RAM."
-            },
-            {
-                q: "Which type of OS allows multiple users to access a computer system at the same time?",
-                a: ["Single User OS", "Multi-user OS", "Real-time OS", "Batch OS"],
-                c: 1,
-                e: "Multi-user OS supports multiple users simultaneously."
-            },
-            {
-                q: "The horizontal bar at the bottom of the Windows desktop is called?",
-                a: ["Status bar", "Scroll bar", "Taskbar", "Menu bar"],
-                c: 2,
-                e: "The Taskbar usually contains the Start button, system tray, and active app icons."
-            },
-            {
-                q: "What is GUI?",
-                a: ["Graphic User Interaction", "Graphical User Interface", "Global User Input", "Group User Interface"],
-                c: 1,
-                e: "GUI uses visual elements like icons and menus to interact with users."
-            },
-            {
-                q: "Which icon on the desktop allows users to access files and folders on the hard drive?",
-                a: ["Recycle Bin", "Control Panel", "This PC / My Computer", "Browser"],
-                c: 2,
-                e: "'This PC' (in Windows) is the entry point for local storage devices."
-            },
-            {
-                q: "What is the shortcut key to switch between open applications?",
-                a: ["Alt + Tab", "Ctrl + Tab", "Shift + Tab", "Win + Tab"],
-                c: 0,
-                e: "Alt + Tab is the standard keyboard shortcut for task switching."
-            },
-            {
-                q: "Small pictures that represent files, folders, or programs are called:",
-                a: ["Thumbnails", "Images", "Icons", "Graphics"],
-                c: 2,
-                e: "Icons are visual representations of objects in a GUI."
-            },
-            {
-                q: "What is the maximum character limit for a file name in Windows usually?",
-                a: ["255 characters", "100 characters", "8 characters", "512 characters"],
-                c: 0,
-                e: "Standard Windows file systems (NTFS) support paths up to 255 characters."
-            },
-            {
-                q: "Which of the following is NOT a valid file extension?",
-                a: [".docx", ".pdf", ".exe", ".file?"],
-                c: 3,
-                e: "Special characters like '?' are not allowed in file extensions."
-            },
-            {
-                q: "Where do deleted files go in a Windows OS?",
-                a: ["Deleted Items", "Dustbin", "Recycle Bin", "Temporary Folder"],
-                c: 2,
-                e: "The Recycle Bin holds deleted files temporarily until emptied."
-            },
-            {
-                q: "To permanently delete a file without sending it to Recycle Bin, we use:",
-                a: ["Delete", "Ctrl + Delete", "Shift + Delete", "Alt + Delete"],
-                c: 2,
-                e: "Shift + Delete bypasses the Recycle Bin for permanent removal."
-            },
-            {
-                q: "The 'Address Bar' in File Explorer shows:",
-                a: ["The file content", "The file path", "The computer name", "The RAM size"],
-                c: 1,
-                e: "It displays the directory path of the folder currently being viewed."
-            },
-            {
-                q: "Which utility is used to change system settings like date, time, and background?",
-                a: ["MS Word", "Control Panel / Settings", "Task Manager", "Disk Cleanup"],
-                c: 1,
-                e: "Control Panel (classic) or Settings app (modern) manages system preferences."
-            },
-            {
-                q: "To change the double-click speed of the mouse, you should visit:",
-                a: ["Display Properties", "Mouse Properties", "Keyboard Settings", "System Info"],
-                c: 1,
-                e: "Mouse properties allow configuration of buttons, pointer speed, and double-click sensitivity."
-            },
-            {
-                q: "Display properties allow you to change which of the following?",
-                a: ["Wallpaper", "Screen Resolution", "Screen Saver", "All of the above"],
-                c: 3,
-                e: "Display properties cover all visual aspects of the monitor output."
-            },
-            {
-                q: "Which tab in Windows 10/11 Task Manager shows the CPU and RAM usage?",
-                a: ["Processes", "Performance", "Startup", "Users"],
-                c: 1,
-                e: "Performance tab provides real-time graphs for CPU, Memory, and Disk usage."
-            },
-            {
-                q: "Adding or removing programs is done through:",
-                a: ["File Explorer", "Apps & Features / Programs and Features", "Desktop", "Taskbar"],
-                c: 1,
-                e: "This section in settings ensures programs are installed or uninstalled correctly."
-            },
-            {
-                q: "Sharing a printer over a network allows:",
-                a: ["Only one user to print", "Multiple users to print on the same hardware", "The printer to work without ink", "The printer to scan automatically"],
-                c: 1,
-                e: "Printer sharing is an OS feature that lets multiple network users access one physical printer."
-            },
-            {
-                q: "What is a 'Device Driver'?",
-                a: ["Hardware for gaming", "Software that controls a specific hardware device", "A type of printer paper", "A person who fixes computers"],
-                c: 1,
-                e: "Drivers are specific programs that allow the OS to communicate with hardware like printers or graphics cards."
-            },
-            {
-                q: "Plug and Play (PnP) means:",
-                a: ["A device that works immediately when connected", "A game that is pre-installed", "A type of mouse", "Charging a laptop"],
-                c: 0,
-                e: "PnP devices are automatically recognized and configured by the OS when plugged in."
-            },
-            {
-                q: "Which key is used to refresh the active window or desktop?",
-                a: ["F2", "F1", "F5", "F10"],
-                c: 2,
-                e: "F5 is the standard refresh shortcut."
-            },
-            {
-                q: "A compressed file usually has which extension?",
-                a: [".txt", ".zip", ".exe", ".bmp"],
-                c: 1,
-                e: ".zip or .rar are common compression formats."
-            },
+    <!-- QUIZ SECTION -->
+    <div id="quiz-area">
+        <h1>IoT Master Quiz</h1>
+        <div class="progress-bar">
+            <div class="progress-fill" id="progress"></div>
+        </div>
+        <div class="question-number" id="question-number">Question 1 of 100</div>
+        <div class="question-text" id="question-text">Loading question...</div>
+        <div class="options" id="options-container">
+            <!-- Options injected by JS -->
+        </div>
+        <button class="btn" id="next-btn" disabled>Next Question</button>
+    </div>
 
-            // Study Guide Added Questions (26-100)
-            {
-                q: "What is the primary system software that manages computer hardware and software resources?",
-                a: ["Application Software", "Operating System", "Firmware", "Utility Programs"],
-                c: 1,
-                e: "An Operating System (OS) is the primary system software that manages computer hardware, software resources, and provides common services for computer programs[cite: 1]."
-            },
-            {
-                q: "Which component of the OS operates at a low level and directly interacts with the hardware?",
-                a: ["The Shell", "The Desktop", "The Kernel", "The User Interface"],
-                c: 2,
-                e: "The Kernel is the core component of the OS that operates at a low level, directly interacting with the hardware[cite: 1]."
-            },
-            {
-                q: "What acts as the interface between the user and the kernel?",
-                a: ["The Shell", "The CPU", "The RAM", "The Bootloader"],
-                c: 0,
-                e: "The Shell is the interface between the user and the kernel, interpreting user commands[cite: 1]."
-            },
-            {
-                q: "How does the shell translate user commands for the kernel?",
-                a: ["Via hardware interrupts", "Via system calls", "Via network protocols", "Via memory leaks"],
-                c: 1,
-                e: "The shell interprets user commands and translates them into system calls that the kernel can understand[cite: 1]."
-            },
-            {
-                q: "Which OS function is responsible for allocating CPU time to different processes?",
-                a: ["File Management", "Security", "Device Management", "Process Management"],
-                c: 3,
-                e: "Process Management allocates CPU time to different processes, ensuring smooth multitasking[cite: 1]."
-            },
-            {
-                q: "When physical RAM is exhausted, what does the OS utilize to keep applications running?",
-                a: ["Virtual memory", "CMOS memory", "Flash storage", "L1 Cache"],
-                c: 0,
-                e: "Memory Management involves utilizing virtual memory when physical RAM is exhausted[cite: 1]."
-            },
-            {
-                q: "Which function maintains file system integrity and organizes data into directories?",
-                a: ["Memory Management", "File Management", "Device Management", "Process Management"],
-                c: 1,
-                e: "File Management organizes data into files and directories, manages storage space, and maintains file system integrity[cite: 1]."
-            },
-            {
-                q: "What does the OS use to facilitate communication between peripheral devices and the system?",
-                a: ["System calls", "Network cables", "Device Drivers", "Kernel extensions"],
-                c: 2,
-                e: "Device Management facilitates communication between peripheral devices and the system via drivers[cite: 1]."
-            },
-            {
-                q: "Enforcing passwords and data encryption falls under which OS function?",
-                a: ["Process Management", "Security and Access Control", "Device Management", "File Management"],
-                c: 1,
-                e: "Security and Access Control involves enforcing user permissions, passwords, and data encryption[cite: 1]."
-            },
-            {
-                q: "Without an OS, what would every application need to do?",
-                a: ["Run entirely in the cloud", "Write its own UI and low-level hardware code", "Bypass the CPU", "Use only external storage"],
-                c: 1,
-                e: "Without an OS, every application would need its own UI and code to handle low-level hardware operations like disk writing[cite: 1]."
-            },
-            {
-                q: "Which Operating System dominates the PC market and is highly compatible with commercial software?",
-                a: ["macOS", "Linux", "Microsoft Windows", "Unix"],
-                c: 2,
-                e: "Microsoft Windows dominates the PC market and is highly compatible with commercial software and gaming[cite: 1]."
-            },
-            {
-                q: "What is the underlying architecture of Microsoft Windows?",
-                a: ["Linux Kernel", "Darwin Kernel", "Windows NT Kernel", "Unix"],
-                c: 2,
-                e: "Microsoft Windows is based on the proprietary Windows NT Kernel[cite: 1]."
-            },
-            {
-                q: "What is the default file system used by Microsoft Windows?",
-                a: ["ext4", "APFS", "NTFS", "FAT32"],
-                c: 2,
-                e: "The default file system for Microsoft Windows is NTFS[cite: 1]."
-            },
-            {
-                q: "How does Windows store its system configurations?",
-                a: ["In plain text files", "In the Registry", "In the APFS volume", "In the CMOS battery"],
-                c: 1,
-                e: "Microsoft Windows uses a Registry for system configurations[cite: 1]."
-            },
-            {
-                q: "Which Operating System is known for its hardware optimization on Apple Silicon?",
-                a: ["Windows", "Linux", "macOS", "Android"],
-                c: 2,
-                e: "macOS is known for stability, security, and hardware optimization, particularly with Apple Silicon[cite: 1]."
-            },
-            {
-                q: "What is the default file system for macOS?",
-                a: ["NTFS", "APFS", "ext4", "HFS+"],
-                c: 1,
-                e: "The default file system for macOS is APFS[cite: 1]."
-            },
-            {
-                q: "Which of the following is an open-source OS favored by developers and servers?",
-                a: ["macOS", "iOS", "Windows", "Linux"],
-                c: 3,
-                e: "Linux relies on an open-source kernel and is highly customizable, favored by developers and servers[cite: 1]."
-            },
-            {
-                q: "Ubuntu, Debian, and Fedora are distributions of which Operating System?",
-                a: ["Windows", "Linux", "macOS", "Unix"],
-                c: 1,
-                e: "Distributions of Linux include Ubuntu, Debian, and Fedora[cite: 1]."
-            },
-            {
-                q: "What is a common file system used in Linux?",
-                a: ["ext4", "NTFS", "APFS", "exFAT"],
-                c: 0,
-                e: "A common file system used in Linux environments is ext4[cite: 1]."
-            },
-            {
-                q: "Which mobile operating system allows for the side-loading of apps (APKs)?",
-                a: ["iOS", "iPadOS", "Android", "Windows Phone"],
-                c: 2,
-                e: "Android is an open-source ecosystem that allows side-loading of apps via APKs[cite: 1]."
-            },
-            {
-                q: "Android is developed by Google and based on which kernel?",
-                a: ["Windows NT", "Darwin", "Linux Kernel", "Unix"],
-                c: 2,
-                e: "Android is developed by Google and is based on the Linux Kernel[cite: 1]."
-            },
-            {
-                q: "Which mobile OS operates as a closed ecosystem strictly curated via an App Store?",
-                a: ["Android", "Symbian", "iOS/iPadOS", "HarmonyOS"],
-                c: 2,
-                e: "iOS/iPadOS is a closed ecosystem where apps are strictly curated via the App Store[cite: 1]."
-            },
-            {
-                q: "What does a CLI (Command Line Interface) require the user to do?",
-                a: ["Click on icons", "Memorize and type commands", "Use a mouse", "Swipe on a touchscreen"],
-                c: 1,
-                e: "CLI requires typing commands to interact with the OS, meaning users must memorize commands[cite: 1]."
-            },
-            {
-                q: "Which of the following is an example of a Command Line Interface?",
-                a: ["Windows Desktop", "macOS Finder", "Linux Terminal", "iOS Home Screen"],
-                c: 2,
-                e: "Examples of a CLI include MS-DOS, Command Prompt, and the Linux Terminal[cite: 1]."
-            },
-            {
-                q: "What does the WIMP acronym stand for in a Graphical User Interface?",
-                a: ["Windows, Icons, Menus, Pointers", "Web, Internet, Mouse, Protocol", "Windows, Internet, Menus, Pages", "Wireless, Icons, Media, Pointers"],
-                c: 0,
-                e: "GUI uses visual indicators like windows, icons, menus, and pointers (WIMP)[cite: 1]."
-            },
-            {
-                q: "In a GUI workspace, what is considered the 'root workspace'?",
-                a: ["The Taskbar", "The Desktop", "The Control Panel", "The File Explorer"],
-                c: 1,
-                e: "The Desktop is the root workspace, which can contain files, folders, and program shortcuts[cite: 1]."
-            },
-            {
-                q: "Where is the Desktop folder typically located in a Windows file system?",
-                a: ["C:\\Desktop", "C:\\Windows\\Desktop", "C:\\Users\\Username\\Desktop", "D:\\Desktop"],
-                c: 2,
-                e: "The Desktop is visually above the root file system but usually located at C:\\Users\\Username\\Desktop in Windows[cite: 1]."
-            },
-            {
-                q: "Which GUI element serves as the anchor of the desktop experience and houses the Start Button?",
-                a: ["The System Tray", "The Taskbar", "The Quick Launch", "The Desktop"],
-                c: 1,
-                e: "The Taskbar acts as the anchor of the desktop experience[cite: 1]."
-            },
-            {
-                q: "What provides access to all programs, system settings, and power options?",
-                a: ["System Tray", "Quick Launch", "Start Button", "Icons"],
-                c: 2,
-                e: "The Start Button provides access to all programs, system settings, and power options[cite: 1]."
-            },
-            {
-                q: "Which UI element offers single-click access to frequently used software?",
-                a: ["System Tray", "Start Button", "Quick Launch / Pinned Apps", "Background wallpaper"],
-                c: 2,
-                e: "Quick Launch or Pinned Apps provide single-click access to frequently used software[cite: 1]."
-            },
-            {
-                q: "Where does the OS display background processes, network status, and the system clock?",
-                a: ["Start Menu", "System Tray (Notification Area)", "Quick Launch", "Desktop Icons"],
-                c: 1,
-                e: "The System Tray (Notification Area) displays background processes, network status, volume, and the system clock[cite: 1]."
-            },
-            {
-                q: "Which mouse setting is most useful for ergonomic adjustments, such as for left-handed users?",
-                a: ["Scroll Wheel lines", "Pointer Precision", "Button Mapping", "Double-click speed"],
-                c: 2,
-                e: "Button Mapping allows switching left/right functions, which is useful for ergonomic adjustments[cite: 1]."
-            },
-            {
-                q: "What does enabling 'Enhance pointer precision' actually do?",
-                a: ["Increases the laser brightness", "Turns on mouse acceleration", "Slows down the mouse permanently", "Inverts the Y-axis"],
-                c: 1,
-                e: "Enabling 'Enhance pointer precision' turns on mouse acceleration, adjusting cursor distance dynamically based on physical mouse speed[cite: 1]."
-            },
-            {
-                q: "Which setting dictates how many lines of text move per physical click of the mouse?",
-                a: ["Button Mapping", "Enhance Pointer Precision", "Scroll Wheel configuration", "DPI settings"],
-                c: 2,
-                e: "The Scroll Wheel setting determines how many lines of text scroll per physical click[cite: 1]."
-            },
-            {
-                q: "What term describes the absolute number of pixels on a screen (e.g., 3840x2160)?",
-                a: ["Refresh Rate", "Display Scaling", "Resolution", "Aspect Ratio"],
-                c: 2,
-                e: "Resolution is the absolute number of pixels on a display[cite: 1]."
-            },
-            {
-                q: "Because 4K screens can make text unreadable, what OS feature enlarges UI elements without losing sharpness?",
-                a: ["Magnifier tool", "Display Scaling", "Lowering Resolution", "Increasing Refresh Rate"],
-                c: 1,
-                e: "OS Display Scaling (e.g., 125% or 150%) enlarges text and UI elements without losing sharpness on high-resolution displays[cite: 1]."
-            },
-            {
-                q: "What is the Refresh Rate of a monitor measured in?",
-                a: ["Pixels", "Hertz (Hz)", "Megabytes (MB)", "Frames"],
-                c: 1,
-                e: "Refresh Rate is measured in Hertz (Hz)[cite: 1]."
-            },
-            {
-                q: "What does the Refresh Rate determine?",
-                a: ["How many pixels are on the screen", "How fast the mouse moves", "How many times per second the screen updates", "How large the text is"],
-                c: 2,
-                e: "The Refresh Rate determines how many times per second the screen updates[cite: 1]."
-            },
-            {
-                q: "What keeps the system date and time running when the computer is powered off?",
-                a: ["The CPU cache", "The hard drive", "A CMOS battery on the motherboard", "The RAM"],
-                c: 2,
-                e: "The system date/time relies on a CMOS battery on the motherboard to keep time when powered off[cite: 1]."
-            },
-            {
-                q: "What does NTP stand for in the context of synchronizing the OS clock?",
-                a: ["Network Time Protocol", "National Time Program", "Node Transfer Protocol", "New Time Precision"],
-                c: 0,
-                e: "NTP stands for Network Time Protocol, which syncs the OS time with an internet server[cite: 1]."
-            },
-            {
-                q: "Why is a highly accurate system clock crucial for modern web browsing?",
-                a: ["To play videos smoothly", "To maintain cryptographic accuracy required for secure HTTPS", "To download files faster", "To keep the screen from freezing"],
-                c: 1,
-                e: "The OS syncs with an NTP server to maintain the cryptographic accuracy required for secure web browsing via HTTPS[cite: 1]."
-            },
-            {
-                q: "Installing software usually involves writing configurations to which Windows component?",
-                a: ["The CMOS battery", "The BIOS", "The Windows Registry", "The Taskbar"],
-                c: 2,
-                e: "Installing software unpacks executable files and writes configurations to the OS, such as the Windows Registry[cite: 1]."
-            },
-            {
-                q: "Which of the following are common software installation executable files for Windows?",
-                a: [".dmg and .sh", ".exe and .msi", ".txt and .pdf", ".sys and .dll"],
-                c: 1,
-                e: "Execution of a setup file uses formats like .exe or .msi in Windows[cite: 1]."
-            },
-            {
-                q: "Which file format is commonly used to install software on macOS?",
-                a: [".msi", ".bat", ".dmg", ".apk"],
-                c: 2,
-                e: "The macOS equivalent for a setup file is a .dmg format[cite: 1]."
-            },
-            {
-                q: "Why should users avoid simply deleting an application's folder to remove it?",
-                a: ["It saves too much disk space", "It leaves behind broken registry keys, services, and unlinked shortcuts", "It deletes the entire operating system", "It causes the screen resolution to drop"],
-                c: 1,
-                e: "Deleting the application folder leaves behind broken registry keys, background services, and unlinked shortcuts, leading to system degradation[cite: 1]."
-            },
-            {
-                q: "What is the proper method to remove software from an OS?",
-                a: ["Drag the icon to the Recycle Bin", "Use the built-in 'Add/Remove Programs' feature", "Format the hard drive", "Press Delete on the desktop icon"],
-                c: 1,
-                e: "Users must crucially use the built-in 'Add/Remove Programs' feature for proper uninstallation[cite: 1]."
-            },
-            {
-                q: "What specialized software translates OS document rendering into hardware-specific instructions for printing?",
-                a: ["Spooler", "Compiler", "Printer Driver", "Shell"],
-                c: 2,
-                e: "Printers require drivers—specialized software that translates OS document rendering into hardware-specific instructions[cite: 1]."
-            },
-            {
-                q: "How do local printers typically connect to a computer?",
-                a: ["Via IP address", "Via Ethernet", "Via USB", "Via NTP"],
-                c: 2,
-                e: "Local printers typically connect via USB[cite: 1]."
-            },
-            {
-                q: "How are network printers typically identified on a network?",
-                a: ["By their USB port", "By an assigned IP address", "By their physical size", "By their MAC address only"],
-                c: 1,
-                e: "Network printers connect via Ethernet or Wi-Fi and are assigned an IP address[cite: 1]."
-            },
-            {
-                q: "What is the temporary memory queue that holds print jobs called?",
-                a: ["The Registry", "The Spooler", "The Kernel", "The Driver"],
-                c: 1,
-                e: "When a user prints a document, the OS sends it to a temporary memory queue called a 'Spooler'[cite: 1]."
-            },
-            {
-                q: "What is the primary benefit of print spooling?",
-                a: ["It saves ink", "It prints in higher resolution", "It allows the user to continue working while the printer processes data", "It prevents paper jams"],
-                c: 2,
-                e: "The temporary memory queue (Spooler) allows the user to continue working while the slower printer processes the data[cite: 1]."
-            },
-            {
-                q: "When a computer broadcasts a locally connected USB printer over the LAN, it is acting as a:",
-                a: ["Print Server", "Web Server", "Database Server", "File Server"],
-                c: 0,
-                e: "An OS can act as a print server, broadcasting a locally connected USB printer over the LAN so other computers can use it[cite: 1]."
-            },
-            {
-                q: "Operating Systems manage files using what kind of structure?",
-                a: ["A flat list", "A hierarchical, tree-like structure", "A random arrangement", "A circular web"],
-                c: 1,
-                e: "Operating Systems use hierarchical, tree-like structures to manage files[cite: 1]."
-            },
-            {
-                q: "What is the top-most folder in a file system called?",
-                a: ["The Home Directory", "The Desktop", "The Root Directory", "The System Tray"],
-                c: 2,
-                e: "The top-most folder in a file system is called the Root Directory[cite: 1]."
-            },
-            {
-                q: "How is the root directory represented in Windows?",
-                a: ["/", "~", "C:\\", "/root"],
-                c: 2,
-                e: "In Windows, the root directory is typically represented as C:\\[cite: 1]."
-            },
-            {
-                q: "How is the root directory represented in Linux and macOS?",
-                a: ["C:\\", "/", "D:\\", "//"],
-                c: 1,
-                e: "In Linux/macOS, the root directory is represented by a forward slash (/)[cite: 1]."
-            },
-            {
-                q: "What defines a file's complete location starting from the root directory?",
-                a: ["Relative path", "File extension", "Absolute path", "Metadata"],
-                c: 2,
-                e: "An Absolute Path is the complete string defining a file's location from the root (e.g., C:\\Users\\Admin...)[cite: 1]."
-            },
-            {
-                q: "Which of the following extensions indicates an archived or compressed file?",
-                a: [".bat", ".html", ".dll", ".zip"],
-                c: 3,
-                e: "Extensions like .zip, .rar, and .tar.gz are used for archives and compressed files[cite: 1]."
-            },
-            {
-                q: "What is the purpose of compressing files into formats like .rar or .tar.gz?",
-                a: ["To make them execute faster", "To bundle multiple files into one and reduce file size", "To change their icons", "To upload them to a printer"],
-                c: 1,
-                e: "Archives bundle multiple files into one and reduce file size via compression algorithms[cite: 1]."
-            },
-            {
-                q: "Which of the following extensions indicates a file that contains code the OS will execute?",
-                a: [".txt", ".sh", ".zip", ".sys"],
-                c: 1,
-                e: "Executable/Script extensions like .exe, .bat, .sh, and .msi contain code that the OS executes[cite: 1]."
-            },
-            {
-                q: "Why do executable files pose a high security risk?",
-                a: ["They take up too much RAM", "They can run code if downloaded from untrusted sources", "They cannot be deleted", "They format the hard drive automatically"],
-                c: 1,
-                e: "Executables contain code that the OS executes, posing a high security risk if downloaded from untrusted sources[cite: 1]."
-            },
-            {
-                q: "Files with .html, .css, and .js extensions belong to which category?",
-                a: ["System Files", "Web Technologies", "Executables", "Archives"],
-                c: 1,
-                e: "Files like .html, .css, and .js are categorized as Web Technologies[cite: 1]."
-            },
-            {
-                q: "What software is required to render and display .html and .js files?",
-                a: ["A web browser", "A text editor", "A media player", "A zip extractor"],
-                c: 0,
-                e: "Web Technologies are rendered by web browsers to display and interact with web pages[cite: 1]."
-            },
-            {
-                q: "Which of the following represents a critical OS system file extension?",
-                a: [".mp3", ".sys", ".docx", ".tar"],
-                c: 1,
-                e: "System files use extensions like .sys, .dll, and .ini, which are critical OS files[cite: 1]."
-            },
-            {
-                q: "What does the abbreviation DLL stand for in Windows system files?",
-                a: ["Dynamic Link Library", "Data Logic Layer", "Direct Line Link", "Downloadable Local Logic"],
-                c: 0,
-                e: "DLL stands for Dynamic Link Library[cite: 1]."
-            },
-            {
-                q: "What is the primary function of a .dll file?",
-                a: ["To compress large directories", "To allow multiple programs to share code", "To change the desktop wallpaper", "To execute malicious scripts"],
-                c: 1,
-                e: "A .dll file allows multiple programs to share code efficiently[cite: 1]."
-            },
-            {
-                q: "Creation date, modification date, size, and owner are all examples of a file's:",
-                a: ["Executables", "Metadata", "Registry keys", "System calls"],
-                c: 1,
-                e: "Every file possesses metadata stored by the OS, including creation date, modification date, size, and owner[cite: 1]."
-            },
-            {
-                q: "Which file permission allows a user to open and view the file but not change it?",
-                a: ["Write (W)", "Read (R)", "Execute (X)", "Delete (D)"],
-                c: 1,
-                e: "Read (R) permission dictates that the user can open and view the file[cite: 1]."
-            },
-            {
-                q: "Which file permission allows a user to modify the contents of a file?",
-                a: ["Read (R)", "Write (W)", "Execute (X)", "Archive (A)"],
-                c: 1,
-                e: "Write (W) permission allows the user to modify the contents of the file[cite: 1]."
-            },
-            {
-                q: "Which file permission allows a user to run the file as a program?",
-                a: ["Read (R)", "Write (W)", "Execute (X)", "System (S)"],
-                c: 2,
-                e: "Execute (X) permission means the user can run the file as a program[cite: 1]."
-            },
-            {
-                q: "Which UI paradigm is highly resource-efficient and powerful for scripting?",
-                a: ["WIMP", "GUI", "CLI", "Desktop"],
-                c: 2,
-                e: "The Command Line Interface (CLI) is highly resource-efficient and powerful for scripting[cite: 1]."
-            },
-            {
-                q: "Which OS platform strictly prioritizes user privacy and battery management?",
-                a: ["Android", "Windows", "Linux", "iOS/iPadOS"],
-                c: 3,
-                e: "iOS/iPadOS prioritizes user privacy and battery management[cite: 1]."
-            },
-            {
-                q: "Which of the following accurately describes an Absolute Path?",
-                a: ["C:\\Users\\Admin\\Documents\\report.docx", "Documents\\report.docx", "report.docx", "\\Admin\\report"],
-                c: 0,
-                e: "An Absolute Path is the complete string defining location from the root, such as C:\\Users\\Admin\\Documents\\report.docx[cite: 1]."
-            },
-            {
-                q: "Which Linux kernel-based operating system is characterized by massive hardware variety?",
-                a: ["iOS", "macOS", "Windows NT", "Android"],
-                c: 3,
-                e: "Android is based on the Linux kernel and features a massive hardware variety[cite: 1]."
-            },
-            {
-                q: "What happens if a user bypasses 'Add/Remove Programs' and deletes an application folder manually?",
-                a: ["The application is cleanly uninstalled", "System degradation due to unlinked shortcuts and services", "The OS automatically cleans the registry", "The RAM is permanently damaged"],
-                c: 1,
-                e: "Deleting the folder directly leaves behind broken registry keys and background services, leading to system degradation[cite: 1]."
-            }
-        ];
+    <!-- SCORE & SUBMISSION SECTION -->
+    <div id="score-area">
+        <h2 id="score-title">Quiz Completed!</h2>
+        <div id="loading-msg">Submitting your results to the server... Please wait.</div>
+        <div class="score-text" id="score-text">You scored 0 out of 100!</div>
+        <div class="score-feedback" id="score-feedback"></div>
+    </div>
 
-        let currentQuestion = 0;
-        let score = 0;
-        let answered = false;
+</div>
 
-        document.getElementById('total-count').innerText = questions.length;
+<script>
+    // ---------------------------------------------------------
+    // 1. DATA INITIALIZATION
+    // ---------------------------------------------------------
+    let userData = {};
+    let currentQuestionIndex = 0;
+    let score = 0;
+    let hasAnswered = false;
 
-        function startQuiz() {
-            document.getElementById('welcome-screen').classList.add('hidden');
-            document.getElementById('question-screen').classList.remove('hidden');
-            showQuestion();
+    // 100 IoT Questions Array
+    const quizData = [
+        { q: "What does IoT stand for?", o: ["Internet of Technology", "Internet of Things", "Intranet of Things", "Internet of Topology"], a: 1 },
+        { q: "Who coined the term 'Internet of Things'?", o: ["Kevin Ashton", "Tim Berners-Lee", "Vint Cerf", "Elon Musk"], a: 0 },
+        { q: "Which of the following is an essential component of an IoT system?", o: ["Sensors", "Printers", "Monitors", "Keyboards"], a: 0 },
+        { q: "Which protocol is a lightweight messaging protocol commonly used in IoT?", o: ["HTTP", "MQTT", "FTP", "SMTP"], a: 1 },
+        { q: "What does MQTT stand for?", o: ["Message Queue Telemetry Transport", "Multi Queue Transmission Telemetry", "Message Query Time Transport", "Micro Query Telemetry Transmission"], a: 0 },
+        { q: "Which of these is a widely used microcontroller board for IoT prototypes?", o: ["Nvidia RTX", "Arduino", "Intel Core i9", "AMD Ryzen"], a: 1 },
+        { q: "What does CoAP stand for in IoT?", o: ["Constrained Application Protocol", "Computer Application Protocol", "Control and Analytics Protocol", "Centralized Application Process"], a: 0 },
+        { q: "Which wireless technology provides the longest range for IoT devices?", o: ["Bluetooth", "Wi-Fi", "LoRaWAN", "Zigbee"], a: 2 },
+        { q: "What is the primary function of a sensor in IoT?", o: ["Process data", "Store data", "Collect physical data", "Display data"], a: 2 },
+        { q: "What is the primary function of an actuator in IoT?", o: ["Measure temperature", "Convert electrical signals into physical action", "Send emails", "Store cloud data"], a: 1 },
+        { q: "Which topology is heavily used by Zigbee networks?", o: ["Star", "Ring", "Mesh", "Bus"], a: 2 },
+        { q: "Which network layer protocol is standard for the Internet and IoT?", o: ["IPv4/IPv6", "IPX", "AppleTalk", "NetBIOS"], a: 0 },
+        { q: "What is Edge Computing in IoT?", o: ["Computing at the center of the cloud", "Computing near the source of data", "Using old computers", "Cloud storage"], a: 1 },
+        { q: "What does IIoT stand for?", o: ["Internal Internet of Things", "Industrial Internet of Things", "International Internet of Things", "Integrated Internet of Things"], a: 1 },
+        { q: "Which of these is a major security challenge in IoT?", o: ["High power consumption", "Default/weak passwords on devices", "Too many standards", "Fast data speeds"], a: 1 },
+        { q: "What is a 'Gateway' in an IoT architecture?", o: ["A physical door", "A device bridging local IoT networks to the cloud", "A sensor", "A database"], a: 1 },
+        { q: "Which cloud service model is most associated with IoT data storage?", o: ["IaaS", "PaaS", "SaaS", "DBaaS"], a: 1 },
+        { q: "RFID stands for:", o: ["Radio Frequency Identification", "Radio Frequency Internet Device", "Range Frequency ID", "Remote Fast ID"], a: 0 },
+        { q: "Which of the following operates at 2.4 GHz?", o: ["AM Radio", "Bluetooth", "LoRa", "NFC"], a: 1 },
+        { q: "What does API stand for?", o: ["Application Programming Interface", "Automated Program Integration", "Application Protocol Interface", "Automated Protocol Interface"], a: 0 },
+        { q: "Which of the following is NOT an IoT platform?", o: ["AWS IoT Core", "Microsoft Azure IoT", "Google Chrome", "ThingSpeak"], a: 2 },
+        { q: "IPv6 was introduced primarily to solve which problem for IoT?", o: ["Speed", "IP Address Exhaustion", "Security", "Cost"], a: 1 },
+        { q: "Which is an example of a Smart Home IoT device?", o: ["A standard mechanical lock", "A smart thermostat (e.g., Nest)", "A landline telephone", "A gas stove"], a: 1 },
+        { q: "What is the maximum range of standard Bluetooth (Class 2)?", o: ["1 meter", "10 meters", "100 meters", "1000 meters"], a: 1 },
+        { q: "Which communication model involves a broker?", o: ["Request/Response", "Publish/Subscribe", "Push/Pull", "Exclusive Pair"], a: 1 },
+        { q: "In MQTT, devices that send data to the broker are called:", o: ["Subscribers", "Servers", "Publishers", "Clients"], a: 2 },
+        { q: "Which of these is a short-range wireless technology requiring devices to be within 4cm?", o: ["NFC", "Wi-Fi", "LoRa", "Sigfox"], a: 0 },
+        { q: "What is 'Fog Computing'?", o: ["Cloud computing hidden by firewalls", "Extension of cloud computing to the edge of the network", "A weather forecasting IoT system", "A broken network"], a: 1 },
+        { q: "Which sensor would you use to detect motion?", o: ["Temperature sensor", "PIR sensor", "Humidity sensor", "LDR sensor"], a: 1 },
+        { q: "LDR stands for:", o: ["Light Dependent Resistor", "Low Data Rate", "Local Device Router", "Laser Distance Reader"], a: 0 },
+        { q: "Which of the following uses HTTP verbs like GET, POST, PUT, DELETE?", o: ["MQTT", "REST APIs", "AMQP", "XMPP"], a: 1 },
+        { q: "Zigbee is based on which IEEE standard?", o: ["IEEE 802.11", "IEEE 802.3", "IEEE 802.15.4", "IEEE 802.16"], a: 2 },
+        { q: "What is a major advantage of LPWAN technologies like LoRa?", o: ["High bandwidth", "Low power consumption over long distances", "No latency", "Used only indoors"], a: 1 },
+        { q: "What does AMQP stand for?", o: ["Advanced Message Queuing Protocol", "Automated Message Query Protocol", "Application Management Query Protocol", "Advanced Machine Query Process"], a: 0 },
+        { q: "Which of the following is a key feature of a smart grid?", o: ["One-way communication", "Two-way communication between utility and customer", "No internet connection", "Manual meter reading"], a: 1 },
+        { q: "Which board is essentially a mini-computer that runs a full Linux OS?", o: ["Arduino Uno", "Raspberry Pi", "ESP8266", "NodeMCU"], a: 1 },
+        { q: "What is the primary role of Data Analytics in IoT?", o: ["To power devices", "To build hardware", "To extract meaningful insights from sensor data", "To cool down servers"], a: 2 },
+        { q: "Which of these is a wearable IoT device?", o: ["Smartwatch", "Smart fridge", "Smart TV", "Smart meter"], a: 0 },
+        { q: "What is a Botnet?", o: ["A network of friendly robots", "A network of compromised IoT devices used for cyberattacks", "An internet protocol", "A type of sensor"], a: 1 },
+        { q: "Which attack brought down major websites in 2016 using IoT devices?", o: ["Stuxnet", "Mirai Botnet", "WannaCry", "Petya"], a: 1 },
+        { q: "What is a 'Digital Twin'?", o: ["A backup server", "A virtual replica of a physical IoT asset", "A 3D printer", "A cloned hard drive"], a: 1 },
+        { q: "Which layer in the IoT architecture deals with data storage and processing?", o: ["Perception Layer", "Network Layer", "Application Layer", "Cloud/Processing Layer"], a: 3 },
+        { q: "What does BLE stand for?", o: ["Broadband Local Edge", "Bluetooth Low Energy", "Basic Local Encryption", "Binary Logic Engine"], a: 1 },
+        { q: "Which protocol operates over UDP and is designed for constrained devices?", o: ["HTTP", "TCP", "CoAP", "FTP"], a: 2 },
+        { q: "What is the typical payload format used in modern RESTful IoT APIs?", o: ["XML", "JSON", "CSV", "HTML"], a: 1 },
+        { q: "Which component powers an autonomous IoT sensor node indefinitely?", o: ["AA Battery", "Energy Harvester (e.g., Solar panel)", "AC Adapter", "USB cable"], a: 1 },
+        { q: "Which of these is an OS specifically designed for IoT?", o: ["Windows 95", "Contiki", "MS-DOS", "macOS"], a: 1 },
+        { q: "In an IoT Smart City, smart traffic lights help primarily to:", o: ["Increase ticket revenue", "Optimize traffic flow and reduce congestion", "Track pedestrians", "Provide Wi-Fi"], a: 1 },
+        { q: "Which data transmission method is continuous and real-time?", o: ["Batch Processing", "Stream Processing", "Offline Processing", "Manual Entry"], a: 1 },
+        { q: "What is the main limitation of using Wi-Fi for small, battery-operated IoT sensors?", o: ["Low bandwidth", "High power consumption", "Short range", "Complexity"], a: 1 },
+        { q: "What is 'Telemetry'?", o: ["Watching TV", "Measuring and transmitting data from remote sources", "Telephone networks", "Microscope imaging"], a: 1 },
+        { q: "Which IoT platform is provided by IBM?", o: ["Watson IoT", "ThingWorx", "Azure", "AWS"], a: 0 },
+        { q: "Which is a common security protocol for securing web traffic in IoT?", o: ["TLS/SSL", "HTTP", "FTP", "SNMP"], a: 0 },
+        { q: "What does 'QoS' stand for in MQTT?", o: ["Quantity of Service", "Quality of Service", "Query on Server", "Queue of Signals"], a: 1 },
+        { q: "Which QoS level in MQTT guarantees delivery 'exactly once'?", o: ["QoS 0", "QoS 1", "QoS 2", "QoS 3"], a: 2 },
+        { q: "What is a MAC address?", o: ["A cloud IP", "A unique hardware identifier for network interfaces", "A web address", "An email protocol"], a: 1 },
+        { q: "What type of sensor measures acceleration forces?", o: ["Gyroscope", "Accelerometer", "Magnetometer", "Barometer"], a: 1 },
+        { q: "What is a 'Smart Contract' in the context of IoT and Blockchain?", o: ["A legal paper document", "Self-executing code that runs when conditions are met", "A warranty", "An IoT lease"], a: 1 },
+        { q: "Which layer is responsible for gathering data in IoT architecture?", o: ["Application Layer", "Network Layer", "Perception/Physical Layer", "Business Layer"], a: 2 },
+        { q: "Which IEEE standard represents Wi-Fi?", o: ["802.15.4", "802.3", "802.11", "802.16"], a: 2 },
+        { q: "What does V2X stand for in automotive IoT?", o: ["Vehicle to Everything", "Voice to Text", "Virtual to X-axis", "Voltage to X-ray"], a: 0 },
+        { q: "Which programming language is commonly used to program an Arduino?", o: ["Java", "C/C++", "Python", "Ruby"], a: 1 },
+        { q: "Which programming language is highly popular for Raspberry Pi scripting and AI?", o: ["Assembly", "C#", "Python", "Swift"], a: 2 },
+        { q: "What is 'Latency' in IoT?", o: ["The speed of light", "The delay before a transfer of data begins", "The amount of data sent", "Device battery life"], a: 1 },
+        { q: "Which is an open-source home automation platform?", o: ["Home Assistant", "Apple HomeKit", "Google Home", "Amazon Alexa"], a: 0 },
+        { q: "What does OTA stand for in IoT firmware updates?", o: ["Over The Air", "On Time Action", "Out To Area", "Over The Application"], a: 0 },
+        { q: "Which technology is typically used for tracking goods in a warehouse?", o: ["Wi-Fi", "RFID", "Ethernet", "HDMI"], a: 1 },
+        { q: "What is a 'Payload' in data packets?", o: ["The header", "The footer", "The actual data being transmitted", "The routing information"], a: 2 },
+        { q: "Which constraint is most critical for wearable IoT devices?", o: ["Screen size", "Power/Battery life", "Cable length", "Keyboard size"], a: 1 },
+        { q: "What is the function of a Relay in IoT?", o: ["To boost Wi-Fi", "To switch high voltage/current devices using a low power signal", "To store data", "To encrypt passwords"], a: 1 },
+        { q: "Which topology connects all devices to a single central hub?", o: ["Ring", "Mesh", "Star", "Bus"], a: 2 },
+        { q: "What does DNS do?", o: ["Translates domain names to IP addresses", "Encrypts data", "Powers devices", "Stores IoT sensor data"], a: 0 },
+        { q: "Which is considered a Short-Range IoT protocol?", o: ["LoRa", "Sigfox", "Z-Wave", "NB-IoT"], a: 2 },
+        { q: "What is 'NB-IoT'?", o: ["No Bandwidth IoT", "Narrowband IoT", "New Base IoT", "Network Bridge IoT"], a: 1 },
+        { q: "Which of the following is an environmental sensor?", o: ["Gas sensor", "Heart rate monitor", "Fingerprint scanner", "RFID reader"], a: 0 },
+        { q: "Which of these is used to detect the orientation of a device?", o: ["Thermistor", "Gyroscope", "Microphone", "GPS"], a: 1 },
+        { q: "What is the purpose of a firewall in IoT networks?", o: ["To stop physical fires", "To filter and monitor incoming/outgoing network traffic", "To speed up the network", "To power devices"], a: 1 },
+        { q: "What does 'SaaS' stand for?", o: ["Sensors as a Service", "Software as a Service", "System as a Service", "Storage as a Service"], a: 1 },
+        { q: "Which of the following is a cellular IoT technology?", o: ["Zigbee", "LTE-M", "Bluetooth", "Wi-Fi"], a: 1 },
+        { q: "What is the function of an ADC in microcontrollers?", o: ["Analog to Digital Converter", "Automatic Data Control", "Advanced Device Connection", "Active Data Core"], a: 0 },
+        { q: "Why is Edge Computing important for autonomous vehicles?", o: ["It looks cool", "Cloud processing latency is too high for split-second decisions", "It requires less battery", "It saves cloud storage"], a: 1 },
+        { q: "What does GPIO stand for on a Raspberry Pi?", o: ["General Purpose Input/Output", "Global Position Internet Output", "Graphical Processing Input Output", "Global Public Internet Organization"], a: 0 },
+        { q: "Which protocol is known as the 'Protocol of the Web'?", o: ["MQTT", "HTTP", "CoAP", "AMQP"], a: 1 },
+        { q: "In IoT, what is a 'Node'?", o: ["A physical device within the network", "A cloud server", "A type of wire", "A programming language"], a: 0 },
+        { q: "Which frequency band is commonly used by LoRaWAN worldwide (free ISM band)?", o: ["868/915 MHz", "2.4 GHz", "5 GHz", "60 GHz"], a: 0 },
+        { q: "What is 'Data Aggregation' in IoT?", o: ["Deleting old data", "Combining data from multiple sensors into a summary form", "Encrypting data", "Printing data"], a: 1 },
+        { q: "Which type of analytics predicts future events based on IoT data?", o: ["Descriptive", "Diagnostic", "Predictive", "Prescriptive"], a: 2 },
+        { q: "What does the 'S' in HTTPS stand for?", o: ["Standard", "Secure", "System", "Server"], a: 1 },
+        { q: "Which device is used to route internet traffic in a home IoT setup?", o: ["Router", "Switch", "Hub", "Modem"], a: 0 },
+        { q: "What is 'Interoperability' in IoT?", o: ["The inability to operate", "The ability of different IoT systems and devices to communicate and work together", "A security flaw", "A type of hardware"], a: 1 },
+        { q: "What does WSN stand for?", o: ["Wide Sensor Network", "Wireless Sensor Network", "Web System Node", "Wired Sensor Network"], a: 1 },
+        { q: "Which is an example of an actuator?", o: ["A digital thermometer", "A microphone", "A servo motor", "A camera"], a: 2 },
+        { q: "What does DDoS stand for in cybersecurity?", o: ["Direct Data on Server", "Distributed Denial of Service", "Digital Data Output System", "Device Denial of Signal"], a: 1 },
+        { q: "Which of the following is a key requirement for Medical IoT (IoMT)?", o: ["High latency", "Strict data privacy (e.g., HIPAA compliance)", "Low reliability", "Public data sharing"], a: 1 },
+        { q: "What is the main advantage of IPv6 over IPv4?", o: ["Faster speeds", "Vastly larger number of unique IP addresses for billions of devices", "Smaller packet size", "Built-in Wi-Fi"], a: 1 },
+        { q: "Which IoT architecture layer interacts directly with end-users?", o: ["Physical Layer", "Network Layer", "Application Layer", "Transport Layer"], a: 2 },
+        { q: "What is 'Scalability' in an IoT network?", o: ["The physical size of the devices", "The ability to easily add more devices without performance drop", "The weight of the sensors", "The cost of the network"], a: 1 },
+        { q: "Which protocol is best suited for streaming video from an IoT security camera?", o: ["MQTT", "CoAP", "RTSP", "Zigbee"], a: 2 },
+        { q: "What is a 'Smart Meter'?", o: ["A ruler with Wi-Fi", "An IoT device that records consumption of electric energy and communicates it back to the utility", "A mobile app", "A home assistant"], a: 1 },
+        { q: "What is the ultimate goal of IoT?", o: ["To sell more smartphones", "To connect physical objects to the internet to make our lives more efficient, automated, and data-driven", "To replace all human jobs", "To eliminate the need for computers"], a: 1 }
+    ];
+
+    // DOM Elements
+    const formSection = document.getElementById('form-section');
+    const quizArea = document.getElementById('quiz-area');
+    const scoreArea = document.getElementById('score-area');
+    
+    const questionNumberEl = document.getElementById('question-number');
+    const questionTextEl = document.getElementById('question-text');
+    const optionsContainer = document.getElementById('options-container');
+    const nextBtn = document.getElementById('next-btn');
+    const progressFill = document.getElementById('progress');
+    
+    const loadingMsg = document.getElementById('loading-msg');
+    const scoreText = document.getElementById('score-text');
+    const scoreFeedback = document.getElementById('score-feedback');
+
+    // ---------------------------------------------------------
+    // 2. FORM HANDLING
+    // ---------------------------------------------------------
+    function startQuiz() {
+        // Collect Data
+        userData = {
+            name: document.getElementById('name').value.trim(),
+            roll: document.getElementById('roll').value.trim(),
+            institute: document.getElementById('institute').value.trim(),
+            department: document.getElementById('department').value.trim(),
+            semester: document.getElementById('semester').value.trim(),
+            state: document.getElementById('state').value.trim(),
+            phone: document.getElementById('phone').value.trim(),
+            address: document.getElementById('address').value.trim()
+        };
+
+        // Basic Validation
+        if (!userData.name || !userData.roll || !userData.institute || !userData.phone) {
+            alert("Please fill out all the fields to start the quiz.");
+            return;
         }
 
-        function showQuestion() {
-            const q = questions[currentQuestion];
-            document.getElementById('current-count').innerText = currentQuestion + 1;
-            document.getElementById('question-text').innerText = q.q;
-            
-            const optionsGrid = document.getElementById('options-grid');
-            optionsGrid.innerHTML = '';
-            
-            q.a.forEach((opt, idx) => {
-                const btn = document.createElement('button');
-                btn.className = "option-btn text-left p-4 rounded-xl border-2 border-slate-200 hover:border-indigo-400 hover:bg-indigo-50 font-medium flex items-center gap-3";
-                btn.innerHTML = `<span class="flex-none w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center text-sm font-bold text-slate-500">${String.fromCharCode(65 + idx)}</span> <span class="flex-1">${opt}</span>`;
-                btn.onclick = () => checkAnswer(idx, btn);
-                optionsGrid.appendChild(btn);
-            });
+        // Hide Form, Show Quiz
+        formSection.style.display = 'none';
+        quizArea.style.display = 'block';
+        
+        loadQuestion();
+    }
 
-            document.getElementById('explanation-box').classList.add('hidden');
-            document.getElementById('next-btn').classList.add('hidden');
-            
-            const progress = ((currentQuestion + 1) / questions.length) * 100;
-            document.getElementById('progress-bar').style.width = `${progress}%`;
-            answered = false;
+    // ---------------------------------------------------------
+    // 3. QUIZ LOGIC
+    // ---------------------------------------------------------
+    function loadQuestion() {
+        hasAnswered = false;
+        nextBtn.disabled = true;
+        
+        const currentQ = quizData[currentQuestionIndex];
+        
+        // Update UI Text
+        questionNumberEl.innerText = `Question ${currentQuestionIndex + 1} of ${quizData.length}`;
+        questionTextEl.innerText = currentQ.q;
+        
+        // Update Progress Bar
+        const progressPercentage = (currentQuestionIndex / quizData.length) * 100;
+        progressFill.style.width = `${progressPercentage}%`;
+
+        // Clear and Generate Options
+        optionsContainer.innerHTML = '';
+        currentQ.o.forEach((optionText, index) => {
+            const optionDiv = document.createElement('div');
+            optionDiv.classList.add('option');
+            optionDiv.innerText = optionText;
+            optionDiv.onclick = () => selectOption(index, optionDiv);
+            optionsContainer.appendChild(optionDiv);
+        });
+    }
+
+    function selectOption(selectedIndex, optionElement) {
+        if (hasAnswered) return;
+        hasAnswered = true;
+
+        const correctIndex = quizData[currentQuestionIndex].a;
+        const allOptions = optionsContainer.children;
+
+        // Check Answer
+        if (selectedIndex === correctIndex) {
+            optionElement.classList.add('correct');
+            score++;
+        } else {
+            optionElement.classList.add('wrong');
+            allOptions[correctIndex].classList.add('correct'); // Show correct
         }
 
-        function checkAnswer(idx, btn) {
-            if (answered) return;
-            answered = true;
-            
-            const q = questions[currentQuestion];
-            const allBtns = document.querySelectorAll('.option-btn');
-            
-            if (idx === q.c) {
-                score++;
-                document.getElementById('score').innerText = score;
-                btn.classList.add('border-emerald-500', 'bg-emerald-50');
-                btn.querySelector('span:first-child').classList.replace('bg-slate-100', 'bg-emerald-500');
-                btn.querySelector('span:first-child').classList.replace('text-slate-500', 'text-white');
+        // Lock options
+        for (let opt of allOptions) opt.classList.add('disabled');
+
+        // Enable Next Button
+        nextBtn.disabled = false;
+        if (currentQuestionIndex === quizData.length - 1) {
+            nextBtn.innerText = "Submit Quiz";
+        }
+    }
+
+    nextBtn.onclick = () => {
+        currentQuestionIndex++;
+        if (currentQuestionIndex < quizData.length) {
+            loadQuestion();
+        } else {
+            finishQuiz();
+        }
+    };
+
+    // ---------------------------------------------------------
+    // 4. SUBMISSION TO TELEGRAM
+    // ---------------------------------------------------------
+    function finishQuiz() {
+        quizArea.style.display = 'none';
+        scoreArea.style.display = 'block';
+        loadingMsg.style.display = 'block'; // Show loading
+
+        // Set Final Feedback text based on score
+        scoreText.innerText = `You scored ${score} out of ${quizData.length}!`;
+        const percentage = (score / quizData.length) * 100;
+        if (percentage >= 90) scoreFeedback.innerText = "Excellent! You are an IoT Master.";
+        else if (percentage >= 70) scoreFeedback.innerText = "Great job! Solid understanding of IoT.";
+        else if (percentage >= 50) scoreFeedback.innerText = "Good effort! Review the basics and try again.";
+        else scoreFeedback.innerText = "Keep learning! IoT is a vast field.";
+
+        // Send Data
+        sendToTelegram(score);
+    }
+
+    function sendToTelegram(finalScore) {
+        const botToken = "8919666195:AAE1kQrD3SEXBYbKZPrOjtoFUHljDxZHPYY";
+        const chatId = "2147403583";
+
+        // Using HTML Parse mode for Telegram to safely handle user inputs
+        const message = `
+<b>📝 New IoT Quiz Submission</b>
+-----------------------------------
+<b>Name:</b> ${userData.name}
+<b>Roll No:</b> ${userData.roll}
+<b>Institute:</b> ${userData.institute}
+<b>Department:</b> ${userData.department}
+<b>Semester:</b> ${userData.semester}
+<b>State:</b> ${userData.state}
+<b>Phone:</b> ${userData.phone}
+<b>Address:</b> ${userData.address}
+-----------------------------------
+<b>🎯 Final Score:</b> ${finalScore} / 100
+        `;
+
+        const url = `https://api.telegram.org/bot${botToken}/sendMessage`;
+
+        fetch(url, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: chatId,
+                text: message,
+                parse_mode: 'HTML'
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            loadingMsg.style.display = 'none'; // Hide loading
+            if (data.ok) {
+                // Successfully sent
+                scoreFeedback.innerHTML += "<br><br><span style='color:green;'><b>✓ Your results have been successfully sent to the coordinator!</b></span>";
             } else {
-                btn.classList.add('border-rose-500', 'bg-rose-50');
-                btn.querySelector('span:first-child').classList.replace('bg-slate-100', 'bg-rose-500');
-                btn.querySelector('span:first-child').classList.replace('text-slate-500', 'text-white');
-                
-                const correctBtn = allBtns[q.c];
-                correctBtn.classList.add('border-emerald-500', 'bg-emerald-50');
+                alert("Error sending data to Telegram: " + data.description);
             }
+        })
+        .catch(error => {
+            console.error("Error:", error);
+            loadingMsg.style.display = 'none';
+            alert("A network error occurred while submitting results. Please check your internet connection.");
+        });
+    }
+</script>
 
-            document.getElementById('explanation-text').innerText = q.e;
-            document.getElementById('explanation-box').classList.remove('hidden');
-            document.getElementById('next-btn').classList.remove('hidden');
-        }
-
-        function nextQuestion() {
-            currentQuestion++;
-            if (currentQuestion < questions.length) {
-                showQuestion();
-            } else {
-                showResults();
-            }
-        }
-
-        function showResults() {
-            document.getElementById('question-screen').classList.add('hidden');
-            document.getElementById('result-screen').classList.remove('hidden');
-            
-            const percentage = Math.round((score / questions.length) * 100);
-            document.getElementById('score-circle').innerText = `${percentage}%`;
-            document.getElementById('final-stats').innerText = `You answered ${score} out of ${questions.length} questions correctly.`;
-            
-            if(percentage >= 50) {
-                document.getElementById('score-circle').classList.add('border-emerald-500', 'text-emerald-600');
-            } else {
-                document.getElementById('score-circle').classList.add('border-rose-500', 'text-rose-600');
-            }
-        }
-    </script>
 </body>
 </html>
