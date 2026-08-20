@@ -61,57 +61,54 @@
             
             .btn { padding: 15px; font-size: 1.1em; }
         }
+
+        /* Password Lock Styles */
+        #password-screen {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 50vh;
+            text-align: center;
+        }
+        #password-input {
+            padding: 12px;
+            font-size: 1.1em;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            margin-bottom: 15px;
+            width: 100%;
+            max-width: 300px;
+        }
+        #error-message {
+            color: #d9534f;
+            margin-bottom: 15px;
+            display: none;
+            font-weight: bold;
+        }
+        
+        /* Hide main content initially */
+        #main-content {
+            display: none;
+        }
     </style>
 </head>
 <body>
 
 <div class="container">
-    <h1>Indian Knowledge System (IKS)</h1>
+    <!-- Password Lock Screen -->
+    <div id="password-screen">
+        <h2>Authentication Required</h2>
+        <input type="password" id="password-input" placeholder="Enter password">
+        <div id="error-message">Incorrect password. Please try again.</div>
+        <button class="btn" style="max-width: 300px; margin-top: 0;" onclick="checkPassword()">Unlock</button>
+    </div>
     
-    <!-- Study Guide Section -->
-    <div id="study-guide">
-        <h2>Comprehensive Study Guide</h2>
-        <p>Welcome to the extended study guide for the Indian Knowledge System (IKS). Please review the comprehensive material below carefully before attempting the quiz. This guide covers the foundational texts, scientific achievements, philosophical schools, and classical arts of ancient India.</p>
-
-        <div class="guide-section">
-            <h3>1. The Foundational Corpus: Shruti and Smriti</h3>
-            <p>The vast body of Indian Knowledge is broadly classified into two main categories: <span class="highlight">Shruti</span> and <span class="highlight">Smriti</span>. This bipartite division forms the bedrock of ancient Indian epistemology.</p>
-            <ul>
-                <li><strong>Shruti ("That which is heard"):</strong> These are considered the foundational, revealed texts of pristine origin. They are believed to be <strong>'Apurusheya'</strong>—meaning they are not of human origin, but eternal cosmic sounds revealed to ancient sages (Rishis) in deep meditative states. The sage <strong>Veda Vyasa</strong> is regarded as the compiler who organized these texts.</li>
-                <li><strong>The Four Vedas:</strong> The core of Shruti consists of:
-                    <ul>
-                        <li><strong>Rig Veda:</strong> The oldest, consisting of hymns praising natural forces and deities.</li>
-                        <li><strong>Sama Veda:</strong> The Veda of melodies and chants, heavily influencing classical Indian music.</li>
-                        <li><strong>Yajur Veda:</strong> A prose compilation of ritual offering formulas.</li>
-                        <li><strong>Atharva Veda:</strong> Contains procedures for everyday life, early medicine, and statecraft. <em>(Note: Vedic Mathematics is often traced back to the Atharva Veda).</em></li>
-                    </ul>
-                </li>
-                <li><strong>Smriti ("That which is remembered"):</strong> These are derivative texts of human authorship that interpret, codify, and apply the principles of Shruti to daily life, law, and societal norms. Examples include:
-                    <ul>
-                        <li><strong>Dharma Shastras:</strong> Codes of law, ethics, and social duties (e.g., Manusmriti).</li>
-                        <li><strong>Itihasas:</strong> Historical epics, primarily the <strong>Ramayana</strong> and <strong>Mahabharata</strong>, designed to simplify complex Vedic and philosophical concepts for the masses.</li>
-                        <li><strong>Puranas:</strong> Encyclopedic texts containing myths, cosmology, and genealogies.</li>
-                    </ul>
-                </li>
-            </ul>
-            <p><strong>Structure of the Vedas:</strong> Each of the four Vedas is traditionally divided into four progressive sections representing different stages of life and understanding:</p>
-            <ul>
-                <li><strong>Samhita:</strong> The core mantras and hymns.</li>
-                <li><strong>Brahmana:</strong> Prose texts explaining the meaning and procedures of rituals.</li>
-                <li><strong>Aranyaka:</strong> "Forest texts" focusing on the theology and meditation behind the rituals.</li>
-                <li><strong>Upanishad:</strong> The philosophical core, dealing with the nature of ultimate reality (Brahman) and the self (Atman).</li>
-            </ul>
-        </div>
-
-        <div class="guide-section">
-            <h3>2. Vedangas and Upavedas (Auxiliary Sciences)</h3>
-            <p>To properly understand, preserve, and apply the Vedas without distortion over millennia, several auxiliary disciplines were meticulously developed.</p>
-            <p><strong>Vedangas (Limbs of the Veda):</strong> There are <span class="highlight">six</span> Vedangas, each serving a specific structural or practical purpose:</p>
-            <ol>
-                <li><strong>Shiksha (Phonetics):</strong> Focuses on exact pronunciation, intonation, and acoustics to ensure mantras are chanted correctly. It acts as the "nose" of the Veda.</li>
-                <li><strong>Vyakarana (Grammar):</strong> The structural analysis of language. <strong>Panini's Ashtadhyayi</strong> is the most famous and definitive text of this Vedanga, outlining generative grammar rules that parallel modern computer science. It is the "mouth" of the Veda.</li>
-                <li><strong>Nirukta (Etymology):</strong> Studies the origins and meanings of obscure or archaic Vedic words. Authored famously by Yaska. It is the "ears" of the Veda.</li>
-                <li><strong>Chhandas (Meter):</strong> The study of poetic meters used in composing Vedic verses. Pingala's <em>Chhandas Shastra</em> is notable for presenting the first known description of a binary numeral system. It is the "feet" of the Veda.</li>
+    <!-- Main Content (Study Guide & Quiz) -->
+    <div id="main-content">
+        <!-- Study Guide Section -->
+        <div id="study-guide">
+            <h2>Comprehensive Study Guide</h2>
                 <li><strong>Kalpa (Ritual Rules):</strong> Details the rules and procedures for performing rituals. It is the "hands" of the Veda. It is subdivided into:
                     <ul>
                         <li><em>Shrauta Sutras</em> (public rituals).</li>
@@ -250,10 +247,36 @@
         <button class="btn btn-success" id="submit-btn" style="display: none;" onclick="submitQuiz()">Submit Quiz</button>
         <div id="result"></div>
     </div>
+    </div> <!-- End of main-content -->
 
 </div>
 
 <script>
+    // Password Lock Functionality
+    const CORRECT_PASSWORD = "1331@N";
+
+    function checkPassword() {
+        const input = document.getElementById('password-input').value;
+        const errorMessage = document.getElementById('error-message');
+        const passwordScreen = document.getElementById('password-screen');
+        const mainContent = document.getElementById('main-content');
+
+        if (input === CORRECT_PASSWORD) {
+            passwordScreen.style.display = 'none';
+            mainContent.style.display = 'block';
+            errorMessage.style.display = 'none';
+        } else {
+            errorMessage.style.display = 'block';
+        }
+    }
+
+    // Add event listener for Enter key on password input
+    document.getElementById('password-input').addEventListener('keypress', function (e) {
+        if (e.key === 'Enter') {
+            checkPassword();
+        }
+    });
+
     // Functions to toggle between study guide and quiz
     function startQuiz() {
         document.getElementById('study-guide').style.display = 'none';
