@@ -3,423 +3,281 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AMOR FATI</title>
+    <title>Cybersecurity Awareness Program</title>
     <style>
-        body { font-family: Arial, sans-serif; background-color: #f4f4f9; color: #333; margin: 0; padding: 20px; line-height: 1.6; }
-        .container { max-width: 900px; margin: auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        h1 { text-align: center; color: #0056b3; margin-bottom: 20px; }
-        h2 { color: #004085; border-bottom: 2px solid #e9ecef; padding-bottom: 10px; margin-top: 30px; }
-        h3 { color: #0056b3; margin-top: 20px; }
-        
-        /* Study Guide Styles */
-        #study-guide { display: block; }
-        .guide-section { margin-bottom: 25px; }
-        .guide-section p { margin-bottom: 15px; text-align: justify; }
-        .guide-section ul { margin-bottom: 15px; padding-left: 20px; }
-        .guide-section li { margin-bottom: 5px; }
-        .highlight { font-weight: bold; color: #d9534f; }
-        
-        /* Quiz Styles */
-        #quiz-section { display: none; }
-        .question { font-size: 1.1em; font-weight: bold; margin-bottom: 15px; }
-        .options { list-style: none; padding: 0; }
-        .options li { background: #eef; margin-bottom: 10px; padding: 12px; border-radius: 4px; cursor: pointer; border: 1px solid #ccd; transition: 0.2s; }
-        .options li:hover { background: #dde; }
-        .options li.selected { background: #0056b3; color: #fff; border-color: #004085; }
-        
-        /* Buttons */
-        .btn { display: block; width: 100%; padding: 15px; margin-top: 30px; background: #0056b3; color: #fff; border: none; border-radius: 4px; font-size: 1.2em; font-weight: bold; cursor: pointer; transition: background 0.3s; }
-        .btn:hover { background: #004085; }
-        .btn-success { background: #28a745; }
-        .btn-success:hover { background: #218838; }
-        
-        .quiz-navigation { display: flex; justify-content: space-between; align-items: center; margin-top: 25px; }
-        .nav-btn { background: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 1em; transition: background 0.2s; }
-        .nav-btn:hover:not(:disabled) { background: #5a6268; }
-        .nav-btn:disabled { background: #ccc; cursor: not-allowed; }
-        #question-tracker { font-weight: bold; color: #555; }
-        
-        #result { text-align: center; font-size: 1.5em; font-weight: bold; margin-top: 30px; display: none; padding: 20px; border-radius: 8px; background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-        
-        @media (max-width: 768px) {
-            body { padding: 0; background-color: #fff; }
-            .container { padding: 20px 15px; box-shadow: none; border-radius: 0; margin: 0; }
-            
-            h1 { font-size: 1.6em; margin-bottom: 15px; }
-            h2 { font-size: 1.3em; margin-top: 20px; }
-            h3 { font-size: 1.1em; }
-            
-            .guide-section p, .guide-section li { font-size: 0.95em; }
-            
-            /* Larger touch targets for quiz options on mobile */
-            .options li { padding: 15px; font-size: 1em; margin-bottom: 12px; } 
-            
-            /* Restructure navigation to be more touch-friendly */
-            .quiz-navigation { flex-wrap: wrap; gap: 10px; margin-top: 20px; }
-            #question-tracker { width: 100%; text-align: center; order: -1; font-size: 0.95em; margin-bottom: 10px; }
-            .nav-btn { flex: 1; padding: 14px; font-size: 1em; }
-            
-            .btn { padding: 15px; font-size: 1.1em; }
+        :root {
+            --bg-color: #0d1117;
+            --text-color: #c9d1d9;
+            --accent-color: #58a6ff;
+            --card-bg: #161b22;
+            --border-color: #30363d;
         }
 
-        /* Password Lock Styles */
-        #password-screen {
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            overflow: hidden;
+            /* Prevents default browser swipe actions on mobile */
+            touch-action: none; 
+        }
+
+        .presentation-container {
+            position: relative;
+            width: 100%;
+            height: 100vh;
             display: flex;
             flex-direction: column;
-            align-items: center;
             justify-content: center;
-            min-height: 50vh;
+            align-items: center;
+        }
+
+        .slide {
+            position: absolute;
+            width: 80%;
+            max-width: 900px;
+            height: 70%;
+            background-color: var(--card-bg);
+            border: 1px solid var(--border-color);
+            border-radius: 12px;
+            padding: 50px;
+            box-sizing: border-box;
+            opacity: 0;
+            transform: translateY(20px);
+            transition: all 0.5s ease-in-out;
+            pointer-events: none;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+        }
+
+        .slide.active {
+            opacity: 1;
+            transform: translateY(0);
+            pointer-events: auto;
+            z-index: 10;
+        }
+
+        h1 {
+            color: var(--accent-color);
+            text-align: center;
+            font-size: 3em;
+            margin-bottom: 20px;
+        }
+
+        h2 {
+            color: #ffffff;
+            border-bottom: 2px solid var(--border-color);
+            padding-bottom: 10px;
+            font-size: 2.2em;
+            margin-top: 0;
+        }
+
+        ul {
+            font-size: 1.4em;
+            line-height: 1.8;
+        }
+
+        li {
+            margin-bottom: 18px;
+        }
+
+        .title-slide {
             text-align: center;
         }
-        #password-input {
-            padding: 12px;
-            font-size: 1.1em;
-            border: 1px solid #ccc;
-            border-radius: 4px;
-            margin-bottom: 15px;
+
+        .title-slide p {
+            font-size: 1.4em;
+            color: #8b949e;
+        }
+
+        .controls {
+            position: absolute;
+            bottom: 5%;
             width: 100%;
-            max-width: 300px;
+            display: flex;
+            justify-content: center; /* Center the counter now that buttons are gone */
+            align-items: center;
+            z-index: 20;
         }
-        #error-message {
-            color: #d9534f;
-            margin-bottom: 15px;
-            display: none;
+
+        .counter {
+            font-size: 1.3em;
             font-weight: bold;
-        }
-        
-        /* Hide main content initially */
-        #main-content {
-            display: none;
+            color: #8b949e;
         }
     </style>
 </head>
 <body>
 
-<div class="container">
-    <!-- Password Lock Screen -->
-    <div id="password-screen">
-        <h2>Authentication Required</h2>
-        <input type="password" id="password-input" placeholder="Enter password">
-        <div id="error-message">Incorrect password. Please try again.</div>
-        <button class="btn" style="max-width: 300px; margin-top: 0;" onclick="checkPassword()">Unlock</button>
-    </div>
+<div class="presentation-container">
     
-    <!-- Main Content (Study Guide & Quiz) -->
-    <div id="main-content">
-        <!-- Study Guide Section -->
-        <div id="study-guide">
-            <h2>Comprehensive Study Guide</h2>
-                <li><strong>Kalpa (Ritual Rules):</strong> Details the rules and procedures for performing rituals. It is the "hands" of the Veda. It is subdivided into:
-                    <ul>
-                        <li><em>Shrauta Sutras</em> (public rituals).</li>
-                        <li><em>Grihya Sutras</em> (domestic rituals).</li>
-                        <li><em>Dharma Sutras</em> (social customs).</li>
-                        <li><strong>Shulba Sutras:</strong> Crucial texts dealing with the complex <strong>geometry</strong> required for constructing precise fire altars (incorporating early forms of the Pythagorean theorem).</li>
-                    </ul>
-                </li>
-                <li><strong>Jyotisha (Astronomy/Astrology):</strong> Traditionally classified into <span class="highlight">three branches</span> (Siddhanta/Ganita - mathematical astronomy, Samhita - mundane astrology, and Hora - predictive astrology). It was primarily developed for <strong>timing Vedic rituals accurately</strong>. It is metaphorically considered the <strong>"Eye"</strong> of the Veda.</li>
-            </ol>
-            <p><strong>Upavedas (Applied Knowledges):</strong> These are applied sciences attached to the main Vedas:</p>
-            <ul>
-                <li><strong>Ayurveda</strong> (Medicine and Life Sciences) - associated with Rig/Atharva Veda.</li>
-                <li><strong>Dhanurveda</strong> (Archery/Martial Arts) - associated with Yajur Veda.</li>
-                <li><strong>Gandharvaveda</strong> (Music and Dance) - associated with Sama Veda.</li>
-                <li><strong>Sthapatyaveda / Vastu Shastra</strong> (Architecture and Engineering) - associated with Atharva Veda.</li>
-            </ul>
-        </div>
-
-        <div class="guide-section">
-            <h3>3. Indian Mathematics, Astronomy, and Cryptography</h3>
-            <p>Ancient India made profound contributions to mathematics and astronomy, uniquely integrating them with linguistics, poetry, and philosophy.</p>
-            <ul>
-                <li><strong>Unique Aspects:</strong> A hallmark of Indian mathematics was its heavy reliance on <span class="highlight">poetic meter (Sutras/Chhandas)</span> for encoding complex formulas and astronomical data. This oral tradition made vast amounts of data easier to memorize and transmit across generations without written texts.</li>
-                <li><strong>Encoding Systems:</strong> To represent numbers in verse without breaking the poetic meter, scholars used ingenious systems:
-                    <ul>
-                        <li><strong>Bhuta-Sankhya (Object-Number System):</strong> Used synonyms of common objects to represent numbers. For example, synonyms for "Eyes", "Wings", or "Hands" might represent the number <span class="highlight">2</span>. "Vedas" would mean 4, "Seasons" would mean 6.</li>
-                        <li><strong>Katapayadi System:</strong> A sophisticated hashing system that mapped numbers to the Sanskrit consonant alphabet, allowing scholars to write mathematical formulas that doubled as devotional poetry.</li>
-                    </ul>
-                </li>
-                <li><strong>Algebra and Arithmetic:</strong> Algebra was known as <strong>Bija-ganita</strong> (Bija meaning 'seed'), signifying operations using unknown or 'seed' variables to find a solution. Arithmetic was called <em>Pati-ganita</em>.</li>
-                <li><strong>Key Figures and Discoveries:</strong>
-                    <ul>
-                        <li><strong>Aryabhatta:</strong> Authored the <em>Aryabhatiya</em>. He provided a highly accurate approximation of pi (<span class="highlight">3.1416</span>), formulas for the area of the <strong>triangle and circle</strong>, and famously proposed a heliocentric model where the <strong>Earth rotates on its axis</strong>.</li>
-                        <li><strong>Varahamihira:</strong> Authored the astronomical treatise <strong>Pancha-Siddhantika</strong>, synthesizing five older astronomical schools.</li>
-                        <li><strong>Brahmagupta:</strong> First to clearly define the rules for computing with <strong>Zero (Shunya)</strong> and negative numbers.</li>
-                        <li><strong>The Kerala School (e.g., Madhava of Sangamagrama):</strong> Known for pioneering work in <strong>infinite series and early calculus</strong> centuries before Newton and Leibniz in Europe.</li>
-                    </ul>
-                </li>
-            </ul>
-            <p><strong>Astronomical Terminology:</strong> In Indian astronomy, a <strong>'Graha'</strong> refers to a planet or major celestial body (like the Sun or Moon) that 'grasps' or influences observers. A <strong>'Nakshatra'</strong> refers to a lunar mansion or constellation along the ecliptic. The traditional luni-solar calendar system is the <strong>Panchanga</strong> (five limbs: Tithi, Vara, Nakshatra, Yoga, Karana), where a <strong>'Tithi'</strong> represents a specific lunar day.</p>
-        </div>
-
-        <div class="guide-section">
-            <h3>4. The Six Darshanas (Classical Philosophical Schools)</h3>
-            <p>Indian philosophy comprises six orthodox (Astika) schools that accept the authority of the Vedas. They provide frameworks for understanding reality, logic, and consciousness.</p>
-            <ol>
-                <li><strong>Nyaya:</strong> The school of logic and epistemology. It establishes rules for valid debate and methods for acquiring true knowledge (Pramana).</li>
-                <li><strong>Vaisheshika:</strong> An ancient school of atomism. It theorized that all matter in the universe is composed of indivisible particles (paramanu).</li>
-                <li><strong>Samkhya:</strong> A dualistic philosophy that deeply influences Ayurveda and Yoga. It posits two fundamental realities:
-                    <ul>
-                        <li><strong>Purusha:</strong> Pure, passive, and unmanifested cosmic consciousness (the observer).</li>
-                        <li><strong>Prakriti:</strong> Active, primal matter or energy, from which the physical and mental universe evolves (the observed).</li>
-                    </ul>
-                </li>
-                <li><strong>Yoga:</strong> Systematized by Patanjali, focusing on the practical methodology to calm the mind and achieve union between Purusha and Prakriti.</li>
-                <li><strong>Mimamsa:</strong> Focuses on the hermeneutics and interpretation of Vedic rituals.</li>
-                <li><strong>Vedanta:</strong> Focuses on the teachings of the Upanishads, exploring the non-dual relationship between the individual soul (Atman) and the ultimate reality (Brahman).</li>
-            </ol>
-        </div>
-
-        <div class="guide-section">
-            <h3>5. Ayurveda and Life Sciences</h3>
-            <p>Ayurveda ("The Science of Life") is the traditional system of medicine, deeply rooted in Indian philosophical schools, particularly <strong>Nyaya</strong> and <strong>Samkhya</strong>.</p>
-            <p><strong>Core Concepts in Ayurveda:</strong></p>
-            <ul>
-                <li><strong>Pancha-Mahabhuta (Five Great Elements):</strong> All matter is composed of Akasha (Space), Vayu (Air), Agni (Fire), Jala (Water), and Prithvi (Earth). <em>(Note: Concepts like Medhas/Intellect are cognitive, NOT physical elements).</em></li>
-                <li><strong>Tridosha Theory:</strong> The five elements combine to form three biological humors (Doshas) that govern physiology:
-                    <ul>
-                        <li><strong>Vata (Space + Air):</strong> Governs movement, breathing, and the nervous system.</li>
-                        <li><strong>Pitta (Fire + Water):</strong> Governs digestion, metabolism, and energy production.</li>
-                        <li><strong>Kapha (Water + Earth):</strong> Governs structure, lubrication, and immunity.</li>
-                    </ul>
-                </li>
-                <li><strong>The Three Gunas (Mental Qualities):</strong> 
-                    <ul>
-                        <li><strong>Sattva:</strong> Purity, balance, clarity, peace, and harmony.</li>
-                        <li><strong>Rajas:</strong> Activity, passion, movement, dynamism, and restlessness.</li>
-                        <li><strong>Tamas:</strong> Inertia, darkness, ignorance, lethargy, and decay.</li>
-                    </ul>
-                </li>
-                <li><strong>Sapta-Dhatu (Seven Tissues):</strong> The physical body is sustained by <span class="highlight">seven</span> fundamental tissues: Rasa (plasma/lymph), <strong>Rakta</strong> (blood), Mamsa (muscle), Meda (fat), Asthi (bone), Majja (marrow), and Shukra (reproductive tissue).</li>
-                <li><strong>The Six Rasas (Tastes):</strong> Ayurveda utilizes diet as medicine, identifying <span class="highlight">six</span> tastes, each affecting the Doshas differently:
-                    <ul>
-                        <li><strong>Madhura (Sweet):</strong> Decreases Vata and Pitta, but increases Kapha.</li>
-                        <li><strong>Amla (Sour):</strong> Increases Pitta and Kapha, decreases Vata.</li>
-                        <li><strong>Lavana (Salty):</strong> Decreases Vata; increases Pitta and Kapha.</li>
-                        <li><strong>Katu (Pungent):</strong> Decreases Kapha but increases Vata and Pitta.</li>
-                        <li><strong>Tikta (Bitter):</strong> Decreases Pitta and Kapha, increases Vata.</li>
-                        <li><strong>Kashaya (Astringent):</strong> Decreases Pitta and Kapha, increases Vata.</li>
-                    </ul>
-                </li>
-                <li><strong>Disease Classification:</strong> 
-                    <ul>
-                        <li><strong>Nija:</strong> Endogenous diseases (internal dosha imbalances caused by diet or lifestyle).</li>
-                        <li><strong>Agantuja:</strong> Exogenous diseases caused by external factors like trauma, poisons, or infections.</li>
-                        <li><strong>Manasa:</strong> Psychological diseases caused by imbalances in the mental Gunas (specifically an excess of Rajas and Tamas).</li>
-                    </ul>
-                </li>
-                <li><strong>Dinacharya and Ritucharya:</strong> Crucial preventative aspects of Ayurveda. <strong>Dinacharya</strong> refers to a prescribed <strong>daily routine</strong> (waking early, tongue scraping, oil pulling, bathing) aligned with natural circadian rhythms. <em>Ritucharya</em> refers to seasonal routines.</li>
-            </ul>
-        </div>
-
-        <div class="guide-section">
-            <h3>6. Engineering, Metallurgy, and Architecture</h3>
-            <p>Beyond theoretical sciences, the Indian Knowledge System encompasses highly advanced practical engineering and material sciences.</p>
-            <ul>
-                <li><strong>Metallurgy (Rasashastra):</strong> Ancient India was a world leader in metallurgy. 
-                    <ul>
-                        <li><strong>Wootz Steel:</strong> Originating in South India, this crucible steel was famous globally for its high carbon content and distinctive banding (later known as Damascus steel).</li>
-                        <li><strong>Iron Pillar of Delhi:</strong> A marvel of ancient metallurgy, this 7-meter high iron pillar dating back to the Gupta Empire (c. 400 CE) has astonishingly resisted rusting for over 1600 years due to a protective passive layer of crystalline iron hydrogen phosphate.</li>
-                        <li><strong>Zinc Smelting:</strong> The ancient mines at Zawar, Rajasthan, contain the world's earliest known evidence of the complex distillation process required to extract pure zinc.</li>
-                    </ul>
-                </li>
-                <li><strong>Architecture (Vastu Shastra and Shilpa Shastra):</strong> The science of architecture and town planning. It emphasizes integrating architecture with nature, sacred geometry, and the directional flow of elements to create harmonious living spaces and monumental temple structures.</li>
-                <li><strong>Water Management:</strong> From the sophisticated drainage systems of the Indus Valley Civilization (e.g., at Dholavira) to the intricate stepwells (Baoris) and artificial lakes of medieval India, advanced hydrology was a key component of urban planning.</li>
-            </ul>
-        </div>
-
-        <button class="btn" onclick="startQuiz()">I have read the comprehensive guide. Start Quiz!</button>
+    <!-- Slide 1: Title -->
+    <div class="slide active title-slide" id="slide-1">
+        <h1>Cybersecurity Awareness</h1>
+        <p>A Guide for Students: Staying Safe in the Digital World</p>
+        <p style="font-size: 1em; opacity: 0.7; margin-top: 40px;">(Swipe left or right to navigate)</p>
     </div>
 
-    <!-- Quiz Section -->
-    <div id="quiz-section">
-        <div id="quiz-container">
-            <div class="question" id="question-text"></div>
-            <ul class="options" id="options-list"></ul>
-        </div>
-        
-        <div class="quiz-navigation">
-            <button class="nav-btn" id="prev-btn" onclick="prevQuestion()" disabled>Previous</button>
-            <span id="question-tracker"></span>
-            <button class="nav-btn" id="next-btn" onclick="nextQuestion()">Next</button>
-        </div>
-
-        <button class="btn btn-success" id="submit-btn" style="display: none;" onclick="submitQuiz()">Submit Quiz</button>
-        <div id="result"></div>
+    <!-- Slide 2: Introduction -->
+    <div class="slide" id="slide-2">
+        <h2>What is Cybersecurity?</h2>
+        <ul>
+            <li><strong>Digital Armor:</strong> It's the practice of protecting your devices, personal information, and online identity.</li>
+            <li><strong>Why it matters:</strong> Cybercriminals actively look for stolen info to use for scams, bullying, and theft.</li>
+            <li><strong>Your role:</strong> You are the very first line of defense against online threats!</li>
+        </ul>
     </div>
-    </div> <!-- End of main-content -->
+
+    <!-- Slide 3: Passwords -->
+    <div class="slide" id="slide-3">
+        <h2>Password Power</h2>
+        <ul>
+            <li><strong>Make it long:</strong> Use at least 12 characters. Nonsense phrases work best (e.g., <i>Blue$Sky*Pizza99</i>).</li>
+            <li><strong>Keep it secret:</strong> Never share your passwords with friends—only with a parent or guardian.</li>
+            <li><strong>Mix it up:</strong> Never reuse the same password for your school account, email, and games.</li>
+        </ul>
+    </div>
+
+    <!-- Slide 4: Phishing -->
+    <div class="slide" id="slide-4">
+        <h2>Spotting Phishing & Scams</h2>
+        <ul>
+            <li><strong>What is it?</strong> Fake emails, texts, or messages pretending to be a trusted company or friend.</li>
+            <li><strong>Red Flags:</strong> Urgent warnings, bad spelling, asking for passwords, or "You won a free phone!"</li>
+            <li><strong>Action Plan:</strong> Think before you click! If it looks suspicious, delete it or ask a teacher.</li>
+        </ul>
+    </div>
+
+    <!-- Slide 5: Social Media -->
+    <div class="slide" id="slide-5">
+        <h2>Safe Social Media Habits</h2>
+        <ul>
+            <li><strong>Privacy Check:</strong> Set profiles to private. Only accept requests from people you know in real life.</li>
+            <li><strong>The Internet is Forever:</strong> Think carefully before posting photos or comments.</li>
+            <li><strong>Location tagging:</strong> Turn off location sharing so strangers don't know exactly where you are.</li>
+        </ul>
+    </div>
+
+    <!-- Slide 6: Device Protection -->
+    <div class="slide" id="slide-6">
+        <h2>Device Defense</h2>
+        <ul>
+            <li><strong>Lock it down:</strong> Always lock your phone or laptop screen with a PIN or password when you step away.</li>
+            <li><strong>Update regularly:</strong> Keep your apps and operating system up to date. Those updates fix hidden security holes!</li>
+            <li><strong>Download safely:</strong> Only download apps and games from official stores (like the App Store or Google Play).</li>
+        </ul>
+    </div>
+
+    <!-- Slide 7: Public Wi-Fi -->
+    <div class="slide" id="slide-7">
+        <h2>Public Wi-Fi Perils</h2>
+        <ul>
+            <li><strong>It's not private:</strong> Free Wi-Fi at cafes, airports, or malls can easily be snooped on by hackers.</li>
+            <li><strong>Avoid sensitive sites:</strong> Never log into your bank, school portal, or social media on unsecured public networks.</li>
+            <li><strong>Use a VPN:</strong> If you must use public Wi-Fi, a Virtual Private Network scrambles your data to keep it safe.</li>
+        </ul>
+    </div>
+
+    <!-- Slide 8: Digital Citizenship -->
+    <div class="slide" id="slide-8">
+        <h2>Digital Citizenship</h2>
+        <ul>
+            <li><strong>Be kind online:</strong> Treat others with the same respect you would in person. Behind every screen is a real person.</li>
+            <li><strong>Don't engage:</strong> If someone is cyberbullying you, don't argue back. Block them and take screenshots for proof.</li>
+            <li><strong>Speak up:</strong> Always tell a trusted adult or teacher if you or a friend feels unsafe online.</li>
+        </ul>
+    </div>
+
+    <!-- Slide 9: Conclusion -->
+    <div class="slide" id="slide-9">
+        <h1 style="margin-top: 40px;">Stay Safe Online!</h1>
+        <ul style="list-style-type: none; text-align: center; padding: 0;">
+            <li>Remember to stop, think, and connect carefully.</li>
+            <li style="margin-top: 30px; font-size: 1.2em; color: var(--accent-color);"><strong>Any Questions?</strong></li>
+        </ul>
+    </div>
+
+    <!-- Slide Counter -->
+    <div class="controls">
+        <div class="counter"><span id="currentNum">1</span> / <span id="totalNum">9</span></div>
+    </div>
 
 </div>
 
 <script>
-    // Password Lock Functionality
-    const CORRECT_PASSWORD = "1331@N";
+    let currentSlideIndex = 0;
+    const slides = document.querySelectorAll('.slide');
+    const currentNum = document.getElementById('currentNum');
+    
+    // Set total slides dynamically
+    document.getElementById('totalNum').innerText = slides.length;
 
-    function checkPassword() {
-        const input = document.getElementById('password-input').value;
-        const errorMessage = document.getElementById('error-message');
-        const passwordScreen = document.getElementById('password-screen');
-        const mainContent = document.getElementById('main-content');
+    function updateSlides() {
+        slides.forEach((slide, index) => {
+            slide.classList.remove('active');
+            if (index === currentSlideIndex) {
+                slide.classList.add('active');
+            }
+        });
 
-        if (input === CORRECT_PASSWORD) {
-            passwordScreen.style.display = 'none';
-            mainContent.style.display = 'block';
-            errorMessage.style.display = 'none';
-        } else {
-            errorMessage.style.display = 'block';
-        }
+        // Update the slide counter text
+        currentNum.innerText = currentSlideIndex + 1;
     }
 
-    // Add event listener for Enter key on password input
-    document.getElementById('password-input').addEventListener('keypress', function (e) {
-        if (e.key === 'Enter') {
-            checkPassword();
+    function changeSlide(direction) {
+        currentSlideIndex += direction;
+        
+        if (currentSlideIndex < 0) {
+            currentSlideIndex = 0;
+        } else if (currentSlideIndex >= slides.length) {
+            currentSlideIndex = slides.length - 1;
+        }
+
+        updateSlides();
+    }
+
+    // --- KEYBOARD CONTROLS ---
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') {
+            if (currentSlideIndex < slides.length - 1) changeSlide(1);
+        } else if (e.key === 'ArrowLeft') {
+            if (currentSlideIndex > 0) changeSlide(-1);
         }
     });
 
-    // Functions to toggle between study guide and quiz
-    function startQuiz() {
-        document.getElementById('study-guide').style.display = 'none';
-        document.getElementById('quiz-section').style.display = 'block';
-        loadQuestion();
-    }
+    // --- SWIPE CONTROLS ---
+    let touchstartX = 0;
+    let touchendX = 0;
 
-    // Questions derived directly from "BCA iks pyq.pdf" with citations removed
-    const quizData = [
-        { q: "Which Rishi is regarded as the compiler of the Vedas?", o: ["Valmiki", "Veda Vyasa", "Patanjali", "Panini"], a: 1 },
-        { q: "Vedic Mathematics is derived from which Veda?", o: ["Rig Veda", "Sama Veda", "Atharva Veda", "Yajur Veda"], a: 2 },
-        { q: "How is Jyotisha Shashtra traditionally classified?", o: ["Two branches", "Three branches", "Four branches", "Five branches"], a: 1 },
-        { q: "What does 'Graha' refer to in Indian Astronomy?", o: ["Lunar mansion", "Planet or major celestial body", "Galaxy", "Meteor"], a: 1 },
-        { q: "What does 'Nakshatra' refer to?", o: ["Planet", "Lunar mansion / constellation", "Sun", "Eclipse"], a: 1 },
-        { q: "What is a unique aspect of Indian Mathematics?", o: ["Reliance on Arabic numerals", "Heavy reliance on poetic meter (Sutras)", "Lack of written texts", "Use of abacus"], a: 1 },
-        { q: "What does the Shruti classification of the IKS corpus refer to?", o: ["Remembered texts", "Applied sciences", "Foundational, revealed texts", "Epics"], a: 2 },
-        { q: "Which of the following falls under Smriti?", o: ["Rig Veda", "Dharma Shastras", "Atharva Veda", "Sama Veda"], a: 1 },
-        { q: "How many auxiliary disciplines make up the Vedangas?", o: ["Four", "Five", "Six", "Eight"], a: 2 },
-        { q: "What are Upavedas?", o: ["Applied sciences attached to the Vedas", "Classical schools of philosophy", "Lunar mansions", "Daily routines"], a: 0 },
-        { q: "Which of the following is a Darshana?", o: ["Ayurveda", "Dhanurveda", "Nyaya", "Ramayana"], a: 2 },
-        { q: "What was the purpose of Itihasas and Puranas?", o: ["To calculate eclipses", "To simplify Vedic concepts for the masses", "To outline grammar", "To define planetary motions"], a: 1 },
-        { q: "Sanskrit poetic meters used in Indian Mathematics are called:", o: ["Chhandas", "Bija", "Kalpa", "Nirukta"], a: 0 },
-        { q: "In poetic math encoding, what synonym was used for the number 2?", o: ["Vedas", "Eyes", "Seas", "Fingers"], a: 1 },
-        { q: "Which encoding system mapped numbers to the Sanskrit alphabet?", o: ["Panchanga", "Katapayadi", "Dinacharya", "Samkhya"], a: 1 },
-        { q: "How many Rasas (tastes) does Ayurveda identify?", o: ["Three", "Four", "Five", "Six"], a: 3 },
-        { q: "Which Rasa decreases Vata and Pitta, but increases Kapha?", o: ["Madhura (Sweet)", "Amla (Sour)", "Katu (Pungent)", "Tikta (Bitter)"], a: 0 },
-        { q: "What is the effect of Lavana (Salty) taste?", o: ["Decreases Kapha", "Decreases Pitta", "Decreases Vata; increases Pitta and Kapha", "Increases Vata"], a: 2 },
-        { q: "Which Rasa decreases Kapha but increases Vata and Pitta?", o: ["Madhura", "Tikta", "Kashaya", "Katu (Pungent)"], a: 3 },
-        { q: "Why are Vedas regarded as 'Apurusheya'?", o: ["They are written by Vyasa", "They are not of human origin", "They are fictional", "They are mathematical texts"], a: 1 },
-        { q: "What is Kalpa in the context of Vedangas?", o: ["Astronomy", "Grammar", "Rules and procedures for rituals", "Etymology"], a: 2 },
-        { q: "Which Sutras under Kalpa deal with geometry for building fire altars?", o: ["Shrauta Sutras", "Grihya Sutras", "Dharma Sutras", "Shulba Sutras"], a: 3 },
-        { q: "What was Aryabhatta's approximation of pi?", o: ["3.1415", "3.1416", "3.14", "3.1428"], a: 1 },
-        { q: "Aryabhatta provided the formula for calculating the area of which shapes?", o: ["Square and rectangle", "Triangle and circle", "Cube and sphere", "Pentagon and hexagon"], a: 1 },
-        { q: "What does 'Shruti' literally mean?", o: ["That which is remembered", "That which is seen", "That which is heard", "That which is read"], a: 2 },
-        { q: "In Samkhya philosophy, what is Purusha?", o: ["Active primal matter", "Pure, passive, and unmanifested cosmic consciousness", "The five elements", "The physical body"], a: 1 },
-        { q: "In Samkhya philosophy, what is Prakriti?", o: ["Pure consciousness", "Active, primal matter or energy", "The soul", "Illusion"], a: 1 },
-        { q: "What does Dinacharya refer to in Ayurveda?", o: ["Dietary restrictions", "A daily routine", "Surgical procedures", "Herbal medicines"], a: 1 },
-        { q: "Why was Algebra known as Bija-ganita in Ancient India?", o: ["It was brought by a scholar named Bija", "Bija means 'seed', involving operations using unknown elements", "It was written on seeds", "It only solved agricultural problems"], a: 1 },
-        { q: "Which astronomical treatise was authored by Varahamihira?", o: ["Aryabhatiya", "Lilavati", "Pancha-Siddhantika", "Ashtadhyayi"], a: 2 },
-        { q: "What was the primary purpose of astronomy in the Vedic Period?", o: ["Ocean navigation", "Timing Vedic rituals accurately", "Predicting weather", "Astrological readings only"], a: 1 },
-        { q: "Which Siddhantic Era scholar proposed Earth's rotation?", o: ["Bhaskaracharya", "Brahmagupta", "Aryabhata", "Madhava"], a: 2 },
-        { q: "What mathematical advancement is the Kerala School known for?", o: ["Invention of zero", "Infinite series and early calculus", "Geometry of altars", "Decimal system"], a: 1 },
-        { q: "Which Vedanga focuses on exact pronunciation and phonetics?", o: ["Shiksha", "Vyakarana", "Chhandas", "Nirukta"], a: 0 },
-        { q: "Panini's Ashtadhyayi is the most famous text of which Vedanga?", o: ["Jyotisha", "Vyakarana", "Kalpa", "Nirukta"], a: 1 },
-        { q: "Which Vedanga studies the origins and meanings of obscure Vedic words (Etymology)?", o: ["Vyakarana", "Nirukta", "Shiksha", "Chhandas"], a: 1 },
-        { q: "Jyotisha is considered the 'what' of the Veda?", o: ["Heart", "Brain", "Eye", "Ear"], a: 2 },
-        { q: "What are the three Gunas in Ayurveda?", o: ["Vata, Pitta, Kapha", "Sattva, Rajas, Tamas", "Rasa, Rakta, Mamsa", "Shruti, Smriti, Purana"], a: 1 },
-        { q: "Which Guna represents purity and balance?", o: ["Tamas", "Rajas", "Sattva", "Kapha"], a: 2 },
-        { q: "What represents activity and passion among the Gunas?", o: ["Tamas", "Sattva", "Rajas", "Pitta"], a: 2 },
-        { q: "How many sections is each Veda divided into?", o: ["Two", "Three", "Four", "Five"], a: 2 },
-        { q: "Which section of the Vedas deals with philosophy?", o: ["Samhita", "Brahmana", "Aranyaka", "Upanishad"], a: 3 },
-        { q: "How are Nija diseases classified in Ayurveda?", o: ["Exogenous", "Endogenous", "Psychological", "Traumatic"], a: 1 },
-        { q: "Agantuja diseases are caused by:", o: ["Internal dosha imbalances", "Mental Gunas", "External factors like trauma or infections", "Poor diet"], a: 2 },
-        { q: "Manasa diseases are caused by imbalances in:", o: ["Mental Gunas (Rajas/Tamas)", "Doshas (Vata/Pitta/Kapha)", "Dhatus", "Mahabhutas"], a: 0 },
-        { q: "The traditional Indian luni-solar calendar system is known as:", o: ["Tithi", "Panchanga", "Yoga", "Karana"], a: 1 },
-        { q: "What does 'Tithi' represent in the Panchanga?", o: ["The weekday", "A half-day", "The lunar day", "A lunar mansion"], a: 2 },
-        { q: "Which element is NOT part of the Pancha-Mahabhuta?", o: ["Akasha (Space)", "Agni (Fire)", "Prithvi (Earth)", "Medhas (Intellect)"], a: 3 },
-        { q: "How many fundamental tissues (Dhatus) are there in the physical body according to Ayurveda?", o: ["Three", "Five", "Seven", "Nine"], a: 2 },
-        { q: "Which of the following is an Ayurvedic Sapta-Dhatu?", o: ["Akasha", "Vayu", "Rakta", "Prakriti"], a: 2 }
-    ];
+    // Minimum distance (in pixels) for a swipe to be recognized
+    const minSwipeDistance = 50; 
 
-    let currentQuestion = 0;
-    let userAnswers = new Array(quizData.length).fill(null);
-
-    const questionText = document.getElementById("question-text");
-    const optionsList = document.getElementById("options-list");
-    const prevBtn = document.getElementById("prev-btn");
-    const nextBtn = document.getElementById("next-btn");
-    const submitBtn = document.getElementById("submit-btn");
-    const tracker = document.getElementById("question-tracker");
-    const resultDiv = document.getElementById("result");
-
-    function loadQuestion() {
-        optionsList.innerHTML = "";
-        const current = quizData[currentQuestion];
-        questionText.innerText = `Q${currentQuestion + 1}: ${current.q}`;
-        tracker.innerText = `Question ${currentQuestion + 1} of ${quizData.length}`;
-
-        current.o.forEach((option, index) => {
-            const li = document.createElement("li");
-            li.innerText = option;
-            if (userAnswers[currentQuestion] === index) {
-                li.classList.add("selected");
-            }
-            li.onclick = () => selectOption(index);
-            optionsList.appendChild(li);
-        });
-
-        prevBtn.disabled = currentQuestion === 0;
+    function handleGesture() {
+        if (touchendX < touchstartX - minSwipeDistance) {
+            // Swiped Left (Go to Next)
+            if (currentSlideIndex < slides.length - 1) changeSlide(1);
+        }
         
-        if (currentQuestion === quizData.length - 1) {
-            nextBtn.style.display = "none";
-            submitBtn.style.display = "block";
-        } else {
-            nextBtn.style.display = "block";
-            submitBtn.style.display = "none";
+        if (touchendX > touchstartX + minSwipeDistance) {
+            // Swiped Right (Go to Previous)
+            if (currentSlideIndex > 0) changeSlide(-1);
         }
     }
 
-    function selectOption(index) {
-        userAnswers[currentQuestion] = index;
-        loadQuestion();
-    }
+    document.addEventListener('touchstart', e => {
+        touchstartX = e.changedTouches[0].screenX;
+    });
 
-    function nextQuestion() {
-        if (currentQuestion < quizData.length - 1) {
-            currentQuestion++;
-            loadQuestion();
-        }
-    }
-
-    function prevQuestion() {
-        if (currentQuestion > 0) {
-            currentQuestion--;
-            loadQuestion();
-        }
-    }
-
-    function submitQuiz() {
-        let score = 0;
-        userAnswers.forEach((ans, index) => {
-            if (ans === quizData[index].a) {
-                score++;
-            }
-        });
-        
-        document.getElementById("quiz-container").style.display = "none";
-        document.querySelector(".quiz-navigation").style.display = "none";
-        submitBtn.style.display = "none";
-        
-        resultDiv.style.display = "block";
-        
-        const percentage = Math.round((score / quizData.length) * 100);
-        let message = "";
-        if(percentage >= 80) message = "Excellent work!";
-        else if (percentage >= 60) message = "Good job!";
-        else message = "Keep studying and try again!";
-
-        resultDiv.innerHTML = `You scored ${score} out of ${quizData.length} (${percentage}%)<br><span style="font-size: 0.8em; font-weight: normal; color: #333; display: block; margin-top: 10px;">${message}</span>`;
-    }
-
-    // Note: loadQuestion() is no longer called immediately on page load.
-    // It is called by startQuiz() after the user reads the guide.
+    document.addEventListener('touchend', e => {
+        touchendX = e.changedTouches[0].screenX;
+        handleGesture();
+    });
 </script>
 
 </body>
