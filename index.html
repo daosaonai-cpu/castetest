@@ -3,296 +3,401 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Cybersecurity Suite</title>
+    <title>Indian Knowledge System: Mathematics Quiz</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        /* Wrapper Styling */
-        body, html {
-            margin: 0; 
-            padding: 0; 
-            width: 100%; 
-            height: 100%; 
-            overflow: hidden;
-            background-color: #050b14;
-        }
-        
-        iframe {
-            width: 100%; 
-            height: 100%; 
-            border: none;
-        }
-        
-        /* Green Toggle Button Bottom Left */
-        #toggleBtn {
-            position: fixed;
-            bottom: 20px;
-            left: 20px;
-            background-color: #10b981;
-            color: white;
-            border: 2px solid #047857;
-            padding: 12px 24px;
-            border-radius: 8px;
-            font-family: 'Inter', sans-serif;
-            font-weight: bold;
-            font-size: 16px;
-            cursor: pointer;
-            box-shadow: 0 4px 15px rgba(16, 185, 129, 0.4);
-            z-index: 9999;
-            transition: all 0.3s ease;
-        }
-        
-        #toggleBtn:hover {
-            background-color: #059669;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(16, 185, 129, 0.6);
-        }
+        /* Custom scrollbar for better aesthetics */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #f1f1f1; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
     </style>
 </head>
-<body>
+<body class="bg-gray-50 text-gray-800 antialiased h-screen flex flex-col relative overflow-hidden">
 
-    <!-- Viewer that will display the active app -->
-    <iframe id="viewer"></iframe>
-
-    <!-- Toggle Button -->
-    <button id="toggleBtn">Switch View (1/3)</button>
-
-    <!-- ========================================== -->
-    <!-- APP 1: ENCRYPTION & DECRYPTION             -->
-    <!-- ========================================== -->
-    <template id="app1">
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Encryption & Decryption Presentation</title>
-            <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Poppins:wght@500;700&display=swap" rel="stylesheet">
-            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-            <style>
-                :root { --bg-dark: #050b14; --text-color: #e2e8f0; --text-muted: #94a3b8; --accent-primary: #00f0ff; --accent-secondary: #3b82f6; --card-bg: rgba(17, 24, 39, 0.85); --border-color: rgba(0, 240, 255, 0.3); }
-                body, html { margin: 0; padding: 0; width: 100%; height: 100%; font-family: 'Inter', sans-serif; color: var(--text-color); overflow: hidden; touch-action: none; background: linear-gradient(135deg, rgba(15, 23, 42, 0.92) 0%, rgba(5, 11, 20, 0.98) 100%), url('https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=2000&q=80') no-repeat center center fixed; background-size: cover; }
-                body::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px); background-size: 40px 40px; z-index: -1; }
-                .progress-container { position: fixed; top: 0; left: 0; width: 100%; height: 4px; background-color: rgba(255, 255, 255, 0.1); z-index: 50; }
-                .progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent-secondary), var(--accent-primary)); transition: width 0.4s ease; box-shadow: 0 0 15px var(--accent-primary); }
-                .presentation-container { position: relative; width: 100%; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-                .slide { position: absolute; width: 85%; max-width: 1000px; height: 75%; background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 50px; box-sizing: border-box; opacity: 0; transform: translateY(40px) scale(0.95); transition: all 0.6s cubic-bezier(0.25, 0.8, 0.25, 1); pointer-events: none; display: flex; flex-direction: column; justify-content: center; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); box-shadow: 0 25px 50px rgba(0,0,0,0.7), inset 0 0 30px rgba(0, 240, 255, 0.05); }
-                .slide.active { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; z-index: 10; }
-                .slide-layout { display: flex; flex-direction: row; align-items: center; gap: 40px; height: 100%; }
-                .slide-content { flex: 1; display: flex; flex-direction: column; justify-content: center; }
-                .slide-image { flex: 0.8; height: 100%; max-height: 380px; border-radius: 12px; overflow: hidden; border: 2px solid rgba(0, 240, 255, 0.2); box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 20px rgba(0, 240, 255, 0.1); background-color: #0f172a; }
-                .slide-image img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
-                .slide-image:hover img { transform: scale(1.05); }
-                .main-logo { font-size: 5em; margin-bottom: 20px; background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 15px rgba(0, 240, 255, 0.5)); display: inline-block; }
-                h2 i { color: var(--accent-primary); margin-right: 12px; font-size: 0.9em; text-shadow: 0 0 10px rgba(0, 240, 255, 0.4); }
-                h1, h2 { font-family: 'Poppins', sans-serif; margin-top: 0; }
-                h1 { text-align: center; font-size: 3.2em; margin-bottom: 10px; color: #ffffff; text-shadow: 0 0 20px rgba(255, 255, 255, 0.2); }
-                h2 { color: #ffffff; border-bottom: 2px solid var(--border-color); padding-bottom: 12px; font-size: 2.2em; margin-bottom: 20px; display: flex; align-items: center; }
-                ul { font-size: 1.1em; line-height: 1.5; list-style: none; padding-left: 0; margin-bottom: 0; }
-                li { margin-bottom: 15px; position: relative; padding-left: 30px; }
-                li::before { content: '▹'; position: absolute; left: 0; color: var(--accent-primary); font-size: 1.2em; font-weight: bold; top: -2px; }
-                li strong { color: #ffffff; font-weight: 600; }
-                .title-slide, .end-slide { align-items: center; text-align: center; }
-                .title-slide p { font-size: 1.4em; color: var(--text-muted); font-weight: 300; max-width: 80%; }
-                .controls { position: absolute; bottom: 4%; width: 100%; display: flex; justify-content: center; align-items: center; z-index: 20; }
-                .counter { font-size: 1.1em; font-family: 'Poppins', sans-serif; font-weight: 500; color: var(--text-muted); background: rgba(0,0,0,0.6); padding: 8px 20px; border-radius: 30px; border: 1px solid rgba(0, 240, 255, 0.2); box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-                @media (max-width: 768px) { .slide { padding: 25px; height: 85%; } .slide-layout { flex-direction: column-reverse; gap: 20px; } .slide-image { flex: none; width: 100%; height: 180px; } .main-logo { font-size: 4em; } h1 { font-size: 2.2em; } h2 { font-size: 1.5em; margin-bottom: 15px; } ul { font-size: 0.95em; } .title-slide p { font-size: 1.1em; } li { padding-left: 25px; margin-bottom: 10px; } }
-            </style>
-        </head>
-        <body>
-        <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
-        <div class="presentation-container">
-            <div class="slide active title-slide" id="slide-1"><i class="fa-solid fa-lock main-logo"></i><h1>Encryption & Decryption</h1><p>Digital Secrets, Confidentiality, and Authenticity</p></div>
-            <div class="slide" id="slide-2"><div class="slide-layout"><div class="slide-content"><h2><i class="fa-solid fa-file-shield"></i> The Core of Confidentiality</h2><ul><li><strong>Plaintext:</strong> The original, readable message, such as "Meet me at the park at 5 PM."</li><li><strong>Readability:</strong> Plaintext can be understood instantly by anyone without special tools.</li><li><strong>Ciphertext:</strong> The scrambled, encrypted version of the message, looking like "Xy6lp Qw9z".</li><li><strong>Reversing it:</strong> Ciphertext requires a specific mathematical secret key to turn back into Plaintext.</li></ul></div><div class="slide-image"><img src="https://images.unsplash.com/photo-1614064641938-3bbee52942c7?auto=format&fit=crop&w=800&q=80" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=800&q=80';" alt="Padlock on glowing digital code"></div></div></div>
-            <div class="slide" id="slide-3"><div class="slide-layout"><div class="slide-content"><h2><i class="fa-solid fa-gear"></i> Ancient Origins</h2><ul><li><strong>Mechanical Complexity:</strong> Before the digital age, encryption was largely a mechanical process.</li><li><strong>The Enigma Machine:</strong> Used during WWII, this machine utilized complex rotors to scramble letters into trillions of daily combinations.</li><li><strong>Historical Impact:</strong> Cracking this code at Bletchley Park changed the course of history and laid the groundwork for modern computer science.</li></ul></div><div class="slide-image"><img src="https://image.pollinations.ai/prompt/World%20War%202%20Enigma%20machine%20on%20a%20desk,%20cinematic,%20photorealistic?width=800&height=600&nologo=true" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1509343259692-8091a4574971?auto=format&fit=crop&w=800&q=80';" alt="AI Generated Historical Enigma Machine"></div></div></div>
-            <div class="slide" id="slide-4"><div class="slide-layout"><div class="slide-content"><h2><i class="fa-solid fa-key"></i> Symmetric Encryption</h2><ul><li><strong>One Shared Key:</strong> Both the sender and the receiver use the exact same secret key to lock and unlock information.</li><li><strong>Speed & Efficiency:</strong> Because the math is simpler, this method is incredibly fast and ideal for encrypting large amounts of data.</li><li><strong>Real-Life Example:</strong> A home Wi-Fi password acts as a single key that both the router and phone use to encrypt traffic.</li></ul></div><div class="slide-image"><img src="https://images.unsplash.com/photo-1544197150-b99a580bb7a8?auto=format&fit=crop&w=800&q=80" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=800&q=80';" alt="Glowing network cables representing fast symmetric encryption"></div></div></div>
-            <div class="slide" id="slide-5"><div class="slide-layout"><div class="slide-content"><h2><i class="fa-solid fa-key-skeleton"></i> Asymmetric Encryption</h2><ul><li><strong>The Magic Pair:</strong> This method uses a mathematically linked Public Key and Private Key.</li><li><strong>Public Key:</strong> Operates like a mailbox address that anyone can use to send you a locked letter.</li><li><strong>Private Key:</strong> The physical key only you hold to open that specific mailbox.</li><li><strong>The Solution:</strong> Elegantly solves the issue of sharing secret keys over the internet without them being stolen.</li></ul></div><div class="slide-image"><img src="https://images.unsplash.com/photo-1529148482759-b35b25c5f217?auto=format&fit=crop&w=800&q=80" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=800&q=80';" alt="Row of secure mailboxes representing public keys"></div></div></div>
-            <div class="slide" id="slide-6"><div class="slide-layout"><div class="slide-content"><h2><i class="fa-solid fa-shield-halved"></i> HTTPS & Brute Force</h2><ul><li><strong>HTTPS Handshake:</strong> A browser requests a server's Public Key, creates a one-time Symmetric key, and encrypts it to secure the session.</li><li><strong>Brute Force Defense:</strong> Modern AES-256 encryption offers 2<sup>256</sup> possible key combinations.</li><li><strong>Unimaginable Math:</strong> There are more key combinations than atoms in the observable universe.</li><li><strong>Security Bedrock:</strong> Harnessing all computing power on Earth would take trillions of years to guess the key.</li></ul></div><div class="slide-image"><img src="https://images.unsplash.com/photo-1462331940025-496dfbfc7564?auto=format&fit=crop&w=800&q=80" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=800&q=80';" alt="The universe representing an unimaginable number of atoms and combinations"></div></div></div>
-            <div class="slide" id="slide-7"><div class="slide-layout"><div class="slide-content"><h2><i class="fa-solid fa-robot"></i> The Authenticity Crisis</h2><ul><li><strong>Rise of AI:</strong> Generative AI is dissolving the line between reality and synthetic media by creating hyper-realistic content.</li><li><strong>New Risks:</strong> This technological shift creates massive new risks regarding fraud and misinformation.</li><li><strong>The Encryption Gap:</strong> Encryption hides content well, but cannot prove its original source or whether it is artificial.</li></ul></div><div class="slide-image"><img src="https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&w=800&q=80" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=800&q=80';" alt="A hyper-realistic artificial intelligence face"></div></div></div>
-            <div class="slide" id="slide-8"><div class="slide-layout"><div class="slide-content"><h2><i class="fa-solid fa-fingerprint"></i> What is SynthID?</h2><ul><li><strong>Digital Watermarking:</strong> Developed by Google DeepMind, SynthID embeds an imperceptible signal directly into AI-generated content.</li><li><strong>Resilient Design:</strong> Unlike visible watermarks, it is woven into pixels or sound waves at the exact moment of generation.</li><li><strong>Multi-Medium:</strong> Protects images/videos (pixel adjustments), audio (spectrogram frequencies), and text (tournament sampling of an LLM's word choices).</li></ul></div><div class="slide-image"><img src="https://images.unsplash.com/photo-1550745165-9bc0b252726f?auto=format&fit=crop&w=800&q=80" onerror="this.onerror=null; this.src='https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=800&q=80';" alt="Digital fingerprint representing synthetic media watermarks"></div></div></div>
-            <div class="slide end-slide" id="slide-9"><i class="fa-solid fa-network-wired main-logo" style="font-size: 4em; margin-bottom: 0;"></i><h1 style="font-size: 3.5em; margin-top: 15px; margin-bottom: 10px;">The Future of Security</h1><p style="font-size: 1.5em; color: var(--text-muted);">Trust is not simply a matter of security; it is the fundamental currency of a functioning digital society.</p><div style="margin-top: 40px; padding: 15px 40px; background: rgba(0, 240, 255, 0.1); border: 1px solid var(--accent-primary); border-radius: 30px; color: var(--accent-primary); font-weight: bold; font-family: 'Poppins', sans-serif; letter-spacing: 2px;">THANK YOU</div></div>
-            <div class="controls"><div class="counter"><span id="currentNum">1</span> / <span id="totalNum">9</span></div></div>
+    <div id="auth-screen" class="fixed inset-0 bg-white z-50 flex flex-col items-center justify-center">
+        <div class="w-full max-w-sm flex flex-col items-center px-4">
+            <h2 class="text-2xl font-bold text-[#004b9b] mb-4">Authentication Required</h2>
+            <hr class="border-gray-200 mb-6 w-full">
+            <div class="mb-4 w-full">
+                <input type="password" id="password-input" class="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#004b9b] focus:ring-1 focus:ring-[#004b9b] text-gray-700" placeholder="Enter password">
+            </div>
+            <p id="auth-error" class="text-red-500 text-sm mb-4 hidden w-full text-left font-medium">Incorrect password. Please try again.</p>
+            <button id="unlock-btn" class="w-full bg-[#005bb5] hover:bg-[#004182] text-white font-semibold py-3 px-4 rounded transition duration-200">
+                Unlock
+            </button>
         </div>
-        <script>
-            let currentSlideIndex = 0; const slides = document.querySelectorAll('.slide'); const currentNum = document.getElementById('currentNum'); const progressBar = document.getElementById('progressBar'); document.getElementById('totalNum').innerText = slides.length;
-            function updateSlides() { slides.forEach((slide, index) => { slide.classList.remove('active'); if (index === currentSlideIndex) { slide.classList.add('active'); } }); currentNum.innerText = currentSlideIndex + 1; progressBar.style.width = ((currentSlideIndex / (slides.length - 1)) * 100) + '%'; }
-            function changeSlide(direction) { currentSlideIndex += direction; if (currentSlideIndex < 0) currentSlideIndex = 0; else if (currentSlideIndex >= slides.length) currentSlideIndex = slides.length - 1; updateSlides(); }
-            updateSlides(); document.addEventListener('keydown', (e) => { if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') { if (currentSlideIndex < slides.length - 1) changeSlide(1); } else if (e.key === 'ArrowLeft') { if (currentSlideIndex > 0) changeSlide(-1); } });
-            let touchstartX = 0; let touchendX = 0; const minSwipeDistance = 50;
-            function handleGesture() { if (touchendX < touchstartX - minSwipeDistance) { if (currentSlideIndex < slides.length - 1) changeSlide(1); } if (touchendX > touchstartX + minSwipeDistance) { if (currentSlideIndex > 0) changeSlide(-1); } }
-            document.addEventListener('touchstart', e => { touchstartX = e.changedTouches[0].screenX; }); document.addEventListener('touchend', e => { touchendX = e.changedTouches[0].screenX; handleGesture(); });
-        </script>
-        </body>
-        </html>
-    </template>
+    </div>
 
-    <!-- ========================================== -->
-    <!-- APP 2: CYBERSEC WORKBENCH                  -->
-    <!-- ========================================== -->
-    <template id="app2">
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>CyberSec Workbench: Encryption & Decryption</title>
-            <script src="https://cdn.tailwindcss.com"></script>
-            <script src="https://unpkg.com/@phosphor-icons/web"></script>
-            <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
-            <script> tailwind.config = { theme: { extend: { fontFamily: { sans: ['Inter', 'sans-serif'], mono: ['Fira Code', 'monospace'], }, colors: { slate: { 850: '#151e2e', 900: '#0f172a', 950: '#020617', }, cyan: { 400: '#22d3ee', 500: '#06b6d4', }, emerald: { 400: '#34d399', 500: '#10b981', } } } } } </script>
-            <style> ::-webkit-scrollbar { width: 8px; height: 8px; } ::-webkit-scrollbar-track { background: #0f172a; } ::-webkit-scrollbar-thumb { background: #334155; border-radius: 4px; } ::-webkit-scrollbar-thumb:hover { background: #475569; } .glass-panel { background: rgba(30, 41, 59, 0.7); backdrop-filter: blur(10px); border: 1px solid rgba(51, 65, 85, 0.5); } .nav-item.active { background-color: rgba(16, 185, 129, 0.1); border-left: 4px solid #10b981; color: #34d399; } .section { display: none; } .section.active { display: block; animation: fadeIn 0.3s ease-in-out; } @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } } .key-block { color: #86efac; } .hash-block { color: #93c5fd; } </style>
-        </head>
-        <body class="bg-slate-950 text-slate-300 h-screen flex flex-col md:flex-row overflow-hidden">
-            <div id="toast" class="fixed bottom-4 right-4 px-6 py-3 rounded shadow-lg transition-opacity duration-300 z-50 opacity-0 pointer-events-none font-medium"></div>
-            <nav class="w-full md:w-72 bg-slate-900 border-b md:border-b-0 md:border-r border-slate-800 flex flex-col h-auto md:h-full z-10 shrink-0">
-                <div class="p-6 flex items-center gap-3 border-b border-slate-800"><i class="ph ph-shield-check text-emerald-400 text-3xl"></i><div><h1 class="text-xl font-bold text-white tracking-tight">Encrypt<span class="text-emerald-400">-Decrypt</span></h1><p class="text-xs text-slate-500 uppercase tracking-wider">BANAJIT BORO</p></div></div>
-                <div class="flex-1 overflow-y-auto py-4 flex md:flex-col gap-1 px-3 overflow-x-auto md:overflow-x-hidden">
-                    <button onclick="switchTab('intro')" id="nav-intro" class="nav-item active flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors hover:bg-slate-800 whitespace-nowrap md:whitespace-normal"><i class="ph ph-book-open text-lg"></i> Fundamentals</button>
-                    <div class="text-xs font-semibold text-slate-600 uppercase tracking-wider mt-4 mb-2 px-4 hidden md:block">Classical Ciphers</div>
-                    <button onclick="switchTab('caesar')" id="nav-caesar" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors hover:bg-slate-800 whitespace-nowrap md:whitespace-normal"><i class="ph ph-arrows-left-right text-lg"></i> Caesar Cipher</button>
-                    <button onclick="switchTab('vigenere')" id="nav-vigenere" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors hover:bg-slate-800 whitespace-nowrap md:whitespace-normal"><i class="ph ph-grid-four text-lg"></i> Vigenère Cipher</button>
-                    <div class="text-xs font-semibold text-slate-600 uppercase tracking-wider mt-4 mb-2 px-4 hidden md:block">Modern Cryptography</div>
-                    <button onclick="switchTab('aes')" id="nav-aes" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors hover:bg-slate-800 whitespace-nowrap md:whitespace-normal"><i class="ph ph-lock-key text-lg"></i> Symmetric (AES)</button>
-                    <button onclick="switchTab('rsa')" id="nav-rsa" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors hover:bg-slate-800 whitespace-nowrap md:whitespace-normal"><i class="ph ph-key text-lg"></i> Asymmetric (RSA)</button>
-                    <button onclick="switchTab('hashing')" id="nav-hashing" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors hover:bg-slate-800 whitespace-nowrap md:whitespace-normal"><i class="ph ph-hash text-lg"></i> Hashing (SHA)</button>
-                    <div class="text-xs font-semibold text-slate-600 uppercase tracking-wider mt-4 mb-2 px-4 hidden md:block">Challenges</div>
-                    <button onclick="switchTab('ctf')" id="nav-ctf" class="nav-item flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors hover:bg-slate-800 whitespace-nowrap md:whitespace-normal"><i class="ph ph-flag text-lg"></i> Capture The Flag</button>
-                </div>
+    <header class="bg-[#004b9b] text-white shadow-md p-4 flex-shrink-0 hidden" id="main-header">
+        <div class="container mx-auto flex justify-between items-center max-w-5xl">
+            <h1 class="text-lg md:text-xl font-bold flex items-center gap-2">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
+                IKS Mathematics
+            </h1>
+            <nav class="space-x-2">
+                <button id="nav-guide-btn" class="px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded text-sm font-medium transition">Study Guide</button>
+                <button id="nav-quiz-btn" class="px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded text-sm font-medium transition">Quiz</button>
             </nav>
-            <main class="flex-1 overflow-y-auto bg-slate-950 p-4 md:p-8 relative">
-                <div id="sec-intro" class="section active max-w-5xl mx-auto"><h2 class="text-3xl md:text-4xl font-bold text-white mb-6">The Foundations of Cryptography</h2><div class="grid grid-cols-1 lg:grid-cols-3 gap-8"><div class="lg:col-span-2 space-y-6 text-slate-400 leading-relaxed"><p class="text-lg text-slate-300">Welcome to the Cybersecurity Workbench. Over the next hour, you will transform from a novice to someone who deeply understands how digital secrets are kept.</p><div class="glass-panel p-6 rounded-xl"><h3 class="text-xl font-semibold text-emerald-400 mb-3">What is Cryptography?</h3><p>Cryptography is the practice of securing communication in the presence of adversaries. The core components are:</p><ul class="list-disc pl-5 mt-3 space-y-2"><li><strong class="text-white">Plaintext:</strong> The original, readable message.</li><li><strong class="text-white">Ciphertext:</strong> The scrambled, unreadable output.</li><li><strong class="text-white">Encryption:</strong> The algorithm that turns Plaintext into Ciphertext.</li><li><strong class="text-white">Decryption:</strong> The reverse algorithm.</li><li><strong class="text-white">Key:</strong> A secret piece of information that dictates exactly how the algorithm scrambles the data. Without the key, the algorithm is useless.</li></ul></div><h3 class="text-2xl font-semibold text-white mt-8 mb-4">The Actors: Alice, Bob, and Eve</h3><p>In cryptography, we traditionally use characters to explain scenarios:</p><div class="flex flex-col md:flex-row gap-4 mt-4"><div class="flex-1 bg-slate-900 p-4 rounded border border-slate-700 text-center"><i class="ph ph-user text-3xl text-cyan-400 mb-2"></i><h4 class="font-bold text-white">Alice</h4><p class="text-sm">Wants to send a secret message to Bob.</p></div><div class="flex-1 bg-slate-900 p-4 rounded border border-slate-700 text-center"><i class="ph ph-user text-3xl text-emerald-400 mb-2"></i><h4 class="font-bold text-white">Bob</h4><p class="text-sm">Wants to read Alice's message securely.</p></div><div class="flex-1 bg-red-900/20 p-4 rounded border border-red-900/50 text-center"><i class="ph ph-detective text-3xl text-red-400 mb-2"></i><h4 class="font-bold text-white">Eve</h4><p class="text-sm">The eavesdropper intercepting the network.</p></div></div><p class="mt-4">If Alice sends plaintext, Eve reads it. If Alice encrypts it, Eve only sees random noise. The challenge of cryptography is making sure Bob has the key to decrypt it, without Eve ever getting that key.</p></div><div class="space-y-6"><div class="bg-gradient-to-br from-slate-800 to-slate-900 p-6 rounded-xl border border-slate-700"><h3 class="font-bold text-white mb-2">Your Mission</h3><p class="text-sm text-slate-400 mb-4">Go through the sidebar modules one by one. Read the theory, play with the interactive tools, and understand the vulnerabilities.</p><p class="text-sm text-slate-400 mb-4">Once you reach the <strong>Capture The Flag</strong> section, you will use the tools you've learned to decode hidden messages.</p><button onclick="switchTab('caesar')" class="w-full bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2 px-4 rounded transition">Start with Caesar Cipher &rarr;</button></div></div></div></div>
-                <div id="sec-caesar" class="section max-w-6xl mx-auto"><h2 class="text-3xl md:text-4xl font-bold text-white mb-2">Caesar Cipher</h2><p class="text-slate-400 mb-8">The dawn of cryptography: Substitution Ciphers.</p><div class="grid grid-cols-1 lg:grid-cols-2 gap-8"><div class="space-y-6"><div class="glass-panel p-6 rounded-xl"><h3 class="text-xl font-semibold text-emerald-400 mb-3">How it works</h3><p class="text-slate-300 text-sm leading-relaxed mb-4">Used by Julius Caesar in 58 BC, this is a <strong>substitution cipher</strong>. Every letter in the plaintext is shifted a certain number of places down the alphabet. For example, with a shift of 1, A becomes B, B becomes C, and Z wraps around to A.</p><p class="text-slate-300 text-sm leading-relaxed font-bold text-red-400">The Vulnerability: Frequency Analysis & Brute Force</p><p class="text-slate-300 text-sm leading-relaxed">Since there are only 25 possible shifts, a modern computer (or a bored human) can simply try all 25 until the text makes sense. Furthermore, because it's a direct substitution, the most common letter in the ciphertext will usually correspond to 'E', the most common letter in English.</p></div><div class="glass-panel p-6 rounded-xl border-red-900/50 bg-red-900/10"><h3 class="text-xl font-semibold text-red-400 mb-3 flex items-center gap-2"><i class="ph ph-skull"></i> Brute Force Attacker</h3><p class="text-sm text-slate-400 mb-4">Paste intercepted ciphertext here to instantly try all 25 possible keys. Green text indicates english dictionary matches.</p><textarea id="caesar-brute-input" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-white font-mono text-sm focus:border-red-500 focus:outline-none mb-4" rows="2" placeholder="Paste intercepted text..."></textarea><button onclick="runCaesarBruteForce()" class="bg-red-600 hover:bg-red-500 text-white font-semibold py-2 px-4 rounded transition text-sm">Initiate Brute Force</button><div id="caesar-brute-results" class="mt-4 max-h-60 overflow-y-auto font-mono text-xs space-y-1 bg-slate-950 p-2 rounded hidden"></div></div></div><div class="glass-panel p-6 rounded-xl"><h3 class="text-xl font-semibold text-white mb-4">Interactive Lab</h3><label class="block text-sm font-medium text-slate-400 mb-2">Shift (Key): <span id="caesar-shift-val" class="text-cyan-400 font-bold">3</span></label><input type="range" id="caesar-shift" min="1" max="25" value="3" class="w-full accent-cyan-500 mb-6" oninput="updateCaesar()"><label class="block text-sm font-medium text-slate-400 mb-2">Plaintext</label><textarea id="caesar-plain" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-white font-mono text-sm focus:border-cyan-500 focus:outline-none mb-6 transition-colors" rows="4" oninput="updateCaesar('plain')">ATTACK AT DAWN</textarea><div class="flex justify-center mb-6"><i class="ph ph-arrows-down-up text-3xl text-slate-600"></i></div><label class="block text-sm font-medium text-slate-400 mb-2">Ciphertext</label><textarea id="caesar-cipher" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-emerald-400 font-mono text-sm focus:border-emerald-500 focus:outline-none transition-colors" rows="4" oninput="updateCaesar('cipher')"></textarea></div></div></div>
-                <div id="sec-vigenere" class="section max-w-6xl mx-auto"><h2 class="text-3xl md:text-4xl font-bold text-white mb-2">Vigenère Cipher</h2><p class="text-slate-400 mb-8">The unbreakable cipher of the 16th century: Polyalphabetic Substitution.</p><div class="grid grid-cols-1 lg:grid-cols-2 gap-8"><div class="space-y-6"><div class="glass-panel p-6 rounded-xl"><h3 class="text-xl font-semibold text-emerald-400 mb-3">How it works</h3><p class="text-slate-300 text-sm leading-relaxed mb-4">To defeat frequency analysis, Giovan Battista Bellaso invented a cipher that uses a <strong>keyword</strong>. Instead of shifting the whole message by one number (like Caesar), every letter is shifted by a different amount based on the repeating keyword.</p><p class="text-slate-300 text-sm leading-relaxed mb-4">If the keyword is "LEMON", the first letter of plaintext is shifted by 'L' (11), the second by 'E' (4), and so on. The key repeats: LEMONLEMONLEM.</p><p class="text-slate-300 text-sm leading-relaxed font-bold text-red-400">The Vulnerability: Kasiski Examination</p><p class="text-slate-300 text-sm leading-relaxed">It was considered unbreakable ("le chiffre indéchiffrable") for 300 years! In 1863, Friedrich Kasiski published a method. If you find repeating sequences in the ciphertext, the distance between them is likely a multiple of the keyword length. Once you know the key length, you break it down into several standard Caesar ciphers and solve them individually.</p></div></div><div class="glass-panel p-6 rounded-xl"><h3 class="text-xl font-semibold text-white mb-4">Interactive Lab</h3><label class="block text-sm font-medium text-slate-400 mb-2">Keyword</label><input type="text" id="vigenere-key" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-cyan-400 font-mono text-sm focus:border-cyan-500 focus:outline-none mb-6 uppercase" value="LEMON" oninput="updateVigenere('plain')"><label class="block text-sm font-medium text-slate-400 mb-2">Plaintext</label><textarea id="vigenere-plain" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-white font-mono text-sm focus:border-cyan-500 focus:outline-none mb-6" rows="4" oninput="updateVigenere('plain')">ATTACK AT DAWN</textarea><div class="flex justify-center mb-6"><i class="ph ph-arrows-down-up text-3xl text-slate-600"></i></div><label class="block text-sm font-medium text-slate-400 mb-2">Ciphertext</label><textarea id="vigenere-cipher" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-emerald-400 font-mono text-sm focus:border-emerald-500 focus:outline-none" rows="4" oninput="updateVigenere('cipher')"></textarea></div></div></div>
-                <div id="sec-aes" class="section max-w-6xl mx-auto"><h2 class="text-3xl md:text-4xl font-bold text-white mb-2">Symmetric Encryption: AES-GCM</h2><p class="text-slate-400 mb-8">The modern standard for keeping secrets. One key locks and unlocks.</p><div class="grid grid-cols-1 lg:grid-cols-2 gap-8"><div class="space-y-6"><div class="glass-panel p-6 rounded-xl"><h3 class="text-xl font-semibold text-emerald-400 mb-3">Advanced Encryption Standard</h3><p class="text-slate-300 text-sm leading-relaxed mb-4">AES is a block cipher established by NIST in 2001. Unlike Caesar or Vigenère, which operate on individual letters, AES operates on blocks of <strong>bits</strong> using complex mathematical substitutions and permutations.</p><h4 class="font-bold text-white mt-4 mb-2">The Components:</h4><ul class="list-disc pl-5 text-sm text-slate-300 space-y-2"><li><strong>Password/Key:</strong> Used to encrypt. In modern web apps, a human password is fed through a Key Derivation Function (like PBKDF2) to generate a secure 256-bit mathematical key.</li><li><strong>Salt:</strong> Random data added to the password before derivation to prevent dictionary attacks.</li><li><strong>IV (Initialization Vector):</strong> A random number added to the encryption process. If you encrypt the same message twice with the same password, the IV ensures the ciphertexts look completely different.</li><li><strong>GCM (Galois/Counter Mode):</strong> The specific "mode" of AES. GCM not only encrypts the data (Confidentiality) but adds a tag to ensure the data hasn't been tampered with (Integrity).</li></ul></div></div><div class="glass-panel p-6 rounded-xl"><h3 class="text-xl font-semibold text-white mb-4">Interactive Lab (Real WebCrypto API)</h3><label class="block text-sm font-medium text-slate-400 mb-2">Secret Password</label><div class="relative mb-6"><input type="password" id="aes-pass" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-cyan-400 font-mono text-sm focus:border-cyan-500 focus:outline-none" value="SuperSecret123"><button onclick="toggleVisibility('aes-pass')" class="absolute right-3 top-3 text-slate-400 hover:text-white"><i class="ph ph-eye"></i></button></div><label class="block text-sm font-medium text-slate-400 mb-2">Plaintext</label><textarea id="aes-plain" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-white font-mono text-sm focus:border-cyan-500 focus:outline-none mb-4" rows="3">This is highly classified information.</textarea><div class="flex gap-4 mb-6"><button onclick="executeAESEncrypt()" class="flex-1 bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2 px-4 rounded transition flex justify-center items-center gap-2"><i class="ph ph-lock-key"></i> Encrypt</button><button onclick="executeAESDecrypt()" class="flex-1 bg-emerald-600 hover:bg-emerald-500 text-white font-semibold py-2 px-4 rounded transition flex justify-center items-center gap-2"><i class="ph ph-lock-key-open"></i> Decrypt</button></div><label class="block text-sm font-medium text-slate-400 mb-2">Ciphertext (Base64 Encoded)</label><textarea id="aes-cipher" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-emerald-400 font-mono text-xs focus:border-emerald-500 focus:outline-none mb-2 break-all" rows="4"></textarea><p class="text-xs text-slate-500">Note: This Base64 string actually contains [Salt + IV + Ciphertext] concatenated together.</p></div></div></div>
-                <div id="sec-rsa" class="section max-w-6xl mx-auto"><h2 class="text-3xl md:text-4xl font-bold text-white mb-2">Asymmetric Encryption: RSA</h2><p class="text-slate-400 mb-8">Public Key Cryptography. Two keys: one to lock, one to unlock.</p><div class="grid grid-cols-1 lg:grid-cols-2 gap-8"><div class="space-y-6"><div class="glass-panel p-6 rounded-xl"><h3 class="text-xl font-semibold text-emerald-400 mb-3">The Key Exchange Problem</h3><p class="text-slate-300 text-sm leading-relaxed mb-4">Symmetric encryption (AES) is incredibly fast and secure, but there's a fatal flaw: <strong>How does Alice securely get the password to Bob over the internet without Eve stealing it?</strong></p><h4 class="font-bold text-white mt-4 mb-2">The Solution: Asymmetric Encryption</h4><p class="text-slate-300 text-sm leading-relaxed mb-4">In 1977, Rivest, Shamir, and Adleman (RSA) published a system using prime numbers. Instead of one key, you generate a mathematically linked <strong>Key Pair</strong>:</p><ul class="list-disc pl-5 text-sm text-slate-300 space-y-2 mb-4"><li><strong class="text-cyan-400">Public Key:</strong> You give this to everyone in the world. It can ONLY encrypt data. It is physically impossible for it to decrypt data.</li><li><strong class="text-red-400">Private Key:</strong> You keep this secret. It is the ONLY thing that can decrypt data encrypted by your Public Key.</li></ul><p class="text-slate-300 text-sm leading-relaxed italic">Analogy: Bob hands out hundreds of open padlocks (Public Keys). Alice puts her message in a box, snaps Bob's padlock shut, and mails it. Now, NO ONE can open the box—not even Alice! Only Bob, who has the only key (Private Key) to that padlock, can open it.</p></div><div class="glass-panel p-6 rounded-xl border-cyan-900/50"><div class="flex justify-between items-center mb-4"><h3 class="text-xl font-semibold text-cyan-400">Your Keys</h3><button onclick="generateRSAKeys()" class="bg-slate-700 hover:bg-slate-600 text-white font-semibold py-1.5 px-3 rounded text-sm transition flex items-center gap-2" id="rsa-gen-btn"><i class="ph ph-arrows-clockwise"></i> Generate New Pair</button></div><div class="grid grid-cols-1 gap-4"><div><label class="block text-xs font-semibold text-cyan-400 mb-1 uppercase tracking-wider">Public Key (Share widely)</label><textarea id="rsa-pub-display" readonly class="w-full bg-slate-900 border border-slate-700 rounded p-2 key-block font-mono text-[10px] focus:outline-none" rows="4">Click 'Generate New Pair' to create 2048-bit RSA keys.</textarea></div><div><label class="block text-xs font-semibold text-red-400 mb-1 uppercase tracking-wider">Private Key (NEVER SHARE)</label><textarea id="rsa-priv-display" readonly class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-red-300 font-mono text-[10px] focus:outline-none" rows="4">Click 'Generate New Pair' to create 2048-bit RSA keys.</textarea></div></div></div></div><div class="glass-panel p-6 rounded-xl flex flex-col"><h3 class="text-xl font-semibold text-white mb-4">Interactive Lab</h3><label class="block text-sm font-medium text-slate-400 mb-2">Short Plaintext Message</label><textarea id="rsa-plain" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-white font-mono text-sm focus:border-cyan-500 focus:outline-none mb-2" rows="3" placeholder="Type a message here..."></textarea><p class="text-xs text-slate-500 mb-6 text-right">RSA is slow and can only encrypt small amounts of data (usually max ~190 bytes for a 2048-bit key).</p><div class="flex gap-4 mb-6"><button onclick="executeRSAEncrypt()" class="flex-1 bg-cyan-600 hover:bg-cyan-500 text-white font-semibold py-2 px-4 rounded transition flex flex-col justify-center items-center gap-1"><span class="flex items-center gap-2"><i class="ph ph-lock-key"></i> Encrypt</span><span class="text-[10px] opacity-75">(Uses Public Key)</span></button><button onclick="executeRSADecrypt()" class="flex-1 bg-red-600 hover:bg-red-500 text-white font-semibold py-2 px-4 rounded transition flex flex-col justify-center items-center gap-1"><span class="flex items-center gap-2"><i class="ph ph-lock-key-open"></i> Decrypt</span><span class="text-[10px] opacity-75">(Uses Private Key)</span></button></div><label class="block text-sm font-medium text-slate-400 mb-2">Ciphertext (Base64)</label><textarea id="rsa-cipher" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-emerald-400 font-mono text-xs focus:border-emerald-500 focus:outline-none flex-1 min-h-[150px] break-all" placeholder="Encrypted data will appear here..."></textarea></div></div></div>
-                <div id="sec-hashing" class="section max-w-6xl mx-auto"><h2 class="text-3xl md:text-4xl font-bold text-white mb-2">Cryptographic Hashing</h2><p class="text-slate-400 mb-8">One-way mathematical fingerprints. Data goes in, it never comes out.</p><div class="grid grid-cols-1 lg:grid-cols-2 gap-8"><div class="space-y-6"><div class="glass-panel p-6 rounded-xl"><h3 class="text-xl font-semibold text-emerald-400 mb-3">Not Encryption, but Crucial</h3><p class="text-slate-300 text-sm leading-relaxed mb-4">Encryption is a two-way street: you encrypt to decrypt later. <strong>Hashing is a one-way street.</strong></p><p class="text-slate-300 text-sm leading-relaxed mb-4">A hash function takes an input of ANY size (a password, a 50GB video file) and mathematically condenses it into a fixed-size string of characters (a "fingerprint").</p><h4 class="font-bold text-white mt-4 mb-2">Properties of a good Hash:</h4><ul class="list-disc pl-5 text-sm text-slate-300 space-y-2"><li><strong>Deterministic:</strong> The same input ALWAYS produces the exact same hash.</li><li><strong>Irreversible:</strong> You cannot derive the input from the hash.</li><li><strong>The Avalanche Effect:</strong> Changing a single letter or even a single bit of the input changes the entire resulting hash completely.</li><li><strong>Collision Resistant:</strong> It is statistically improbable for two different inputs to produce the same hash.</li></ul></div></div><div class="glass-panel p-6 rounded-xl"><h3 class="text-xl font-semibold text-white mb-4">The Avalanche Visualizer</h3><label class="block text-sm font-medium text-slate-400 mb-2">Input Data</label><input type="text" id="hash-input" class="w-full bg-slate-900 border border-slate-700 rounded p-3 text-white font-mono text-sm focus:border-cyan-500 focus:outline-none mb-6" value="password" oninput="updateHashes()"><div class="space-y-4"><div><label class="flex justify-between text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wider"><span>SHA-1</span><span class="text-red-400">Depreciated (Insecure)</span></label><div id="hash-sha1" class="w-full bg-slate-900 border border-slate-700 rounded p-3 hash-block font-mono text-[11px] break-all"></div></div><div><label class="flex justify-between text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wider"><span>SHA-256</span><span class="text-emerald-400">Industry Standard</span></label><div id="hash-sha256" class="w-full bg-slate-900 border border-slate-700 rounded p-3 hash-block font-mono text-[11px] break-all"></div></div><div><label class="flex justify-between text-xs font-semibold text-slate-400 mb-1 uppercase tracking-wider"><span>SHA-512</span><span class="text-cyan-400">High Security</span></label><div id="hash-sha512" class="w-full bg-slate-900 border border-slate-700 rounded p-3 hash-block font-mono text-[11px] break-all"></div></div></div><p class="text-xs text-slate-500 mt-4 italic">Try changing "password" to "Password" (capital P) and watch how completely different every output becomes.</p></div></div></div>
-                <div id="sec-ctf" class="section max-w-4xl mx-auto"><h2 class="text-3xl md:text-4xl font-bold text-white mb-2 text-center">Capture The Flag</h2><p class="text-slate-400 mb-8 text-center">Test your skills. Use the tools in the sidebar to decode these intercepted messages.</p><div class="space-y-6"><div class="glass-panel p-6 rounded-xl border-l-4 border-l-blue-500" id="chal-1"><div class="flex justify-between items-start mb-4"><h3 class="text-xl font-bold text-white">Level 1: The Roman General</h3><span class="bg-blue-900/50 text-blue-400 text-xs px-2 py-1 rounded font-bold uppercase tracking-widest">Easy</span></div><p class="text-slate-300 text-sm mb-4">We intercepted this message from an amateur hacker group. We suspect they are using the oldest trick in the book. Use the brute force tool to find the flag.</p><div class="bg-slate-900 p-3 rounded font-mono text-emerald-400 text-sm mb-4 tracking-widest text-center border border-slate-700">IODJ{KHOOR_DJHQW}</div><div class="flex gap-2"><input type="text" id="flag-1" placeholder="Enter decoded text here..." class="flex-1 bg-slate-900 border border-slate-700 rounded px-3 py-2 text-white text-sm focus:border-blue-500 focus:outline-none uppercase"><button onclick="checkFlag(1, 'FLAG{HELLO_AGENT}')" class="bg-blue-600 hover:bg-blue-500 text-white px-4 py-2 rounded text-sm font-bold transition">Submit</button></div></div><div class="glass-panel p-6 rounded-xl border-l-4 border-l-purple-500" id="chal-2"><div class="flex justify-between items-start mb-4"><h3 class="text-xl font-bold text-white">Level 2: Polyalphabetic Panic</h3><span class="bg-purple-900/50 text-purple-400 text-xs px-2 py-1 rounded font-bold uppercase tracking-widest">Medium</span></div><p class="text-slate-300 text-sm mb-4">The adversary got slightly smarter. They used a Vigenère cipher. We managed to recover the keyword from their garbage bin: <strong>SECURE</strong>.</p><div class="bg-slate-900 p-3 rounded font-mono text-emerald-400 text-sm mb-4 tracking-widest text-center border border-slate-700">XPER{TFRQ_TGLYVXZ}</div><div class="flex gap-2"><input type="text" id="flag-2" placeholder="Enter decoded text here..." class="flex-1 bg-slate-900 border border-slate-700 rounded px-3 py-2 text-white text-sm focus:border-purple-500 focus:outline-none uppercase"><button onclick="checkFlag(2, 'FLAG{BANK_ROBBERY}')" class="bg-purple-600 hover:bg-purple-500 text-white px-4 py-2 rounded text-sm font-bold transition">Submit</button></div></div><div class="glass-panel p-6 rounded-xl border-l-4 border-l-red-500" id="chal-3"><div class="flex justify-between items-start mb-4"><h3 class="text-xl font-bold text-white">Level 3: Modern Data Extraction</h3><span class="bg-red-900/50 text-red-400 text-xs px-2 py-1 rounded font-bold uppercase tracking-widest">Hard</span></div><p class="text-slate-300 text-sm mb-4">This file was downloaded from a secure server. It's AES-GCM encrypted. A note attached to it said: <em>"The password is the name of our solar system's star, all lowercase."</em></p><textarea readonly class="w-full bg-slate-900 border border-slate-700 rounded p-2 text-emerald-400 font-mono text-xs mb-4 h-20 break-all">xZtZc1y+j3V4D17/Zf+E4XbH8i4gD2T/1X0O1Qx7r2MhO4D5i5M2n0p9s1D/rY5X2E3P0F0I7H2Q5B9A0N1C8U6V</textarea><p class="text-xs text-slate-500 mb-4">(Note: To make this workable in this lab, use the text below, which was generated with the actual lab's AES tool using the password "sun")</p><div class="bg-slate-900 p-2 rounded font-mono text-cyan-400 text-[10px] mb-4 break-all border border-slate-700" id="chal3-base64"></div><div class="flex gap-2"><input type="text" id="flag-3" placeholder="Enter decrypted text..." class="flex-1 bg-slate-900 border border-slate-700 rounded px-3 py-2 text-white text-sm focus:border-red-500 focus:outline-none"><button onclick="checkFlag(3, 'FLAG{AES_IS_SECURE}')" class="bg-red-600 hover:bg-red-500 text-white px-4 py-2 rounded text-sm font-bold transition">Submit</button></div></div></div><div class="mt-12 text-center text-slate-500 text-sm"><p>Completed all challenges? You've proven you understand the fundamentals of Cryptography!</p></div></div>
-            </main>
-            <script>
-                const tabs = ['intro', 'caesar', 'vigenere', 'aes', 'rsa', 'hashing', 'ctf']; let rsaKeyPair = null;
-                function switchTab(tabId) { tabs.forEach(t => { document.getElementById(`sec-${t}`).classList.remove('active'); document.getElementById(`nav-${t}`).classList.remove('active'); }); document.getElementById(`sec-${tabId}`).classList.add('active'); document.getElementById(`nav-${tabId}`).classList.add('active'); window.scrollTo(0,0); }
-                function showToast(msg, type = 'success') { const toast = document.getElementById('toast'); toast.textContent = msg; toast.className = `fixed bottom-4 right-4 px-6 py-3 rounded shadow-lg transition-opacity duration-300 z-50 text-white font-semibold ${type === 'error' ? 'bg-red-600' : 'bg-emerald-600'}`; toast.style.opacity = '1'; setTimeout(() => { toast.style.opacity = '0'; }, 4000); }
-                function toggleVisibility(id) { const input = document.getElementById(id); input.type = input.type === "password" ? "text" : "password"; }
-                function bufferToBase64(buf) { var binstr = Array.prototype.map.call(new Uint8Array(buf), function (ch) { return String.fromCharCode(ch); }).join(''); return btoa(binstr); }
-                function base64ToBuffer(base64) { var binstr = atob(base64); var buf = new Uint8Array(binstr.length); Array.prototype.forEach.call(binstr, function (ch, i) { buf[i] = ch.charCodeAt(0); }); return buf.buffer; }
-                function doCaesar(str, amount) { if (amount < 0) return doCaesar(str, amount + 26); let output = ''; for (let i = 0; i < str.length; i++) { let c = str[i]; if (c.match(/[a-z]/i)) { let code = str.charCodeAt(i); if (code >= 65 && code <= 90) { c = String.fromCharCode(((code - 65 + amount) % 26) + 65); } else if (code >= 97 && code <= 122) { c = String.fromCharCode(((code - 97 + amount) % 26) + 97); } } output += c; } return output; }
-                function updateCaesar(source = 'plain') { const shift = parseInt(document.getElementById('caesar-shift').value); document.getElementById('caesar-shift-val').textContent = shift; if (source === 'plain') { const plain = document.getElementById('caesar-plain').value; document.getElementById('caesar-cipher').value = doCaesar(plain, shift); } else { const cipher = document.getElementById('caesar-cipher').value; document.getElementById('caesar-plain').value = doCaesar(cipher, (26 - shift) % 26); } }
-                function runCaesarBruteForce() { const cipher = document.getElementById('caesar-brute-input').value; if(!cipher) { showToast('Please input ciphertext.', 'error'); return; } const resDiv = document.getElementById('caesar-brute-results'); resDiv.innerHTML = ''; resDiv.classList.remove('hidden'); const commonWords = ['the', 'and', 'are', 'you', 'that', 'with', 'this', 'have', 'from', 'agent', 'hello', 'flag']; for(let i=1; i<=25; i++) { let dec = doCaesar(cipher, (26 - i) % 26); let lowerDec = dec.toLowerCase(); let matchScore = commonWords.filter(w => lowerDec.includes(w)).length; let el = document.createElement('div'); el.className = `p-1.5 border-b border-slate-800 flex gap-2 ${matchScore > 0 ? 'bg-emerald-900/30 text-emerald-400 font-bold' : 'text-slate-400'}`; el.innerHTML = `<span class="w-16 shrink-0 opacity-50">Shift ${i.toString().padStart(2, '0')}</span> <span>${dec}</span>`; resDiv.appendChild(el); } }
-                function doVigenere(text, key, decrypt = false) { let result = ''; let j = 0; key = key.toUpperCase().replace(/[^A-Z]/g, ''); if(!key) return text; for (let i = 0; i < text.length; i++) { let c = text[i]; if (c.match(/[a-z]/i)) { let isUpper = c === c.toUpperCase(); let textChar = c.toUpperCase().charCodeAt(0) - 65; let keyChar = key[j % key.length].charCodeAt(0) - 65; let shifted; if (decrypt) { shifted = (textChar - keyChar + 26) % 26; } else { shifted = (textChar + keyChar) % 26; } result += String.fromCharCode(shifted + (isUpper ? 65 : 97)); j++; } else { result += c; } } return result; }
-                function updateVigenere(source = 'plain') { const key = document.getElementById('vigenere-key').value; if (source === 'plain') { const plain = document.getElementById('vigenere-plain').value; document.getElementById('vigenere-cipher').value = doVigenere(plain, key, false); } else { const cipher = document.getElementById('vigenere-cipher').value; document.getElementById('vigenere-plain').value = doVigenere(cipher, key, true); } }
-                async function getAESKey(password, salt) { const enc = new TextEncoder(); const keyMaterial = await window.crypto.subtle.importKey( "raw", enc.encode(password), {name: "PBKDF2"}, false, ["deriveKey"] ); return window.crypto.subtle.deriveKey( { name: "PBKDF2", salt: salt, iterations: 100000, hash: "SHA-256" }, keyMaterial, { name: "AES-GCM", length: 256 }, false, ["encrypt", "decrypt"] ); }
-                async function executeAESEncrypt() { try { const password = document.getElementById('aes-pass').value; const plaintext = document.getElementById('aes-plain').value; if(!password || !plaintext) { showToast("Password and Plaintext are required.", "error"); return; } const enc = new TextEncoder(); const salt = window.crypto.getRandomValues(new Uint8Array(16)); const iv = window.crypto.getRandomValues(new Uint8Array(12)); const key = await getAESKey(password, salt); const ciphertextBuffer = await window.crypto.subtle.encrypt( { name: "AES-GCM", iv: iv }, key, enc.encode(plaintext) ); const combined = new Uint8Array(salt.length + iv.length + ciphertextBuffer.byteLength); combined.set(salt, 0); combined.set(iv, salt.length); combined.set(new Uint8Array(ciphertextBuffer), salt.length + iv.length); document.getElementById('aes-cipher').value = bufferToBase64(combined.buffer); showToast("Encryption Successful!"); } catch (e) { console.error(e); showToast("Encryption failed.", "error"); } }
-                async function executeAESDecrypt() { try { const password = document.getElementById('aes-pass').value; const b64Ciphertext = document.getElementById('aes-cipher').value; if(!password || !b64Ciphertext) { showToast("Password and Ciphertext required.", "error"); return; } const combinedBuffer = base64ToBuffer(b64Ciphertext); const combined = new Uint8Array(combinedBuffer); if (combined.length < 28) { showToast("Invalid ciphertext.", "error"); return; } const salt = combined.slice(0, 16); const iv = combined.slice(16, 28); const data = combined.slice(28); const key = await getAESKey(password, salt); const decryptedBuffer = await window.crypto.subtle.decrypt( { name: "AES-GCM", iv: iv }, key, data ); const dec = new TextDecoder(); document.getElementById('aes-plain').value = dec.decode(decryptedBuffer); showToast("Decryption Successful!"); } catch (e) { console.error(e); showToast("Decryption failed!", "error"); } }
-                async function formatPEM(keyBuffer, type) { const b64 = bufferToBase64(keyBuffer); const header = `-----BEGIN ${type} KEY-----\n`; const footer = `\n-----END ${type} KEY-----`; const formattedB64 = b64.match(/.{1,64}/g).join('\n'); return header + formattedB64 + footer; }
-                async function generateRSAKeys() { try { const btn = document.getElementById('rsa-gen-btn'); btn.innerHTML = `<i class="ph ph-spinner animate-spin"></i> Generating...`; btn.disabled = true; rsaKeyPair = await window.crypto.subtle.generateKey( { name: "RSA-OAEP", modulusLength: 2048, publicExponent: new Uint8Array([1, 0, 1]), hash: "SHA-256" }, true, ["encrypt", "decrypt"] ); const pubExport = await window.crypto.subtle.exportKey("spki", rsaKeyPair.publicKey); const privExport = await window.crypto.subtle.exportKey("pkcs8", rsaKeyPair.privateKey); document.getElementById('rsa-pub-display').value = await formatPEM(pubExport, "PUBLIC"); document.getElementById('rsa-priv-display').value = await formatPEM(privExport, "PRIVATE"); showToast("New RSA Keys generated."); } catch (e) { showToast("Failed to generate keys.", "error"); } finally { const btn = document.getElementById('rsa-gen-btn'); btn.innerHTML = `<i class="ph ph-arrows-clockwise"></i> Generate New Pair`; btn.disabled = false; } }
-                async function executeRSAEncrypt() { if (!rsaKeyPair) { showToast("Please generate keys first!", "error"); return; } const plaintext = document.getElementById('rsa-plain').value; if(!plaintext) { showToast("Enter a message.", "error"); return; } const enc = new TextEncoder(); const data = enc.encode(plaintext); if (data.length > 190) { showToast("Message too long.", "error"); return; } try { const encryptedBuf = await window.crypto.subtle.encrypt( { name: "RSA-OAEP" }, rsaKeyPair.publicKey, data ); document.getElementById('rsa-cipher').value = bufferToBase64(encryptedBuf); showToast("Encrypted with Public Key!"); } catch (e) { showToast("RSA Encryption failed.", "error"); } }
-                async function executeRSADecrypt() { if (!rsaKeyPair) { showToast("Please generate keys first!", "error"); return; } const b64Ciphertext = document.getElementById('rsa-cipher').value; if(!b64Ciphertext) { showToast("No ciphertext.", "error"); return; } try { const encryptedBuf = base64ToBuffer(b64Ciphertext); const decryptedBuf = await window.crypto.subtle.decrypt( { name: "RSA-OAEP" }, rsaKeyPair.privateKey, encryptedBuf ); const dec = new TextDecoder(); document.getElementById('rsa-plain').value = dec.decode(decryptedBuf); showToast("Decrypted with Private Key!"); } catch (e) { showToast("RSA Decryption failed.", "error"); } }
-                async function getHash(text, algo) { const msgBuffer = new TextEncoder().encode(text); const hashBuffer = await crypto.subtle.digest(algo, msgBuffer); const hashArray = Array.from(new Uint8Array(hashBuffer)); return hashArray.map(b => b.toString(16).padStart(2, '0')).join(''); }
-                async function updateHashes() { const input = document.getElementById('hash-input').value; if(!input) { document.getElementById('hash-sha1').textContent = ""; document.getElementById('hash-sha256').textContent = ""; document.getElementById('hash-sha512').textContent = ""; return; } document.getElementById('hash-sha1').textContent = await getHash(input, 'SHA-1'); document.getElementById('hash-sha256').textContent = await getHash(input, 'SHA-256'); document.getElementById('hash-sha512').textContent = await getHash(input, 'SHA-512'); }
-                function checkFlag(level, expectedFlag) { const input = document.getElementById(`flag-${level}`).value.trim().toUpperCase(); if (input === expectedFlag) { document.getElementById(`chal-${level}`).classList.remove('border-blue-500', 'border-purple-500', 'border-red-500'); document.getElementById(`chal-${level}`).classList.add('border-emerald-500', 'bg-emerald-900/10'); showToast(`Level ${level} Passed!`, 'success'); } else { showToast("Incorrect Flag.", "error"); } }
-                window.onload = async () => { updateCaesar(); updateVigenere(); updateHashes(); try { const pass = "sun"; const text = "FLAG{AES_IS_SECURE}"; const enc = new TextEncoder(); const salt = window.crypto.getRandomValues(new Uint8Array(16)); const iv = window.crypto.getRandomValues(new Uint8Array(12)); const keyMaterial = await window.crypto.subtle.importKey( "raw", enc.encode(pass), {name: "PBKDF2"}, false, ["deriveKey"] ); const key = await window.crypto.subtle.deriveKey( { name: "PBKDF2", salt: salt, iterations: 100000, hash: "SHA-256" }, keyMaterial, { name: "AES-GCM", length: 256 }, false, ["encrypt", "decrypt"] ); const ciphertextBuffer = await window.crypto.subtle.encrypt( { name: "AES-GCM", iv: iv }, key, enc.encode(text) ); const combined = new Uint8Array(salt.length + iv.length + ciphertextBuffer.byteLength); combined.set(salt, 0); combined.set(iv, salt.length); combined.set(new Uint8Array(ciphertextBuffer), salt.length + iv.length); document.getElementById('chal3-base64').textContent = bufferToBase64(combined.buffer); } catch(e) {} };
-            </script>
-        </body>
-        </html>
-    </template>
-
-    <!-- ========================================== -->
-    <!-- APP 3: CYBERSECURITY AWARENESS             -->
-    <!-- ========================================== -->
-    <template id="app3">
-        <!DOCTYPE html>
-        <html lang="en">
-        <head>
-            <meta charset="UTF-8">
-            <meta name="viewport" content="width=device-width, initial-scale=1.0">
-            <title>Cybersecurity Awareness Program</title>
-            <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Poppins:wght@500;700&display=swap" rel="stylesheet">
-            <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-            <style>
-                :root { --bg-dark: #050b14; --text-color: #e2e8f0; --text-muted: #94a3b8; --accent-primary: #00f0ff; --accent-secondary: #3b82f6; --card-bg: rgba(17, 24, 39, 0.85); --border-color: rgba(0, 240, 255, 0.3); }
-                body, html { margin: 0; padding: 0; width: 100%; height: 100%; font-family: 'Inter', sans-serif; color: var(--text-color); overflow: hidden; touch-action: none; background: linear-gradient(135deg, rgba(15, 23, 42, 0.92) 0%, rgba(5, 11, 20, 0.98) 100%), url('https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=2000&q=80') no-repeat center center fixed; background-size: cover; }
-                body::before { content: ''; position: absolute; top: 0; left: 0; right: 0; bottom: 0; background-image: linear-gradient(rgba(0, 240, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(0, 240, 255, 0.03) 1px, transparent 1px); background-size: 40px 40px; z-index: -1; }
-                .progress-container { position: fixed; top: 0; left: 0; width: 100%; height: 4px; background-color: rgba(255, 255, 255, 0.1); z-index: 50; }
-                .progress-bar { height: 100%; width: 0%; background: linear-gradient(90deg, var(--accent-secondary), var(--accent-primary)); transition: width 0.4s ease; box-shadow: 0 0 15px var(--accent-primary); }
-                .presentation-container { position: relative; width: 100%; height: 100vh; display: flex; flex-direction: column; justify-content: center; align-items: center; }
-                .slide { position: absolute; width: 85%; max-width: 1000px; height: 75%; background-color: var(--card-bg); border: 1px solid var(--border-color); border-radius: 16px; padding: 50px; box-sizing: border-box; opacity: 0; transform: translateY(40px) scale(0.95); transition: all 0.6s cubic-bezier(0.25, 0.8, 0.25, 1); pointer-events: none; display: flex; flex-direction: column; justify-content: center; backdrop-filter: blur(15px); -webkit-backdrop-filter: blur(15px); box-shadow: 0 25px 50px rgba(0,0,0,0.7), inset 0 0 30px rgba(0, 240, 255, 0.05); }
-                .slide.active { opacity: 1; transform: translateY(0) scale(1); pointer-events: auto; z-index: 10; }
-                .slide-layout { display: flex; flex-direction: row; align-items: center; gap: 40px; height: 100%; }
-                .slide-content { flex: 1; display: flex; flex-direction: column; justify-content: center; }
-                .slide-image { flex: 0.8; height: 100%; max-height: 380px; border-radius: 12px; overflow: hidden; border: 2px solid rgba(0, 240, 255, 0.2); box-shadow: 0 10px 30px rgba(0,0,0,0.5), 0 0 20px rgba(0, 240, 255, 0.1); background-color: #0f172a; }
-                .slide-image img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.5s ease; }
-                .slide-image:hover img { transform: scale(1.05); }
-                .main-logo { font-size: 5em; margin-bottom: 20px; background: linear-gradient(135deg, var(--accent-primary), var(--accent-secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; filter: drop-shadow(0 0 15px rgba(0, 240, 255, 0.5)); display: inline-block; }
-                h2 i { color: var(--accent-primary); margin-right: 12px; font-size: 0.9em; text-shadow: 0 0 10px rgba(0, 240, 255, 0.4); }
-                h1, h2 { font-family: 'Poppins', sans-serif; margin-top: 0; }
-                h1 { text-align: center; font-size: 3.2em; margin-bottom: 10px; color: #ffffff; text-shadow: 0 0 20px rgba(255, 255, 255, 0.2); }
-                h2 { color: #ffffff; border-bottom: 2px solid var(--border-color); padding-bottom: 12px; font-size: 2.2em; margin-bottom: 20px; display: flex; align-items: center; }
-                ul { font-size: 1.2em; line-height: 1.6; list-style: none; padding-left: 0; margin-bottom: 0; }
-                li { margin-bottom: 20px; position: relative; padding-left: 30px; }
-                li::before { content: '▹'; position: absolute; left: 0; color: var(--accent-primary); font-size: 1.2em; font-weight: bold; top: -2px; }
-                li strong { color: #ffffff; font-weight: 600; }
-                .title-slide, .end-slide { align-items: center; text-align: center; }
-                .title-slide p { font-size: 1.4em; color: var(--text-muted); font-weight: 300; max-width: 80%; }
-                .controls { position: absolute; bottom: 4%; width: 100%; display: flex; justify-content: center; align-items: center; z-index: 20; }
-                .counter { font-size: 1.1em; font-family: 'Poppins', sans-serif; font-weight: 500; color: var(--text-muted); background: rgba(0,0,0,0.6); padding: 8px 20px; border-radius: 30px; border: 1px solid rgba(0, 240, 255, 0.2); box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
-                @media (max-width: 768px) { .slide { padding: 25px; height: 85%; } .slide-layout { flex-direction: column-reverse; gap: 20px; } .slide-image { flex: none; width: 100%; height: 180px; } .main-logo { font-size: 4em; } h1 { font-size: 2.2em; } h2 { font-size: 1.5em; margin-bottom: 15px; } ul { font-size: 1em; } .title-slide p { font-size: 1.1em; } li { padding-left: 25px; margin-bottom: 12px; } }
-            </style>
-        </head>
-        <body>
-        <div class="progress-container"><div class="progress-bar" id="progressBar"></div></div>
-        <div class="presentation-container">
-            <div class="slide active title-slide" id="slide-1"><i class="fa-solid fa-shield-halved main-logo"></i><h1>Cybersecurity Awareness</h1><p>A Guide for Students: Staying Safe in the Digital World</p></div>
-            <div class="slide" id="slide-2"><div class="slide-layout"><div class="slide-content"><h2><i class="fa-solid fa-user-astronaut"></i> What is Cybersecurity?</h2><ul><li><strong>Digital Armor:</strong> It's the practice of protecting your devices, personal information, and online identity.</li><li><strong>Why it matters:</strong> Cybercriminals actively look for stolen info to use for scams, bullying, and theft.</li><li><strong>Your role:</strong> You are the very first line of defense against online threats!</li></ul></div><div class="slide-image"><img src="https://images.unsplash.com/photo-1550751827-4bd374c3f58b?auto=format&fit=crop&w=800&q=80" onerror="this.onerror=null; this.src='https://picsum.photos/seed/cyber/800/600';" alt="Cybersecurity Code"></div></div></div>
-            <div class="slide" id="slide-3"><div class="slide-layout"><div class="slide-content"><h2><i class="fa-solid fa-key"></i> Password Power</h2><ul><li><strong>Make it long:</strong> Use at least 12 characters. Nonsense phrases work best (e.g., <i>Blue$Sky*Pizza99</i>).</li><li><strong>Keep it secret:</strong> Never share your passwords with friends—only with a parent or guardian.</li><li><strong>Mix it up:</strong> Never reuse the same password for your school account, email, and games.</li></ul></div><div class="slide-image"><img src="https://images.unsplash.com/photo-1584433144859-1fc3ab64a957?auto=format&fit=crop&w=800&q=80" onerror="this.onerror=null; this.src='https://picsum.photos/seed/keyboardlock/800/600';" alt="Padlock on Keyboard"></div></div></div>
-            <div class="slide" id="slide-4"><div class="slide-layout"><div class="slide-content"><h2><i class="fa-solid fa-fish-fins"></i> Spotting Phishing & Scams</h2><ul><li><strong>What is it?</strong> Fake emails, texts, or messages pretending to be a trusted company or friend.</li><li><strong>Red Flags:</strong> Urgent warnings, bad spelling, asking for passwords, or "You won a free phone!"</li><li><strong>Action Plan:</strong> Think before you click! If it looks suspicious, delete it or ask a teacher.</li></ul></div><div class="slide-image"><img src="https://images.unsplash.com/photo-1563206767-5b18f218e8de?auto=format&fit=crop&w=800&q=80" onerror="this.onerror=null; this.src='https://picsum.photos/seed/hacker/800/600';" alt="Security Hacker Warning"></div></div></div>
-            <div class="slide" id="slide-5"><div class="slide-layout"><div class="slide-content"><h2><i class="fa-solid fa-hashtag"></i> Safe Social Media Habits</h2><ul><li><strong>Privacy Check:</strong> Set profiles to private. Only accept requests from people you know in real life.</li><li><strong>The Internet is Forever:</strong> Think carefully before posting photos or comments.</li><li><strong>Location tagging:</strong> Turn off location sharing so strangers don't know exactly where you are.</li></ul></div><div class="slide-image"><img src="https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?auto=format&fit=crop&w=800&q=80" onerror="this.onerror=null; this.src='https://picsum.photos/seed/social/800/600';" alt="Social Media Apps"></div></div></div>
-            <div class="slide" id="slide-6"><div class="slide-layout"><div class="slide-content"><h2><i class="fa-solid fa-mobile-screen"></i> Device Defense</h2><ul><li><strong>Lock it down:</strong> Always lock your phone or laptop screen with a PIN or password when you step away.</li><li><strong>Update regularly:</strong> Keep your apps and operating system up to date. Those updates fix hidden security holes!</li><li><strong>Download safely:</strong> Only download apps and games from official stores (like the App Store or Google Play).</li></ul></div><div class="slide-image"><img src="https://images.unsplash.com/photo-1526406915894-7bcd65f60845?auto=format&fit=crop&w=800&q=80" onerror="this.onerror=null; this.src='https://picsum.photos/seed/tech/800/600';" alt="Electronic Devices"></div></div></div>
-            <div class="slide" id="slide-7"><div class="slide-layout"><div class="slide-content"><h2><i class="fa-solid fa-wifi"></i> Public Wi-Fi Perils</h2><ul><li><strong>It's not private:</strong> Free Wi-Fi at cafes, airports, or malls can easily be snooped on by hackers.</li><li><strong>Avoid sensitive sites:</strong> Never log into your bank, school portal, or social media on unsecured public networks.</li><li><strong>Use a VPN:</strong> If you must use public Wi-Fi, a Virtual Private Network scrambles your data to keep it safe.</li></ul></div><div class="slide-image"><img src="https://images.unsplash.com/photo-1555949963-aa79dcee981c?auto=format&fit=crop&w=800&q=80" onerror="this.onerror=null; this.src='https://picsum.photos/seed/darklaptop/800/600';" alt="Hacker Code on Laptop in the dark"></div></div></div>
-            <div class="slide" id="slide-8"><div class="slide-layout"><div class="slide-content"><h2><i class="fa-solid fa-users-viewfinder"></i> Digital Citizenship</h2><ul><li><strong>Be kind online:</strong> Treat others with the same respect you would in person. Behind every screen is a real person.</li><li><strong>Don't engage:</strong> If someone is cyberbullying you, don't argue back. Block them and take screenshots for proof.</li><li><strong>Speak up:</strong> Always tell a trusted adult or teacher if you or a friend feels unsafe online.</li></ul></div><div class="slide-image"><img src="https://images.unsplash.com/photo-1517245386807-bb43f82c33c4?auto=format&fit=crop&w=800&q=80" onerror="this.onerror=null; this.src='https://picsum.photos/seed/students/800/600';" alt="People using technology together"></div></div></div>
-            <div class="slide end-slide" id="slide-9"><i class="fa-solid fa-laptop-medical main-logo" style="font-size: 4em; margin-bottom: 0;"></i><h1 style="font-size: 3.5em; margin-top: 15px; margin-bottom: 10px;">Stay Safe!</h1><p style="font-size: 1.5em; color: var(--text-muted);">Remember to stop, think, and connect carefully.</p><div style="margin-top: 40px; padding: 15px 40px; background: rgba(0, 240, 255, 0.1); border: 1px solid var(--accent-primary); border-radius: 30px; color: var(--accent-primary); font-weight: bold; font-family: 'Poppins', sans-serif; letter-spacing: 2px;">THANK YOU</div></div>
-            <div class="controls"><div class="counter"><span id="currentNum">1</span> / <span id="totalNum">9</span></div></div>
         </div>
-        <script>
-            let currentSlideIndex = 0; const slides = document.querySelectorAll('.slide'); const currentNum = document.getElementById('currentNum'); const progressBar = document.getElementById('progressBar'); document.getElementById('totalNum').innerText = slides.length;
-            function updateSlides() { slides.forEach((slide, index) => { slide.classList.remove('active'); if (index === currentSlideIndex) { slide.classList.add('active'); } }); currentNum.innerText = currentSlideIndex + 1; progressBar.style.width = ((currentSlideIndex / (slides.length - 1)) * 100) + '%'; }
-            function changeSlide(direction) { currentSlideIndex += direction; if (currentSlideIndex < 0) currentSlideIndex = 0; else if (currentSlideIndex >= slides.length) currentSlideIndex = slides.length - 1; updateSlides(); }
-            updateSlides(); document.addEventListener('keydown', (e) => { if (e.key === 'ArrowRight' || e.key === ' ' || e.key === 'Enter') { if (currentSlideIndex < slides.length - 1) changeSlide(1); } else if (e.key === 'ArrowLeft') { if (currentSlideIndex > 0) changeSlide(-1); } });
-            let touchstartX = 0; let touchendX = 0; const minSwipeDistance = 50;
-            function handleGesture() { if (touchendX < touchstartX - minSwipeDistance) { if (currentSlideIndex < slides.length - 1) changeSlide(1); } if (touchendX > touchstartX + minSwipeDistance) { if (currentSlideIndex > 0) changeSlide(-1); } }
-            document.addEventListener('touchstart', e => { touchstartX = e.changedTouches[0].screenX; }); document.addEventListener('touchend', e => { touchendX = e.changedTouches[0].screenX; handleGesture(); });
-        </script>
-        </body>
-        </html>
-    </template>
+    </header>
 
-    <!-- ========================================== -->
-    <!-- TOGGLE LOGIC                               -->
-    <!-- ========================================== -->
-    <script>
-        // Store IDs for the three templates
-        const templates = ['app1', 'app2', 'app3'];
-        let currentIndex = 0;
-        
-        const viewer = document.getElementById('viewer');
-        const btn = document.getElementById('toggleBtn');
-
-        // Extract HTML from the template and load it into the iframe
-        function loadPage(index) {
-            viewer.srcdoc = document.getElementById(templates[index]).innerHTML;
-            btn.textContent = `Switch View (${index + 1}/3)`;
+    <main class="flex-grow overflow-y-auto hidden bg-gray-50 p-4 md:p-6" id="main-content">
+        <div class="container mx-auto max-w-4xl">
             
-            // Re-focus the iframe so keyboard arrows work immediately without needing to click
-            viewer.onload = () => {
-                viewer.contentWindow.focus();
-            };
-        }
+            <section id="study-guide-section" class="bg-white p-6 md:p-10 rounded-xl shadow-sm border border-gray-100 mb-10">
+                <h2 class="text-3xl font-bold text-gray-800 mb-6 border-b pb-4">Study Guide: Indian Mathematics</h2>
+                
+                <div class="space-y-8 text-gray-700 leading-relaxed">
+                    <div>
+                        <h3 class="text-xl font-bold text-[#004b9b] mb-2">1. Numbers, Fractions and Geometry in the Vedas</h3>
+                        <p>The Vedas, the oldest layer of Sanskrit literature, contain early mathematical concepts. The <strong>Sulba Sutras</strong> (appendices to the Vedas) are primarily known for geometry, detailing the construction of complex fire altars using precise geometric principles. They demonstrate knowledge of the Pythagorean theorem, calculating square roots, and using specific fractions like <i>ardha</i> (1/2), <i>pada</i> (1/4), and <i>tri-bhaga</i> (1/3).</p>
+                    </div>
 
-        // Cycle on click
-        btn.addEventListener('click', () => {
-            currentIndex = (currentIndex + 1) % templates.length;
-            loadPage(currentIndex);
+                    <div>
+                        <h3 class="text-xl font-bold text-[#004b9b] mb-2">2. Decimal Nomenclature in the Vedas</h3>
+                        <p>Vedic Indians developed a systematic decimal nomenclature, assigning unique names to powers of 10 up to extremely large numbers. The sequence includes: Eka (10^0), Dasha (10^1), Shata (10^2), Sahasra (10^3), Ayuta (10^4), Niyuta (10^5), Prayuta (10^6), Arbuda (10^7), and extends to <strong>Parardha</strong> (10^12). This linguistic foundation paved the way for the mathematical place-value system.</p>
+                    </div>
+
+                    <div>
+                        <h3 class="text-xl font-bold text-[#004b9b] mb-2">3. Zero and Infinity</h3>
+                        <p>The concept of zero, called <strong>Shunya</strong> (meaning void or empty), originated in India. Initially used as a placeholder (a dot or <i>bindu</i>), it was formalized as a mathematical number by Brahmagupta in 628 CE. The concept of infinity (<i>Ananta</i> or <i>Purnam</i>) is deeply philosophical and mathematical, explicitly mentioned in the Isha Upanishad, which states that extracting infinity from infinity leaves infinity.</p>
+                    </div>
+
+                    <div>
+                        <h3 class="text-xl font-bold text-[#004b9b] mb-2">4. Development of the Decimal Place Value System</h3>
+                        <p>India is the birthplace of the modern decimal place-value system (Hindu-Arabic numeral system). Using just ten symbols (0-9) and positional value, this system dramatically <strong>simplified all arithmetical operations</strong> compared to older systems (like Roman numerals). This allowed for efficient addition, subtraction, multiplication, and division.</p>
+                    </div>
+
+                    <div>
+                        <h3 class="text-xl font-bold text-[#004b9b] mb-2">5. Linguistic Representation of Numbers</h3>
+                        <p>To memorize vast numerical tables and constants in verse, ancient scholars invented systems to map numbers to words or letters:
+                        <ul class="list-disc pl-5 mt-2 space-y-1">
+                            <li><strong>Bhuta-Sankhya System:</strong> Uses familiar objects to represent numbers (e.g., 'Eyes' or 'Netra' = 2, 'Vedas' = 4, 'Moon' = 1).</li>
+                            <li><strong>Katapayadi System:</strong> Maps Sanskrit consonants to digits (1-9 and 0), allowing numbers to be encoded into meaningful poetry.</li>
+                        </ul>
+                        </p>
+                    </div>
+
+                    <div>
+                        <h3 class="text-xl font-bold text-[#004b9b] mb-2">6. Important Texts of Indian Mathematics</h3>
+                        <p>Key historical texts and their authors include:</p>
+                        <ul class="list-disc pl-5 mt-2 space-y-1">
+                            <li><strong>Aryabhatiya</strong> (by Aryabhata): Covered arithmetic, algebra, and plane trigonometry.</li>
+                            <li><strong>Brahmasphutasiddhanta</strong> (by Brahmagupta): First text to give rules for zero and negative numbers.</li>
+                            <li><strong>Lilavati & Bijaganita</strong> (by Bhaskaracharya / Bhaskara II): Masterpieces on arithmetic and algebra, respectively.</li>
+                        </ul>
+                    </div>
+
+                    <div>
+                        <h3 class="text-xl font-bold text-[#004b9b] mb-2">7. Algebra, Trigonometry, and Calculus</h3>
+                        <ul class="list-disc pl-5 space-y-2">
+                            <li><strong>Algebra (Bijaganita/Avyaktaganita):</strong> Focused on the 'mathematics of the unmanifest' (unknown variables). Included advanced solutions to quadratic and indeterminate equations (like the <i>Chakravala</i> method).</li>
+                            <li><strong>Trigonometry:</strong> Originated from astronomical needs. Aryabhata introduced <strong>Jya</strong> (Sine) and <strong>Koti-jya</strong> (Cosine).</li>
+                            <li><strong>Calculus:</strong> The Kerala School (founded by <strong>Madhava</strong> of Sangamagrama in the 14th century) discovered infinite series for Pi, Sine, and Cosine centuries before Newton and Leibniz.</li>
+                        </ul>
+                    </div>
+                </div>
+                
+                <div class="mt-8 pt-6 border-t flex justify-center">
+                    <button id="start-quiz-btn-guide" class="bg-[#004b9b] hover:bg-[#003370] text-white font-bold py-3 px-8 rounded-lg shadow-md transition transform hover:-translate-y-0.5">
+                        I'm Ready, Start Quiz
+                    </button>
+                </div>
+            </section>
+
+            <section id="quiz-section" class="hidden pb-20">
+                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-6 text-center">
+                    <h2 class="text-2xl font-bold text-gray-800">IKS: Mathematics Master Quiz</h2>
+                    <p class="text-gray-500 mt-2">Answer all 50 questions based on the study guide. Good luck!</p>
+                </div>
+                
+                <div id="questions-container" class="space-y-6">
+                    <!-- Questions will be injected here by JS -->
+                </div>
+
+                <div class="mt-8 flex justify-end">
+                    <button id="submit-quiz-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg shadow-md transition hidden">
+                        Submit Answers
+                    </button>
+                </div>
+            </section>
+
+            <section id="results-section" class="hidden bg-white p-8 rounded-xl shadow-sm border border-gray-100 text-center mb-10">
+                <h2 class="text-3xl font-bold text-gray-800 mb-2">Quiz Completed!</h2>
+                <div class="text-6xl font-bold text-[#004b9b] my-6" id="score-display">0/50</div>
+                <p class="text-xl text-gray-600 mb-8" id="score-message">Great effort!</p>
+                
+                <div class="flex justify-center gap-4">
+                    <button id="review-btn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-6 rounded transition">
+                        Review Answers
+                    </button>
+                    <button id="retry-btn" class="bg-[#004b9b] hover:bg-[#003370] text-white font-semibold py-2 px-6 rounded transition">
+                        Retake Quiz
+                    </button>
+                </div>
+            </section>
+            
+        </div>
+    </main>
+
+    <footer id="quiz-footer" class="bg-white border-t border-gray-200 p-4 sticky bottom-0 hidden shadow-[0_-5px_15px_-15px_rgba(0,0,0,0.1)] z-10">
+        <div class="container mx-auto flex justify-between items-center max-w-4xl">
+            <div class="text-sm font-medium text-gray-600">
+                Answered: <span id="answered-count" class="font-bold text-[#004b9b]">0</span> / 50
+            </div>
+            <div class="w-1/2 bg-gray-200 rounded-full h-2.5">
+                <div id="progress-bar" class="bg-[#004b9b] h-2.5 rounded-full" style="width: 0%"></div>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        const APP_PASSWORD = "1221@J";
+
+        document.getElementById('unlock-btn').addEventListener('click', handleUnlock);
+        document.getElementById('password-input').addEventListener('keypress', function (e) {
+            if (e.key === 'Enter') handleUnlock();
         });
 
-        // Initialize first app
-        loadPage(0);
+        function handleUnlock() {
+            const inputVal = document.getElementById('password-input').value;
+            const errorMsg = document.getElementById('auth-error');
+            
+            if (inputVal === APP_PASSWORD) {
+                document.getElementById('auth-screen').classList.add('hidden');
+                document.getElementById('main-header').classList.remove('hidden');
+                document.getElementById('main-content').classList.remove('hidden');
+            } else {
+                errorMsg.classList.remove('hidden');
+                document.getElementById('password-input').value = '';
+            }
+        }
+
+        const questions = [
+            { q: "Which ancient Indian texts are primarily known for detailing early geometry for altar construction?", o: ["Rigveda", "Sulba Sutras", "Upanishads", "Puranas"], a: 1, e: "The Sulba Sutras (appendices to the Vedas) contain detailed geometric principles for constructing complex fire altars." },
+            { q: "What was the highest power of 10 distinctly named in early Vedic nomenclature (e.g., in the Yajurveda)?", o: ["Shata (10^2)", "Sahasra (10^3)", "Ayuta (10^4)", "Parardha (10^12)"], a: 3, e: "Vedic nomenclature extended up to Parardha, representing 10 to the power of 12." },
+            { q: "What is the Sanskrit term for 'Zero' as conceptualized in ancient India?", o: ["Ananta", "Shunya", "Bindu", "Kha"], a: 1, e: "Shunya is the Sanskrit term for zero, meaning void or empty." },
+            { q: "Who was the first mathematician to formalize rules for operations involving zero?", o: ["Aryabhata", "Madhava", "Brahmagupta", "Bhaskara I"], a: 2, e: "Brahmagupta formalized the mathematical rules for zero in his text Brahmasphutasiddhanta (628 CE)." },
+            { q: "The development of the decimal place value system primarily resulted in the simplification of:", o: ["Geometry", "Arithmetical operations", "Calculus", "Poetry"], a: 1, e: "The place-value system allowed complex arithmetic (addition, multiplication, etc.) to be done easily compared to older numeral systems." },
+            { q: "In the Bhuta-sankhya system, which number would the word 'Netra' (Eyes) represent?", o: ["1", "2", "3", "4"], a: 1, e: "Since humans have two eyes, 'Netra' represents the number 2 in the Bhuta-sankhya word-numeral system." },
+            { q: "Which system maps Sanskrit consonants to digits to memorize numbers as poetry?", o: ["Katapayadi system", "Bhuta-sankhya", "Sulba system", "Chhandas system"], a: 0, e: "The Katapayadi system assigns digits to letters (Ka, Ta, Pa, Ya, etc.) to encode numbers in verses." },
+            { q: "Which renowned text was written by Aryabhata?", o: ["Lilavati", "Brahmasphutasiddhanta", "Aryabhatiya", "Ganita Sara Samgraha"], a: 2, e: "Aryabhatiya is the foundational text written by Aryabhata covering arithmetic, algebra, and trigonometry." },
+            { q: "Bhaskaracharya's masterpiece 'Lilavati' primarily focuses on which branch of mathematics?", o: ["Calculus", "Arithmetic", "Geometry", "Astronomy"], a: 1, e: "Lilavati is Bhaskaracharya's famous treatise on arithmetic and geometry." },
+            { q: "What term was used in ancient India for Algebra?", o: ["Patiganita", "Bijaganita", "Rekhaganita", "Grahaganita"], a: 1, e: "Bijaganita (mathematics of seeds/elements) or Avyaktaganita (mathematics of the unknown) refers to Algebra." },
+            { q: "In Indian trigonometry, what does the term 'Jya' correspond to?", o: ["Cosine", "Tangent", "Sine", "Secant"], a: 2, e: "Jya corresponds to the Sine function in modern trigonometry." },
+            { q: "In Indian trigonometry, what does 'Koti-jya' correspond to?", o: ["Cosine", "Tangent", "Sine", "Cosecant"], a: 0, e: "Koti-jya corresponds to the Cosine function." },
+            { q: "Which Indian mathematician is credited with discovering infinite series for Pi, Sine, and Cosine?", o: ["Aryabhata", "Brahmagupta", "Madhava of Sangamagrama", "Mahavira"], a: 2, e: "Madhava founded the Kerala School and discovered these calculus-related infinite series in the 14th century." },
+            { q: "The mathematical concept of infinity (taking from infinity leaves infinity) is reflected in which text?", o: ["Rigveda", "Isha Upanishad", "Arthashastra", "Manusmriti"], a: 1, e: "The Isha Upanishad contains the verse 'Purnamadah Purnamidam', conceptually describing infinity." },
+            { q: "What does the word 'Sulba' literally mean in the context of the Sulba Sutras?", o: ["Altar", "String or Cord", "Fire", "Square"], a: 1, e: "Sulba means string or cord, which was used for measuring and constructing the fire altars." },
+            { q: "Which of these fractions was frequently used and specifically named (Ardha) in Vedic texts?", o: ["1/3", "1/4", "1/2", "1/8"], a: 2, e: "Ardha translates to 1/2. Vedic texts frequently used specific terms for fundamental fractions." },
+            { q: "What is the Vedic name for the number 10,000?", o: ["Shata", "Ayuta", "Laksha", "Prayuta"], a: 1, e: "In the Vedic decimal nomenclature, Ayuta represents 10,000." },
+            { q: "What was a primary motivation for the development of advanced trigonometry and calculus in ancient India?", o: ["Architecture", "Trade and Commerce", "Astronomical predictions", "Navigation"], a: 2, e: "Accurate astronomical predictions (planetary positions, eclipses) drove the need for trigonometry and calculus." },
+            { q: "Who wrote the algebraic treatise 'Bijaganita'?", o: ["Aryabhata", "Brahmagupta", "Bhaskara II", "Madhava"], a: 2, e: "Bhaskara II (Bhaskaracharya) authored Bijaganita as part of his larger work Siddhanta Shiromani." },
+            { q: "The 'Chakravala' method was an algorithmic approach developed in India to solve:", o: ["Linear equations", "Pell's equation (indeterminate quadratics)", "Cubic equations", "Area of a circle"], a: 1, e: "The Chakravala method is a cyclic algorithm to solve indeterminate quadratic equations." },
+            { q: "Which ancient school of mathematics flourished from the 14th to 16th century CE?", o: ["Ujjain School", "Kusumapura School", "Kerala School", "Takshashila School"], a: 2, e: "The Kerala School of Astronomy and Mathematics produced pioneering work in infinite series and calculus." },
+            { q: "Before the decimal system, early mathematical texts often used a dot as a placeholder. What was it called?", o: ["Bindu", "Rekha", "Chakra", "Mandala"], a: 0, e: "Bindu (dot) was used as an early placeholder symbol for zero." },
+            { q: "Who gave the highly accurate approximation of Pi as 3.1416 in the 5th century?", o: ["Varahamihira", "Aryabhata", "Bhaskara I", "Brahmagupta"], a: 1, e: "Aryabhata gave the approximation of Pi as 62832/20000, which is exactly 3.1416." },
+            { q: "In the context of Indian mathematics, what does 'Kuttaka' refer to?", o: ["A type of fraction", "An algorithm for linear indeterminate equations", "A geometric shape", "A trigonometric ratio"], a: 1, e: "Kuttaka (meaning 'pulverizer') is an algorithm used to solve linear Diophantine equations." },
+            { q: "Which text contains the earliest recorded use of zero explicitly as a number?", o: ["Sulba Sutras", "Bakhshali Manuscript", "Atharvaveda", "Ramayana"], a: 1, e: "The Bakhshali Manuscript (dated around the 3rd or 4th century) contains early uses of zero as a placeholder dot." },
+            { q: "In the Bhuta-sankhya system, which word would likely represent the number 4?", o: ["Veda", "Agni", "Surya", "Rasa"], a: 0, e: "Since there are four Vedas, the word 'Veda' represents 4." },
+            { q: "Bhaskara II defined the mathematical result of dividing a number by zero as:", o: ["Zero", "Khahara (Infinity)", "Undefined", "One"], a: 1, e: "He termed a quantity divided by zero as 'Khahara', meaning a fraction with zero as denominator, relating it to infinity." },
+            { q: "Pingala's Chhandas Shastra, a text on poetic meter, contains early concepts related to:", o: ["Binary numbers", "Calculus", "Geometry", "Negative numbers"], a: 0, e: "Pingala's combinatorial rules for short and long syllables correspond closely to modern binary numerals." },
+            { q: "The term 'Avyaktaganita' translates to:", o: ["Mathematics of knowns", "Mathematics of unknowns", "Mathematics of shapes", "Mathematics of stars"], a: 1, e: "Avyakta means unmanifest or unknown; hence it refers to Algebra where variables are unknown." },
+            { q: "Who is the author of 'Ganita Sara Samgraha'?", o: ["Mahavira", "Sridhara", "Aryabhata", "Brahmagupta"], a: 0, e: "Mahavira, a 9th-century Jain mathematician, authored the Ganita Sara Samgraha." },
+            { q: "What is the Vedic term for 100,000?", o: ["Ayuta", "Niyuta", "Prayuta", "Laksha"], a: 1, e: "While modern Hindi uses Laksha (Lakh), ancient Vedic nomenclature often used Niyuta for 100,000." },
+            { q: "In the Katapayadi system, the consonant 'Ka' corresponds to which number?", o: ["0", "1", "2", "3"], a: 1, e: "Ka, Ta, Pa, Ya all correspond to the number 1 in this system." },
+            { q: "Which text is considered the earliest to establish rules for negative numbers (fortune and debt)?", o: ["Aryabhatiya", "Brahmasphutasiddhanta", "Lilavati", "Sulba Sutras"], a: 1, e: "Brahmagupta used the concepts of 'fortunes' (positive) and 'debts' (negative) to establish algebraic rules." },
+            { q: "The Kerala School's discoveries in calculus predated Newton and Leibniz by approximately how many centuries?", o: ["1 century", "3 centuries", "5 centuries", "10 centuries"], a: 1, e: "Madhava's work in the 14th century predates Newton and Leibniz (17th century) by about three centuries." },
+            { q: "Which mathematical operation is dramatically simplified by the decimal place value system?", o: ["Addition only", "All arithmetical operations", "Geometry proofs", "Trigonometric identities"], a: 1, e: "Place value makes aligning and calculating addition, subtraction, multiplication, and division vastly simpler." },
+            { q: "In ancient Indian astronomy, mathematics was primarily used as a tool for:", o: ["Siddhanta (Astronomy)", "Vastu (Architecture)", "Ayurveda (Medicine)", "Dhanurveda (Archery)"], a: 0, e: "Mathematics was considered the eyes of the Vedas (Vedanga Jyotisha) primarily for astronomical calculations (Siddhanta)." },
+            { q: "Which of these is NOT a recognized mathematical text of ancient India?", o: ["Brahmasphutasiddhanta", "Lilavati", "Arthashastra", "Aryabhatiya"], a: 2, e: "Arthashastra is a treatise on statecraft and economy, not primarily mathematics." },
+            { q: "The Pythagorean theorem was explicitly stated in India prior to Pythagoras in which text?", o: ["Rigveda", "Baudhayana Sulba Sutra", "Atharvaveda", "Upanishads"], a: 1, e: "Baudhayana's Sulba Sutra states the theorem regarding the diagonal of a rectangle producing the same area as its length and breadth." },
+            { q: "What does 'Sahasra' mean in Vedic nomenclature?", o: ["100", "1,000", "10,000", "100,000"], a: 1, e: "Sahasra translates to 1,000." },
+            { q: "Who authored the commentary 'Aryabhatiya Bhasya'?", o: ["Bhaskara I", "Brahmagupta", "Mahavira", "Varahamihira"], a: 0, e: "Bhaskara I wrote the earliest known prose commentary on Aryabhata's work." },
+            { q: "The concept of 'Rasi' in Indian mathematics and astronomy refers to:", o: ["A fraction", "A geometric angle", "A Zodiac sign or mathematical quantity", "Zero"], a: 2, e: "Rasi refers to a quantity, heap, or a zodiac sign (30 degrees) in astronomy." },
+            { q: "Which mathematician is associated with the 'Kuttaka' method?", o: ["Aryabhata", "Madhava", "Pingala", "Baudhayana"], a: 0, e: "Aryabhata gave the earliest systematic formulation of the Kuttaka algorithm." },
+            { q: "What was the primary material used for writing early mathematical manuscripts in India?", o: ["Papyrus", "Clay tablets", "Birch bark and Palm leaves", "Parchment"], a: 2, e: "Most ancient Indian manuscripts, including the Bakhshali manuscript (birch bark), were written on bark or palm leaves." },
+            { q: "In the context of IKS, 'Ganita' broadly refers to:", o: ["Only Arithmetic", "Only Algebra", "Mathematics as a whole", "Only Geometry"], a: 2, e: "Ganita is the encompassing Sanskrit term for mathematics." },
+            { q: "Which text contains the famous verse encoding Pi to 31 decimal places using Katapayadi?", o: ["Sadratnamala", "Lilavati", "Aryabhatiya", "Bijaganita"], a: 0, e: "The Sadratnamala (by Sankara Varman of the Kerala School) encodes Pi accurately to 31 places." },
+            { q: "The word 'Dasha' in Vedic nomenclature represents:", o: ["10", "100", "1,000", "10,000"], a: 0, e: "Dasha means 10." },
+            { q: "Who is famous for refining the Chakravala method?", o: ["Brahmagupta", "Bhaskara II", "Aryabhata", "Mahavira"], a: 1, e: "While roots are seen in Brahmagupta's work, Bhaskara II refined it into the cyclic Chakravala method." },
+            { q: "What is 'Patiganita'?", o: ["Board mathematics (Arithmetic)", "Algebra", "Geometry", "Trigonometry"], a: 0, e: "Pati means board. Patiganita refers to arithmetic, historically done with a stylus on a dust-covered board." },
+            { q: "The linguistic representation systems (Bhuta-sankhya, Katapayadi) share what primary benefit?", o: ["Hiding secrets", "Aiding memorization through meter and verse", "Calculating faster", "Translating to other languages"], a: 1, e: "They allow numbers to be woven into metric verses, making massive astronomical tables easier to memorize." },
+            { q: "Which school demonstrated that the series for Pi is infinite?", o: ["Kerala School", "Ujjain School", "Patliputra School", "Varanasi School"], a: 0, e: "The Kerala School of Mathematics, initiated by Madhava, formulated infinite series for Pi." }
+        ];
+
+        let userAnswers = new Array(questions.length).fill(null);
+        let isSubmitted = false;
+
+        const navGuideBtn = document.getElementById('nav-guide-btn');
+        const navQuizBtn = document.getElementById('nav-quiz-btn');
+        const studyGuideSection = document.getElementById('study-guide-section');
+        const quizSection = document.getElementById('quiz-section');
+        const resultsSection = document.getElementById('results-section');
+        const startQuizBtnGuide = document.getElementById('start-quiz-btn-guide');
+        const submitQuizBtn = document.getElementById('submit-quiz-btn');
+        const questionsContainer = document.getElementById('questions-container');
+        const quizFooter = document.getElementById('quiz-footer');
+
+        navGuideBtn.addEventListener('click', showStudyGuide);
+        navQuizBtn.addEventListener('click', showQuiz);
+        startQuizBtnGuide.addEventListener('click', showQuiz);
+        submitQuizBtn.addEventListener('click', submitQuiz);
+        document.getElementById('retry-btn').addEventListener('click', resetQuiz);
+        document.getElementById('review-btn').addEventListener('click', () => {
+            resultsSection.classList.add('hidden');
+            quizSection.classList.remove('hidden');
+            window.scrollTo(0, 0);
+        });
+
+        function showStudyGuide() {
+            studyGuideSection.classList.remove('hidden');
+            quizSection.classList.add('hidden');
+            resultsSection.classList.add('hidden');
+            quizFooter.classList.add('hidden');
+            navGuideBtn.classList.add('bg-white/30');
+            navQuizBtn.classList.remove('bg-white/30');
+            window.scrollTo(0, 0);
+        }
+
+        function showQuiz() {
+            studyGuideSection.classList.add('hidden');
+            quizSection.classList.remove('hidden');
+            if (isSubmitted) {
+                resultsSection.classList.remove('hidden');
+                quizSection.classList.add('hidden');
+            } else {
+                quizFooter.classList.remove('hidden');
+                submitQuizBtn.classList.remove('hidden');
+            }
+            navQuizBtn.classList.add('bg-white/30');
+            navGuideBtn.classList.remove('bg-white/30');
+            window.scrollTo(0, 0);
+        }
+
+        function renderQuestions() {
+            questionsContainer.innerHTML = '';
+            questions.forEach((q, index) => {
+                const questionDiv = document.createElement('div');
+                questionDiv.className = 'p-5 rounded-lg border border-gray-200 bg-white hover:border-[#004b9b] transition duration-200';
+                questionDiv.id = `question-container-${index}`;
+                
+                const questionTitle = document.createElement('h3');
+                questionTitle.className = 'font-semibold text-lg text-gray-800 mb-4';
+                questionTitle.innerText = `${index + 1}. ${q.q}`;
+                questionDiv.appendChild(questionTitle);
+
+                const optionsDiv = document.createElement('div');
+                optionsDiv.className = 'space-y-2';
+
+                q.o.forEach((opt, optIndex) => {
+                    const label = document.createElement('label');
+                    label.className = 'flex items-center p-3 border rounded-md cursor-pointer hover:bg-gray-50 transition';
+                    label.id = `label-${index}-${optIndex}`;
+                    
+                    const input = document.createElement('input');
+                    input.type = 'radio';
+                    input.name = `question-${index}`;
+                    input.value = optIndex;
+                    input.className = 'w-4 h-4 text-[#004b9b] focus:ring-[#004b9b] border-gray-300';
+                    if (userAnswers[index] === optIndex) input.checked = true;
+                    if (isSubmitted) input.disabled = true;
+                    
+                    input.addEventListener('change', () => handleOptionChange(index, optIndex));
+
+                    const span = document.createElement('span');
+                    span.className = 'ml-3 text-gray-700';
+                    span.innerText = opt;
+
+                    label.appendChild(input);
+                    label.appendChild(span);
+                    optionsDiv.appendChild(label);
+                });
+
+                questionDiv.appendChild(optionsDiv);
+
+                // Explanation Block
+                const explanationDiv = document.createElement('div');
+                explanationDiv.id = `explanation-${index}`;
+                explanationDiv.className = 'mt-4 p-4 bg-blue-50 border-l-4 border-[#004b9b] text-sm text-gray-700 hidden';
+                explanationDiv.innerHTML = `<strong>Explanation:</strong> ${q.e}`;
+                questionDiv.appendChild(explanationDiv);
+
+                questionsContainer.appendChild(questionDiv);
+            });
+            updateProgress();
+        }
+
+        function handleOptionChange(qIndex, optIndex) {
+            userAnswers[qIndex] = optIndex;
+            updateProgress();
+        }
+
+        function updateProgress() {
+            const answeredCount = userAnswers.filter(a => a !== null).length;
+            document.getElementById('answered-count').innerText = answeredCount;
+            const progress = (answeredCount / questions.length) * 100;
+            document.getElementById('progress-bar').style.width = `${progress}%`;
+        }
+
+        function submitQuiz() {
+            const unanswered = userAnswers.filter(a => a === null).length;
+            if (unanswered > 0) {
+                const confirmSubmit = confirm(`You have ${unanswered} unanswered questions. Are you sure you want to submit?`);
+                if (!confirmSubmit) return;
+            }
+
+            isSubmitted = true;
+            let score = 0;
+
+            questions.forEach((q, index) => {
+                const userAns = userAnswers[index];
+                const explanationDiv = document.getElementById(`explanation-${index}`);
+                explanationDiv.classList.remove('hidden');
+
+                q.o.forEach((_, optIndex) => {
+                    const label = document.getElementById(`label-${index}-${optIndex}`);
+                    const input = label.querySelector('input');
+                    input.disabled = true;
+
+                    if (optIndex === q.a) {
+                        label.classList.add('bg-green-100', 'border-green-400');
+                    } else if (userAns === optIndex && userAns !== q.a) {
+                        label.classList.add('bg-red-100', 'border-red-400');
+                    }
+                });
+
+                if (userAns === q.a) {
+                    score++;
+                }
+            });
+
+            document.getElementById('score-display').innerText = `${score} / ${questions.length}`;
+            
+            let message = "Keep studying the IKS materials!";
+            if (score > 40) message = "Excellent! You have a profound knowledge of Indian Mathematics.";
+            else if (score > 30) message = "Great job! Very strong understanding.";
+            else if (score > 20) message = "Good effort! Review the study guide to improve.";
+            
+            document.getElementById('score-message').innerText = message;
+
+            quizSection.classList.add('hidden');
+            quizFooter.classList.add('hidden');
+            resultsSection.classList.remove('hidden');
+            window.scrollTo(0, 0);
+        }
+
+        function resetQuiz() {
+            userAnswers = new Array(questions.length).fill(null);
+            isSubmitted = false;
+            renderQuestions();
+            showQuiz();
+        }
+
+        // Initialize quiz rendering
+        renderQuestions();
+
     </script>
 </body>
 </html>
