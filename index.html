@@ -3,401 +3,380 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Indian Knowledge System: Mathematics Quiz</title>
-    <script src="https://cdn.tailwindcss.com"></script>
+    <title>IKS Study Guide & Quiz App</title>
     <style>
-        /* Custom scrollbar for better aesthetics */
-        ::-webkit-scrollbar { width: 8px; }
-        ::-webkit-scrollbar-track { background: #f1f1f1; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        body { font-family: Arial, sans-serif; background-color: #f4f4f9; color: #333; margin: 0; padding: 20px; line-height: 1.6; }
+        .container { max-width: 900px; margin: auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+        h1 { text-align: center; color: #0056b3; margin-bottom: 20px; }
+        h2 { color: #004085; border-bottom: 2px solid #e9ecef; padding-bottom: 10px; margin-top: 30px; }
+        h3 { color: #0056b3; margin-top: 20px; }
+        
+        /* Study Guide Styles */
+        #study-guide { display: block; }
+        .guide-section { margin-bottom: 25px; }
+        .guide-section p { margin-bottom: 15px; text-align: justify; }
+        .guide-section ul { margin-bottom: 15px; padding-left: 20px; }
+        .guide-section li { margin-bottom: 5px; }
+        .highlight { font-weight: bold; color: #d9534f; }
+        
+        /* Quiz Styles */
+        #quiz-section { display: none; }
+        .question { font-size: 1.1em; font-weight: bold; margin-bottom: 15px; }
+        .options { list-style: none; padding: 0; }
+        .options li { background: #eef; margin-bottom: 10px; padding: 12px; border-radius: 4px; cursor: pointer; border: 1px solid #ccd; transition: 0.2s; }
+        .options li:hover { background: #dde; }
+        .options li.selected { background: #0056b3; color: #fff; border-color: #004085; }
+        
+        /* Buttons */
+        .btn { display: block; width: 100%; padding: 15px; margin-top: 30px; background: #0056b3; color: #fff; border: none; border-radius: 4px; font-size: 1.2em; font-weight: bold; cursor: pointer; transition: background 0.3s; }
+        .btn:hover { background: #004085; }
+        .btn-success { background: #28a745; }
+        .btn-success:hover { background: #218838; }
+        
+        .quiz-navigation { display: flex; justify-content: space-between; align-items: center; margin-top: 25px; }
+        .nav-btn { background: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 1em; transition: background 0.2s; }
+        .nav-btn:hover:not(:disabled) { background: #5a6268; }
+        .nav-btn:disabled { background: #ccc; cursor: not-allowed; }
+        #question-tracker { font-weight: bold; color: #555; }
+        
+        #result { text-align: center; font-size: 1.5em; font-weight: bold; margin-top: 30px; display: none; padding: 20px; border-radius: 8px; background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800 antialiased h-screen flex flex-col relative overflow-hidden">
+<body>
 
-    <div id="auth-screen" class="fixed inset-0 bg-white z-50 flex flex-col items-center justify-center">
-        <div class="w-full max-w-sm flex flex-col items-center px-4">
-            <h2 class="text-2xl font-bold text-[#004b9b] mb-4">Authentication Required</h2>
-            <hr class="border-gray-200 mb-6 w-full">
-            <div class="mb-4 w-full">
-                <input type="password" id="password-input" class="w-full px-4 py-3 border border-gray-300 rounded focus:outline-none focus:border-[#004b9b] focus:ring-1 focus:ring-[#004b9b] text-gray-700" placeholder="Enter password">
-            </div>
-            <p id="auth-error" class="text-red-500 text-sm mb-4 hidden w-full text-left font-medium">Incorrect password. Please try again.</p>
-            <button id="unlock-btn" class="w-full bg-[#005bb5] hover:bg-[#004182] text-white font-semibold py-3 px-4 rounded transition duration-200">
-                Unlock
-            </button>
+<div class="container">
+    <h1>Indian Knowledge System (IKS)</h1>
+    
+    <!-- Study Guide Section -->
+    <div id="study-guide">
+        <h2>Comprehensive Study Guide</h2>
+        <p>Welcome to the extended study guide for the Indian Knowledge System (IKS). Please review the comprehensive material below carefully before attempting the quiz. This guide covers the foundational texts, scientific achievements, philosophical schools, and classical arts of ancient India.</p>
+
+        <div class="guide-section">
+            <h3>1. The Foundational Corpus: Shruti and Smriti</h3>
+            <p>The vast body of Indian Knowledge is broadly classified into two main categories: <span class="highlight">Shruti</span> and <span class="highlight">Smriti</span>. This bipartite division forms the bedrock of ancient Indian epistemology.</p>
+            <ul>
+                <li><strong>Shruti ("That which is heard"):</strong> These are considered the foundational, revealed texts of pristine origin. They are believed to be <strong>'Apurusheya'</strong>—meaning they are not of human origin, but eternal cosmic sounds revealed to ancient sages (Rishis) in deep meditative states. The sage <strong>Veda Vyasa</strong> is regarded as the compiler who organized these texts.</li>
+                <li><strong>The Four Vedas:</strong> The core of Shruti consists of:
+                    <ul>
+                        <li><strong>Rig Veda:</strong> The oldest, consisting of hymns praising natural forces and deities.</li>
+                        <li><strong>Sama Veda:</strong> The Veda of melodies and chants, heavily influencing classical Indian music.</li>
+                        <li><strong>Yajur Veda:</strong> A prose compilation of ritual offering formulas.</li>
+                        <li><strong>Atharva Veda:</strong> Contains procedures for everyday life, early medicine, and statecraft. <em>(Note: Vedic Mathematics is often traced back to the Atharva Veda).</em></li>
+                    </ul>
+                </li>
+                <li><strong>Smriti ("That which is remembered"):</strong> These are derivative texts of human authorship that interpret, codify, and apply the principles of Shruti to daily life, law, and societal norms. Examples include:
+                    <ul>
+                        <li><strong>Dharma Shastras:</strong> Codes of law, ethics, and social duties (e.g., Manusmriti).</li>
+                        <li><strong>Itihasas:</strong> Historical epics, primarily the <strong>Ramayana</strong> and <strong>Mahabharata</strong>, designed to simplify complex Vedic and philosophical concepts for the masses.</li>
+                        <li><strong>Puranas:</strong> Encyclopedic texts containing myths, cosmology, and genealogies.</li>
+                    </ul>
+                </li>
+            </ul>
+            <p><strong>Structure of the Vedas:</strong> Each of the four Vedas is traditionally divided into four progressive sections representing different stages of life and understanding:</p>
+            <ul>
+                <li><strong>Samhita:</strong> The core mantras and hymns.</li>
+                <li><strong>Brahmana:</strong> Prose texts explaining the meaning and procedures of rituals.</li>
+                <li><strong>Aranyaka:</strong> "Forest texts" focusing on the theology and meditation behind the rituals.</li>
+                <li><strong>Upanishad:</strong> The philosophical core, dealing with the nature of ultimate reality (Brahman) and the self (Atman).</li>
+            </ul>
         </div>
+
+        <div class="guide-section">
+            <h3>2. Vedangas and Upavedas (Auxiliary Sciences)</h3>
+            <p>To properly understand, preserve, and apply the Vedas without distortion over millennia, several auxiliary disciplines were meticulously developed.</p>
+            <p><strong>Vedangas (Limbs of the Veda):</strong> There are <span class="highlight">six</span> Vedangas, each serving a specific structural or practical purpose:</p>
+            <ol>
+                <li><strong>Shiksha (Phonetics):</strong> Focuses on exact pronunciation, intonation, and acoustics to ensure mantras are chanted correctly. It acts as the "nose" of the Veda.</li>
+                <li><strong>Vyakarana (Grammar):</strong> The structural analysis of language. <strong>Panini's Ashtadhyayi</strong> is the most famous and definitive text of this Vedanga, outlining generative grammar rules that parallel modern computer science. It is the "mouth" of the Veda.</li>
+                <li><strong>Nirukta (Etymology):</strong> Studies the origins and meanings of obscure or archaic Vedic words. Authored famously by Yaska. It is the "ears" of the Veda.</li>
+                <li><strong>Chhandas (Meter):</strong> The study of poetic meters used in composing Vedic verses. Pingala's <em>Chhandas Shastra</em> is notable for presenting the first known description of a binary numeral system. It is the "feet" of the Veda.</li>
+                <li><strong>Kalpa (Ritual Rules):</strong> Details the rules and procedures for performing rituals. It is the "hands" of the Veda. It is subdivided into:
+                    <ul>
+                        <li><em>Shrauta Sutras</em> (public rituals).</li>
+                        <li><em>Grihya Sutras</em> (domestic rituals).</li>
+                        <li><em>Dharma Sutras</em> (social customs).</li>
+                        <li><strong>Shulba Sutras:</strong> Crucial texts dealing with the complex <strong>geometry</strong> required for constructing precise fire altars (incorporating early forms of the Pythagorean theorem).</li>
+                    </ul>
+                </li>
+                <li><strong>Jyotisha (Astronomy/Astrology):</strong> Traditionally classified into <span class="highlight">three branches</span> (Siddhanta/Ganita - mathematical astronomy, Samhita - mundane astrology, and Hora - predictive astrology). It was primarily developed for <strong>timing Vedic rituals accurately</strong>. It is metaphorically considered the <strong>"Eye"</strong> of the Veda.</li>
+            </ol>
+            <p><strong>Upavedas (Applied Knowledges):</strong> These are applied sciences attached to the main Vedas:</p>
+            <ul>
+                <li><strong>Ayurveda</strong> (Medicine and Life Sciences) - associated with Rig/Atharva Veda.</li>
+                <li><strong>Dhanurveda</strong> (Archery/Martial Arts) - associated with Yajur Veda.</li>
+                <li><strong>Gandharvaveda</strong> (Music and Dance) - associated with Sama Veda.</li>
+                <li><strong>Sthapatyaveda / Vastu Shastra</strong> (Architecture and Engineering) - associated with Atharva Veda.</li>
+            </ul>
+        </div>
+
+        <div class="guide-section">
+            <h3>3. Indian Mathematics, Astronomy, and Cryptography</h3>
+            <p>Ancient India made profound contributions to mathematics and astronomy, uniquely integrating them with linguistics, poetry, and philosophy.</p>
+            <ul>
+                <li><strong>Unique Aspects:</strong> A hallmark of Indian mathematics was its heavy reliance on <span class="highlight">poetic meter (Sutras/Chhandas)</span> for encoding complex formulas and astronomical data. This oral tradition made vast amounts of data easier to memorize and transmit across generations without written texts.</li>
+                <li><strong>Encoding Systems:</strong> To represent numbers in verse without breaking the poetic meter, scholars used ingenious systems:
+                    <ul>
+                        <li><strong>Bhuta-Sankhya (Object-Number System):</strong> Used synonyms of common objects to represent numbers. For example, synonyms for "Eyes", "Wings", or "Hands" might represent the number <span class="highlight">2</span>. "Vedas" would mean 4, "Seasons" would mean 6.</li>
+                        <li><strong>Katapayadi System:</strong> A sophisticated hashing system that mapped numbers to the Sanskrit consonant alphabet, allowing scholars to write mathematical formulas that doubled as devotional poetry.</li>
+                    </ul>
+                </li>
+                <li><strong>Algebra and Arithmetic:</strong> Algebra was known as <strong>Bija-ganita</strong> (Bija meaning 'seed'), signifying operations using unknown or 'seed' variables to find a solution. Arithmetic was called <em>Pati-ganita</em>.</li>
+                <li><strong>Key Figures and Discoveries:</strong>
+                    <ul>
+                        <li><strong>Aryabhatta:</strong> Authored the <em>Aryabhatiya</em>. He provided a highly accurate approximation of pi (<span class="highlight">3.1416</span>), formulas for the area of the <strong>triangle and circle</strong>, and famously proposed a heliocentric model where the <strong>Earth rotates on its axis</strong>.</li>
+                        <li><strong>Varahamihira:</strong> Authored the astronomical treatise <strong>Pancha-Siddhantika</strong>, synthesizing five older astronomical schools.</li>
+                        <li><strong>Brahmagupta:</strong> First to clearly define the rules for computing with <strong>Zero (Shunya)</strong> and negative numbers.</li>
+                        <li><strong>The Kerala School (e.g., Madhava of Sangamagrama):</strong> Known for pioneering work in <strong>infinite series and early calculus</strong> centuries before Newton and Leibniz in Europe.</li>
+                    </ul>
+                </li>
+            </ul>
+            <p><strong>Astronomical Terminology:</strong> In Indian astronomy, a <strong>'Graha'</strong> refers to a planet or major celestial body (like the Sun or Moon) that 'grasps' or influences observers. A <strong>'Nakshatra'</strong> refers to a lunar mansion or constellation along the ecliptic. The traditional luni-solar calendar system is the <strong>Panchanga</strong> (five limbs: Tithi, Vara, Nakshatra, Yoga, Karana), where a <strong>'Tithi'</strong> represents a specific lunar day.</p>
+        </div>
+
+        <div class="guide-section">
+            <h3>4. The Six Darshanas (Classical Philosophical Schools)</h3>
+            <p>Indian philosophy comprises six orthodox (Astika) schools that accept the authority of the Vedas. They provide frameworks for understanding reality, logic, and consciousness.</p>
+            <ol>
+                <li><strong>Nyaya:</strong> The school of logic and epistemology. It establishes rules for valid debate and methods for acquiring true knowledge (Pramana).</li>
+                <li><strong>Vaisheshika:</strong> An ancient school of atomism. It theorized that all matter in the universe is composed of indivisible particles (paramanu).</li>
+                <li><strong>Samkhya:</strong> A dualistic philosophy that deeply influences Ayurveda and Yoga. It posits two fundamental realities:
+                    <ul>
+                        <li><strong>Purusha:</strong> Pure, passive, and unmanifested cosmic consciousness (the observer).</li>
+                        <li><strong>Prakriti:</strong> Active, primal matter or energy, from which the physical and mental universe evolves (the observed).</li>
+                    </ul>
+                </li>
+                <li><strong>Yoga:</strong> Systematized by Patanjali, focusing on the practical methodology to calm the mind and achieve union between Purusha and Prakriti.</li>
+                <li><strong>Mimamsa:</strong> Focuses on the hermeneutics and interpretation of Vedic rituals.</li>
+                <li><strong>Vedanta:</strong> Focuses on the teachings of the Upanishads, exploring the non-dual relationship between the individual soul (Atman) and the ultimate reality (Brahman).</li>
+            </ol>
+        </div>
+
+        <div class="guide-section">
+            <h3>5. Ayurveda and Life Sciences</h3>
+            <p>Ayurveda ("The Science of Life") is the traditional system of medicine, deeply rooted in Indian philosophical schools, particularly <strong>Nyaya</strong> and <strong>Samkhya</strong>.</p>
+            <p><strong>Core Concepts in Ayurveda:</strong></p>
+            <ul>
+                <li><strong>Pancha-Mahabhuta (Five Great Elements):</strong> All matter is composed of Akasha (Space), Vayu (Air), Agni (Fire), Jala (Water), and Prithvi (Earth). <em>(Note: Concepts like Medhas/Intellect are cognitive, NOT physical elements).</em></li>
+                <li><strong>Tridosha Theory:</strong> The five elements combine to form three biological humors (Doshas) that govern physiology:
+                    <ul>
+                        <li><strong>Vata (Space + Air):</strong> Governs movement, breathing, and the nervous system.</li>
+                        <li><strong>Pitta (Fire + Water):</strong> Governs digestion, metabolism, and energy production.</li>
+                        <li><strong>Kapha (Water + Earth):</strong> Governs structure, lubrication, and immunity.</li>
+                    </ul>
+                </li>
+                <li><strong>The Three Gunas (Mental Qualities):</strong> 
+                    <ul>
+                        <li><strong>Sattva:</strong> Purity, balance, clarity, peace, and harmony.</li>
+                        <li><strong>Rajas:</strong> Activity, passion, movement, dynamism, and restlessness.</li>
+                        <li><strong>Tamas:</strong> Inertia, darkness, ignorance, lethargy, and decay.</li>
+                    </ul>
+                </li>
+                <li><strong>Sapta-Dhatu (Seven Tissues):</strong> The physical body is sustained by <span class="highlight">seven</span> fundamental tissues: Rasa (plasma/lymph), <strong>Rakta</strong> (blood), Mamsa (muscle), Meda (fat), Asthi (bone), Majja (marrow), and Shukra (reproductive tissue).</li>
+                <li><strong>The Six Rasas (Tastes):</strong> Ayurveda utilizes diet as medicine, identifying <span class="highlight">six</span> tastes, each affecting the Doshas differently:
+                    <ul>
+                        <li><strong>Madhura (Sweet):</strong> Decreases Vata and Pitta, but increases Kapha.</li>
+                        <li><strong>Amla (Sour):</strong> Increases Pitta and Kapha, decreases Vata.</li>
+                        <li><strong>Lavana (Salty):</strong> Decreases Vata; increases Pitta and Kapha.</li>
+                        <li><strong>Katu (Pungent):</strong> Decreases Kapha but increases Vata and Pitta.</li>
+                        <li><strong>Tikta (Bitter):</strong> Decreases Pitta and Kapha, increases Vata.</li>
+                        <li><strong>Kashaya (Astringent):</strong> Decreases Pitta and Kapha, increases Vata.</li>
+                    </ul>
+                </li>
+                <li><strong>Disease Classification:</strong> 
+                    <ul>
+                        <li><strong>Nija:</strong> Endogenous diseases (internal dosha imbalances caused by diet or lifestyle).</li>
+                        <li><strong>Agantuja:</strong> Exogenous diseases caused by external factors like trauma, poisons, or infections.</li>
+                        <li><strong>Manasa:</strong> Psychological diseases caused by imbalances in the mental Gunas (specifically an excess of Rajas and Tamas).</li>
+                    </ul>
+                </li>
+                <li><strong>Dinacharya and Ritucharya:</strong> Crucial preventative aspects of Ayurveda. <strong>Dinacharya</strong> refers to a prescribed <strong>daily routine</strong> (waking early, tongue scraping, oil pulling, bathing) aligned with natural circadian rhythms. <em>Ritucharya</em> refers to seasonal routines.</li>
+            </ul>
+        </div>
+
+        <div class="guide-section">
+            <h3>6. Engineering, Metallurgy, and Architecture</h3>
+            <p>Beyond theoretical sciences, the Indian Knowledge System encompasses highly advanced practical engineering and material sciences.</p>
+            <ul>
+                <li><strong>Metallurgy (Rasashastra):</strong> Ancient India was a world leader in metallurgy. 
+                    <ul>
+                        <li><strong>Wootz Steel:</strong> Originating in South India, this crucible steel was famous globally for its high carbon content and distinctive banding (later known as Damascus steel).</li>
+                        <li><strong>Iron Pillar of Delhi:</strong> A marvel of ancient metallurgy, this 7-meter high iron pillar dating back to the Gupta Empire (c. 400 CE) has astonishingly resisted rusting for over 1600 years due to a protective passive layer of crystalline iron hydrogen phosphate.</li>
+                        <li><strong>Zinc Smelting:</strong> The ancient mines at Zawar, Rajasthan, contain the world's earliest known evidence of the complex distillation process required to extract pure zinc.</li>
+                    </ul>
+                </li>
+                <li><strong>Architecture (Vastu Shastra and Shilpa Shastra):</strong> The science of architecture and town planning. It emphasizes integrating architecture with nature, sacred geometry, and the directional flow of elements to create harmonious living spaces and monumental temple structures.</li>
+                <li><strong>Water Management:</strong> From the sophisticated drainage systems of the Indus Valley Civilization (e.g., at Dholavira) to the intricate stepwells (Baoris) and artificial lakes of medieval India, advanced hydrology was a key component of urban planning.</li>
+            </ul>
+        </div>
+
+        <button class="btn" onclick="startQuiz()">I have read the comprehensive guide. Start Quiz!</button>
     </div>
 
-    <header class="bg-[#004b9b] text-white shadow-md p-4 flex-shrink-0 hidden" id="main-header">
-        <div class="container mx-auto flex justify-between items-center max-w-5xl">
-            <h1 class="text-lg md:text-xl font-bold flex items-center gap-2">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253" /></svg>
-                IKS Mathematics
-            </h1>
-            <nav class="space-x-2">
-                <button id="nav-guide-btn" class="px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded text-sm font-medium transition">Study Guide</button>
-                <button id="nav-quiz-btn" class="px-3 py-1.5 bg-white/20 hover:bg-white/30 rounded text-sm font-medium transition">Quiz</button>
-            </nav>
+    <!-- Quiz Section -->
+    <div id="quiz-section">
+        <div id="quiz-container">
+            <div class="question" id="question-text"></div>
+            <ul class="options" id="options-list"></ul>
         </div>
-    </header>
-
-    <main class="flex-grow overflow-y-auto hidden bg-gray-50 p-4 md:p-6" id="main-content">
-        <div class="container mx-auto max-w-4xl">
-            
-            <section id="study-guide-section" class="bg-white p-6 md:p-10 rounded-xl shadow-sm border border-gray-100 mb-10">
-                <h2 class="text-3xl font-bold text-gray-800 mb-6 border-b pb-4">Study Guide: Indian Mathematics</h2>
-                
-                <div class="space-y-8 text-gray-700 leading-relaxed">
-                    <div>
-                        <h3 class="text-xl font-bold text-[#004b9b] mb-2">1. Numbers, Fractions and Geometry in the Vedas</h3>
-                        <p>The Vedas, the oldest layer of Sanskrit literature, contain early mathematical concepts. The <strong>Sulba Sutras</strong> (appendices to the Vedas) are primarily known for geometry, detailing the construction of complex fire altars using precise geometric principles. They demonstrate knowledge of the Pythagorean theorem, calculating square roots, and using specific fractions like <i>ardha</i> (1/2), <i>pada</i> (1/4), and <i>tri-bhaga</i> (1/3).</p>
-                    </div>
-
-                    <div>
-                        <h3 class="text-xl font-bold text-[#004b9b] mb-2">2. Decimal Nomenclature in the Vedas</h3>
-                        <p>Vedic Indians developed a systematic decimal nomenclature, assigning unique names to powers of 10 up to extremely large numbers. The sequence includes: Eka (10^0), Dasha (10^1), Shata (10^2), Sahasra (10^3), Ayuta (10^4), Niyuta (10^5), Prayuta (10^6), Arbuda (10^7), and extends to <strong>Parardha</strong> (10^12). This linguistic foundation paved the way for the mathematical place-value system.</p>
-                    </div>
-
-                    <div>
-                        <h3 class="text-xl font-bold text-[#004b9b] mb-2">3. Zero and Infinity</h3>
-                        <p>The concept of zero, called <strong>Shunya</strong> (meaning void or empty), originated in India. Initially used as a placeholder (a dot or <i>bindu</i>), it was formalized as a mathematical number by Brahmagupta in 628 CE. The concept of infinity (<i>Ananta</i> or <i>Purnam</i>) is deeply philosophical and mathematical, explicitly mentioned in the Isha Upanishad, which states that extracting infinity from infinity leaves infinity.</p>
-                    </div>
-
-                    <div>
-                        <h3 class="text-xl font-bold text-[#004b9b] mb-2">4. Development of the Decimal Place Value System</h3>
-                        <p>India is the birthplace of the modern decimal place-value system (Hindu-Arabic numeral system). Using just ten symbols (0-9) and positional value, this system dramatically <strong>simplified all arithmetical operations</strong> compared to older systems (like Roman numerals). This allowed for efficient addition, subtraction, multiplication, and division.</p>
-                    </div>
-
-                    <div>
-                        <h3 class="text-xl font-bold text-[#004b9b] mb-2">5. Linguistic Representation of Numbers</h3>
-                        <p>To memorize vast numerical tables and constants in verse, ancient scholars invented systems to map numbers to words or letters:
-                        <ul class="list-disc pl-5 mt-2 space-y-1">
-                            <li><strong>Bhuta-Sankhya System:</strong> Uses familiar objects to represent numbers (e.g., 'Eyes' or 'Netra' = 2, 'Vedas' = 4, 'Moon' = 1).</li>
-                            <li><strong>Katapayadi System:</strong> Maps Sanskrit consonants to digits (1-9 and 0), allowing numbers to be encoded into meaningful poetry.</li>
-                        </ul>
-                        </p>
-                    </div>
-
-                    <div>
-                        <h3 class="text-xl font-bold text-[#004b9b] mb-2">6. Important Texts of Indian Mathematics</h3>
-                        <p>Key historical texts and their authors include:</p>
-                        <ul class="list-disc pl-5 mt-2 space-y-1">
-                            <li><strong>Aryabhatiya</strong> (by Aryabhata): Covered arithmetic, algebra, and plane trigonometry.</li>
-                            <li><strong>Brahmasphutasiddhanta</strong> (by Brahmagupta): First text to give rules for zero and negative numbers.</li>
-                            <li><strong>Lilavati & Bijaganita</strong> (by Bhaskaracharya / Bhaskara II): Masterpieces on arithmetic and algebra, respectively.</li>
-                        </ul>
-                    </div>
-
-                    <div>
-                        <h3 class="text-xl font-bold text-[#004b9b] mb-2">7. Algebra, Trigonometry, and Calculus</h3>
-                        <ul class="list-disc pl-5 space-y-2">
-                            <li><strong>Algebra (Bijaganita/Avyaktaganita):</strong> Focused on the 'mathematics of the unmanifest' (unknown variables). Included advanced solutions to quadratic and indeterminate equations (like the <i>Chakravala</i> method).</li>
-                            <li><strong>Trigonometry:</strong> Originated from astronomical needs. Aryabhata introduced <strong>Jya</strong> (Sine) and <strong>Koti-jya</strong> (Cosine).</li>
-                            <li><strong>Calculus:</strong> The Kerala School (founded by <strong>Madhava</strong> of Sangamagrama in the 14th century) discovered infinite series for Pi, Sine, and Cosine centuries before Newton and Leibniz.</li>
-                        </ul>
-                    </div>
-                </div>
-                
-                <div class="mt-8 pt-6 border-t flex justify-center">
-                    <button id="start-quiz-btn-guide" class="bg-[#004b9b] hover:bg-[#003370] text-white font-bold py-3 px-8 rounded-lg shadow-md transition transform hover:-translate-y-0.5">
-                        I'm Ready, Start Quiz
-                    </button>
-                </div>
-            </section>
-
-            <section id="quiz-section" class="hidden pb-20">
-                <div class="bg-white p-6 rounded-xl shadow-sm border border-gray-100 mb-6 text-center">
-                    <h2 class="text-2xl font-bold text-gray-800">IKS: Mathematics Master Quiz</h2>
-                    <p class="text-gray-500 mt-2">Answer all 50 questions based on the study guide. Good luck!</p>
-                </div>
-                
-                <div id="questions-container" class="space-y-6">
-                    <!-- Questions will be injected here by JS -->
-                </div>
-
-                <div class="mt-8 flex justify-end">
-                    <button id="submit-quiz-btn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-8 rounded-lg shadow-md transition hidden">
-                        Submit Answers
-                    </button>
-                </div>
-            </section>
-
-            <section id="results-section" class="hidden bg-white p-8 rounded-xl shadow-sm border border-gray-100 text-center mb-10">
-                <h2 class="text-3xl font-bold text-gray-800 mb-2">Quiz Completed!</h2>
-                <div class="text-6xl font-bold text-[#004b9b] my-6" id="score-display">0/50</div>
-                <p class="text-xl text-gray-600 mb-8" id="score-message">Great effort!</p>
-                
-                <div class="flex justify-center gap-4">
-                    <button id="review-btn" class="bg-gray-200 hover:bg-gray-300 text-gray-800 font-semibold py-2 px-6 rounded transition">
-                        Review Answers
-                    </button>
-                    <button id="retry-btn" class="bg-[#004b9b] hover:bg-[#003370] text-white font-semibold py-2 px-6 rounded transition">
-                        Retake Quiz
-                    </button>
-                </div>
-            </section>
-            
+        
+        <div class="quiz-navigation">
+            <button class="nav-btn" id="prev-btn" onclick="prevQuestion()" disabled>Previous</button>
+            <span id="question-tracker"></span>
+            <button class="nav-btn" id="next-btn" onclick="nextQuestion()">Next</button>
         </div>
-    </main>
 
-    <footer id="quiz-footer" class="bg-white border-t border-gray-200 p-4 sticky bottom-0 hidden shadow-[0_-5px_15px_-15px_rgba(0,0,0,0.1)] z-10">
-        <div class="container mx-auto flex justify-between items-center max-w-4xl">
-            <div class="text-sm font-medium text-gray-600">
-                Answered: <span id="answered-count" class="font-bold text-[#004b9b]">0</span> / 50
-            </div>
-            <div class="w-1/2 bg-gray-200 rounded-full h-2.5">
-                <div id="progress-bar" class="bg-[#004b9b] h-2.5 rounded-full" style="width: 0%"></div>
-            </div>
-        </div>
-    </footer>
+        <button class="btn btn-success" id="submit-btn" style="display: none;" onclick="submitQuiz()">Submit Quiz</button>
+        <div id="result"></div>
+    </div>
 
-    <script>
-        const APP_PASSWORD = "1221@J";
+</div>
 
-        document.getElementById('unlock-btn').addEventListener('click', handleUnlock);
-        document.getElementById('password-input').addEventListener('keypress', function (e) {
-            if (e.key === 'Enter') handleUnlock();
+<script>
+    // Functions to toggle between study guide and quiz
+    function startQuiz() {
+        document.getElementById('study-guide').style.display = 'none';
+        document.getElementById('quiz-section').style.display = 'block';
+        loadQuestion();
+    }
+
+    // Questions derived directly from "BCA iks pyq.pdf" with citations removed
+    const quizData = [
+        { q: "Which Rishi is regarded as the compiler of the Vedas?", o: ["Valmiki", "Veda Vyasa", "Patanjali", "Panini"], a: 1 },
+        { q: "Vedic Mathematics is derived from which Veda?", o: ["Rig Veda", "Sama Veda", "Atharva Veda", "Yajur Veda"], a: 2 },
+        { q: "How is Jyotisha Shashtra traditionally classified?", o: ["Two branches", "Three branches", "Four branches", "Five branches"], a: 1 },
+        { q: "What does 'Graha' refer to in Indian Astronomy?", o: ["Lunar mansion", "Planet or major celestial body", "Galaxy", "Meteor"], a: 1 },
+        { q: "What does 'Nakshatra' refer to?", o: ["Planet", "Lunar mansion / constellation", "Sun", "Eclipse"], a: 1 },
+        { q: "What is a unique aspect of Indian Mathematics?", o: ["Reliance on Arabic numerals", "Heavy reliance on poetic meter (Sutras)", "Lack of written texts", "Use of abacus"], a: 1 },
+        { q: "What does the Shruti classification of the IKS corpus refer to?", o: ["Remembered texts", "Applied sciences", "Foundational, revealed texts", "Epics"], a: 2 },
+        { q: "Which of the following falls under Smriti?", o: ["Rig Veda", "Dharma Shastras", "Atharva Veda", "Sama Veda"], a: 1 },
+        { q: "How many auxiliary disciplines make up the Vedangas?", o: ["Four", "Five", "Six", "Eight"], a: 2 },
+        { q: "What are Upavedas?", o: ["Applied sciences attached to the Vedas", "Classical schools of philosophy", "Lunar mansions", "Daily routines"], a: 0 },
+        { q: "Which of the following is a Darshana?", o: ["Ayurveda", "Dhanurveda", "Nyaya", "Ramayana"], a: 2 },
+        { q: "What was the purpose of Itihasas and Puranas?", o: ["To calculate eclipses", "To simplify Vedic concepts for the masses", "To outline grammar", "To define planetary motions"], a: 1 },
+        { q: "Sanskrit poetic meters used in Indian Mathematics are called:", o: ["Chhandas", "Bija", "Kalpa", "Nirukta"], a: 0 },
+        { q: "In poetic math encoding, what synonym was used for the number 2?", o: ["Vedas", "Eyes", "Seas", "Fingers"], a: 1 },
+        { q: "Which encoding system mapped numbers to the Sanskrit alphabet?", o: ["Panchanga", "Katapayadi", "Dinacharya", "Samkhya"], a: 1 },
+        { q: "How many Rasas (tastes) does Ayurveda identify?", o: ["Three", "Four", "Five", "Six"], a: 3 },
+        { q: "Which Rasa decreases Vata and Pitta, but increases Kapha?", o: ["Madhura (Sweet)", "Amla (Sour)", "Katu (Pungent)", "Tikta (Bitter)"], a: 0 },
+        { q: "What is the effect of Lavana (Salty) taste?", o: ["Decreases Kapha", "Decreases Pitta", "Decreases Vata; increases Pitta and Kapha", "Increases Vata"], a: 2 },
+        { q: "Which Rasa decreases Kapha but increases Vata and Pitta?", o: ["Madhura", "Tikta", "Kashaya", "Katu (Pungent)"], a: 3 },
+        { q: "Why are Vedas regarded as 'Apurusheya'?", o: ["They are written by Vyasa", "They are not of human origin", "They are fictional", "They are mathematical texts"], a: 1 },
+        { q: "What is Kalpa in the context of Vedangas?", o: ["Astronomy", "Grammar", "Rules and procedures for rituals", "Etymology"], a: 2 },
+        { q: "Which Sutras under Kalpa deal with geometry for building fire altars?", o: ["Shrauta Sutras", "Grihya Sutras", "Dharma Sutras", "Shulba Sutras"], a: 3 },
+        { q: "What was Aryabhatta's approximation of pi?", o: ["3.1415", "3.1416", "3.14", "3.1428"], a: 1 },
+        { q: "Aryabhatta provided the formula for calculating the area of which shapes?", o: ["Square and rectangle", "Triangle and circle", "Cube and sphere", "Pentagon and hexagon"], a: 1 },
+        { q: "What does 'Shruti' literally mean?", o: ["That which is remembered", "That which is seen", "That which is heard", "That which is read"], a: 2 },
+        { q: "In Samkhya philosophy, what is Purusha?", o: ["Active primal matter", "Pure, passive, and unmanifested cosmic consciousness", "The five elements", "The physical body"], a: 1 },
+        { q: "In Samkhya philosophy, what is Prakriti?", o: ["Pure consciousness", "Active, primal matter or energy", "The soul", "Illusion"], a: 1 },
+        { q: "What does Dinacharya refer to in Ayurveda?", o: ["Dietary restrictions", "A daily routine", "Surgical procedures", "Herbal medicines"], a: 1 },
+        { q: "Why was Algebra known as Bija-ganita in Ancient India?", o: ["It was brought by a scholar named Bija", "Bija means 'seed', involving operations using unknown elements", "It was written on seeds", "It only solved agricultural problems"], a: 1 },
+        { q: "Which astronomical treatise was authored by Varahamihira?", o: ["Aryabhatiya", "Lilavati", "Pancha-Siddhantika", "Ashtadhyayi"], a: 2 },
+        { q: "What was the primary purpose of astronomy in the Vedic Period?", o: ["Ocean navigation", "Timing Vedic rituals accurately", "Predicting weather", "Astrological readings only"], a: 1 },
+        { q: "Which Siddhantic Era scholar proposed Earth's rotation?", o: ["Bhaskaracharya", "Brahmagupta", "Aryabhata", "Madhava"], a: 2 },
+        { q: "What mathematical advancement is the Kerala School known for?", o: ["Invention of zero", "Infinite series and early calculus", "Geometry of altars", "Decimal system"], a: 1 },
+        { q: "Which Vedanga focuses on exact pronunciation and phonetics?", o: ["Shiksha", "Vyakarana", "Chhandas", "Nirukta"], a: 0 },
+        { q: "Panini's Ashtadhyayi is the most famous text of which Vedanga?", o: ["Jyotisha", "Vyakarana", "Kalpa", "Nirukta"], a: 1 },
+        { q: "Which Vedanga studies the origins and meanings of obscure Vedic words (Etymology)?", o: ["Vyakarana", "Nirukta", "Shiksha", "Chhandas"], a: 1 },
+        { q: "Jyotisha is considered the 'what' of the Veda?", o: ["Heart", "Brain", "Eye", "Ear"], a: 2 },
+        { q: "What are the three Gunas in Ayurveda?", o: ["Vata, Pitta, Kapha", "Sattva, Rajas, Tamas", "Rasa, Rakta, Mamsa", "Shruti, Smriti, Purana"], a: 1 },
+        { q: "Which Guna represents purity and balance?", o: ["Tamas", "Rajas", "Sattva", "Kapha"], a: 2 },
+        { q: "What represents activity and passion among the Gunas?", o: ["Tamas", "Sattva", "Rajas", "Pitta"], a: 2 },
+        { q: "How many sections is each Veda divided into?", o: ["Two", "Three", "Four", "Five"], a: 2 },
+        { q: "Which section of the Vedas deals with philosophy?", o: ["Samhita", "Brahmana", "Aranyaka", "Upanishad"], a: 3 },
+        { q: "How are Nija diseases classified in Ayurveda?", o: ["Exogenous", "Endogenous", "Psychological", "Traumatic"], a: 1 },
+        { q: "Agantuja diseases are caused by:", o: ["Internal dosha imbalances", "Mental Gunas", "External factors like trauma or infections", "Poor diet"], a: 2 },
+        { q: "Manasa diseases are caused by imbalances in:", o: ["Mental Gunas (Rajas/Tamas)", "Doshas (Vata/Pitta/Kapha)", "Dhatus", "Mahabhutas"], a: 0 },
+        { q: "The traditional Indian luni-solar calendar system is known as:", o: ["Tithi", "Panchanga", "Yoga", "Karana"], a: 1 },
+        { q: "What does 'Tithi' represent in the Panchanga?", o: ["The weekday", "A half-day", "The lunar day", "A lunar mansion"], a: 2 },
+        { q: "Which element is NOT part of the Pancha-Mahabhuta?", o: ["Akasha (Space)", "Agni (Fire)", "Prithvi (Earth)", "Medhas (Intellect)"], a: 3 },
+        { q: "How many fundamental tissues (Dhatus) are there in the physical body according to Ayurveda?", o: ["Three", "Five", "Seven", "Nine"], a: 2 },
+        { q: "Which of the following is an Ayurvedic Sapta-Dhatu?", o: ["Akasha", "Vayu", "Rakta", "Prakriti"], a: 2 }
+    ];
+
+    let currentQuestion = 0;
+    let userAnswers = new Array(quizData.length).fill(null);
+
+    const questionText = document.getElementById("question-text");
+    const optionsList = document.getElementById("options-list");
+    const prevBtn = document.getElementById("prev-btn");
+    const nextBtn = document.getElementById("next-btn");
+    const submitBtn = document.getElementById("submit-btn");
+    const tracker = document.getElementById("question-tracker");
+    const resultDiv = document.getElementById("result");
+
+    function loadQuestion() {
+        optionsList.innerHTML = "";
+        const current = quizData[currentQuestion];
+        questionText.innerText = `Q${currentQuestion + 1}: ${current.q}`;
+        tracker.innerText = `Question ${currentQuestion + 1} of ${quizData.length}`;
+
+        current.o.forEach((option, index) => {
+            const li = document.createElement("li");
+            li.innerText = option;
+            if (userAnswers[currentQuestion] === index) {
+                li.classList.add("selected");
+            }
+            li.onclick = () => selectOption(index);
+            optionsList.appendChild(li);
         });
 
-        function handleUnlock() {
-            const inputVal = document.getElementById('password-input').value;
-            const errorMsg = document.getElementById('auth-error');
-            
-            if (inputVal === APP_PASSWORD) {
-                document.getElementById('auth-screen').classList.add('hidden');
-                document.getElementById('main-header').classList.remove('hidden');
-                document.getElementById('main-content').classList.remove('hidden');
-            } else {
-                errorMsg.classList.remove('hidden');
-                document.getElementById('password-input').value = '';
-            }
+        prevBtn.disabled = currentQuestion === 0;
+        
+        if (currentQuestion === quizData.length - 1) {
+            nextBtn.style.display = "none";
+            submitBtn.style.display = "block";
+        } else {
+            nextBtn.style.display = "block";
+            submitBtn.style.display = "none";
         }
+    }
 
-        const questions = [
-            { q: "Which ancient Indian texts are primarily known for detailing early geometry for altar construction?", o: ["Rigveda", "Sulba Sutras", "Upanishads", "Puranas"], a: 1, e: "The Sulba Sutras (appendices to the Vedas) contain detailed geometric principles for constructing complex fire altars." },
-            { q: "What was the highest power of 10 distinctly named in early Vedic nomenclature (e.g., in the Yajurveda)?", o: ["Shata (10^2)", "Sahasra (10^3)", "Ayuta (10^4)", "Parardha (10^12)"], a: 3, e: "Vedic nomenclature extended up to Parardha, representing 10 to the power of 12." },
-            { q: "What is the Sanskrit term for 'Zero' as conceptualized in ancient India?", o: ["Ananta", "Shunya", "Bindu", "Kha"], a: 1, e: "Shunya is the Sanskrit term for zero, meaning void or empty." },
-            { q: "Who was the first mathematician to formalize rules for operations involving zero?", o: ["Aryabhata", "Madhava", "Brahmagupta", "Bhaskara I"], a: 2, e: "Brahmagupta formalized the mathematical rules for zero in his text Brahmasphutasiddhanta (628 CE)." },
-            { q: "The development of the decimal place value system primarily resulted in the simplification of:", o: ["Geometry", "Arithmetical operations", "Calculus", "Poetry"], a: 1, e: "The place-value system allowed complex arithmetic (addition, multiplication, etc.) to be done easily compared to older numeral systems." },
-            { q: "In the Bhuta-sankhya system, which number would the word 'Netra' (Eyes) represent?", o: ["1", "2", "3", "4"], a: 1, e: "Since humans have two eyes, 'Netra' represents the number 2 in the Bhuta-sankhya word-numeral system." },
-            { q: "Which system maps Sanskrit consonants to digits to memorize numbers as poetry?", o: ["Katapayadi system", "Bhuta-sankhya", "Sulba system", "Chhandas system"], a: 0, e: "The Katapayadi system assigns digits to letters (Ka, Ta, Pa, Ya, etc.) to encode numbers in verses." },
-            { q: "Which renowned text was written by Aryabhata?", o: ["Lilavati", "Brahmasphutasiddhanta", "Aryabhatiya", "Ganita Sara Samgraha"], a: 2, e: "Aryabhatiya is the foundational text written by Aryabhata covering arithmetic, algebra, and trigonometry." },
-            { q: "Bhaskaracharya's masterpiece 'Lilavati' primarily focuses on which branch of mathematics?", o: ["Calculus", "Arithmetic", "Geometry", "Astronomy"], a: 1, e: "Lilavati is Bhaskaracharya's famous treatise on arithmetic and geometry." },
-            { q: "What term was used in ancient India for Algebra?", o: ["Patiganita", "Bijaganita", "Rekhaganita", "Grahaganita"], a: 1, e: "Bijaganita (mathematics of seeds/elements) or Avyaktaganita (mathematics of the unknown) refers to Algebra." },
-            { q: "In Indian trigonometry, what does the term 'Jya' correspond to?", o: ["Cosine", "Tangent", "Sine", "Secant"], a: 2, e: "Jya corresponds to the Sine function in modern trigonometry." },
-            { q: "In Indian trigonometry, what does 'Koti-jya' correspond to?", o: ["Cosine", "Tangent", "Sine", "Cosecant"], a: 0, e: "Koti-jya corresponds to the Cosine function." },
-            { q: "Which Indian mathematician is credited with discovering infinite series for Pi, Sine, and Cosine?", o: ["Aryabhata", "Brahmagupta", "Madhava of Sangamagrama", "Mahavira"], a: 2, e: "Madhava founded the Kerala School and discovered these calculus-related infinite series in the 14th century." },
-            { q: "The mathematical concept of infinity (taking from infinity leaves infinity) is reflected in which text?", o: ["Rigveda", "Isha Upanishad", "Arthashastra", "Manusmriti"], a: 1, e: "The Isha Upanishad contains the verse 'Purnamadah Purnamidam', conceptually describing infinity." },
-            { q: "What does the word 'Sulba' literally mean in the context of the Sulba Sutras?", o: ["Altar", "String or Cord", "Fire", "Square"], a: 1, e: "Sulba means string or cord, which was used for measuring and constructing the fire altars." },
-            { q: "Which of these fractions was frequently used and specifically named (Ardha) in Vedic texts?", o: ["1/3", "1/4", "1/2", "1/8"], a: 2, e: "Ardha translates to 1/2. Vedic texts frequently used specific terms for fundamental fractions." },
-            { q: "What is the Vedic name for the number 10,000?", o: ["Shata", "Ayuta", "Laksha", "Prayuta"], a: 1, e: "In the Vedic decimal nomenclature, Ayuta represents 10,000." },
-            { q: "What was a primary motivation for the development of advanced trigonometry and calculus in ancient India?", o: ["Architecture", "Trade and Commerce", "Astronomical predictions", "Navigation"], a: 2, e: "Accurate astronomical predictions (planetary positions, eclipses) drove the need for trigonometry and calculus." },
-            { q: "Who wrote the algebraic treatise 'Bijaganita'?", o: ["Aryabhata", "Brahmagupta", "Bhaskara II", "Madhava"], a: 2, e: "Bhaskara II (Bhaskaracharya) authored Bijaganita as part of his larger work Siddhanta Shiromani." },
-            { q: "The 'Chakravala' method was an algorithmic approach developed in India to solve:", o: ["Linear equations", "Pell's equation (indeterminate quadratics)", "Cubic equations", "Area of a circle"], a: 1, e: "The Chakravala method is a cyclic algorithm to solve indeterminate quadratic equations." },
-            { q: "Which ancient school of mathematics flourished from the 14th to 16th century CE?", o: ["Ujjain School", "Kusumapura School", "Kerala School", "Takshashila School"], a: 2, e: "The Kerala School of Astronomy and Mathematics produced pioneering work in infinite series and calculus." },
-            { q: "Before the decimal system, early mathematical texts often used a dot as a placeholder. What was it called?", o: ["Bindu", "Rekha", "Chakra", "Mandala"], a: 0, e: "Bindu (dot) was used as an early placeholder symbol for zero." },
-            { q: "Who gave the highly accurate approximation of Pi as 3.1416 in the 5th century?", o: ["Varahamihira", "Aryabhata", "Bhaskara I", "Brahmagupta"], a: 1, e: "Aryabhata gave the approximation of Pi as 62832/20000, which is exactly 3.1416." },
-            { q: "In the context of Indian mathematics, what does 'Kuttaka' refer to?", o: ["A type of fraction", "An algorithm for linear indeterminate equations", "A geometric shape", "A trigonometric ratio"], a: 1, e: "Kuttaka (meaning 'pulverizer') is an algorithm used to solve linear Diophantine equations." },
-            { q: "Which text contains the earliest recorded use of zero explicitly as a number?", o: ["Sulba Sutras", "Bakhshali Manuscript", "Atharvaveda", "Ramayana"], a: 1, e: "The Bakhshali Manuscript (dated around the 3rd or 4th century) contains early uses of zero as a placeholder dot." },
-            { q: "In the Bhuta-sankhya system, which word would likely represent the number 4?", o: ["Veda", "Agni", "Surya", "Rasa"], a: 0, e: "Since there are four Vedas, the word 'Veda' represents 4." },
-            { q: "Bhaskara II defined the mathematical result of dividing a number by zero as:", o: ["Zero", "Khahara (Infinity)", "Undefined", "One"], a: 1, e: "He termed a quantity divided by zero as 'Khahara', meaning a fraction with zero as denominator, relating it to infinity." },
-            { q: "Pingala's Chhandas Shastra, a text on poetic meter, contains early concepts related to:", o: ["Binary numbers", "Calculus", "Geometry", "Negative numbers"], a: 0, e: "Pingala's combinatorial rules for short and long syllables correspond closely to modern binary numerals." },
-            { q: "The term 'Avyaktaganita' translates to:", o: ["Mathematics of knowns", "Mathematics of unknowns", "Mathematics of shapes", "Mathematics of stars"], a: 1, e: "Avyakta means unmanifest or unknown; hence it refers to Algebra where variables are unknown." },
-            { q: "Who is the author of 'Ganita Sara Samgraha'?", o: ["Mahavira", "Sridhara", "Aryabhata", "Brahmagupta"], a: 0, e: "Mahavira, a 9th-century Jain mathematician, authored the Ganita Sara Samgraha." },
-            { q: "What is the Vedic term for 100,000?", o: ["Ayuta", "Niyuta", "Prayuta", "Laksha"], a: 1, e: "While modern Hindi uses Laksha (Lakh), ancient Vedic nomenclature often used Niyuta for 100,000." },
-            { q: "In the Katapayadi system, the consonant 'Ka' corresponds to which number?", o: ["0", "1", "2", "3"], a: 1, e: "Ka, Ta, Pa, Ya all correspond to the number 1 in this system." },
-            { q: "Which text is considered the earliest to establish rules for negative numbers (fortune and debt)?", o: ["Aryabhatiya", "Brahmasphutasiddhanta", "Lilavati", "Sulba Sutras"], a: 1, e: "Brahmagupta used the concepts of 'fortunes' (positive) and 'debts' (negative) to establish algebraic rules." },
-            { q: "The Kerala School's discoveries in calculus predated Newton and Leibniz by approximately how many centuries?", o: ["1 century", "3 centuries", "5 centuries", "10 centuries"], a: 1, e: "Madhava's work in the 14th century predates Newton and Leibniz (17th century) by about three centuries." },
-            { q: "Which mathematical operation is dramatically simplified by the decimal place value system?", o: ["Addition only", "All arithmetical operations", "Geometry proofs", "Trigonometric identities"], a: 1, e: "Place value makes aligning and calculating addition, subtraction, multiplication, and division vastly simpler." },
-            { q: "In ancient Indian astronomy, mathematics was primarily used as a tool for:", o: ["Siddhanta (Astronomy)", "Vastu (Architecture)", "Ayurveda (Medicine)", "Dhanurveda (Archery)"], a: 0, e: "Mathematics was considered the eyes of the Vedas (Vedanga Jyotisha) primarily for astronomical calculations (Siddhanta)." },
-            { q: "Which of these is NOT a recognized mathematical text of ancient India?", o: ["Brahmasphutasiddhanta", "Lilavati", "Arthashastra", "Aryabhatiya"], a: 2, e: "Arthashastra is a treatise on statecraft and economy, not primarily mathematics." },
-            { q: "The Pythagorean theorem was explicitly stated in India prior to Pythagoras in which text?", o: ["Rigveda", "Baudhayana Sulba Sutra", "Atharvaveda", "Upanishads"], a: 1, e: "Baudhayana's Sulba Sutra states the theorem regarding the diagonal of a rectangle producing the same area as its length and breadth." },
-            { q: "What does 'Sahasra' mean in Vedic nomenclature?", o: ["100", "1,000", "10,000", "100,000"], a: 1, e: "Sahasra translates to 1,000." },
-            { q: "Who authored the commentary 'Aryabhatiya Bhasya'?", o: ["Bhaskara I", "Brahmagupta", "Mahavira", "Varahamihira"], a: 0, e: "Bhaskara I wrote the earliest known prose commentary on Aryabhata's work." },
-            { q: "The concept of 'Rasi' in Indian mathematics and astronomy refers to:", o: ["A fraction", "A geometric angle", "A Zodiac sign or mathematical quantity", "Zero"], a: 2, e: "Rasi refers to a quantity, heap, or a zodiac sign (30 degrees) in astronomy." },
-            { q: "Which mathematician is associated with the 'Kuttaka' method?", o: ["Aryabhata", "Madhava", "Pingala", "Baudhayana"], a: 0, e: "Aryabhata gave the earliest systematic formulation of the Kuttaka algorithm." },
-            { q: "What was the primary material used for writing early mathematical manuscripts in India?", o: ["Papyrus", "Clay tablets", "Birch bark and Palm leaves", "Parchment"], a: 2, e: "Most ancient Indian manuscripts, including the Bakhshali manuscript (birch bark), were written on bark or palm leaves." },
-            { q: "In the context of IKS, 'Ganita' broadly refers to:", o: ["Only Arithmetic", "Only Algebra", "Mathematics as a whole", "Only Geometry"], a: 2, e: "Ganita is the encompassing Sanskrit term for mathematics." },
-            { q: "Which text contains the famous verse encoding Pi to 31 decimal places using Katapayadi?", o: ["Sadratnamala", "Lilavati", "Aryabhatiya", "Bijaganita"], a: 0, e: "The Sadratnamala (by Sankara Varman of the Kerala School) encodes Pi accurately to 31 places." },
-            { q: "The word 'Dasha' in Vedic nomenclature represents:", o: ["10", "100", "1,000", "10,000"], a: 0, e: "Dasha means 10." },
-            { q: "Who is famous for refining the Chakravala method?", o: ["Brahmagupta", "Bhaskara II", "Aryabhata", "Mahavira"], a: 1, e: "While roots are seen in Brahmagupta's work, Bhaskara II refined it into the cyclic Chakravala method." },
-            { q: "What is 'Patiganita'?", o: ["Board mathematics (Arithmetic)", "Algebra", "Geometry", "Trigonometry"], a: 0, e: "Pati means board. Patiganita refers to arithmetic, historically done with a stylus on a dust-covered board." },
-            { q: "The linguistic representation systems (Bhuta-sankhya, Katapayadi) share what primary benefit?", o: ["Hiding secrets", "Aiding memorization through meter and verse", "Calculating faster", "Translating to other languages"], a: 1, e: "They allow numbers to be woven into metric verses, making massive astronomical tables easier to memorize." },
-            { q: "Which school demonstrated that the series for Pi is infinite?", o: ["Kerala School", "Ujjain School", "Patliputra School", "Varanasi School"], a: 0, e: "The Kerala School of Mathematics, initiated by Madhava, formulated infinite series for Pi." }
-        ];
+    function selectOption(index) {
+        userAnswers[currentQuestion] = index;
+        loadQuestion();
+    }
 
-        let userAnswers = new Array(questions.length).fill(null);
-        let isSubmitted = false;
+    function nextQuestion() {
+        if (currentQuestion < quizData.length - 1) {
+            currentQuestion++;
+            loadQuestion();
+        }
+    }
 
-        const navGuideBtn = document.getElementById('nav-guide-btn');
-        const navQuizBtn = document.getElementById('nav-quiz-btn');
-        const studyGuideSection = document.getElementById('study-guide-section');
-        const quizSection = document.getElementById('quiz-section');
-        const resultsSection = document.getElementById('results-section');
-        const startQuizBtnGuide = document.getElementById('start-quiz-btn-guide');
-        const submitQuizBtn = document.getElementById('submit-quiz-btn');
-        const questionsContainer = document.getElementById('questions-container');
-        const quizFooter = document.getElementById('quiz-footer');
+    function prevQuestion() {
+        if (currentQuestion > 0) {
+            currentQuestion--;
+            loadQuestion();
+        }
+    }
 
-        navGuideBtn.addEventListener('click', showStudyGuide);
-        navQuizBtn.addEventListener('click', showQuiz);
-        startQuizBtnGuide.addEventListener('click', showQuiz);
-        submitQuizBtn.addEventListener('click', submitQuiz);
-        document.getElementById('retry-btn').addEventListener('click', resetQuiz);
-        document.getElementById('review-btn').addEventListener('click', () => {
-            resultsSection.classList.add('hidden');
-            quizSection.classList.remove('hidden');
-            window.scrollTo(0, 0);
+    function submitQuiz() {
+        let score = 0;
+        userAnswers.forEach((ans, index) => {
+            if (ans === quizData[index].a) {
+                score++;
+            }
         });
+        
+        document.getElementById("quiz-container").style.display = "none";
+        document.querySelector(".quiz-navigation").style.display = "none";
+        submitBtn.style.display = "none";
+        
+        resultDiv.style.display = "block";
+        
+        const percentage = Math.round((score / quizData.length) * 100);
+        let message = "";
+        if(percentage >= 80) message = "Excellent work!";
+        else if (percentage >= 60) message = "Good job!";
+        else message = "Keep studying and try again!";
 
-        function showStudyGuide() {
-            studyGuideSection.classList.remove('hidden');
-            quizSection.classList.add('hidden');
-            resultsSection.classList.add('hidden');
-            quizFooter.classList.add('hidden');
-            navGuideBtn.classList.add('bg-white/30');
-            navQuizBtn.classList.remove('bg-white/30');
-            window.scrollTo(0, 0);
-        }
+        resultDiv.innerHTML = `You scored ${score} out of ${quizData.length} (${percentage}%)<br><span style="font-size: 0.8em; font-weight: normal; color: #333; display: block; margin-top: 10px;">${message}</span>`;
+    }
 
-        function showQuiz() {
-            studyGuideSection.classList.add('hidden');
-            quizSection.classList.remove('hidden');
-            if (isSubmitted) {
-                resultsSection.classList.remove('hidden');
-                quizSection.classList.add('hidden');
-            } else {
-                quizFooter.classList.remove('hidden');
-                submitQuizBtn.classList.remove('hidden');
-            }
-            navQuizBtn.classList.add('bg-white/30');
-            navGuideBtn.classList.remove('bg-white/30');
-            window.scrollTo(0, 0);
-        }
+    // Note: loadQuestion() is no longer called immediately on page load.
+    // It is called by startQuiz() after the user reads the guide.
+</script>
 
-        function renderQuestions() {
-            questionsContainer.innerHTML = '';
-            questions.forEach((q, index) => {
-                const questionDiv = document.createElement('div');
-                questionDiv.className = 'p-5 rounded-lg border border-gray-200 bg-white hover:border-[#004b9b] transition duration-200';
-                questionDiv.id = `question-container-${index}`;
-                
-                const questionTitle = document.createElement('h3');
-                questionTitle.className = 'font-semibold text-lg text-gray-800 mb-4';
-                questionTitle.innerText = `${index + 1}. ${q.q}`;
-                questionDiv.appendChild(questionTitle);
-
-                const optionsDiv = document.createElement('div');
-                optionsDiv.className = 'space-y-2';
-
-                q.o.forEach((opt, optIndex) => {
-                    const label = document.createElement('label');
-                    label.className = 'flex items-center p-3 border rounded-md cursor-pointer hover:bg-gray-50 transition';
-                    label.id = `label-${index}-${optIndex}`;
-                    
-                    const input = document.createElement('input');
-                    input.type = 'radio';
-                    input.name = `question-${index}`;
-                    input.value = optIndex;
-                    input.className = 'w-4 h-4 text-[#004b9b] focus:ring-[#004b9b] border-gray-300';
-                    if (userAnswers[index] === optIndex) input.checked = true;
-                    if (isSubmitted) input.disabled = true;
-                    
-                    input.addEventListener('change', () => handleOptionChange(index, optIndex));
-
-                    const span = document.createElement('span');
-                    span.className = 'ml-3 text-gray-700';
-                    span.innerText = opt;
-
-                    label.appendChild(input);
-                    label.appendChild(span);
-                    optionsDiv.appendChild(label);
-                });
-
-                questionDiv.appendChild(optionsDiv);
-
-                // Explanation Block
-                const explanationDiv = document.createElement('div');
-                explanationDiv.id = `explanation-${index}`;
-                explanationDiv.className = 'mt-4 p-4 bg-blue-50 border-l-4 border-[#004b9b] text-sm text-gray-700 hidden';
-                explanationDiv.innerHTML = `<strong>Explanation:</strong> ${q.e}`;
-                questionDiv.appendChild(explanationDiv);
-
-                questionsContainer.appendChild(questionDiv);
-            });
-            updateProgress();
-        }
-
-        function handleOptionChange(qIndex, optIndex) {
-            userAnswers[qIndex] = optIndex;
-            updateProgress();
-        }
-
-        function updateProgress() {
-            const answeredCount = userAnswers.filter(a => a !== null).length;
-            document.getElementById('answered-count').innerText = answeredCount;
-            const progress = (answeredCount / questions.length) * 100;
-            document.getElementById('progress-bar').style.width = `${progress}%`;
-        }
-
-        function submitQuiz() {
-            const unanswered = userAnswers.filter(a => a === null).length;
-            if (unanswered > 0) {
-                const confirmSubmit = confirm(`You have ${unanswered} unanswered questions. Are you sure you want to submit?`);
-                if (!confirmSubmit) return;
-            }
-
-            isSubmitted = true;
-            let score = 0;
-
-            questions.forEach((q, index) => {
-                const userAns = userAnswers[index];
-                const explanationDiv = document.getElementById(`explanation-${index}`);
-                explanationDiv.classList.remove('hidden');
-
-                q.o.forEach((_, optIndex) => {
-                    const label = document.getElementById(`label-${index}-${optIndex}`);
-                    const input = label.querySelector('input');
-                    input.disabled = true;
-
-                    if (optIndex === q.a) {
-                        label.classList.add('bg-green-100', 'border-green-400');
-                    } else if (userAns === optIndex && userAns !== q.a) {
-                        label.classList.add('bg-red-100', 'border-red-400');
-                    }
-                });
-
-                if (userAns === q.a) {
-                    score++;
-                }
-            });
-
-            document.getElementById('score-display').innerText = `${score} / ${questions.length}`;
-            
-            let message = "Keep studying the IKS materials!";
-            if (score > 40) message = "Excellent! You have a profound knowledge of Indian Mathematics.";
-            else if (score > 30) message = "Great job! Very strong understanding.";
-            else if (score > 20) message = "Good effort! Review the study guide to improve.";
-            
-            document.getElementById('score-message').innerText = message;
-
-            quizSection.classList.add('hidden');
-            quizFooter.classList.add('hidden');
-            resultsSection.classList.remove('hidden');
-            window.scrollTo(0, 0);
-        }
-
-        function resetQuiz() {
-            userAnswers = new Array(questions.length).fill(null);
-            isSubmitted = false;
-            renderQuestions();
-            showQuiz();
-        }
-
-        // Initialize quiz rendering
-        renderQuestions();
-
-    </script>
 </body>
 </html>
