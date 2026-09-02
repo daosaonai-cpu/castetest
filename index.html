@@ -1,382 +1,298 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>IKS Study Guide & Quiz App</title>
-    <style>
-        body { font-family: Arial, sans-serif; background-color: #f4f4f9; color: #333; margin: 0; padding: 20px; line-height: 1.6; }
-        .container { max-width: 900px; margin: auto; background: #fff; padding: 30px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
-        h1 { text-align: center; color: #0056b3; margin-bottom: 20px; }
-        h2 { color: #004085; border-bottom: 2px solid #e9ecef; padding-bottom: 10px; margin-top: 30px; }
-        h3 { color: #0056b3; margin-top: 20px; }
-        
-        /* Study Guide Styles */
-        #study-guide { display: block; }
-        .guide-section { margin-bottom: 25px; }
-        .guide-section p { margin-bottom: 15px; text-align: justify; }
-        .guide-section ul { margin-bottom: 15px; padding-left: 20px; }
-        .guide-section li { margin-bottom: 5px; }
-        .highlight { font-weight: bold; color: #d9534f; }
-        
-        /* Quiz Styles */
-        #quiz-section { display: none; }
-        .question { font-size: 1.1em; font-weight: bold; margin-bottom: 15px; }
-        .options { list-style: none; padding: 0; }
-        .options li { background: #eef; margin-bottom: 10px; padding: 12px; border-radius: 4px; cursor: pointer; border: 1px solid #ccd; transition: 0.2s; }
-        .options li:hover { background: #dde; }
-        .options li.selected { background: #0056b3; color: #fff; border-color: #004085; }
-        
-        /* Buttons */
-        .btn { display: block; width: 100%; padding: 15px; margin-top: 30px; background: #0056b3; color: #fff; border: none; border-radius: 4px; font-size: 1.2em; font-weight: bold; cursor: pointer; transition: background 0.3s; }
-        .btn:hover { background: #004085; }
-        .btn-success { background: #28a745; }
-        .btn-success:hover { background: #218838; }
-        
-        .quiz-navigation { display: flex; justify-content: space-between; align-items: center; margin-top: 25px; }
-        .nav-btn { background: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 4px; cursor: pointer; font-size: 1em; transition: background 0.2s; }
-        .nav-btn:hover:not(:disabled) { background: #5a6268; }
-        .nav-btn:disabled { background: #ccc; cursor: not-allowed; }
-        #question-tracker { font-weight: bold; color: #555; }
-        
-        #result { text-align: center; font-size: 1.5em; font-weight: bold; margin-top: 30px; display: none; padding: 20px; border-radius: 8px; background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; }
-    </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>BCA 1st Semester - Indian Astronomy Quiz</title>
+<style>
+    body {
+        font-family: Arial, sans-serif;
+        background-color: #f9f9f9;
+        margin: 0;
+        padding: 0;
+    }
+    
+    #login-container {
+        max-width: 420px;
+        margin: 100px auto;
+        background-color: #ffffff;
+        padding: 40px 30px;
+        border-radius: 8px;
+        box-shadow: 0px 4px 12px rgba(0,0,0,0.1);
+        text-align: center;
+    }
+    #login-container h2 {
+        color: #004bb5;
+        margin-top: 0;
+        margin-bottom: 15px;
+        font-size: 24px;
+    }
+    #login-container hr {
+        border: 0;
+        border-top: 1px solid #e0e0e0;
+        margin-bottom: 30px;
+    }
+    #login-container input[type="password"] {
+        width: 100%;
+        padding: 14px;
+        margin-bottom: 20px;
+        border: 1px solid #ccc;
+        border-radius: 4px;
+        box-sizing: border-box;
+        font-size: 16px;
+    }
+    #login-container button {
+        width: 100%;
+        padding: 14px;
+        background-color: #0056b3;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        font-size: 16px;
+        font-weight: bold;
+        cursor: pointer;
+    }
+    #login-container button:hover {
+        background-color: #004494;
+    }
+    #error-msg {
+        color: red;
+        margin-top: 15px;
+        display: none;
+        font-size: 14px;
+    }
+
+    #quiz-container {
+        display: none;
+        max-width: 800px;
+        margin: 40px auto;
+        background-color: #ffffff;
+        padding: 30px;
+        border-radius: 8px;
+        box-shadow: 0px 4px 12px rgba(0,0,0,0.1);
+    }
+    h1 {
+        color: #333;
+        text-align: center;
+    }
+    .question {
+        margin-bottom: 20px;
+        padding: 15px;
+        border-bottom: 1px solid #eee;
+        border-radius: 4px;
+        transition: background-color 0.3s, border-left 0.3s;
+    }
+    .question p {
+        font-weight: bold;
+        color: #444;
+        margin-top: 0;
+    }
+    .options label {
+        display: block;
+        margin-bottom: 8px;
+        cursor: pointer;
+        padding: 5px;
+        border-radius: 4px;
+    }
+    .options label:hover {
+        background-color: #f1f1f1;
+    }
+    #submit-btn {
+        display: block;
+        width: 100%;
+        padding: 15px;
+        background-color: #28a745;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        font-size: 18px;
+        cursor: pointer;
+        margin-top: 30px;
+        font-weight: bold;
+    }
+    #submit-btn:hover {
+        background-color: #218838;
+    }
+    #result {
+        display: none;
+        text-align: center;
+        margin-top: 20px;
+        padding: 20px;
+        background-color: #e9ecef;
+        border-radius: 8px;
+        font-size: 24px;
+        font-weight: bold;
+        color: #333;
+    }
+    
+    /* Styling for graded questions */
+    .correct-q {
+        border-left: 6px solid #28a745;
+        background-color: #f4fff5;
+    }
+    .incorrect-q {
+        border-left: 6px solid #dc3545;
+        background-color: #fff4f4;
+    }
+    .unanswered-q {
+        border-left: 6px solid #ffc107;
+        background-color: #fffcf2;
+    }
+</style>
 </head>
 <body>
 
-<div class="container">
-    <h1>Indian Knowledge System (IKS)</h1>
-    
-    <!-- Study Guide Section -->
-    <div id="study-guide">
-        <h2>Comprehensive Study Guide</h2>
-        <p>Welcome to the extended study guide for the Indian Knowledge System (IKS). Please review the comprehensive material below carefully before attempting the quiz. This guide covers the foundational texts, scientific achievements, philosophical schools, and classical arts of ancient India.</p>
-
-        <div class="guide-section">
-            <h3>1. The Foundational Corpus: Shruti and Smriti</h3>
-            <p>The vast body of Indian Knowledge is broadly classified into two main categories: <span class="highlight">Shruti</span> and <span class="highlight">Smriti</span>. This bipartite division forms the bedrock of ancient Indian epistemology.</p>
-            <ul>
-                <li><strong>Shruti ("That which is heard"):</strong> These are considered the foundational, revealed texts of pristine origin. They are believed to be <strong>'Apurusheya'</strong>—meaning they are not of human origin, but eternal cosmic sounds revealed to ancient sages (Rishis) in deep meditative states. The sage <strong>Veda Vyasa</strong> is regarded as the compiler who organized these texts.</li>
-                <li><strong>The Four Vedas:</strong> The core of Shruti consists of:
-                    <ul>
-                        <li><strong>Rig Veda:</strong> The oldest, consisting of hymns praising natural forces and deities.</li>
-                        <li><strong>Sama Veda:</strong> The Veda of melodies and chants, heavily influencing classical Indian music.</li>
-                        <li><strong>Yajur Veda:</strong> A prose compilation of ritual offering formulas.</li>
-                        <li><strong>Atharva Veda:</strong> Contains procedures for everyday life, early medicine, and statecraft. <em>(Note: Vedic Mathematics is often traced back to the Atharva Veda).</em></li>
-                    </ul>
-                </li>
-                <li><strong>Smriti ("That which is remembered"):</strong> These are derivative texts of human authorship that interpret, codify, and apply the principles of Shruti to daily life, law, and societal norms. Examples include:
-                    <ul>
-                        <li><strong>Dharma Shastras:</strong> Codes of law, ethics, and social duties (e.g., Manusmriti).</li>
-                        <li><strong>Itihasas:</strong> Historical epics, primarily the <strong>Ramayana</strong> and <strong>Mahabharata</strong>, designed to simplify complex Vedic and philosophical concepts for the masses.</li>
-                        <li><strong>Puranas:</strong> Encyclopedic texts containing myths, cosmology, and genealogies.</li>
-                    </ul>
-                </li>
-            </ul>
-            <p><strong>Structure of the Vedas:</strong> Each of the four Vedas is traditionally divided into four progressive sections representing different stages of life and understanding:</p>
-            <ul>
-                <li><strong>Samhita:</strong> The core mantras and hymns.</li>
-                <li><strong>Brahmana:</strong> Prose texts explaining the meaning and procedures of rituals.</li>
-                <li><strong>Aranyaka:</strong> "Forest texts" focusing on the theology and meditation behind the rituals.</li>
-                <li><strong>Upanishad:</strong> The philosophical core, dealing with the nature of ultimate reality (Brahman) and the self (Atman).</li>
-            </ul>
-        </div>
-
-        <div class="guide-section">
-            <h3>2. Vedangas and Upavedas (Auxiliary Sciences)</h3>
-            <p>To properly understand, preserve, and apply the Vedas without distortion over millennia, several auxiliary disciplines were meticulously developed.</p>
-            <p><strong>Vedangas (Limbs of the Veda):</strong> There are <span class="highlight">six</span> Vedangas, each serving a specific structural or practical purpose:</p>
-            <ol>
-                <li><strong>Shiksha (Phonetics):</strong> Focuses on exact pronunciation, intonation, and acoustics to ensure mantras are chanted correctly. It acts as the "nose" of the Veda.</li>
-                <li><strong>Vyakarana (Grammar):</strong> The structural analysis of language. <strong>Panini's Ashtadhyayi</strong> is the most famous and definitive text of this Vedanga, outlining generative grammar rules that parallel modern computer science. It is the "mouth" of the Veda.</li>
-                <li><strong>Nirukta (Etymology):</strong> Studies the origins and meanings of obscure or archaic Vedic words. Authored famously by Yaska. It is the "ears" of the Veda.</li>
-                <li><strong>Chhandas (Meter):</strong> The study of poetic meters used in composing Vedic verses. Pingala's <em>Chhandas Shastra</em> is notable for presenting the first known description of a binary numeral system. It is the "feet" of the Veda.</li>
-                <li><strong>Kalpa (Ritual Rules):</strong> Details the rules and procedures for performing rituals. It is the "hands" of the Veda. It is subdivided into:
-                    <ul>
-                        <li><em>Shrauta Sutras</em> (public rituals).</li>
-                        <li><em>Grihya Sutras</em> (domestic rituals).</li>
-                        <li><em>Dharma Sutras</em> (social customs).</li>
-                        <li><strong>Shulba Sutras:</strong> Crucial texts dealing with the complex <strong>geometry</strong> required for constructing precise fire altars (incorporating early forms of the Pythagorean theorem).</li>
-                    </ul>
-                </li>
-                <li><strong>Jyotisha (Astronomy/Astrology):</strong> Traditionally classified into <span class="highlight">three branches</span> (Siddhanta/Ganita - mathematical astronomy, Samhita - mundane astrology, and Hora - predictive astrology). It was primarily developed for <strong>timing Vedic rituals accurately</strong>. It is metaphorically considered the <strong>"Eye"</strong> of the Veda.</li>
-            </ol>
-            <p><strong>Upavedas (Applied Knowledges):</strong> These are applied sciences attached to the main Vedas:</p>
-            <ul>
-                <li><strong>Ayurveda</strong> (Medicine and Life Sciences) - associated with Rig/Atharva Veda.</li>
-                <li><strong>Dhanurveda</strong> (Archery/Martial Arts) - associated with Yajur Veda.</li>
-                <li><strong>Gandharvaveda</strong> (Music and Dance) - associated with Sama Veda.</li>
-                <li><strong>Sthapatyaveda / Vastu Shastra</strong> (Architecture and Engineering) - associated with Atharva Veda.</li>
-            </ul>
-        </div>
-
-        <div class="guide-section">
-            <h3>3. Indian Mathematics, Astronomy, and Cryptography</h3>
-            <p>Ancient India made profound contributions to mathematics and astronomy, uniquely integrating them with linguistics, poetry, and philosophy.</p>
-            <ul>
-                <li><strong>Unique Aspects:</strong> A hallmark of Indian mathematics was its heavy reliance on <span class="highlight">poetic meter (Sutras/Chhandas)</span> for encoding complex formulas and astronomical data. This oral tradition made vast amounts of data easier to memorize and transmit across generations without written texts.</li>
-                <li><strong>Encoding Systems:</strong> To represent numbers in verse without breaking the poetic meter, scholars used ingenious systems:
-                    <ul>
-                        <li><strong>Bhuta-Sankhya (Object-Number System):</strong> Used synonyms of common objects to represent numbers. For example, synonyms for "Eyes", "Wings", or "Hands" might represent the number <span class="highlight">2</span>. "Vedas" would mean 4, "Seasons" would mean 6.</li>
-                        <li><strong>Katapayadi System:</strong> A sophisticated hashing system that mapped numbers to the Sanskrit consonant alphabet, allowing scholars to write mathematical formulas that doubled as devotional poetry.</li>
-                    </ul>
-                </li>
-                <li><strong>Algebra and Arithmetic:</strong> Algebra was known as <strong>Bija-ganita</strong> (Bija meaning 'seed'), signifying operations using unknown or 'seed' variables to find a solution. Arithmetic was called <em>Pati-ganita</em>.</li>
-                <li><strong>Key Figures and Discoveries:</strong>
-                    <ul>
-                        <li><strong>Aryabhatta:</strong> Authored the <em>Aryabhatiya</em>. He provided a highly accurate approximation of pi (<span class="highlight">3.1416</span>), formulas for the area of the <strong>triangle and circle</strong>, and famously proposed a heliocentric model where the <strong>Earth rotates on its axis</strong>.</li>
-                        <li><strong>Varahamihira:</strong> Authored the astronomical treatise <strong>Pancha-Siddhantika</strong>, synthesizing five older astronomical schools.</li>
-                        <li><strong>Brahmagupta:</strong> First to clearly define the rules for computing with <strong>Zero (Shunya)</strong> and negative numbers.</li>
-                        <li><strong>The Kerala School (e.g., Madhava of Sangamagrama):</strong> Known for pioneering work in <strong>infinite series and early calculus</strong> centuries before Newton and Leibniz in Europe.</li>
-                    </ul>
-                </li>
-            </ul>
-            <p><strong>Astronomical Terminology:</strong> In Indian astronomy, a <strong>'Graha'</strong> refers to a planet or major celestial body (like the Sun or Moon) that 'grasps' or influences observers. A <strong>'Nakshatra'</strong> refers to a lunar mansion or constellation along the ecliptic. The traditional luni-solar calendar system is the <strong>Panchanga</strong> (five limbs: Tithi, Vara, Nakshatra, Yoga, Karana), where a <strong>'Tithi'</strong> represents a specific lunar day.</p>
-        </div>
-
-        <div class="guide-section">
-            <h3>4. The Six Darshanas (Classical Philosophical Schools)</h3>
-            <p>Indian philosophy comprises six orthodox (Astika) schools that accept the authority of the Vedas. They provide frameworks for understanding reality, logic, and consciousness.</p>
-            <ol>
-                <li><strong>Nyaya:</strong> The school of logic and epistemology. It establishes rules for valid debate and methods for acquiring true knowledge (Pramana).</li>
-                <li><strong>Vaisheshika:</strong> An ancient school of atomism. It theorized that all matter in the universe is composed of indivisible particles (paramanu).</li>
-                <li><strong>Samkhya:</strong> A dualistic philosophy that deeply influences Ayurveda and Yoga. It posits two fundamental realities:
-                    <ul>
-                        <li><strong>Purusha:</strong> Pure, passive, and unmanifested cosmic consciousness (the observer).</li>
-                        <li><strong>Prakriti:</strong> Active, primal matter or energy, from which the physical and mental universe evolves (the observed).</li>
-                    </ul>
-                </li>
-                <li><strong>Yoga:</strong> Systematized by Patanjali, focusing on the practical methodology to calm the mind and achieve union between Purusha and Prakriti.</li>
-                <li><strong>Mimamsa:</strong> Focuses on the hermeneutics and interpretation of Vedic rituals.</li>
-                <li><strong>Vedanta:</strong> Focuses on the teachings of the Upanishads, exploring the non-dual relationship between the individual soul (Atman) and the ultimate reality (Brahman).</li>
-            </ol>
-        </div>
-
-        <div class="guide-section">
-            <h3>5. Ayurveda and Life Sciences</h3>
-            <p>Ayurveda ("The Science of Life") is the traditional system of medicine, deeply rooted in Indian philosophical schools, particularly <strong>Nyaya</strong> and <strong>Samkhya</strong>.</p>
-            <p><strong>Core Concepts in Ayurveda:</strong></p>
-            <ul>
-                <li><strong>Pancha-Mahabhuta (Five Great Elements):</strong> All matter is composed of Akasha (Space), Vayu (Air), Agni (Fire), Jala (Water), and Prithvi (Earth). <em>(Note: Concepts like Medhas/Intellect are cognitive, NOT physical elements).</em></li>
-                <li><strong>Tridosha Theory:</strong> The five elements combine to form three biological humors (Doshas) that govern physiology:
-                    <ul>
-                        <li><strong>Vata (Space + Air):</strong> Governs movement, breathing, and the nervous system.</li>
-                        <li><strong>Pitta (Fire + Water):</strong> Governs digestion, metabolism, and energy production.</li>
-                        <li><strong>Kapha (Water + Earth):</strong> Governs structure, lubrication, and immunity.</li>
-                    </ul>
-                </li>
-                <li><strong>The Three Gunas (Mental Qualities):</strong> 
-                    <ul>
-                        <li><strong>Sattva:</strong> Purity, balance, clarity, peace, and harmony.</li>
-                        <li><strong>Rajas:</strong> Activity, passion, movement, dynamism, and restlessness.</li>
-                        <li><strong>Tamas:</strong> Inertia, darkness, ignorance, lethargy, and decay.</li>
-                    </ul>
-                </li>
-                <li><strong>Sapta-Dhatu (Seven Tissues):</strong> The physical body is sustained by <span class="highlight">seven</span> fundamental tissues: Rasa (plasma/lymph), <strong>Rakta</strong> (blood), Mamsa (muscle), Meda (fat), Asthi (bone), Majja (marrow), and Shukra (reproductive tissue).</li>
-                <li><strong>The Six Rasas (Tastes):</strong> Ayurveda utilizes diet as medicine, identifying <span class="highlight">six</span> tastes, each affecting the Doshas differently:
-                    <ul>
-                        <li><strong>Madhura (Sweet):</strong> Decreases Vata and Pitta, but increases Kapha.</li>
-                        <li><strong>Amla (Sour):</strong> Increases Pitta and Kapha, decreases Vata.</li>
-                        <li><strong>Lavana (Salty):</strong> Decreases Vata; increases Pitta and Kapha.</li>
-                        <li><strong>Katu (Pungent):</strong> Decreases Kapha but increases Vata and Pitta.</li>
-                        <li><strong>Tikta (Bitter):</strong> Decreases Pitta and Kapha, increases Vata.</li>
-                        <li><strong>Kashaya (Astringent):</strong> Decreases Pitta and Kapha, increases Vata.</li>
-                    </ul>
-                </li>
-                <li><strong>Disease Classification:</strong> 
-                    <ul>
-                        <li><strong>Nija:</strong> Endogenous diseases (internal dosha imbalances caused by diet or lifestyle).</li>
-                        <li><strong>Agantuja:</strong> Exogenous diseases caused by external factors like trauma, poisons, or infections.</li>
-                        <li><strong>Manasa:</strong> Psychological diseases caused by imbalances in the mental Gunas (specifically an excess of Rajas and Tamas).</li>
-                    </ul>
-                </li>
-                <li><strong>Dinacharya and Ritucharya:</strong> Crucial preventative aspects of Ayurveda. <strong>Dinacharya</strong> refers to a prescribed <strong>daily routine</strong> (waking early, tongue scraping, oil pulling, bathing) aligned with natural circadian rhythms. <em>Ritucharya</em> refers to seasonal routines.</li>
-            </ul>
-        </div>
-
-        <div class="guide-section">
-            <h3>6. Engineering, Metallurgy, and Architecture</h3>
-            <p>Beyond theoretical sciences, the Indian Knowledge System encompasses highly advanced practical engineering and material sciences.</p>
-            <ul>
-                <li><strong>Metallurgy (Rasashastra):</strong> Ancient India was a world leader in metallurgy. 
-                    <ul>
-                        <li><strong>Wootz Steel:</strong> Originating in South India, this crucible steel was famous globally for its high carbon content and distinctive banding (later known as Damascus steel).</li>
-                        <li><strong>Iron Pillar of Delhi:</strong> A marvel of ancient metallurgy, this 7-meter high iron pillar dating back to the Gupta Empire (c. 400 CE) has astonishingly resisted rusting for over 1600 years due to a protective passive layer of crystalline iron hydrogen phosphate.</li>
-                        <li><strong>Zinc Smelting:</strong> The ancient mines at Zawar, Rajasthan, contain the world's earliest known evidence of the complex distillation process required to extract pure zinc.</li>
-                    </ul>
-                </li>
-                <li><strong>Architecture (Vastu Shastra and Shilpa Shastra):</strong> The science of architecture and town planning. It emphasizes integrating architecture with nature, sacred geometry, and the directional flow of elements to create harmonious living spaces and monumental temple structures.</li>
-                <li><strong>Water Management:</strong> From the sophisticated drainage systems of the Indus Valley Civilization (e.g., at Dholavira) to the intricate stepwells (Baoris) and artificial lakes of medieval India, advanced hydrology was a key component of urban planning.</li>
-            </ul>
-        </div>
-
-        <button class="btn" onclick="startQuiz()">I have read the comprehensive guide. Start Quiz!</button>
+    <div id="login-container">
+        <h2>Authentication Required</h2>
+        <hr>
+        <input type="password" id="passwordInput" placeholder="Enter password">
+        <button onclick="checkPassword()">Unlock</button>
+        <div id="error-msg">Incorrect password. Please try again.</div>
     </div>
 
-    <!-- Quiz Section -->
-    <div id="quiz-section">
-        <div id="quiz-container">
-            <div class="question" id="question-text"></div>
-            <ul class="options" id="options-list"></ul>
-        </div>
-        
-        <div class="quiz-navigation">
-            <button class="nav-btn" id="prev-btn" onclick="prevQuestion()" disabled>Previous</button>
-            <span id="question-tracker"></span>
-            <button class="nav-btn" id="next-btn" onclick="nextQuestion()">Next</button>
-        </div>
-
-        <button class="btn btn-success" id="submit-btn" style="display: none;" onclick="submitQuiz()">Submit Quiz</button>
-        <div id="result"></div>
+    <div id="quiz-container">
+        <h1>BCA 1st Semester: Indian Astronomy (Jyotisha)</h1>
+        <form id="quizForm">
+            <!-- 50 MCQs Generated from the Source Document -->
+            <div class="question" id="qd1"><p>1. Jyotisha is historically classified as one of the six...?</p><div class="options"><label><input type="radio" name="q1" value="a"> A) Vedas</label><label><input type="radio" name="q1" value="b"> B) Vedangas</label><label><input type="radio" name="q1" value="c"> C) Upanishads</label><label><input type="radio" name="q1" value="d"> D) Puranas</label></div></div>
+            <div class="question" id="qd2"><p>2. What was the primary historical necessity for cultivating Jyotisha?</p><div class="options"><label><input type="radio" name="q2" value="a"> A) To navigate the oceans</label><label><input type="radio" name="q2" value="b"> B) To synchronize human activities with the cosmic rhythm</label><label><input type="radio" name="q2" value="c"> C) To predict personal fortunes</label><label><input type="radio" name="q2" value="d"> D) To track weather patterns</label></div></div>
+            <div class="question" id="qd3"><p>3. Who authored the ancient text Vedanga Jyotisha?</p><div class="options"><label><input type="radio" name="q3" value="a"> A) Aryabhata</label><label><input type="radio" name="q3" value="b"> B) Lagadha</label><label><input type="radio" name="q3" value="c"> C) Varahamihira</label><label><input type="radio" name="q3" value="d"> D) Brahmagupta</label></div></div>
+            <div class="question" id="qd4"><p>4. Early Indian astronomy was deeply rooted in continuous and rigorous...?</p><div class="options"><label><input type="radio" name="q4" value="a"> A) Speculative philosophies</label><label><input type="radio" name="q4" value="b"> B) Mathematical observation</label><label><input type="radio" name="q4" value="c"> C) Telescopic research</label><label><input type="radio" name="q4" value="d"> D) Astrological readings</label></div></div>
+            <div class="question" id="qd5"><p>5. The immense data collection in ancient Indian astronomy allowed for precise calculation of all the following EXCEPT...?</p><div class="options"><label><input type="radio" name="q5" value="a"> A) Eclipses</label><label><input type="radio" name="q5" value="b"> B) Equinoxes</label><label><input type="radio" name="q5" value="c"> C) Solstices</label><label><input type="radio" name="q5" value="d"> D) Black holes</label></div></div>
+            <div class="question" id="qd6"><p>6. Which celestial body was recognized as the central anchor for macroscopic timekeeping?</p><div class="options"><label><input type="radio" name="q6" value="a"> A) Moon</label><label><input type="radio" name="q6" value="b"> B) Sun (Surya)</label><label><input type="radio" name="q6" value="c"> C) Mars</label><label><input type="radio" name="q6" value="d"> D) Jupiter</label></div></div>
+            <div class="question" id="qd7"><p>7. Ayanas refer to...?</p><div class="options"><label><input type="radio" name="q7" value="a"> A) Lunar phases</label><label><input type="radio" name="q7" value="b"> B) Solar journeys</label><label><input type="radio" name="q7" value="c"> C) Planetary retrogrades</label><label><input type="radio" name="q7" value="d"> D) Eclipses</label></div></div>
+            <div class="question" id="qd8"><p>8. Uttarayana is roughly a six-month period when the Sun appears to move in which direction?</p><div class="options"><label><input type="radio" name="q8" value="a"> A) Northward</label><label><input type="radio" name="q8" value="b"> B) Southward</label><label><input type="radio" name="q8" value="c"> C) Eastward</label><label><input type="radio" name="q8" value="d"> D) Westward</label></div></div>
+            <div class="question" id="qd9"><p>9. The period from the summer solstice to the winter solstice is called...?</p><div class="options"><label><input type="radio" name="q9" value="a"> A) Uttarayana</label><label><input type="radio" name="q9" value="b"> B) Dakshinayana</label><label><input type="radio" name="q9" value="c"> C) Vasanta</label><label><input type="radio" name="q9" value="d"> D) Hemanta</label></div></div>
+            <div class="question" id="qd10"><p>10. How many seasons (Ritus) was the solar year systematically divided into?</p><div class="options"><label><input type="radio" name="q10" value="a"> A) Four</label><label><input type="radio" name="q10" value="b"> B) Five</label><label><input type="radio" name="q10" value="c"> C) Six</label><label><input type="radio" name="q10" value="d"> D) Twelve</label></div></div>
+            
+            <div class="question" id="qd11"><p>11. Which of the following is NOT one of the traditional six Indian seasons?</p><div class="options"><label><input type="radio" name="q11" value="a"> A) Vasanta</label><label><input type="radio" name="q11" value="b"> B) Grishma</label><label><input type="radio" name="q11" value="c"> C) Purnima</label><label><input type="radio" name="q11" value="d"> D) Varsha</label></div></div>
+            <div class="question" id="qd12"><p>12. The Moon (Chandra) was critical for the micro-management of...?</p><div class="options"><label><input type="radio" name="q12" value="a"> A) Annual cycles</label><label><input type="radio" name="q12" value="b"> B) Daily and monthly timekeeping</label><label><input type="radio" name="q12" value="c"> C) Agricultural harvesting</label><label><input type="radio" name="q12" value="d"> D) Identifying eclipses</label></div></div>
+            <div class="question" id="qd13"><p>13. A Tithi represents what in ancient Indian astronomy?</p><div class="options"><label><input type="radio" name="q13" value="a"> A) A standard 24-hour day</label><label><input type="radio" name="q13" value="b"> B) A mathematical measurement of the longitudinal angle between the Sun and Moon</label><label><input type="radio" name="q13" value="c"> C) The time it takes for the Moon to orbit Earth</label><label><input type="radio" name="q13" value="d"> D) The exact moment of an eclipse</label></div></div>
+            <div class="question" id="qd14"><p>14. By how many degrees must the angle between the Sun and Moon increase to begin a new Tithi?</p><div class="options"><label><input type="radio" name="q14" value="a"> A) 10 degrees</label><label><input type="radio" name="q14" value="b"> B) 12 degrees</label><label><input type="radio" name="q14" value="c"> C) 13 degrees</label><label><input type="radio" name="q14" value="d"> D) 15 degrees</label></div></div>
+            <div class="question" id="qd15"><p>15. How many Tithis exist in a standard lunar month?</p><div class="options"><label><input type="radio" name="q15" value="a"> A) 27</label><label><input type="radio" name="q15" value="b"> B) 28</label><label><input type="radio" name="q15" value="c"> C) 30</label><label><input type="radio" name="q15" value="d"> D) 31</label></div></div>
+            <div class="question" id="qd16"><p>16. A Paksha refers to a distinct period of how many days?</p><div class="options"><label><input type="radio" name="q16" value="a"> A) 7 days</label><label><input type="radio" name="q16" value="b"> B) 14 days</label><label><input type="radio" name="q16" value="c"> C) 15 days</label><label><input type="radio" name="q16" value="d"> D) 30 days</label></div></div>
+            <div class="question" id="qd17"><p>17. Shukla Paksha refers to which lunar phase?</p><div class="options"><label><input type="radio" name="q17" value="a"> A) Waxing phase</label><label><input type="radio" name="q17" value="b"> B) Waning phase</label><label><input type="radio" name="q17" value="c"> C) Eclipse phase</label><label><input type="radio" name="q17" value="d"> D) Stationary phase</label></div></div>
+            <div class="question" id="qd18"><p>18. Krishna Paksha leads up to which lunar event?</p><div class="options"><label><input type="radio" name="q18" value="a"> A) Purnima</label><label><input type="radio" name="q18" value="b"> B) Amavasya</label><label><input type="radio" name="q18" value="c"> C) Uttarayana</label><label><input type="radio" name="q18" value="d"> D) Equinox</label></div></div>
+            <div class="question" id="qd19"><p>19. Purnima is the Sanskrit term for...?</p><div class="options"><label><input type="radio" name="q19" value="a"> A) New Moon</label><label><input type="radio" name="q19" value="b"> B) Full Moon</label><label><input type="radio" name="q19" value="c"> C) Half Moon</label><label><input type="radio" name="q19" value="d"> D) Blue Moon</label></div></div>
+            <div class="question" id="qd20"><p>20. The Nakshatra system provides a visually observable coordinate system against the background of...?</p><div class="options"><label><input type="radio" name="q20" value="a"> A) Moving planets</label><label><input type="radio" name="q20" value="b"> B) Fixed stars</label><label><input type="radio" name="q20" value="c"> C) The Sun</label><label><input type="radio" name="q20" value="d"> D) The Earth's equator</label></div></div>
+            
+            <div class="question" id="qd21"><p>21. The ecliptic is mathematically divided into how many equal Nakshatra segments?</p><div class="options"><label><input type="radio" name="q21" value="a"> A) 12</label><label><input type="radio" name="q21" value="b"> B) 24</label><label><input type="radio" name="q21" value="c"> C) 27 (or 28)</label><label><input type="radio" name="q21" value="d"> D) 30</label></div></div>
+            <div class="question" id="qd22"><p>22. What is the precise mathematical size of a single Nakshatra segment?</p><div class="options"><label><input type="radio" name="q22" value="a"> A) 12 degrees</label><label><input type="radio" name="q22" value="b"> B) 13 degrees and 20 minutes</label><label><input type="radio" name="q22" value="c"> C) 15 degrees</label><label><input type="radio" name="q22" value="d"> D) 30 degrees</label></div></div>
+            <div class="question" id="qd23"><p>23. Approximately how many days does the Moon take to complete an orbit around the Earth?</p><div class="options"><label><input type="radio" name="q23" value="a"> A) 24</label><label><input type="radio" name="q23" value="b"> B) 27.3</label><label><input type="radio" name="q23" value="c"> C) 29.5</label><label><input type="radio" name="q23" value="d"> D) 30</label></div></div>
+            <div class="question" id="qd24"><p>24. Because of its orbital period, how many specific Nakshatras does the Moon occupy each day?</p><div class="options"><label><input type="radio" name="q24" value="a"> A) One</label><label><input type="radio" name="q24" value="b"> B) Two</label><label><input type="radio" name="q24" value="c"> C) Three</label><label><input type="radio" name="q24" value="d"> D) It takes one week per Nakshatra</label></div></div>
+            <div class="question" id="qd25"><p>25. A Yoga Tara is known as an identifying or...?</p><div class="options"><label><input type="radio" name="q25" value="a"> A) Hidden star</label><label><input type="radio" name="q25" value="b"> B) Junction star</label><label><input type="radio" name="q25" value="c"> C) Moving planet</label><label><input type="radio" name="q25" value="d"> D) Solar eclipse</label></div></div>
+            <div class="question" id="qd26"><p>26. The Nakshatra Krittika corresponds to which modern asterism?</p><div class="options"><label><input type="radio" name="q26" value="a"> A) Orion</label><label><input type="radio" name="q26" value="b"> B) Pleiades</label><label><input type="radio" name="q26" value="c"> C) Ursa Major</label><label><input type="radio" name="q26" value="d"> D) Sirius</label></div></div>
+            <div class="question" id="qd27"><p>27. The Nakshatra Rohini corresponds to which star?</p><div class="options"><label><input type="radio" name="q27" value="a"> A) Aldebaran</label><label><input type="radio" name="q27" value="b"> B) Polaris</label><label><input type="radio" name="q27" value="c"> C) Betelgeuse</label><label><input type="radio" name="q27" value="d"> D) Vega</label></div></div>
+            <div class="question" id="qd28"><p>28. In the classical IKS context, a Graha refers to...?</p><div class="options"><label><input type="radio" name="q28" value="a"> A) A fixed star</label><label><input type="radio" name="q28" value="b"> B) Any major moving celestial entity</label><label><input type="radio" name="q28" value="c"> C) A constellation</label><label><input type="radio" name="q28" value="d"> D) A specific phase of the moon</label></div></div>
+            <div class="question" id="qd29"><p>29. How many primary Grahas are in the Navagraha system?</p><div class="options"><label><input type="radio" name="q29" value="a"> A) Five</label><label><input type="radio" name="q29" value="b"> B) Seven</label><label><input type="radio" name="q29" value="c"> C) Nine</label><label><input type="radio" name="q29" value="d"> D) Twelve</label></div></div>
+            <div class="question" id="qd30"><p>30. Surya is classified astronomically in IKS as a...?</p><div class="options"><label><input type="radio" name="q30" value="a"> A) Planet</label><label><input type="radio" name="q30" value="b"> B) Star (Primary Luminary)</label><label><input type="radio" name="q30" value="c"> C) Satellite</label><label><input type="radio" name="q30" value="d"> D) Mathematical node</label></div></div>
+            
+            <div class="question" id="qd31"><p>31. Which of these translates to Mars in modern astronomy?</p><div class="options"><label><input type="radio" name="q31" value="a"> A) Budha</label><label><input type="radio" name="q31" value="b"> B) Shukra</label><label><input type="radio" name="q31" value="c"> C) Mangala</label><label><input type="radio" name="q31" value="d"> D) Shani</label></div></div>
+            <div class="question" id="qd32"><p>32. Budha represents which modern planet?</p><div class="options"><label><input type="radio" name="q32" value="a"> A) Venus</label><label><input type="radio" name="q32" value="b"> B) Mercury</label><label><input type="radio" name="q32" value="c"> C) Saturn</label><label><input type="radio" name="q32" value="d"> D) Jupiter</label></div></div>
+            <div class="question" id="qd33"><p>33. Guru is the Sanskrit name for which physical planet?</p><div class="options"><label><input type="radio" name="q33" value="a"> A) Jupiter</label><label><input type="radio" name="q33" value="b"> B) Mars</label><label><input type="radio" name="q33" value="c"> C) Saturn</label><label><input type="radio" name="q33" value="d"> D) Venus</label></div></div>
+            <div class="question" id="qd34"><p>34. Which modern planet does Shukra correspond to?</p><div class="options"><label><input type="radio" name="q34" value="a"> A) Venus</label><label><input type="radio" name="q34" value="b"> B) Saturn</label><label><input type="radio" name="q34" value="c"> C) Mercury</label><label><input type="radio" name="q34" value="d"> D) Jupiter</label></div></div>
+            <div class="question" id="qd35"><p>35. Shani corresponds to which planet?</p><div class="options"><label><input type="radio" name="q35" value="a"> A) Mars</label><label><input type="radio" name="q35" value="b"> B) Saturn</label><label><input type="radio" name="q35" value="c"> C) Venus</label><label><input type="radio" name="q35" value="d"> D) Mercury</label></div></div>
+            <div class="question" id="qd36"><p>36. What does the term Vakri refer to in planetary motion?</p><div class="options"><label><input type="radio" name="q36" value="a"> A) Forward motion</label><label><input type="radio" name="q36" value="b"> B) Retrograde motion</label><label><input type="radio" name="q36" value="c"> C) Stationary alignment</label><label><input type="radio" name="q36" value="d"> D) Eclipse alignment</label></div></div>
+            <div class="question" id="qd37"><p>37. The physical, visible planets like Mars, Mercury, Jupiter, Venus, and Saturn are classified as...?</p><div class="options"><label><input type="radio" name="q37" value="a"> A) Chhaya Grahas</label><label><input type="radio" name="q37" value="b"> B) Tara Grahas</label><label><input type="radio" name="q37" value="c"> C) Nakshatras</label><label><input type="radio" name="q37" value="d"> D) Ayanas</label></div></div>
+            <div class="question" id="qd38"><p>38. What are Rahu and Ketu?</p><div class="options"><label><input type="radio" name="q38" value="a"> A) Physical planets</label><label><input type="radio" name="q38" value="b"> B) Visible stars</label><label><input type="radio" name="q38" value="c"> C) Ascending and Descending Lunar Nodes</label><label><input type="radio" name="q38" value="d"> D) Astrological houses</label></div></div>
+            <div class="question" id="qd39"><p>39. Rahu and Ketu are absolutely crucial for predicting...?</p><div class="options"><label><input type="radio" name="q39" value="a"> A) The seasons</label><label><input type="radio" name="q39" value="b"> B) Solar and lunar eclipses</label><label><input type="radio" name="q39" value="c"> C) Planetary retrogrades</label><label><input type="radio" name="q39" value="d"> D) Tithi changes</label></div></div>
+            <div class="question" id="qd40"><p>40. The IKS classification for Rahu and Ketu is...?</p><div class="options"><label><input type="radio" name="q40" value="a"> A) Tara Grahas</label><label><input type="radio" name="q40" value="b"> B) Chhaya Grahas</label><label><input type="radio" name="q40" value="c"> C) Surya Grahas</label><label><input type="radio" name="q40" value="d"> D) Ritus</label></div></div>
+            
+            <div class="question" id="qd41"><p>41. A purely lunar year is approximately how many days long?</p><div class="options"><label><input type="radio" name="q41" value="a"> A) 365.24 days</label><label><input type="radio" name="q41" value="b"> B) 354 days</label><label><input type="radio" name="q41" value="c"> C) 360 days</label><label><input type="radio" name="q41" value="d"> D) 330 days</label></div></div>
+            <div class="question" id="qd42"><p>42. A purely solar year is approximately how many days long?</p><div class="options"><label><input type="radio" name="q42" value="a"> A) 354 days</label><label><input type="radio" name="q42" value="b"> B) 365.24 days</label><label><input type="radio" name="q42" value="c"> C) 360 days</label><label><input type="radio" name="q42" value="d"> D) 370 days</label></div></div>
+            <div class="question" id="qd43"><p>43. By roughly how many days are a purely lunar and solar year out of sync annually?</p><div class="options"><label><input type="radio" name="q43" value="a"> A) 5 days</label><label><input type="radio" name="q43" value="b"> B) 7 days</label><label><input type="radio" name="q43" value="c"> C) 11 days</label><label><input type="radio" name="q43" value="d"> D) 15 days</label></div></div>
+            <div class="question" id="qd44"><p>44. What mathematical concept did Indian astronomers introduce to sync the lunar and solar calendars?</p><div class="options"><label><input type="radio" name="q44" value="a"> A) Leap year</label><label><input type="radio" name="q44" value="b"> B) Intercalary month (Adhik Maas)</label><label><input type="radio" name="q44" value="c"> C) Removing a week from the year</label><label><input type="radio" name="q44" value="d"> D) Adding an extra lunar phase</label></div></div>
+            <div class="question" id="qd45"><p>45. When is an Adhik Maas added to the calendar?</p><div class="options"><label><input type="radio" name="q45" value="a"> A) Every 4 years</label><label><input type="radio" name="q45" value="b"> B) When two consecutive lunar months fall entirely within one solar month</label><label><input type="radio" name="q45" value="c"> C) During a solar eclipse</label><label><input type="radio" name="q45" value="d"> D) At the start of Uttarayana</label></div></div>
+            <div class="question" id="qd46"><p>46. The Luni-Solar Calendar ensured that lunar phases remained tethered to...?</p><div class="options"><label><input type="radio" name="q46" value="a"> A) The movement of Jupiter</label><label><input type="radio" name="q46" value="b"> B) Solar seasons</label><label><input type="radio" name="q46" value="c"> C) Retrograde cycles</label><label><input type="radio" name="q46" value="d"> D) Planetary nodes</label></div></div>
+            <div class="question" id="qd47"><p>47. What simple yet effective instrument was used to accurately determine spatial direction (Dik) and geographical place (Desa)?</p><div class="options"><label><input type="radio" name="q47" value="a"> A) Telescope</label><label><input type="radio" name="q47" value="b"> B) Compass</label><label><input type="radio" name="q47" value="c"> C) Sanku (gnomon)</label><label><input type="radio" name="q47" value="d"> D) Astrolabe</label></div></div>
+            <div class="question" id="qd48"><p>48. To determine the East-West axis, astronomers drew a line between two points where the Sanku's shadow touched a circle's circumference in the...?</p><div class="options"><label><input type="radio" name="q48" value="a"> A) Morning and afternoon</label><label><input type="radio" name="q48" value="b"> B) Midnight and noon</label><label><input type="radio" name="q48" value="c"> C) Spring and Autumn</label><label><input type="radio" name="q48" value="d"> D) Full moon and new moon</label></div></div>
+            <div class="question" id="qd49"><p>49. Akshamsa refers to...?</p><div class="options"><label><input type="radio" name="q49" value="a"> A) Longitude</label><label><input type="radio" name="q49" value="b"> B) Local terrestrial latitude</label><label><input type="radio" name="q49" value="c"> C) Equator</label><label><input type="radio" name="q49" value="d"> D) Declination</label></div></div>
+            <div class="question" id="qd50"><p>50. To calculate latitude, astronomers measured the Sanku's mid-day shadow on which specific days utilizing early trigonometry?</p><div class="options"><label><input type="radio" name="q50" value="a"> A) Solstice days</label><label><input type="radio" name="q50" value="b"> B) Equinox days</label><label><input type="radio" name="q50" value="c"> C) Purnima days</label><label><input type="radio" name="q50" value="d"> D) Lunar eclipse days</label></div></div>
+            
+            <button type="button" id="submit-btn" onclick="gradeQuiz()">Submit Quiz</button>
+            <div id="result"></div>
+        </form>
     </div>
 
-</div>
-
-<script>
-    // Functions to toggle between study guide and quiz
-    function startQuiz() {
-        document.getElementById('study-guide').style.display = 'none';
-        document.getElementById('quiz-section').style.display = 'block';
-        loadQuestion();
-    }
-
-    // Questions derived directly from "BCA iks pyq.pdf" with citations removed
-    const quizData = [
-        { q: "Which Rishi is regarded as the compiler of the Vedas?", o: ["Valmiki", "Veda Vyasa", "Patanjali", "Panini"], a: 1 },
-        { q: "Vedic Mathematics is derived from which Veda?", o: ["Rig Veda", "Sama Veda", "Atharva Veda", "Yajur Veda"], a: 2 },
-        { q: "How is Jyotisha Shashtra traditionally classified?", o: ["Two branches", "Three branches", "Four branches", "Five branches"], a: 1 },
-        { q: "What does 'Graha' refer to in Indian Astronomy?", o: ["Lunar mansion", "Planet or major celestial body", "Galaxy", "Meteor"], a: 1 },
-        { q: "What does 'Nakshatra' refer to?", o: ["Planet", "Lunar mansion / constellation", "Sun", "Eclipse"], a: 1 },
-        { q: "What is a unique aspect of Indian Mathematics?", o: ["Reliance on Arabic numerals", "Heavy reliance on poetic meter (Sutras)", "Lack of written texts", "Use of abacus"], a: 1 },
-        { q: "What does the Shruti classification of the IKS corpus refer to?", o: ["Remembered texts", "Applied sciences", "Foundational, revealed texts", "Epics"], a: 2 },
-        { q: "Which of the following falls under Smriti?", o: ["Rig Veda", "Dharma Shastras", "Atharva Veda", "Sama Veda"], a: 1 },
-        { q: "How many auxiliary disciplines make up the Vedangas?", o: ["Four", "Five", "Six", "Eight"], a: 2 },
-        { q: "What are Upavedas?", o: ["Applied sciences attached to the Vedas", "Classical schools of philosophy", "Lunar mansions", "Daily routines"], a: 0 },
-        { q: "Which of the following is a Darshana?", o: ["Ayurveda", "Dhanurveda", "Nyaya", "Ramayana"], a: 2 },
-        { q: "What was the purpose of Itihasas and Puranas?", o: ["To calculate eclipses", "To simplify Vedic concepts for the masses", "To outline grammar", "To define planetary motions"], a: 1 },
-        { q: "Sanskrit poetic meters used in Indian Mathematics are called:", o: ["Chhandas", "Bija", "Kalpa", "Nirukta"], a: 0 },
-        { q: "In poetic math encoding, what synonym was used for the number 2?", o: ["Vedas", "Eyes", "Seas", "Fingers"], a: 1 },
-        { q: "Which encoding system mapped numbers to the Sanskrit alphabet?", o: ["Panchanga", "Katapayadi", "Dinacharya", "Samkhya"], a: 1 },
-        { q: "How many Rasas (tastes) does Ayurveda identify?", o: ["Three", "Four", "Five", "Six"], a: 3 },
-        { q: "Which Rasa decreases Vata and Pitta, but increases Kapha?", o: ["Madhura (Sweet)", "Amla (Sour)", "Katu (Pungent)", "Tikta (Bitter)"], a: 0 },
-        { q: "What is the effect of Lavana (Salty) taste?", o: ["Decreases Kapha", "Decreases Pitta", "Decreases Vata; increases Pitta and Kapha", "Increases Vata"], a: 2 },
-        { q: "Which Rasa decreases Kapha but increases Vata and Pitta?", o: ["Madhura", "Tikta", "Kashaya", "Katu (Pungent)"], a: 3 },
-        { q: "Why are Vedas regarded as 'Apurusheya'?", o: ["They are written by Vyasa", "They are not of human origin", "They are fictional", "They are mathematical texts"], a: 1 },
-        { q: "What is Kalpa in the context of Vedangas?", o: ["Astronomy", "Grammar", "Rules and procedures for rituals", "Etymology"], a: 2 },
-        { q: "Which Sutras under Kalpa deal with geometry for building fire altars?", o: ["Shrauta Sutras", "Grihya Sutras", "Dharma Sutras", "Shulba Sutras"], a: 3 },
-        { q: "What was Aryabhatta's approximation of pi?", o: ["3.1415", "3.1416", "3.14", "3.1428"], a: 1 },
-        { q: "Aryabhatta provided the formula for calculating the area of which shapes?", o: ["Square and rectangle", "Triangle and circle", "Cube and sphere", "Pentagon and hexagon"], a: 1 },
-        { q: "What does 'Shruti' literally mean?", o: ["That which is remembered", "That which is seen", "That which is heard", "That which is read"], a: 2 },
-        { q: "In Samkhya philosophy, what is Purusha?", o: ["Active primal matter", "Pure, passive, and unmanifested cosmic consciousness", "The five elements", "The physical body"], a: 1 },
-        { q: "In Samkhya philosophy, what is Prakriti?", o: ["Pure consciousness", "Active, primal matter or energy", "The soul", "Illusion"], a: 1 },
-        { q: "What does Dinacharya refer to in Ayurveda?", o: ["Dietary restrictions", "A daily routine", "Surgical procedures", "Herbal medicines"], a: 1 },
-        { q: "Why was Algebra known as Bija-ganita in Ancient India?", o: ["It was brought by a scholar named Bija", "Bija means 'seed', involving operations using unknown elements", "It was written on seeds", "It only solved agricultural problems"], a: 1 },
-        { q: "Which astronomical treatise was authored by Varahamihira?", o: ["Aryabhatiya", "Lilavati", "Pancha-Siddhantika", "Ashtadhyayi"], a: 2 },
-        { q: "What was the primary purpose of astronomy in the Vedic Period?", o: ["Ocean navigation", "Timing Vedic rituals accurately", "Predicting weather", "Astrological readings only"], a: 1 },
-        { q: "Which Siddhantic Era scholar proposed Earth's rotation?", o: ["Bhaskaracharya", "Brahmagupta", "Aryabhata", "Madhava"], a: 2 },
-        { q: "What mathematical advancement is the Kerala School known for?", o: ["Invention of zero", "Infinite series and early calculus", "Geometry of altars", "Decimal system"], a: 1 },
-        { q: "Which Vedanga focuses on exact pronunciation and phonetics?", o: ["Shiksha", "Vyakarana", "Chhandas", "Nirukta"], a: 0 },
-        { q: "Panini's Ashtadhyayi is the most famous text of which Vedanga?", o: ["Jyotisha", "Vyakarana", "Kalpa", "Nirukta"], a: 1 },
-        { q: "Which Vedanga studies the origins and meanings of obscure Vedic words (Etymology)?", o: ["Vyakarana", "Nirukta", "Shiksha", "Chhandas"], a: 1 },
-        { q: "Jyotisha is considered the 'what' of the Veda?", o: ["Heart", "Brain", "Eye", "Ear"], a: 2 },
-        { q: "What are the three Gunas in Ayurveda?", o: ["Vata, Pitta, Kapha", "Sattva, Rajas, Tamas", "Rasa, Rakta, Mamsa", "Shruti, Smriti, Purana"], a: 1 },
-        { q: "Which Guna represents purity and balance?", o: ["Tamas", "Rajas", "Sattva", "Kapha"], a: 2 },
-        { q: "What represents activity and passion among the Gunas?", o: ["Tamas", "Sattva", "Rajas", "Pitta"], a: 2 },
-        { q: "How many sections is each Veda divided into?", o: ["Two", "Three", "Four", "Five"], a: 2 },
-        { q: "Which section of the Vedas deals with philosophy?", o: ["Samhita", "Brahmana", "Aranyaka", "Upanishad"], a: 3 },
-        { q: "How are Nija diseases classified in Ayurveda?", o: ["Exogenous", "Endogenous", "Psychological", "Traumatic"], a: 1 },
-        { q: "Agantuja diseases are caused by:", o: ["Internal dosha imbalances", "Mental Gunas", "External factors like trauma or infections", "Poor diet"], a: 2 },
-        { q: "Manasa diseases are caused by imbalances in:", o: ["Mental Gunas (Rajas/Tamas)", "Doshas (Vata/Pitta/Kapha)", "Dhatus", "Mahabhutas"], a: 0 },
-        { q: "The traditional Indian luni-solar calendar system is known as:", o: ["Tithi", "Panchanga", "Yoga", "Karana"], a: 1 },
-        { q: "What does 'Tithi' represent in the Panchanga?", o: ["The weekday", "A half-day", "The lunar day", "A lunar mansion"], a: 2 },
-        { q: "Which element is NOT part of the Pancha-Mahabhuta?", o: ["Akasha (Space)", "Agni (Fire)", "Prithvi (Earth)", "Medhas (Intellect)"], a: 3 },
-        { q: "How many fundamental tissues (Dhatus) are there in the physical body according to Ayurveda?", o: ["Three", "Five", "Seven", "Nine"], a: 2 },
-        { q: "Which of the following is an Ayurvedic Sapta-Dhatu?", o: ["Akasha", "Vayu", "Rakta", "Prakriti"], a: 2 }
-    ];
-
-    let currentQuestion = 0;
-    let userAnswers = new Array(quizData.length).fill(null);
-
-    const questionText = document.getElementById("question-text");
-    const optionsList = document.getElementById("options-list");
-    const prevBtn = document.getElementById("prev-btn");
-    const nextBtn = document.getElementById("next-btn");
-    const submitBtn = document.getElementById("submit-btn");
-    const tracker = document.getElementById("question-tracker");
-    const resultDiv = document.getElementById("result");
-
-    function loadQuestion() {
-        optionsList.innerHTML = "";
-        const current = quizData[currentQuestion];
-        questionText.innerText = `Q${currentQuestion + 1}: ${current.q}`;
-        tracker.innerText = `Question ${currentQuestion + 1} of ${quizData.length}`;
-
-        current.o.forEach((option, index) => {
-            const li = document.createElement("li");
-            li.innerText = option;
-            if (userAnswers[currentQuestion] === index) {
-                li.classList.add("selected");
-            }
-            li.onclick = () => selectOption(index);
-            optionsList.appendChild(li);
-        });
-
-        prevBtn.disabled = currentQuestion === 0;
-        
-        if (currentQuestion === quizData.length - 1) {
-            nextBtn.style.display = "none";
-            submitBtn.style.display = "block";
-        } else {
-            nextBtn.style.display = "block";
-            submitBtn.style.display = "none";
-        }
-    }
-
-    function selectOption(index) {
-        userAnswers[currentQuestion] = index;
-        loadQuestion();
-    }
-
-    function nextQuestion() {
-        if (currentQuestion < quizData.length - 1) {
-            currentQuestion++;
-            loadQuestion();
-        }
-    }
-
-    function prevQuestion() {
-        if (currentQuestion > 0) {
-            currentQuestion--;
-            loadQuestion();
-        }
-    }
-
-    function submitQuiz() {
-        let score = 0;
-        userAnswers.forEach((ans, index) => {
-            if (ans === quizData[index].a) {
-                score++;
+    <!-- Script to handle authentication and grading -->
+    <script>
+        // Authentication logic
+        document.getElementById("passwordInput").addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                event.preventDefault();
+                checkPassword();
             }
         });
-        
-        document.getElementById("quiz-container").style.display = "none";
-        document.querySelector(".quiz-navigation").style.display = "none";
-        submitBtn.style.display = "none";
-        
-        resultDiv.style.display = "block";
-        
-        const percentage = Math.round((score / quizData.length) * 100);
-        let message = "";
-        if(percentage >= 80) message = "Excellent work!";
-        else if (percentage >= 60) message = "Good job!";
-        else message = "Keep studying and try again!";
 
-        resultDiv.innerHTML = `You scored ${score} out of ${quizData.length} (${percentage}%)<br><span style="font-size: 0.8em; font-weight: normal; color: #333; display: block; margin-top: 10px;">${message}</span>`;
-    }
+        function checkPassword() {
+            var pwd = document.getElementById("passwordInput").value;
+            var errorMsg = document.getElementById("error-msg");
+            
+            if (pwd === "1671@") {
+                document.getElementById("login-container").style.display = "none";
+                document.getElementById("quiz-container").style.display = "block";
+            } else {
+                errorMsg.style.display = "block";
+                document.getElementById("passwordInput").value = "";
+            }
+        }
 
-    // Note: loadQuestion() is no longer called immediately on page load.
-    // It is called by startQuiz() after the user reads the guide.
-</script>
+        // Grading logic
+        const answerKey = {
+            q1: 'b', q2: 'b', q3: 'b', q4: 'b', q5: 'd',
+            q6: 'b', q7: 'b', q8: 'a', q9: 'b', q10: 'c',
+            q11: 'c', q12: 'b', q13: 'b', q14: 'b', q15: 'c',
+            q16: 'c', q17: 'a', q18: 'b', q19: 'b', q20: 'b',
+            q21: 'c', q22: 'b', q23: 'b', q24: 'a', q25: 'b',
+            q26: 'b', q27: 'a', q28: 'b', q29: 'c', q30: 'b',
+            q31: 'c', q32: 'b', q33: 'a', q34: 'a', q35: 'b',
+            q36: 'b', q37: 'b', q38: 'c', q39: 'b', q40: 'b',
+            q41: 'b', q42: 'b', q43: 'c', q44: 'b', q45: 'b',
+            q46: 'b', q47: 'c', q48: 'a', q49: 'b', q50: 'b'
+        };
+
+        function gradeQuiz() {
+            let score = 0;
+            let totalQuestions = 50;
+
+            for (let i = 1; i <= totalQuestions; i++) {
+                let questionName = 'q' + i;
+                let selectedOption = document.querySelector(`input[name="${questionName}"]:checked`);
+                let questionDiv = document.getElementById('qd' + i);
+                
+                // Reset classes
+                questionDiv.classList.remove('correct-q', 'incorrect-q', 'unanswered-q');
+
+                if (selectedOption) {
+                    if (selectedOption.value === answerKey[questionName]) {
+                        score++;
+                        questionDiv.classList.add('correct-q');
+                    } else {
+                        questionDiv.classList.add('incorrect-q');
+                    }
+                } else {
+                    questionDiv.classList.add('unanswered-q');
+                }
+            }
+
+            const resultDiv = document.getElementById('result');
+            resultDiv.style.display = 'block';
+            
+            // Calculate percentage
+            const percentage = (score / totalQuestions) * 100;
+            let feedback = '';
+            
+            if (percentage >= 90) feedback = 'Excellent!';
+            else if (percentage >= 70) feedback = 'Good job!';
+            else if (percentage >= 50) feedback = 'You passed, but keep studying!';
+            else feedback = 'Please review the material and try again.';
+
+            resultDiv.innerHTML = `You scored ${score} out of ${totalQuestions} (${percentage}%)<br><span style="font-size:18px; font-weight:normal; color:#555;">${feedback}</span>`;
+            
+            // Scroll to bottom to see results
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+    </script>
 
 </body>
 </html>
