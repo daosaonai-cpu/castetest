@@ -1,298 +1,471 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>BCA 1st Semester - Indian Astronomy Quiz</title>
-<style>
-    body {
-        font-family: Arial, sans-serif;
-        background-color: #f9f9f9;
-        margin: 0;
-        padding: 0;
-    }
-    
-    #login-container {
-        max-width: 420px;
-        margin: 100px auto;
-        background-color: #ffffff;
-        padding: 40px 30px;
-        border-radius: 8px;
-        box-shadow: 0px 4px 12px rgba(0,0,0,0.1);
-        text-align: center;
-    }
-    #login-container h2 {
-        color: #004bb5;
-        margin-top: 0;
-        margin-bottom: 15px;
-        font-size: 24px;
-    }
-    #login-container hr {
-        border: 0;
-        border-top: 1px solid #e0e0e0;
-        margin-bottom: 30px;
-    }
-    #login-container input[type="password"] {
-        width: 100%;
-        padding: 14px;
-        margin-bottom: 20px;
-        border: 1px solid #ccc;
-        border-radius: 4px;
-        box-sizing: border-box;
-        font-size: 16px;
-    }
-    #login-container button {
-        width: 100%;
-        padding: 14px;
-        background-color: #0056b3;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        font-size: 16px;
-        font-weight: bold;
-        cursor: pointer;
-    }
-    #login-container button:hover {
-        background-color: #004494;
-    }
-    #error-msg {
-        color: red;
-        margin-top: 15px;
-        display: none;
-        font-size: 14px;
-    }
-
-    #quiz-container {
-        display: none;
-        max-width: 800px;
-        margin: 40px auto;
-        background-color: #ffffff;
-        padding: 30px;
-        border-radius: 8px;
-        box-shadow: 0px 4px 12px rgba(0,0,0,0.1);
-    }
-    h1 {
-        color: #333;
-        text-align: center;
-    }
-    .question {
-        margin-bottom: 20px;
-        padding: 15px;
-        border-bottom: 1px solid #eee;
-        border-radius: 4px;
-        transition: background-color 0.3s, border-left 0.3s;
-    }
-    .question p {
-        font-weight: bold;
-        color: #444;
-        margin-top: 0;
-    }
-    .options label {
-        display: block;
-        margin-bottom: 8px;
-        cursor: pointer;
-        padding: 5px;
-        border-radius: 4px;
-    }
-    .options label:hover {
-        background-color: #f1f1f1;
-    }
-    #submit-btn {
-        display: block;
-        width: 100%;
-        padding: 15px;
-        background-color: #28a745;
-        color: white;
-        border: none;
-        border-radius: 4px;
-        font-size: 18px;
-        cursor: pointer;
-        margin-top: 30px;
-        font-weight: bold;
-    }
-    #submit-btn:hover {
-        background-color: #218838;
-    }
-    #result {
-        display: none;
-        text-align: center;
-        margin-top: 20px;
-        padding: 20px;
-        background-color: #e9ecef;
-        border-radius: 8px;
-        font-size: 24px;
-        font-weight: bold;
-        color: #333;
-    }
-    
-    /* Styling for graded questions */
-    .correct-q {
-        border-left: 6px solid #28a745;
-        background-color: #f4fff5;
-    }
-    .incorrect-q {
-        border-left: 6px solid #dc3545;
-        background-color: #fff4f4;
-    }
-    .unanswered-q {
-        border-left: 6px solid #ffc107;
-        background-color: #fffcf2;
-    }
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BCA 1st Sem - Indian Knowledge Systems Quiz</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f4f7f6;
+            color: #333;
+            line-height: 1.6;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            margin: 0;
+            box-sizing: border-box;
+        }
+        .quiz-container {
+            width: 100%;
+            max-width: 800px;
+            background: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-top: 20px;
+        }
+        .auth-container {
+            max-width: 450px; /* Smaller width for auth screen */
+            margin-top: 10vh;
+            text-align: center;
+        }
+        .auth-title {
+            color: #004a99;
+            margin-bottom: 10px;
+            font-size: 1.8em;
+        }
+        hr.auth-divider {
+            border: 0;
+            border-top: 1px solid #ddd;
+            margin-bottom: 25px;
+            width: 90%;
+        }
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            border-bottom: 2px solid #3498db;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        .input-group {
+            margin-bottom: 20px;
+            text-align: left;
+        }
+        .input-group label {
+            font-weight: bold;
+            display: block;
+            margin-bottom: 5px;
+        }
+        .input-group input, .auth-input {
+            width: 100%;
+            padding: 12px;
+            font-size: 1em;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        .auth-input {
+            margin-bottom: 20px;
+        }
+        .question-block {
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        .question-block p {
+            font-weight: bold;
+            font-size: 1.1em;
+            margin-bottom: 10px;
+        }
+        label.option-label {
+            display: block;
+            margin-bottom: 8px;
+            cursor: pointer;
+            font-weight: normal;
+        }
+        input[type="radio"] {
+            margin-right: 10px;
+        }
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 15px;
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 5px;
+            font-size: 1.2em;
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+        .btn:hover {
+            background-color: #2980b9;
+        }
+        .btn-auth {
+            background-color: #0056b3; /* Darker blue to match your image */
+        }
+        .btn-auth:hover {
+            background-color: #004494;
+        }
+        .error-msg {
+            color: #e74c3c;
+            margin-top: 10px;
+            text-align: center;
+            display: none;
+        }
+        #result {
+            margin-top: 20px;
+            font-size: 1.5em;
+            font-weight: bold;
+            text-align: center;
+            color: #27ae60;
+        }
+    </style>
 </head>
 <body>
 
-    <div id="login-container">
-        <h2>Authentication Required</h2>
-        <hr>
-        <input type="password" id="passwordInput" placeholder="Enter password">
-        <button onclick="checkPassword()">Unlock</button>
-        <div id="error-msg">Incorrect password. Please try again.</div>
+<!-- AUTHENTICATION SCREEN -->
+<div class="quiz-container auth-container" id="auth-screen">
+    <h2 class="auth-title">Authentication Required</h2>
+    <hr class="auth-divider">
+    
+    <input type="password" id="authPassword" class="auth-input" placeholder="Enter password">
+    <button type="button" class="btn btn-auth" onclick="unlockQuiz()">Unlock</button>
+    <div id="auth-error" class="error-msg">Incorrect password. Please try again.</div>
+</div>
+
+<!-- START SCREEN (Hidden initially) -->
+<div class="quiz-container" id="start-screen" style="display: none;">
+    <h1>BCA 1st Sem - IKS Quiz</h1>
+    <p style="text-align: center;">Please enter your details to begin the test.</p>
+    
+    <div class="input-group">
+        <label for="studentName">Full Name:</label>
+        <input type="text" id="studentName" required>
+    </div>
+    
+    <div class="input-group">
+        <label for="studentRoll">Roll Number:</label>
+        <input type="text" id="studentRoll" required>
     </div>
 
-    <div id="quiz-container">
-        <h1>BCA 1st Semester: Indian Astronomy (Jyotisha)</h1>
-        <form id="quizForm">
-            <!-- 50 MCQs Generated from the Source Document -->
-            <div class="question" id="qd1"><p>1. Jyotisha is historically classified as one of the six...?</p><div class="options"><label><input type="radio" name="q1" value="a"> A) Vedas</label><label><input type="radio" name="q1" value="b"> B) Vedangas</label><label><input type="radio" name="q1" value="c"> C) Upanishads</label><label><input type="radio" name="q1" value="d"> D) Puranas</label></div></div>
-            <div class="question" id="qd2"><p>2. What was the primary historical necessity for cultivating Jyotisha?</p><div class="options"><label><input type="radio" name="q2" value="a"> A) To navigate the oceans</label><label><input type="radio" name="q2" value="b"> B) To synchronize human activities with the cosmic rhythm</label><label><input type="radio" name="q2" value="c"> C) To predict personal fortunes</label><label><input type="radio" name="q2" value="d"> D) To track weather patterns</label></div></div>
-            <div class="question" id="qd3"><p>3. Who authored the ancient text Vedanga Jyotisha?</p><div class="options"><label><input type="radio" name="q3" value="a"> A) Aryabhata</label><label><input type="radio" name="q3" value="b"> B) Lagadha</label><label><input type="radio" name="q3" value="c"> C) Varahamihira</label><label><input type="radio" name="q3" value="d"> D) Brahmagupta</label></div></div>
-            <div class="question" id="qd4"><p>4. Early Indian astronomy was deeply rooted in continuous and rigorous...?</p><div class="options"><label><input type="radio" name="q4" value="a"> A) Speculative philosophies</label><label><input type="radio" name="q4" value="b"> B) Mathematical observation</label><label><input type="radio" name="q4" value="c"> C) Telescopic research</label><label><input type="radio" name="q4" value="d"> D) Astrological readings</label></div></div>
-            <div class="question" id="qd5"><p>5. The immense data collection in ancient Indian astronomy allowed for precise calculation of all the following EXCEPT...?</p><div class="options"><label><input type="radio" name="q5" value="a"> A) Eclipses</label><label><input type="radio" name="q5" value="b"> B) Equinoxes</label><label><input type="radio" name="q5" value="c"> C) Solstices</label><label><input type="radio" name="q5" value="d"> D) Black holes</label></div></div>
-            <div class="question" id="qd6"><p>6. Which celestial body was recognized as the central anchor for macroscopic timekeeping?</p><div class="options"><label><input type="radio" name="q6" value="a"> A) Moon</label><label><input type="radio" name="q6" value="b"> B) Sun (Surya)</label><label><input type="radio" name="q6" value="c"> C) Mars</label><label><input type="radio" name="q6" value="d"> D) Jupiter</label></div></div>
-            <div class="question" id="qd7"><p>7. Ayanas refer to...?</p><div class="options"><label><input type="radio" name="q7" value="a"> A) Lunar phases</label><label><input type="radio" name="q7" value="b"> B) Solar journeys</label><label><input type="radio" name="q7" value="c"> C) Planetary retrogrades</label><label><input type="radio" name="q7" value="d"> D) Eclipses</label></div></div>
-            <div class="question" id="qd8"><p>8. Uttarayana is roughly a six-month period when the Sun appears to move in which direction?</p><div class="options"><label><input type="radio" name="q8" value="a"> A) Northward</label><label><input type="radio" name="q8" value="b"> B) Southward</label><label><input type="radio" name="q8" value="c"> C) Eastward</label><label><input type="radio" name="q8" value="d"> D) Westward</label></div></div>
-            <div class="question" id="qd9"><p>9. The period from the summer solstice to the winter solstice is called...?</p><div class="options"><label><input type="radio" name="q9" value="a"> A) Uttarayana</label><label><input type="radio" name="q9" value="b"> B) Dakshinayana</label><label><input type="radio" name="q9" value="c"> C) Vasanta</label><label><input type="radio" name="q9" value="d"> D) Hemanta</label></div></div>
-            <div class="question" id="qd10"><p>10. How many seasons (Ritus) was the solar year systematically divided into?</p><div class="options"><label><input type="radio" name="q10" value="a"> A) Four</label><label><input type="radio" name="q10" value="b"> B) Five</label><label><input type="radio" name="q10" value="c"> C) Six</label><label><input type="radio" name="q10" value="d"> D) Twelve</label></div></div>
-            
-            <div class="question" id="qd11"><p>11. Which of the following is NOT one of the traditional six Indian seasons?</p><div class="options"><label><input type="radio" name="q11" value="a"> A) Vasanta</label><label><input type="radio" name="q11" value="b"> B) Grishma</label><label><input type="radio" name="q11" value="c"> C) Purnima</label><label><input type="radio" name="q11" value="d"> D) Varsha</label></div></div>
-            <div class="question" id="qd12"><p>12. The Moon (Chandra) was critical for the micro-management of...?</p><div class="options"><label><input type="radio" name="q12" value="a"> A) Annual cycles</label><label><input type="radio" name="q12" value="b"> B) Daily and monthly timekeeping</label><label><input type="radio" name="q12" value="c"> C) Agricultural harvesting</label><label><input type="radio" name="q12" value="d"> D) Identifying eclipses</label></div></div>
-            <div class="question" id="qd13"><p>13. A Tithi represents what in ancient Indian astronomy?</p><div class="options"><label><input type="radio" name="q13" value="a"> A) A standard 24-hour day</label><label><input type="radio" name="q13" value="b"> B) A mathematical measurement of the longitudinal angle between the Sun and Moon</label><label><input type="radio" name="q13" value="c"> C) The time it takes for the Moon to orbit Earth</label><label><input type="radio" name="q13" value="d"> D) The exact moment of an eclipse</label></div></div>
-            <div class="question" id="qd14"><p>14. By how many degrees must the angle between the Sun and Moon increase to begin a new Tithi?</p><div class="options"><label><input type="radio" name="q14" value="a"> A) 10 degrees</label><label><input type="radio" name="q14" value="b"> B) 12 degrees</label><label><input type="radio" name="q14" value="c"> C) 13 degrees</label><label><input type="radio" name="q14" value="d"> D) 15 degrees</label></div></div>
-            <div class="question" id="qd15"><p>15. How many Tithis exist in a standard lunar month?</p><div class="options"><label><input type="radio" name="q15" value="a"> A) 27</label><label><input type="radio" name="q15" value="b"> B) 28</label><label><input type="radio" name="q15" value="c"> C) 30</label><label><input type="radio" name="q15" value="d"> D) 31</label></div></div>
-            <div class="question" id="qd16"><p>16. A Paksha refers to a distinct period of how many days?</p><div class="options"><label><input type="radio" name="q16" value="a"> A) 7 days</label><label><input type="radio" name="q16" value="b"> B) 14 days</label><label><input type="radio" name="q16" value="c"> C) 15 days</label><label><input type="radio" name="q16" value="d"> D) 30 days</label></div></div>
-            <div class="question" id="qd17"><p>17. Shukla Paksha refers to which lunar phase?</p><div class="options"><label><input type="radio" name="q17" value="a"> A) Waxing phase</label><label><input type="radio" name="q17" value="b"> B) Waning phase</label><label><input type="radio" name="q17" value="c"> C) Eclipse phase</label><label><input type="radio" name="q17" value="d"> D) Stationary phase</label></div></div>
-            <div class="question" id="qd18"><p>18. Krishna Paksha leads up to which lunar event?</p><div class="options"><label><input type="radio" name="q18" value="a"> A) Purnima</label><label><input type="radio" name="q18" value="b"> B) Amavasya</label><label><input type="radio" name="q18" value="c"> C) Uttarayana</label><label><input type="radio" name="q18" value="d"> D) Equinox</label></div></div>
-            <div class="question" id="qd19"><p>19. Purnima is the Sanskrit term for...?</p><div class="options"><label><input type="radio" name="q19" value="a"> A) New Moon</label><label><input type="radio" name="q19" value="b"> B) Full Moon</label><label><input type="radio" name="q19" value="c"> C) Half Moon</label><label><input type="radio" name="q19" value="d"> D) Blue Moon</label></div></div>
-            <div class="question" id="qd20"><p>20. The Nakshatra system provides a visually observable coordinate system against the background of...?</p><div class="options"><label><input type="radio" name="q20" value="a"> A) Moving planets</label><label><input type="radio" name="q20" value="b"> B) Fixed stars</label><label><input type="radio" name="q20" value="c"> C) The Sun</label><label><input type="radio" name="q20" value="d"> D) The Earth's equator</label></div></div>
-            
-            <div class="question" id="qd21"><p>21. The ecliptic is mathematically divided into how many equal Nakshatra segments?</p><div class="options"><label><input type="radio" name="q21" value="a"> A) 12</label><label><input type="radio" name="q21" value="b"> B) 24</label><label><input type="radio" name="q21" value="c"> C) 27 (or 28)</label><label><input type="radio" name="q21" value="d"> D) 30</label></div></div>
-            <div class="question" id="qd22"><p>22. What is the precise mathematical size of a single Nakshatra segment?</p><div class="options"><label><input type="radio" name="q22" value="a"> A) 12 degrees</label><label><input type="radio" name="q22" value="b"> B) 13 degrees and 20 minutes</label><label><input type="radio" name="q22" value="c"> C) 15 degrees</label><label><input type="radio" name="q22" value="d"> D) 30 degrees</label></div></div>
-            <div class="question" id="qd23"><p>23. Approximately how many days does the Moon take to complete an orbit around the Earth?</p><div class="options"><label><input type="radio" name="q23" value="a"> A) 24</label><label><input type="radio" name="q23" value="b"> B) 27.3</label><label><input type="radio" name="q23" value="c"> C) 29.5</label><label><input type="radio" name="q23" value="d"> D) 30</label></div></div>
-            <div class="question" id="qd24"><p>24. Because of its orbital period, how many specific Nakshatras does the Moon occupy each day?</p><div class="options"><label><input type="radio" name="q24" value="a"> A) One</label><label><input type="radio" name="q24" value="b"> B) Two</label><label><input type="radio" name="q24" value="c"> C) Three</label><label><input type="radio" name="q24" value="d"> D) It takes one week per Nakshatra</label></div></div>
-            <div class="question" id="qd25"><p>25. A Yoga Tara is known as an identifying or...?</p><div class="options"><label><input type="radio" name="q25" value="a"> A) Hidden star</label><label><input type="radio" name="q25" value="b"> B) Junction star</label><label><input type="radio" name="q25" value="c"> C) Moving planet</label><label><input type="radio" name="q25" value="d"> D) Solar eclipse</label></div></div>
-            <div class="question" id="qd26"><p>26. The Nakshatra Krittika corresponds to which modern asterism?</p><div class="options"><label><input type="radio" name="q26" value="a"> A) Orion</label><label><input type="radio" name="q26" value="b"> B) Pleiades</label><label><input type="radio" name="q26" value="c"> C) Ursa Major</label><label><input type="radio" name="q26" value="d"> D) Sirius</label></div></div>
-            <div class="question" id="qd27"><p>27. The Nakshatra Rohini corresponds to which star?</p><div class="options"><label><input type="radio" name="q27" value="a"> A) Aldebaran</label><label><input type="radio" name="q27" value="b"> B) Polaris</label><label><input type="radio" name="q27" value="c"> C) Betelgeuse</label><label><input type="radio" name="q27" value="d"> D) Vega</label></div></div>
-            <div class="question" id="qd28"><p>28. In the classical IKS context, a Graha refers to...?</p><div class="options"><label><input type="radio" name="q28" value="a"> A) A fixed star</label><label><input type="radio" name="q28" value="b"> B) Any major moving celestial entity</label><label><input type="radio" name="q28" value="c"> C) A constellation</label><label><input type="radio" name="q28" value="d"> D) A specific phase of the moon</label></div></div>
-            <div class="question" id="qd29"><p>29. How many primary Grahas are in the Navagraha system?</p><div class="options"><label><input type="radio" name="q29" value="a"> A) Five</label><label><input type="radio" name="q29" value="b"> B) Seven</label><label><input type="radio" name="q29" value="c"> C) Nine</label><label><input type="radio" name="q29" value="d"> D) Twelve</label></div></div>
-            <div class="question" id="qd30"><p>30. Surya is classified astronomically in IKS as a...?</p><div class="options"><label><input type="radio" name="q30" value="a"> A) Planet</label><label><input type="radio" name="q30" value="b"> B) Star (Primary Luminary)</label><label><input type="radio" name="q30" value="c"> C) Satellite</label><label><input type="radio" name="q30" value="d"> D) Mathematical node</label></div></div>
-            
-            <div class="question" id="qd31"><p>31. Which of these translates to Mars in modern astronomy?</p><div class="options"><label><input type="radio" name="q31" value="a"> A) Budha</label><label><input type="radio" name="q31" value="b"> B) Shukra</label><label><input type="radio" name="q31" value="c"> C) Mangala</label><label><input type="radio" name="q31" value="d"> D) Shani</label></div></div>
-            <div class="question" id="qd32"><p>32. Budha represents which modern planet?</p><div class="options"><label><input type="radio" name="q32" value="a"> A) Venus</label><label><input type="radio" name="q32" value="b"> B) Mercury</label><label><input type="radio" name="q32" value="c"> C) Saturn</label><label><input type="radio" name="q32" value="d"> D) Jupiter</label></div></div>
-            <div class="question" id="qd33"><p>33. Guru is the Sanskrit name for which physical planet?</p><div class="options"><label><input type="radio" name="q33" value="a"> A) Jupiter</label><label><input type="radio" name="q33" value="b"> B) Mars</label><label><input type="radio" name="q33" value="c"> C) Saturn</label><label><input type="radio" name="q33" value="d"> D) Venus</label></div></div>
-            <div class="question" id="qd34"><p>34. Which modern planet does Shukra correspond to?</p><div class="options"><label><input type="radio" name="q34" value="a"> A) Venus</label><label><input type="radio" name="q34" value="b"> B) Saturn</label><label><input type="radio" name="q34" value="c"> C) Mercury</label><label><input type="radio" name="q34" value="d"> D) Jupiter</label></div></div>
-            <div class="question" id="qd35"><p>35. Shani corresponds to which planet?</p><div class="options"><label><input type="radio" name="q35" value="a"> A) Mars</label><label><input type="radio" name="q35" value="b"> B) Saturn</label><label><input type="radio" name="q35" value="c"> C) Venus</label><label><input type="radio" name="q35" value="d"> D) Mercury</label></div></div>
-            <div class="question" id="qd36"><p>36. What does the term Vakri refer to in planetary motion?</p><div class="options"><label><input type="radio" name="q36" value="a"> A) Forward motion</label><label><input type="radio" name="q36" value="b"> B) Retrograde motion</label><label><input type="radio" name="q36" value="c"> C) Stationary alignment</label><label><input type="radio" name="q36" value="d"> D) Eclipse alignment</label></div></div>
-            <div class="question" id="qd37"><p>37. The physical, visible planets like Mars, Mercury, Jupiter, Venus, and Saturn are classified as...?</p><div class="options"><label><input type="radio" name="q37" value="a"> A) Chhaya Grahas</label><label><input type="radio" name="q37" value="b"> B) Tara Grahas</label><label><input type="radio" name="q37" value="c"> C) Nakshatras</label><label><input type="radio" name="q37" value="d"> D) Ayanas</label></div></div>
-            <div class="question" id="qd38"><p>38. What are Rahu and Ketu?</p><div class="options"><label><input type="radio" name="q38" value="a"> A) Physical planets</label><label><input type="radio" name="q38" value="b"> B) Visible stars</label><label><input type="radio" name="q38" value="c"> C) Ascending and Descending Lunar Nodes</label><label><input type="radio" name="q38" value="d"> D) Astrological houses</label></div></div>
-            <div class="question" id="qd39"><p>39. Rahu and Ketu are absolutely crucial for predicting...?</p><div class="options"><label><input type="radio" name="q39" value="a"> A) The seasons</label><label><input type="radio" name="q39" value="b"> B) Solar and lunar eclipses</label><label><input type="radio" name="q39" value="c"> C) Planetary retrogrades</label><label><input type="radio" name="q39" value="d"> D) Tithi changes</label></div></div>
-            <div class="question" id="qd40"><p>40. The IKS classification for Rahu and Ketu is...?</p><div class="options"><label><input type="radio" name="q40" value="a"> A) Tara Grahas</label><label><input type="radio" name="q40" value="b"> B) Chhaya Grahas</label><label><input type="radio" name="q40" value="c"> C) Surya Grahas</label><label><input type="radio" name="q40" value="d"> D) Ritus</label></div></div>
-            
-            <div class="question" id="qd41"><p>41. A purely lunar year is approximately how many days long?</p><div class="options"><label><input type="radio" name="q41" value="a"> A) 365.24 days</label><label><input type="radio" name="q41" value="b"> B) 354 days</label><label><input type="radio" name="q41" value="c"> C) 360 days</label><label><input type="radio" name="q41" value="d"> D) 330 days</label></div></div>
-            <div class="question" id="qd42"><p>42. A purely solar year is approximately how many days long?</p><div class="options"><label><input type="radio" name="q42" value="a"> A) 354 days</label><label><input type="radio" name="q42" value="b"> B) 365.24 days</label><label><input type="radio" name="q42" value="c"> C) 360 days</label><label><input type="radio" name="q42" value="d"> D) 370 days</label></div></div>
-            <div class="question" id="qd43"><p>43. By roughly how many days are a purely lunar and solar year out of sync annually?</p><div class="options"><label><input type="radio" name="q43" value="a"> A) 5 days</label><label><input type="radio" name="q43" value="b"> B) 7 days</label><label><input type="radio" name="q43" value="c"> C) 11 days</label><label><input type="radio" name="q43" value="d"> D) 15 days</label></div></div>
-            <div class="question" id="qd44"><p>44. What mathematical concept did Indian astronomers introduce to sync the lunar and solar calendars?</p><div class="options"><label><input type="radio" name="q44" value="a"> A) Leap year</label><label><input type="radio" name="q44" value="b"> B) Intercalary month (Adhik Maas)</label><label><input type="radio" name="q44" value="c"> C) Removing a week from the year</label><label><input type="radio" name="q44" value="d"> D) Adding an extra lunar phase</label></div></div>
-            <div class="question" id="qd45"><p>45. When is an Adhik Maas added to the calendar?</p><div class="options"><label><input type="radio" name="q45" value="a"> A) Every 4 years</label><label><input type="radio" name="q45" value="b"> B) When two consecutive lunar months fall entirely within one solar month</label><label><input type="radio" name="q45" value="c"> C) During a solar eclipse</label><label><input type="radio" name="q45" value="d"> D) At the start of Uttarayana</label></div></div>
-            <div class="question" id="qd46"><p>46. The Luni-Solar Calendar ensured that lunar phases remained tethered to...?</p><div class="options"><label><input type="radio" name="q46" value="a"> A) The movement of Jupiter</label><label><input type="radio" name="q46" value="b"> B) Solar seasons</label><label><input type="radio" name="q46" value="c"> C) Retrograde cycles</label><label><input type="radio" name="q46" value="d"> D) Planetary nodes</label></div></div>
-            <div class="question" id="qd47"><p>47. What simple yet effective instrument was used to accurately determine spatial direction (Dik) and geographical place (Desa)?</p><div class="options"><label><input type="radio" name="q47" value="a"> A) Telescope</label><label><input type="radio" name="q47" value="b"> B) Compass</label><label><input type="radio" name="q47" value="c"> C) Sanku (gnomon)</label><label><input type="radio" name="q47" value="d"> D) Astrolabe</label></div></div>
-            <div class="question" id="qd48"><p>48. To determine the East-West axis, astronomers drew a line between two points where the Sanku's shadow touched a circle's circumference in the...?</p><div class="options"><label><input type="radio" name="q48" value="a"> A) Morning and afternoon</label><label><input type="radio" name="q48" value="b"> B) Midnight and noon</label><label><input type="radio" name="q48" value="c"> C) Spring and Autumn</label><label><input type="radio" name="q48" value="d"> D) Full moon and new moon</label></div></div>
-            <div class="question" id="qd49"><p>49. Akshamsa refers to...?</p><div class="options"><label><input type="radio" name="q49" value="a"> A) Longitude</label><label><input type="radio" name="q49" value="b"> B) Local terrestrial latitude</label><label><input type="radio" name="q49" value="c"> C) Equator</label><label><input type="radio" name="q49" value="d"> D) Declination</label></div></div>
-            <div class="question" id="qd50"><p>50. To calculate latitude, astronomers measured the Sanku's mid-day shadow on which specific days utilizing early trigonometry?</p><div class="options"><label><input type="radio" name="q50" value="a"> A) Solstice days</label><label><input type="radio" name="q50" value="b"> B) Equinox days</label><label><input type="radio" name="q50" value="c"> C) Purnima days</label><label><input type="radio" name="q50" value="d"> D) Lunar eclipse days</label></div></div>
-            
-            <button type="button" id="submit-btn" onclick="gradeQuiz()">Submit Quiz</button>
-            <div id="result"></div>
-        </form>
-    </div>
+    <button type="button" class="btn" onclick="startQuiz()">Start Quiz</button>
+    <div id="details-error" class="error-msg">Please fill in both your Name and Roll Number.</div>
+</div>
 
-    <!-- Script to handle authentication and grading -->
-    <script>
-        // Authentication logic
-        document.getElementById("passwordInput").addEventListener("keypress", function(event) {
-            if (event.key === "Enter") {
-                event.preventDefault();
-                checkPassword();
-            }
-        });
+<!-- QUIZ SCREEN (Hidden initially) -->
+<div class="quiz-container" id="quiz-screen" style="display: none;">
+    <h1>BCA 1st Semester Quiz Test</h1>
+    
+    <form id="quizForm">
+        
+        <!-- Question 1 -->
+        <div class="question-block">
+            <p>1. Which Rishi is regarded as the compiler of the Vedas?</p>
+            <label class="option-label"><input type="radio" name="q1" value="a"> Valmiki</label>
+            <label class="option-label"><input type="radio" name="q1" value="b"> Veda Vyasa</label>
+            <label class="option-label"><input type="radio" name="q1" value="c"> Patanjali</label>
+            <label class="option-label"><input type="radio" name="q1" value="d"> Panini</label>
+        </div>
 
-        function checkPassword() {
-            var pwd = document.getElementById("passwordInput").value;
-            var errorMsg = document.getElementById("error-msg");
-            
-            if (pwd === "1671@") {
-                document.getElementById("login-container").style.display = "none";
-                document.getElementById("quiz-container").style.display = "block";
-            } else {
-                errorMsg.style.display = "block";
-                document.getElementById("passwordInput").value = "";
-            }
+        <!-- Question 2 -->
+        <div class="question-block">
+            <p>2. Vedic Mathematics is derived from which Veda?</p>
+            <label class="option-label"><input type="radio" name="q2" value="a"> Rig Veda</label>
+            <label class="option-label"><input type="radio" name="q2" value="b"> Sama Veda</label>
+            <label class="option-label"><input type="radio" name="q2" value="c"> Atharva Veda</label>
+            <label class="option-label"><input type="radio" name="q2" value="d"> Yajur Veda</label>
+        </div>
+
+        <!-- Question 3 -->
+        <div class="question-block">
+            <p>3. How is Jyotisha Shashtra traditionally classified?</p>
+            <label class="option-label"><input type="radio" name="q3" value="a"> Two branches</label>
+            <label class="option-label"><input type="radio" name="q3" value="b"> Three branches</label>
+            <label class="option-label"><input type="radio" name="q3" value="c"> Four branches</label>
+            <label class="option-label"><input type="radio" name="q3" value="d"> Five branches</label>
+        </div>
+
+        <!-- Question 4 -->
+        <div class="question-block">
+            <p>4. What does 'Graha' refer to in Indian Astronomy?</p>
+            <label class="option-label"><input type="radio" name="q4" value="a"> Lunar mansion</label>
+            <label class="option-label"><input type="radio" name="q4" value="b"> Planet or major celestial body</label>
+            <label class="option-label"><input type="radio" name="q4" value="c"> Galaxy</label>
+            <label class="option-label"><input type="radio" name="q4" value="d"> Meteor</label>
+        </div>
+
+        <!-- Question 5 -->
+        <div class="question-block">
+            <p>5. What does 'Nakshatra' refer to?</p>
+            <label class="option-label"><input type="radio" name="q5" value="a"> Planet</label>
+            <label class="option-label"><input type="radio" name="q5" value="b"> Lunar mansion / constellation</label>
+            <label class="option-label"><input type="radio" name="q5" value="c"> Sun</label>
+            <label class="option-label"><input type="radio" name="q5" value="d"> Eclipse</label>
+        </div>
+
+        <!-- Question 6 -->
+        <div class="question-block">
+            <p>6. What is a unique aspect of Indian Mathematics?</p>
+            <label class="option-label"><input type="radio" name="q6" value="a"> Reliance on Arabic numerals</label>
+            <label class="option-label"><input type="radio" name="q6" value="b"> Heavy reliance on poetic meter (Sutras)</label>
+            <label class="option-label"><input type="radio" name="q6" value="c"> Lack of written texts</label>
+            <label class="option-label"><input type="radio" name="q6" value="d"> Use of abacus</label>
+        </div>
+
+        <!-- Question 7 -->
+        <div class="question-block">
+            <p>7. What does the Shruti classification of the IKS corpus refer to?</p>
+            <label class="option-label"><input type="radio" name="q7" value="a"> Remembered texts</label>
+            <label class="option-label"><input type="radio" name="q7" value="b"> Applied sciences</label>
+            <label class="option-label"><input type="radio" name="q7" value="c"> Foundational, revealed texts</label>
+            <label class="option-label"><input type="radio" name="q7" value="d"> Epics</label>
+        </div>
+
+        <!-- Question 8 -->
+        <div class="question-block">
+            <p>8. Which of the following falls under Smriti?</p>
+            <label class="option-label"><input type="radio" name="q8" value="a"> Rig Veda</label>
+            <label class="option-label"><input type="radio" name="q8" value="b"> Dharma Shastras</label>
+            <label class="option-label"><input type="radio" name="q8" value="c"> Atharva Veda</label>
+            <label class="option-label"><input type="radio" name="q8" value="d"> Sama Veda</label>
+        </div>
+
+        <!-- Question 9 -->
+        <div class="question-block">
+            <p>9. How many auxiliary disciplines make up the Vedangas?</p>
+            <label class="option-label"><input type="radio" name="q9" value="a"> Four</label>
+            <label class="option-label"><input type="radio" name="q9" value="b"> Five</label>
+            <label class="option-label"><input type="radio" name="q9" value="c"> Six</label>
+            <label class="option-label"><input type="radio" name="q9" value="d"> Eight</label>
+        </div>
+
+        <!-- Question 10 -->
+        <div class="question-block">
+            <p>10. What are Upavedas?</p>
+            <label class="option-label"><input type="radio" name="q10" value="a"> Applied sciences attached to the Vedas</label>
+            <label class="option-label"><input type="radio" name="q10" value="b"> Classical schools of philosophy</label>
+            <label class="option-label"><input type="radio" name="q10" value="c"> Lunar mansions</label>
+            <label class="option-label"><input type="radio" name="q10" value="d"> Daily routines</label>
+        </div>
+
+        <!-- Question 11 -->
+        <div class="question-block">
+            <p>11. Which of the following is a Darshana?</p>
+            <label class="option-label"><input type="radio" name="q11" value="a"> Ayurveda</label>
+            <label class="option-label"><input type="radio" name="q11" value="b"> Dhanurveda</label>
+            <label class="option-label"><input type="radio" name="q11" value="c"> Nyaya</label>
+            <label class="option-label"><input type="radio" name="q11" value="d"> Ramayana</label>
+        </div>
+
+        <!-- Question 12 -->
+        <div class="question-block">
+            <p>12. What was the purpose of Itihasas and Puranas?</p>
+            <label class="option-label"><input type="radio" name="q12" value="a"> To calculate eclipses</label>
+            <label class="option-label"><input type="radio" name="q12" value="b"> To simplify Vedic concepts for the masses</label>
+            <label class="option-label"><input type="radio" name="q12" value="c"> To outline grammar</label>
+            <label class="option-label"><input type="radio" name="q12" value="d"> To define planetary motions</label>
+        </div>
+
+        <!-- Question 13 -->
+        <div class="question-block">
+            <p>13. Sanskrit poetic meters used in Indian Mathematics are called:</p>
+            <label class="option-label"><input type="radio" name="q13" value="a"> Chhandas</label>
+            <label class="option-label"><input type="radio" name="q13" value="b"> Bija</label>
+            <label class="option-label"><input type="radio" name="q13" value="c"> Kalpa</label>
+            <label class="option-label"><input type="radio" name="q13" value="d"> Nirukta</label>
+        </div>
+
+        <!-- Question 14 -->
+        <div class="question-block">
+            <p>14. In poetic math encoding, what synonym was used for the number 2?</p>
+            <label class="option-label"><input type="radio" name="q14" value="a"> Vedas</label>
+            <label class="option-label"><input type="radio" name="q14" value="b"> Eyes</label>
+            <label class="option-label"><input type="radio" name="q14" value="c"> Seas</label>
+            <label class="option-label"><input type="radio" name="q14" value="d"> Fingers</label>
+        </div>
+
+        <!-- Question 15 -->
+        <div class="question-block">
+            <p>15. Jyotisha is historically classified as one of the six...?</p>
+            <label class="option-label"><input type="radio" name="q15" value="a"> Vedas</label>
+            <label class="option-label"><input type="radio" name="q15" value="b"> Vedangas</label>
+            <label class="option-label"><input type="radio" name="q15" value="c"> Upanishads</label>
+            <label class="option-label"><input type="radio" name="q15" value="d"> Puranas</label>
+        </div>
+
+        <!-- Question 16 -->
+        <div class="question-block">
+            <p>16. What was the primary historical necessity for cultivating Jyotisha?</p>
+            <label class="option-label"><input type="radio" name="q16" value="a"> To navigate the oceans</label>
+            <label class="option-label"><input type="radio" name="q16" value="b"> To synchronize human activities with the cosmic rhythm</label>
+            <label class="option-label"><input type="radio" name="q16" value="c"> To predict personal fortunes</label>
+            <label class="option-label"><input type="radio" name="q16" value="d"> To track weather patterns</label>
+        </div>
+
+        <!-- Question 17 -->
+        <div class="question-block">
+            <p>17. Who authored the ancient text Vedanga Jyotisha?</p>
+            <label class="option-label"><input type="radio" name="q17" value="a"> Aryabhata</label>
+            <label class="option-label"><input type="radio" name="q17" value="b"> Lagadha</label>
+            <label class="option-label"><input type="radio" name="q17" value="c"> Varahamihira</label>
+            <label class="option-label"><input type="radio" name="q17" value="d"> Brahmagupta</label>
+        </div>
+
+        <!-- Question 18 -->
+        <div class="question-block">
+            <p>18. Early Indian astronomy was deeply rooted in continuous and rigorous...?</p>
+            <label class="option-label"><input type="radio" name="q18" value="a"> Speculative philosophies</label>
+            <label class="option-label"><input type="radio" name="q18" value="b"> Mathematical observation</label>
+            <label class="option-label"><input type="radio" name="q18" value="c"> Telescopic research</label>
+            <label class="option-label"><input type="radio" name="q18" value="d"> Astrological readings</label>
+        </div>
+
+        <!-- Question 19 -->
+        <div class="question-block">
+            <p>19. The immense data collection in ancient Indian astronomy allowed for precise calculation of all the following EXCEPT...?</p>
+            <label class="option-label"><input type="radio" name="q19" value="a"> Eclipses</label>
+            <label class="option-label"><input type="radio" name="q19" value="b"> Equinoxes</label>
+            <label class="option-label"><input type="radio" name="q19" value="c"> Solstices</label>
+            <label class="option-label"><input type="radio" name="q19" value="d"> Black holes</label>
+        </div>
+
+        <!-- Question 20 -->
+        <div class="question-block">
+            <p>20. Which celestial body was recognized as the central anchor for macroscopic timekeeping?</p>
+            <label class="option-label"><input type="radio" name="q20" value="a"> Moon</label>
+            <label class="option-label"><input type="radio" name="q20" value="b"> Sun (Surya)</label>
+            <label class="option-label"><input type="radio" name="q20" value="c"> Mars</label>
+            <label class="option-label"><input type="radio" name="q20" value="d"> Jupiter</label>
+        </div>
+
+        <button type="button" class="btn" onclick="calculateScore()">Submit Quiz</button>
+    </form>
+
+    <div id="result"></div>
+</div>
+
+<script>
+    // Variables to store student info
+    let finalStudentName = "";
+    let finalStudentRoll = "";
+
+    // 1. Authentication Function
+    function unlockQuiz() {
+        const passwordInput = document.getElementById("authPassword").value;
+        const authError = document.getElementById("auth-error");
+
+        // Allow user to hit "Enter" on keyboard as well
+        if (passwordInput === "1999") {
+            authError.style.display = "none";
+            document.getElementById("auth-screen").style.display = "none";
+            document.getElementById("start-screen").style.display = "block";
+        } else {
+            authError.style.display = "block";
+        }
+    }
+
+    // Allow hitting "Enter" to unlock
+    document.getElementById("authPassword").addEventListener("keypress", function(event) {
+        if (event.key === "Enter") {
+            event.preventDefault();
+            unlockQuiz();
+        }
+    });
+
+    // 2. Start Quiz Details Function
+    function startQuiz() {
+        const nameInput = document.getElementById("studentName").value.trim();
+        const rollInput = document.getElementById("studentRoll").value.trim();
+        const detailsError = document.getElementById("details-error");
+
+        if (nameInput === "" || rollInput === "") {
+            detailsError.style.display = "block";
+            return;
         }
 
-        // Grading logic
-        const answerKey = {
-            q1: 'b', q2: 'b', q3: 'b', q4: 'b', q5: 'd',
-            q6: 'b', q7: 'b', q8: 'a', q9: 'b', q10: 'c',
-            q11: 'c', q12: 'b', q13: 'b', q14: 'b', q15: 'c',
-            q16: 'c', q17: 'a', q18: 'b', q19: 'b', q20: 'b',
-            q21: 'c', q22: 'b', q23: 'b', q24: 'a', q25: 'b',
-            q26: 'b', q27: 'a', q28: 'b', q29: 'c', q30: 'b',
-            q31: 'c', q32: 'b', q33: 'a', q34: 'a', q35: 'b',
-            q36: 'b', q37: 'b', q38: 'c', q39: 'b', q40: 'b',
-            q41: 'b', q42: 'b', q43: 'c', q44: 'b', q45: 'b',
-            q46: 'b', q47: 'c', q48: 'a', q49: 'b', q50: 'b'
+        // Save data and switch screens
+        finalStudentName = nameInput;
+        finalStudentRoll = rollInput;
+        detailsError.style.display = "none";
+        
+        document.getElementById("start-screen").style.display = "none";
+        document.getElementById("quiz-screen").style.display = "block";
+    }
+
+    // 3. Evaluate and Submit Function
+    function calculateScore() {
+        // Define correct answers
+        const correctAnswers = {
+            q1: "b", q2: "c", q3: "b", q4: "b", q5: "b",
+            q6: "b", q7: "c", q8: "b", q9: "c", q10: "a",
+            q11: "c", q12: "b", q13: "a", q14: "b", q15: "b",
+            q16: "b", q17: "b", q18: "b", q19: "d", q20: "b"
         };
 
-        function gradeQuiz() {
-            let score = 0;
-            let totalQuestions = 50;
+        let score = 0;
+        let totalQuestions = Object.keys(correctAnswers).length;
+        const form = document.forms["quizForm"];
 
-            for (let i = 1; i <= totalQuestions; i++) {
-                let questionName = 'q' + i;
-                let selectedOption = document.querySelector(`input[name="${questionName}"]:checked`);
-                let questionDiv = document.getElementById('qd' + i);
-                
-                // Reset classes
-                questionDiv.classList.remove('correct-q', 'incorrect-q', 'unanswered-q');
-
-                if (selectedOption) {
-                    if (selectedOption.value === answerKey[questionName]) {
-                        score++;
-                        questionDiv.classList.add('correct-q');
-                    } else {
-                        questionDiv.classList.add('incorrect-q');
-                    }
-                } else {
-                    questionDiv.classList.add('unanswered-q');
-                }
+        // Loop through and evaluate
+        for (let q in correctAnswers) {
+            let selectedOption = form.elements[q] ? form.elements[q].value : null;
+            if (selectedOption === correctAnswers[q]) {
+                score++;
             }
-
-            const resultDiv = document.getElementById('result');
-            resultDiv.style.display = 'block';
-            
-            // Calculate percentage
-            const percentage = (score / totalQuestions) * 100;
-            let feedback = '';
-            
-            if (percentage >= 90) feedback = 'Excellent!';
-            else if (percentage >= 70) feedback = 'Good job!';
-            else if (percentage >= 50) feedback = 'You passed, but keep studying!';
-            else feedback = 'Please review the material and try again.';
-
-            resultDiv.innerHTML = `You scored ${score} out of ${totalQuestions} (${percentage}%)<br><span style="font-size:18px; font-weight:normal; color:#555;">${feedback}</span>`;
-            
-            // Scroll to bottom to see results
-            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
         }
-    </script>
+
+        // Display results on the web page
+        const resultDiv = document.getElementById("result");
+        resultDiv.innerHTML = `You scored ${score} out of ${totalQuestions}!`;
+        resultDiv.scrollIntoView({ behavior: 'smooth' });
+
+        // Send the score to Telegram including Name and Roll No.
+        const botToken = "8919666195:AAE1kQrD3SEXBYbKZPrOjtoFUHljDxZHPYY";
+        const chatId = "2147403583";
+        
+        const message = `🎓 *Quiz Submission*\n\n*Name:* ${finalStudentName}\n*Roll No:* ${finalStudentRoll}\n*Score:* ${score} / ${totalQuestions}`;
+
+        // Telegram API endpoint
+        const telegramUrl = `https://api.telegram.org/bot${botToken}/sendMessage`;
+
+        // Make the API request
+        fetch(telegramUrl, {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({
+                chat_id: chatId,
+                text: message,
+                parse_mode: "Markdown"
+            })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if(data.ok) {
+                console.log("Score successfully sent to Telegram!");
+                resultDiv.innerHTML += `<br><span style="font-size:0.6em; color:gray;">(Result successfully submitted to instructor)</span>`;
+                
+                // Disable the submit button to prevent duplicate submissions
+                const submitBtn = document.querySelector(".btn[onclick='calculateScore()']");
+                submitBtn.disabled = true;
+                submitBtn.style.backgroundColor = "#95a5a6";
+                submitBtn.style.cursor = "not-allowed";
+            } else {
+                console.error("Telegram API Error:", data.description);
+                resultDiv.innerHTML += `<br><span style="font-size:0.6em; color:red;">(Error submitting to instructor: ${data.description})</span>`;
+            }
+        })
+        .catch(error => {
+            console.error("Error connecting to Telegram:", error);
+            resultDiv.innerHTML += `<br><span style="font-size:0.6em; color:red;">(Network error while submitting)</span>`;
+        });
+    }
+</script>
 
 </body>
 </html>
