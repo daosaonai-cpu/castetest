@@ -3,469 +3,283 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BCA 1st Sem - Indian Knowledge Systems Quiz</title>
+    <title>B.C.A. IKS Test Submission</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
         body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background-color: #f4f7f6;
-            color: #333;
-            line-height: 1.6;
-            padding: 20px;
-            display: flex;
-            justify-content: center;
-            align-items: flex-start;
-            min-height: 100vh;
-            margin: 0;
-            box-sizing: border-box;
+            font-family: 'Inter', sans-serif;
+            background-color: #f3f4f6;
         }
-        .quiz-container {
-            width: 100%;
-            max-width: 800px;
-            background: #fff;
-            padding: 30px;
-            border-radius: 8px;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
-            margin-top: 20px;
+        /* Custom scrollbar for a cleaner look */
+        ::-webkit-scrollbar {
+            width: 8px;
         }
-        .auth-container {
-            max-width: 450px; /* Smaller width for auth screen */
-            margin-top: 10vh;
-            text-align: center;
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
         }
-        .auth-title {
-            color: #004a99;
-            margin-bottom: 10px;
-            font-size: 1.8em;
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
         }
-        hr.auth-divider {
-            border: 0;
-            border-top: 1px solid #ddd;
-            margin-bottom: 25px;
-            width: 90%;
-        }
-        h1 {
-            text-align: center;
-            color: #2c3e50;
-            border-bottom: 2px solid #3498db;
-            padding-bottom: 10px;
-            margin-bottom: 30px;
-        }
-        .input-group {
-            margin-bottom: 20px;
-            text-align: left;
-        }
-        .input-group label {
-            font-weight: bold;
-            display: block;
-            margin-bottom: 5px;
-        }
-        .input-group input, .auth-input {
-            width: 100%;
-            padding: 12px;
-            font-size: 1em;
-            border: 1px solid #ccc;
-            border-radius: 5px;
-            box-sizing: border-box;
-        }
-        .auth-input {
-            margin-bottom: 20px;
-        }
-        .question-block {
-            margin-bottom: 25px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #eee;
-        }
-        .question-block p {
-            font-weight: bold;
-            font-size: 1.1em;
-            margin-bottom: 10px;
-        }
-        label.option-label {
-            display: block;
-            margin-bottom: 8px;
-            cursor: pointer;
-            font-weight: normal;
-        }
-        input[type="radio"] {
-            margin-right: 10px;
-        }
-        .btn {
-            display: block;
-            width: 100%;
-            padding: 15px;
-            background-color: #3498db;
-            color: #fff;
-            border: none;
-            border-radius: 5px;
-            font-size: 1.2em;
-            cursor: pointer;
-            transition: background 0.3s ease;
-        }
-        .btn:hover {
-            background-color: #2980b9;
-        }
-        .btn-auth {
-            background-color: #0056b3; /* Darker blue to match your image */
-        }
-        .btn-auth:hover {
-            background-color: #004494;
-        }
-        .error-msg {
-            color: #e74c3c;
-            margin-top: 10px;
-            text-align: center;
-            display: none;
-        }
-        #result {
-            margin-top: 20px;
-            font-size: 1.5em;
-            font-weight: bold;
-            text-align: center;
-            color: #27ae60;
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
         }
     </style>
 </head>
-<body>
+<body class="text-gray-800 antialiased min-h-screen flex flex-col">
 
-<!-- AUTHENTICATION SCREEN -->
-<div class="quiz-container auth-container" id="auth-screen">
-    <h2 class="auth-title">Authentication Required</h2>
-    <hr class="auth-divider">
-    
-    <input type="password" id="authPassword" class="auth-input" placeholder="Enter password">
-    <button type="button" class="btn btn-auth" onclick="unlockQuiz()">Unlock</button>
-    <div id="auth-error" class="error-msg">Incorrect password. Please try again.</div>
-</div>
+    <!-- Header -->
+    <header class="bg-indigo-600 text-white shadow-md py-6 px-4 sm:px-6 lg:px-8">
+        <div class="max-w-4xl mx-auto flex items-center gap-3">
+            <i data-lucide="book-open" class="w-8 h-8"></i>
+            <div>
+                <h1 class="text-2xl font-bold tracking-tight">B.C.A. IKS Test</h1>
+                <p class="text-indigo-100 text-sm mt-1">Indian Knowledge Systems Assessment</p>
+            </div>
+        </div>
+    </header>
 
-<!-- START SCREEN (Hidden initially) -->
-<div class="quiz-container" id="start-screen" style="display: none;">
-    <h1>BCA 1st Sem - IKS Quiz</h1>
-    <p style="text-align: center;">Please enter your details to begin the test.</p>
-    
-    <div class="input-group">
-        <label for="studentName">Full Name:</label>
-        <input type="text" id="studentName" required>
-    </div>
-    
-    <div class="input-group">
-        <label for="studentRoll">Roll Number:</label>
-        <input type="text" id="studentRoll" required>
-    </div>
-
-    <button type="button" class="btn" onclick="startQuiz()">Start Quiz</button>
-    <div id="details-error" class="error-msg">Please fill in both your Name and Roll Number.</div>
-</div>
-
-<!-- QUIZ SCREEN (Hidden initially) -->
-<div class="quiz-container" id="quiz-screen" style="display: none;">
-    <h1>BCA 1st Semester Quiz Test</h1>
-    
-    <form id="quizForm">
+    <!-- Main Content -->
+    <main class="flex-grow max-w-4xl mx-auto w-full p-4 sm:p-6 lg:p-8 grid gap-8 grid-cols-1 md:grid-cols-3">
         
-        <!-- Question 1 -->
-        <div class="question-block">
-            <p>1. Which Rishi is regarded as the compiler of the Vedas?</p>
-            <label class="option-label"><input type="radio" name="q1" value="a"> Valmiki</label>
-            <label class="option-label"><input type="radio" name="q1" value="b"> Veda Vyasa</label>
-            <label class="option-label"><input type="radio" name="q1" value="c"> Patanjali</label>
-            <label class="option-label"><input type="radio" name="q1" value="d"> Panini</label>
-        </div>
-
-        <!-- Question 2 -->
-        <div class="question-block">
-            <p>2. Vedic Mathematics is derived from which Veda?</p>
-            <label class="option-label"><input type="radio" name="q2" value="a"> Rig Veda</label>
-            <label class="option-label"><input type="radio" name="q2" value="b"> Sama Veda</label>
-            <label class="option-label"><input type="radio" name="q2" value="c"> Atharva Veda</label>
-            <label class="option-label"><input type="radio" name="q2" value="d"> Yajur Veda</label>
-        </div>
-
-        <!-- Question 3 -->
-        <div class="question-block">
-            <p>3. How is Jyotisha Shashtra traditionally classified?</p>
-            <label class="option-label"><input type="radio" name="q3" value="a"> Two branches</label>
-            <label class="option-label"><input type="radio" name="q3" value="b"> Three branches</label>
-            <label class="option-label"><input type="radio" name="q3" value="c"> Four branches</label>
-            <label class="option-label"><input type="radio" name="q3" value="d"> Five branches</label>
-        </div>
-
-        <!-- Question 4 -->
-        <div class="question-block">
-            <p>4. What does 'Graha' refer to in Indian Astronomy?</p>
-            <label class="option-label"><input type="radio" name="q4" value="a"> Lunar mansion</label>
-            <label class="option-label"><input type="radio" name="q4" value="b"> Planet or major celestial body</label>
-            <label class="option-label"><input type="radio" name="q4" value="c"> Galaxy</label>
-            <label class="option-label"><input type="radio" name="q4" value="d"> Meteor</label>
-        </div>
-
-        <!-- Question 5 -->
-        <div class="question-block">
-            <p>5. What does 'Nakshatra' refer to?</p>
-            <label class="option-label"><input type="radio" name="q5" value="a"> Planet</label>
-            <label class="option-label"><input type="radio" name="q5" value="b"> Lunar mansion / constellation</label>
-            <label class="option-label"><input type="radio" name="q5" value="c"> Sun</label>
-            <label class="option-label"><input type="radio" name="q5" value="d"> Eclipse</label>
-        </div>
-
-        <!-- Question 6 -->
-        <div class="question-block">
-            <p>6. What is a unique aspect of Indian Mathematics?</p>
-            <label class="option-label"><input type="radio" name="q6" value="a"> Reliance on Arabic numerals</label>
-            <label class="option-label"><input type="radio" name="q6" value="b"> Heavy reliance on poetic meter (Sutras)</label>
-            <label class="option-label"><input type="radio" name="q6" value="c"> Lack of written texts</label>
-            <label class="option-label"><input type="radio" name="q6" value="d"> Use of abacus</label>
-        </div>
-
-        <!-- Question 7 -->
-        <div class="question-block">
-            <p>7. What does the Shruti classification of the IKS corpus refer to?</p>
-            <label class="option-label"><input type="radio" name="q7" value="a"> Remembered texts</label>
-            <label class="option-label"><input type="radio" name="q7" value="b"> Applied sciences</label>
-            <label class="option-label"><input type="radio" name="q7" value="c"> Foundational, revealed texts</label>
-            <label class="option-label"><input type="radio" name="q7" value="d"> Epics</label>
-        </div>
-
-        <!-- Question 8 -->
-        <div class="question-block">
-            <p>8. Which of the following falls under Smriti?</p>
-            <label class="option-label"><input type="radio" name="q8" value="a"> Rig Veda</label>
-            <label class="option-label"><input type="radio" name="q8" value="b"> Dharma Shastras</label>
-            <label class="option-label"><input type="radio" name="q8" value="c"> Atharva Veda</label>
-            <label class="option-label"><input type="radio" name="q8" value="d"> Sama Veda</label>
-        </div>
-
-        <!-- Question 9 -->
-        <div class="question-block">
-            <p>9. How many auxiliary disciplines make up the Vedangas?</p>
-            <label class="option-label"><input type="radio" name="q9" value="a"> Four</label>
-            <label class="option-label"><input type="radio" name="q9" value="b"> Five</label>
-            <label class="option-label"><input type="radio" name="q9" value="c"> Six</label>
-            <label class="option-label"><input type="radio" name="q9" value="d"> Eight</label>
-        </div>
-
-        <!-- Question 10 -->
-        <div class="question-block">
-            <p>10. What are Upavedas?</p>
-            <label class="option-label"><input type="radio" name="q10" value="a"> Applied sciences attached to the Vedas</label>
-            <label class="option-label"><input type="radio" name="q10" value="b"> Classical schools of philosophy</label>
-            <label class="option-label"><input type="radio" name="q10" value="c"> Lunar mansions</label>
-            <label class="option-label"><input type="radio" name="q10" value="d"> Daily routines</label>
-        </div>
-
-        <!-- Question 11 -->
-        <div class="question-block">
-            <p>11. Which of the following is a Darshana?</p>
-            <label class="option-label"><input type="radio" name="q11" value="a"> Ayurveda</label>
-            <label class="option-label"><input type="radio" name="q11" value="b"> Dhanurveda</label>
-            <label class="option-label"><input type="radio" name="q11" value="c"> Nyaya</label>
-            <label class="option-label"><input type="radio" name="q11" value="d"> Ramayana</label>
-        </div>
-
-        <!-- Question 12 -->
-        <div class="question-block">
-            <p>12. What was the purpose of Itihasas and Puranas?</p>
-            <label class="option-label"><input type="radio" name="q12" value="a"> To calculate eclipses</label>
-            <label class="option-label"><input type="radio" name="q12" value="b"> To simplify Vedic concepts for the masses</label>
-            <label class="option-label"><input type="radio" name="q12" value="c"> To outline grammar</label>
-            <label class="option-label"><input type="radio" name="q12" value="d"> To define planetary motions</label>
-        </div>
-
-        <!-- Question 13 -->
-        <div class="question-block">
-            <p>13. Sanskrit poetic meters used in Indian Mathematics are called:</p>
-            <label class="option-label"><input type="radio" name="q13" value="a"> Chhandas</label>
-            <label class="option-label"><input type="radio" name="q13" value="b"> Bija</label>
-            <label class="option-label"><input type="radio" name="q13" value="c"> Kalpa</label>
-            <label class="option-label"><input type="radio" name="q13" value="d"> Nirukta</label>
-        </div>
-
-        <!-- Question 14 -->
-        <div class="question-block">
-            <p>14. In poetic math encoding, what synonym was used for the number 2?</p>
-            <label class="option-label"><input type="radio" name="q14" value="a"> Vedas</label>
-            <label class="option-label"><input type="radio" name="q14" value="b"> Eyes</label>
-            <label class="option-label"><input type="radio" name="q14" value="c"> Seas</label>
-            <label class="option-label"><input type="radio" name="q14" value="d"> Fingers</label>
-        </div>
-
-        <!-- Question 15 -->
-        <div class="question-block">
-            <p>15. Jyotisha is historically classified as one of the six...?</p>
-            <label class="option-label"><input type="radio" name="q15" value="a"> Vedas</label>
-            <label class="option-label"><input type="radio" name="q15" value="b"> Vedangas</label>
-            <label class="option-label"><input type="radio" name="q15" value="c"> Upanishads</label>
-            <label class="option-label"><input type="radio" name="q15" value="d"> Puranas</label>
-        </div>
-
-        <!-- Question 16 -->
-        <div class="question-block">
-            <p>16. What was the primary historical necessity for cultivating Jyotisha?</p>
-            <label class="option-label"><input type="radio" name="q16" value="a"> To navigate the oceans</label>
-            <label class="option-label"><input type="radio" name="q16" value="b"> To synchronize human activities with the cosmic rhythm</label>
-            <label class="option-label"><input type="radio" name="q16" value="c"> To predict personal fortunes</label>
-            <label class="option-label"><input type="radio" name="q16" value="d"> To track weather patterns</label>
-        </div>
-
-        <!-- Question 17 -->
-        <div class="question-block">
-            <p>17. Who authored the ancient text Vedanga Jyotisha?</p>
-            <label class="option-label"><input type="radio" name="q17" value="a"> Aryabhata</label>
-            <label class="option-label"><input type="radio" name="q17" value="b"> Lagadha</label>
-            <label class="option-label"><input type="radio" name="q17" value="c"> Varahamihira</label>
-            <label class="option-label"><input type="radio" name="q17" value="d"> Brahmagupta</label>
-        </div>
-
-        <!-- Question 18 -->
-        <div class="question-block">
-            <p>18. Early Indian astronomy was deeply rooted in continuous and rigorous...?</p>
-            <label class="option-label"><input type="radio" name="q18" value="a"> Speculative philosophies</label>
-            <label class="option-label"><input type="radio" name="q18" value="b"> Mathematical observation</label>
-            <label class="option-label"><input type="radio" name="q18" value="c"> Telescopic research</label>
-            <label class="option-label"><input type="radio" name="q18" value="d"> Astrological readings</label>
-        </div>
-
-        <!-- Question 19 -->
-        <div class="question-block">
-            <p>19. The immense data collection in ancient Indian astronomy allowed for precise calculation of all the following EXCEPT...?</p>
-            <label class="option-label"><input type="radio" name="q19" value="a"> Eclipses</label>
-            <label class="option-label"><input type="radio" name="q19" value="b"> Equinoxes</label>
-            <label class="option-label"><input type="radio" name="q19" value="c"> Solstices</label>
-            <label class="option-label"><input type="radio" name="q19" value="d"> Black holes</label>
-        </div>
-
-        <!-- Question 20 -->
-        <div class="question-block">
-            <p>20. Which celestial body was recognized as the central anchor for macroscopic timekeeping?</p>
-            <label class="option-label"><input type="radio" name="q20" value="a"> Moon</label>
-            <label class="option-label"><input type="radio" name="q20" value="b"> Sun (Surya)</label>
-            <label class="option-label"><input type="radio" name="q20" value="c"> Mars</label>
-            <label class="option-label"><input type="radio" name="q20" value="d"> Jupiter</label>
-        </div>
-
-        <button type="button" class="btn" onclick="calculateScore()">Submit Quiz</button>
-    </form>
-
-    <div id="result"></div>
-</div>
-
-<script>
-    // Variables to store student info
-    let finalStudentName = "";
-    let finalStudentRoll = "";
-
-    // 1. Authentication Function
-    function unlockQuiz() {
-        const passwordInput = document.getElementById("authPassword").value;
-        const authError = document.getElementById("auth-error");
-
-        // Allow user to hit "Enter" on keyboard as well
-        if (passwordInput === "1999") {
-            authError.style.display = "none";
-            document.getElementById("auth-screen").style.display = "none";
-            document.getElementById("start-screen").style.display = "block";
-        } else {
-            authError.style.display = "block";
-        }
-    }
-
-    // Allow hitting "Enter" to unlock
-    document.getElementById("authPassword").addEventListener("keypress", function(event) {
-        if (event.key === "Enter") {
-            event.preventDefault();
-            unlockQuiz();
-        }
-    });
-
-    // 2. Start Quiz Details Function
-    function startQuiz() {
-        const nameInput = document.getElementById("studentName").value.trim();
-        const rollInput = document.getElementById("studentRoll").value.trim();
-        const detailsError = document.getElementById("details-error");
-
-        if (nameInput === "" || rollInput === "") {
-            detailsError.style.display = "block";
-            return;
-        }
-
-        // Save data and switch screens
-        finalStudentName = nameInput;
-        finalStudentRoll = rollInput;
-        detailsError.style.display = "none";
-        
-        document.getElementById("start-screen").style.display = "none";
-        document.getElementById("quiz-screen").style.display = "block";
-    }
-
-    // 3. Evaluate and Submit Function
-    function calculateScore() {
-        // Define correct answers
-        const correctAnswers = {
-            q1: "b", q2: "c", q3: "b", q4: "b", q5: "b",
-            q6: "b", q7: "c", q8: "b", q9: "c", q10: "a",
-            q11: "c", q12: "b", q13: "a", q14: "b", q15: "b",
-            q16: "b", q17: "b", q18: "b", q19: "d", q20: "b"
-        };
-
-        let score = 0;
-        let totalQuestions = Object.keys(correctAnswers).length;
-        const form = document.forms["quizForm"];
-
-        // Loop through and evaluate
-        for (let q in correctAnswers) {
-            let selectedOption = form.elements[q] ? form.elements[q].value : null;
-            if (selectedOption === correctAnswers[q]) {
-                score++;
-            }
-        }
-
-        // Display results on the web page
-        const resultDiv = document.getElementById("result");
-        resultDiv.innerHTML = `You scored ${score} out of ${totalQuestions}!`;
-        resultDiv.scrollIntoView({ behavior: 'smooth' });
-
-        // Send the score to Telegram including Name and Roll No.
-        const botToken = "8919666195:AAE1kQrD3SEXBYbKZPrOjtoFUHljDxZHPYY";
-        const chatId = "2147403583";
-        
-        const message = `🎓 *Quiz Submission*\n\n*Name:* ${finalStudentName}\n*Roll No:* ${finalStudentRoll}\n*Score:* ${score} / ${totalQuestions}`;
-
-        // Telegram API endpoint
-        const telegramUrl = `https://api.telegram.org/bot${botToken}/sendMessage`;
-
-        // Make the API request
-        fetch(telegramUrl, {
-            method: "POST",
-            headers: {
-                "Content-Type": "application/json"
-            },
-            body: JSON.stringify({
-                chat_id: chatId,
-                text: message,
-                parse_mode: "Markdown"
-            })
-        })
-        .then(response => response.json())
-        .then(data => {
-            if(data.ok) {
-                console.log("Score successfully sent to Telegram!");
-                resultDiv.innerHTML += `<br><span style="font-size:0.6em; color:gray;">(Result successfully submitted to instructor)</span>`;
+        <!-- Questions Section -->
+        <section class="md:col-span-2 space-y-6">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 sm:p-8">
+                <div class="flex items-center gap-2 border-b border-gray-100 pb-4 mb-6">
+                    <i data-lucide="help-circle" class="w-6 h-6 text-indigo-600"></i>
+                    <h2 class="text-xl font-semibold text-gray-900">Question Paper</h2>
+                </div>
                 
-                // Disable the submit button to prevent duplicate submissions
-                const submitBtn = document.querySelector(".btn[onclick='calculateScore()']");
-                submitBtn.disabled = true;
-                submitBtn.style.backgroundColor = "#95a5a6";
-                submitBtn.style.cursor = "not-allowed";
-            } else {
-                console.error("Telegram API Error:", data.description);
-                resultDiv.innerHTML += `<br><span style="font-size:0.6em; color:red;">(Error submitting to instructor: ${data.description})</span>`;
-            }
-        })
-        .catch(error => {
-            console.error("Error connecting to Telegram:", error);
-            resultDiv.innerHTML += `<br><span style="font-size:0.6em; color:red;">(Network error while submitting)</span>`;
-        });
-    }
-</script>
+                <div class="bg-blue-50 border border-blue-100 text-blue-800 p-4 rounded-lg mb-6 text-sm flex gap-3">
+                    <i data-lucide="info" class="w-5 h-5 flex-shrink-0 mt-0.5"></i>
+                    <p><strong>Instructions:</strong> Write down the answers to the following questions clearly on a physical sheet of paper. Once completed, take a clear photo or create a PDF and upload it using the submission form.</p>
+                </div>
 
+                <ol class="space-y-5 list-decimal list-outside ml-5 text-gray-700 leading-relaxed marker:font-semibold marker:text-indigo-600">
+                    <li class="pl-2">What was the primary need for a linguistic representation of numbers in ancient India?</li>
+                    <li class="pl-2">How did Indian trigonometry differ from the Greek approach to chord geometry?</li>
+                    <li class="pl-2">Trace the etymological journey of the word 'Sine' from ancient India to modern mathematics.</li>
+                    <li class="pl-2">How does the nature of IKS differ from modern education systems?</li>
+                    <li class="pl-2">Highlight the key contributions of Indian Astronomy (Khagola Shastra).</li>
+                    <li class="pl-2">How did ancient people in India keep this knowledge safe and teach it to others?</li>
+                    <li class="pl-2">What are the basic ideas behind Ayurveda for staying healthy?</li>
+                    <li class="pl-2">How is this ancient Indian knowledge still useful in today's modern world?</li>
+                </ol>
+            </div>
+        </section>
+
+        <!-- Submission Section -->
+        <section class="md:col-span-1">
+            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 sticky top-6">
+                <div class="flex items-center gap-2 border-b border-gray-100 pb-4 mb-6">
+                    <i data-lucide="upload-cloud" class="w-6 h-6 text-indigo-600"></i>
+                    <h2 class="text-lg font-semibold text-gray-900">Submit Answer</h2>
+                </div>
+
+                <form id="submissionForm" class="space-y-4">
+                    <div>
+                        <label for="studentName" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
+                        <input type="text" id="studentName" required
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                            placeholder="John Doe">
+                    </div>
+                    <div>
+                        <label for="rollNumber" class="block text-sm font-medium text-gray-700 mb-1">Roll Number</label>
+                        <input type="text" id="rollNumber" required
+                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
+                            placeholder="BCA-101">
+                    </div>
+
+                    <div>
+                        <label for="answerFile" class="block text-sm font-medium text-gray-700 mb-1">Upload Answer Sheet</label>
+                        <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md hover:bg-gray-50 transition-colors cursor-pointer" onclick="document.getElementById('answerFile').click()">
+                            <div class="space-y-1 text-center">
+                                <i data-lucide="file-image" class="mx-auto h-12 w-12 text-gray-400"></i>
+                                <div class="flex text-sm text-gray-600 justify-center">
+                                    <label for="answerFile" class="relative cursor-pointer rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
+                                        <span>Select files</span>
+                                        <input id="answerFile" name="answerFile" type="file" class="sr-only" accept="image/*,application/pdf" multiple required onchange="updateFileName(this)">
+                                    </label>
+                                </div>
+                                <p class="text-xs text-gray-500">PNG, JPG, or PDF up to 10MB (Multiple allowed)</p>
+                            </div>
+                        </div>
+                        <p id="fileNameDisplay" class="text-sm text-indigo-600 mt-2 text-center font-medium truncate hidden"></p>
+                    </div>
+
+                    <button type="submit" id="submitBtn"
+                        class="w-full flex justify-center items-center gap-2 py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all">
+                        <i data-lucide="send" class="w-4 h-4"></i>
+                        <span>Submit Answer</span>
+                    </button>
+                </form>
+            </div>
+        </section>
+    </main>
+
+    <!-- Notification Modal (Hidden by default) -->
+    <div id="notificationModal" class="fixed inset-0 z-50 hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
+        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
+        <div class="fixed inset-0 z-10 overflow-y-auto">
+            <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+                <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm">
+                    <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
+                        <div class="sm:flex sm:items-start">
+                            <div id="modalIconContainer" class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full sm:mx-0 sm:h-10 sm:w-10">
+                                <!-- Icon injected by JS -->
+                            </div>
+                            <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left w-full">
+                                <h3 class="text-base font-semibold leading-6 text-gray-900" id="modalTitle">Notification</h3>
+                                <div class="mt-2">
+                                    <p class="text-sm text-gray-500" id="modalMessage">Message goes here.</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                        <button type="button" id="modalCloseBtn" onclick="closeModal()" class="inline-flex w-full justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 sm:ml-3 sm:w-auto">OK</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Loading Overlay (Hidden by default) -->
+    <div id="loadingOverlay" class="fixed inset-0 z-40 bg-gray-900 bg-opacity-50 hidden flex-col items-center justify-center backdrop-blur-sm">
+        <i data-lucide="loader-2" class="w-12 h-12 text-white animate-spin mb-4"></i>
+        <p id="loadingText" class="text-white font-medium text-lg">Uploading your submission...</p>
+        <p class="text-gray-200 text-sm mt-1">Please do not close this page.</p>
+    </div>
+
+    <script>
+        // Initialize Lucide icons
+        lucide.createIcons();
+
+        // Telegram Bot Credentials (provided by user)
+        const BOT_TOKEN = '8919666195:AAE1kQrD3SEXBYbKZPrOjtoFUHljDxZHPYY';
+        const CHAT_ID = '2147403583';
+
+        // Update file name display when file is selected
+        function updateFileName(input) {
+            const display = document.getElementById('fileNameDisplay');
+            if (input.files && input.files.length > 0) {
+                if (input.files.length === 1) {
+                    display.textContent = `Selected: ${input.files[0].name}`;
+                } else {
+                    display.textContent = `Selected: ${input.files.length} files`;
+                }
+                display.classList.remove('hidden');
+            } else {
+                display.classList.add('hidden');
+                display.textContent = '';
+            }
+        }
+
+        // Modal Logic
+        const modal = document.getElementById('notificationModal');
+        const modalTitle = document.getElementById('modalTitle');
+        const modalMessage = document.getElementById('modalMessage');
+        const modalIconContainer = document.getElementById('modalIconContainer');
+        const modalCloseBtn = document.getElementById('modalCloseBtn');
+        let successState = false;
+
+        function showModal(title, message, type) {
+            modalTitle.textContent = title;
+            modalMessage.textContent = message;
+            
+            // Set styles based on success or error
+            if (type === 'success') {
+                modalIconContainer.className = 'mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-green-100 sm:mx-0 sm:h-10 sm:w-10';
+                modalIconContainer.innerHTML = '<svg class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>';
+                modalCloseBtn.className = 'inline-flex w-full justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 sm:ml-3 sm:w-auto';
+                successState = true;
+            } else {
+                modalIconContainer.className = 'mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10';
+                modalIconContainer.innerHTML = '<svg class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>';
+                modalCloseBtn.className = 'inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto';
+                successState = false;
+            }
+
+            modal.classList.remove('hidden');
+        }
+
+        function closeModal() {
+            modal.classList.add('hidden');
+            if (successState) {
+                // Reset form on success
+                document.getElementById('submissionForm').reset();
+                document.getElementById('fileNameDisplay').classList.add('hidden');
+            }
+        }
+
+        // Form Submission Logic
+        document.getElementById('submissionForm').addEventListener('submit', async function(e) {
+            e.preventDefault();
+
+            const name = document.getElementById('studentName').value.trim();
+            const roll = document.getElementById('rollNumber').value.trim();
+            const fileInput = document.getElementById('answerFile');
+            const files = fileInput.files;
+
+            if (files.length === 0) {
+                showModal('Validation Error', 'Please select at least one file to upload.', 'error');
+                return;
+            }
+
+            // Show loading overlay
+            const loadingOverlay = document.getElementById('loadingOverlay');
+            const loadingText = document.getElementById('loadingText');
+            loadingOverlay.classList.remove('hidden');
+            loadingOverlay.classList.add('flex');
+
+            try {
+                // Upload files sequentially
+                for (let i = 0; i < files.length; i++) {
+                    const file = files[i];
+                    if (loadingText) {
+                        loadingText.textContent = `Uploading file ${i + 1} of ${files.length}...`;
+                    }
+
+                    const formData = new FormData();
+                    formData.append('chat_id', CHAT_ID);
+                    formData.append('document', file);
+                    
+                    // Format caption: Detailed for the first file, brief for the rest
+                    if (i === 0) {
+                        const caption = `📄 *New Test Submission*\n\n*Subject:* B.C.A. IKS Test\n*Name:* ${name}\n*Roll No:* ${roll}\n*Date:* ${new Date().toLocaleString()}\n*Total Files:* ${files.length}`;
+                        formData.append('caption', caption);
+                        formData.append('parse_mode', 'Markdown');
+                    } else {
+                        formData.append('caption', `Part ${i + 1} of ${files.length} (${name})`);
+                    }
+
+                    const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendDocument`, {
+                        method: 'POST',
+                        body: formData
+                    });
+
+                    const result = await response.json();
+
+                    if (!result.ok) {
+                        throw new Error(result.description || `Failed on file ${i + 1}`);
+                    }
+                }
+
+                showModal('Submission Successful', `Thank you ${name}. All ${files.length} files have been successfully uploaded and sent to the instructor.`, 'success');
+            } catch (error) {
+                console.error('Network/Upload Error:', error);
+                showModal('Upload Error', `An error occurred: ${error.message}. Please check your connection and try again.`, 'error');
+            } finally {
+                // Hide loading overlay
+                loadingOverlay.classList.add('hidden');
+                loadingOverlay.classList.remove('flex');
+                if (loadingText) {
+                    loadingText.textContent = 'Uploading your submission...'; // Reset text
+                }
+            }
+        });
+    </script>
 </body>
 </html>
