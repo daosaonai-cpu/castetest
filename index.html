@@ -3,283 +3,263 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>B.C.A. IKS Test Submission</title>
+    <title>IT & Computing Fundamentals Study Guide</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
     <style>
-        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #f3f4f6;
+            background-color: #f8fafc;
         }
-        /* Custom scrollbar for a cleaner look */
-        ::-webkit-scrollbar {
-            width: 8px;
+        .tab-active {
+            border-bottom: 2px solid #3b82f6;
+            color: #1d4ed8;
+            font-weight: 600;
         }
-        ::-webkit-scrollbar-track {
-            background: #f1f1f1;
+        .fade-in {
+            animation: fadeIn 0.3s ease-in-out;
         }
-        ::-webkit-scrollbar-thumb {
-            background: #cbd5e1;
-            border-radius: 4px;
-        }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #94a3b8;
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
     </style>
 </head>
-<body class="text-gray-800 antialiased min-h-screen flex flex-col">
+<body class="text-slate-800 antialiased min-h-screen flex flex-col">
 
     <!-- Header -->
-    <header class="bg-indigo-600 text-white shadow-md py-6 px-4 sm:px-6 lg:px-8">
-        <div class="max-w-4xl mx-auto flex items-center gap-3">
-            <i data-lucide="book-open" class="w-8 h-8"></i>
+    <header class="bg-white shadow-sm border-b border-slate-200 sticky top-0 z-10">
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-4 flex justify-between items-center">
             <div>
-                <h1 class="text-2xl font-bold tracking-tight">B.C.A. IKS Test</h1>
-                <p class="text-indigo-100 text-sm mt-1">Indian Knowledge Systems Assessment</p>
+                <h1 class="text-xl md:text-2xl font-bold text-slate-900 flex items-center gap-2">
+                    <i class="fa-solid fa-book-open text-blue-600"></i>
+                    Study Guide
+                </h1>
+                <p class="text-xs md:text-sm text-slate-500 mt-1">IT, Database, Finance & Office Fundamentals</p>
             </div>
+            <div class="flex items-center gap-3">
+                <span class="text-sm font-medium text-slate-600 bg-slate-100 px-3 py-1.5 rounded-full">
+                    <span id="total-questions">0</span> Questions
+                </span>
+            </div>
+        </div>
+        
+        <!-- Navigation Tabs -->
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 mt-2 overflow-x-auto no-scrollbar">
+            <nav class="flex space-x-6 min-w-max" id="tabs-container">
+                <!-- Tabs will be injected here by JS -->
+            </nav>
         </div>
     </header>
 
     <!-- Main Content -->
-    <main class="flex-grow max-w-4xl mx-auto w-full p-4 sm:p-6 lg:p-8 grid gap-8 grid-cols-1 md:grid-cols-3">
+    <main class="flex-grow max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 py-8 w-full">
+        <div class="mb-6 flex justify-between items-center">
+            <h2 id="category-title" class="text-2xl font-bold text-slate-800">Category Name</h2>
+        </div>
         
-        <!-- Questions Section -->
-        <section class="md:col-span-2 space-y-6">
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 sm:p-8">
-                <div class="flex items-center gap-2 border-b border-gray-100 pb-4 mb-6">
-                    <i data-lucide="help-circle" class="w-6 h-6 text-indigo-600"></i>
-                    <h2 class="text-xl font-semibold text-gray-900">Question Paper</h2>
-                </div>
-                
-                <div class="bg-blue-50 border border-blue-100 text-blue-800 p-4 rounded-lg mb-6 text-sm flex gap-3">
-                    <i data-lucide="info" class="w-5 h-5 flex-shrink-0 mt-0.5"></i>
-                    <p><strong>Instructions:</strong> Write down the answers to the following questions clearly on a physical sheet of paper. Once completed, take a clear photo or create a PDF and upload it using the submission form.</p>
-                </div>
-
-                <ol class="space-y-5 list-decimal list-outside ml-5 text-gray-700 leading-relaxed marker:font-semibold marker:text-indigo-600">
-                    <li class="pl-2">What was the primary need for a linguistic representation of numbers in ancient India?</li>
-                    <li class="pl-2">How did Indian trigonometry differ from the Greek approach to chord geometry?</li>
-                    <li class="pl-2">Trace the etymological journey of the word 'Sine' from ancient India to modern mathematics.</li>
-                    <li class="pl-2">How does the nature of IKS differ from modern education systems?</li>
-                    <li class="pl-2">Highlight the key contributions of Indian Astronomy (Khagola Shastra).</li>
-                    <li class="pl-2">How did ancient people in India keep this knowledge safe and teach it to others?</li>
-                    <li class="pl-2">What are the basic ideas behind Ayurveda for staying healthy?</li>
-                    <li class="pl-2">How is this ancient Indian knowledge still useful in today's modern world?</li>
-                </ol>
-            </div>
-        </section>
-
-        <!-- Submission Section -->
-        <section class="md:col-span-1">
-            <div class="bg-white rounded-xl shadow-sm border border-gray-100 p-6 sticky top-6">
-                <div class="flex items-center gap-2 border-b border-gray-100 pb-4 mb-6">
-                    <i data-lucide="upload-cloud" class="w-6 h-6 text-indigo-600"></i>
-                    <h2 class="text-lg font-semibold text-gray-900">Submit Answer</h2>
-                </div>
-
-                <form id="submissionForm" class="space-y-4">
-                    <div>
-                        <label for="studentName" class="block text-sm font-medium text-gray-700 mb-1">Full Name</label>
-                        <input type="text" id="studentName" required
-                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
-                            placeholder="John Doe">
-                    </div>
-                    <div>
-                        <label for="rollNumber" class="block text-sm font-medium text-gray-700 mb-1">Roll Number</label>
-                        <input type="text" id="rollNumber" required
-                            class="w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 transition-colors"
-                            placeholder="BCA-101">
-                    </div>
-
-                    <div>
-                        <label for="answerFile" class="block text-sm font-medium text-gray-700 mb-1">Upload Answer Sheet</label>
-                        <div class="mt-1 flex justify-center px-6 pt-5 pb-6 border-2 border-gray-300 border-dashed rounded-md hover:bg-gray-50 transition-colors cursor-pointer" onclick="document.getElementById('answerFile').click()">
-                            <div class="space-y-1 text-center">
-                                <i data-lucide="file-image" class="mx-auto h-12 w-12 text-gray-400"></i>
-                                <div class="flex text-sm text-gray-600 justify-center">
-                                    <label for="answerFile" class="relative cursor-pointer rounded-md font-medium text-indigo-600 hover:text-indigo-500 focus-within:outline-none focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-indigo-500">
-                                        <span>Select files</span>
-                                        <input id="answerFile" name="answerFile" type="file" class="sr-only" accept="image/*,application/pdf" multiple required onchange="updateFileName(this)">
-                                    </label>
-                                </div>
-                                <p class="text-xs text-gray-500">PNG, JPG, or PDF up to 10MB (Multiple allowed)</p>
-                            </div>
-                        </div>
-                        <p id="fileNameDisplay" class="text-sm text-indigo-600 mt-2 text-center font-medium truncate hidden"></p>
-                    </div>
-
-                    <button type="submit" id="submitBtn"
-                        class="w-full flex justify-center items-center gap-2 py-2.5 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 transition-all">
-                        <i data-lucide="send" class="w-4 h-4"></i>
-                        <span>Submit Answer</span>
-                    </button>
-                </form>
-            </div>
-        </section>
+        <div id="questions-container" class="space-y-6">
+            <!-- Questions will be injected here by JS -->
+        </div>
     </main>
 
-    <!-- Notification Modal (Hidden by default) -->
-    <div id="notificationModal" class="fixed inset-0 z-50 hidden" aria-labelledby="modal-title" role="dialog" aria-modal="true">
-        <div class="fixed inset-0 bg-gray-500 bg-opacity-75 transition-opacity"></div>
-        <div class="fixed inset-0 z-10 overflow-y-auto">
-            <div class="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-                <div class="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all sm:my-8 sm:w-full sm:max-w-sm">
-                    <div class="bg-white px-4 pb-4 pt-5 sm:p-6 sm:pb-4">
-                        <div class="sm:flex sm:items-start">
-                            <div id="modalIconContainer" class="mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full sm:mx-0 sm:h-10 sm:w-10">
-                                <!-- Icon injected by JS -->
-                            </div>
-                            <div class="mt-3 text-center sm:ml-4 sm:mt-0 sm:text-left w-full">
-                                <h3 class="text-base font-semibold leading-6 text-gray-900" id="modalTitle">Notification</h3>
-                                <div class="mt-2">
-                                    <p class="text-sm text-gray-500" id="modalMessage">Message goes here.</p>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-                        <button type="button" id="modalCloseBtn" onclick="closeModal()" class="inline-flex w-full justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-indigo-500 sm:ml-3 sm:w-auto">OK</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <!-- Loading Overlay (Hidden by default) -->
-    <div id="loadingOverlay" class="fixed inset-0 z-40 bg-gray-900 bg-opacity-50 hidden flex-col items-center justify-center backdrop-blur-sm">
-        <i data-lucide="loader-2" class="w-12 h-12 text-white animate-spin mb-4"></i>
-        <p id="loadingText" class="text-white font-medium text-lg">Uploading your submission...</p>
-        <p class="text-gray-200 text-sm mt-1">Please do not close this page.</p>
-    </div>
+    <footer class="bg-slate-900 text-slate-400 py-6 text-center text-sm mt-auto">
+        <p>Extracted from "Image to PDF 20260908 10.27.58.pdf" • All correct options are marked in green.</p>
+    </footer>
 
     <script>
-        // Initialize Lucide icons
-        lucide.createIcons();
-
-        // Telegram Bot Credentials (provided by user)
-        const BOT_TOKEN = '8919666195:AAE1kQrD3SEXBYbKZPrOjtoFUHljDxZHPYY';
-        const CHAT_ID = '2147403583';
-
-        // Update file name display when file is selected
-        function updateFileName(input) {
-            const display = document.getElementById('fileNameDisplay');
-            if (input.files && input.files.length > 0) {
-                if (input.files.length === 1) {
-                    display.textContent = `Selected: ${input.files[0].name}`;
-                } else {
-                    display.textContent = `Selected: ${input.files.length} files`;
-                }
-                display.classList.remove('hidden');
-            } else {
-                display.classList.add('hidden');
-                display.textContent = '';
+        // Data Structure holding all extracted questions
+        const quizData = [
+            {
+                id: "photoshop",
+                title: "Image Editing (Photoshop)",
+                icon: "fa-image",
+                questions: [
+                    { no: "2", text: "Which tool is used to fill single color in background?", options: ["Gradient Tool", "Paint Bucket Tool", "Paint Bucket Tool", "Background Tool"], correct: 1 },
+                    { no: "3", text: "The name of the areas that include the color swatches, layers and toolbox?", options: ["layer", "layer effect", "blending option", "pallette"], correct: 3 },
+                    { no: "4", text: "If you have a solid color to select and delete, the tool is the quickest and most effective.", options: ["magic wand", "color picker", "zoom", "none"], correct: 0 },
+                    { no: "5", text: "To cut down the size of the entire graphic design, including all layers, you should select the tool.", options: ["marquee", "magic wand", "eraser", "crop"], correct: 3 },
+                    { no: "7", text: "What is File Extension in Photoshop?", options: ["Bmp", "Tiff", "Psd", "Txt"], correct: 2 },
+                    { no: "8", text: "Which tool is used to light the pixels of the image in Photoshop.", options: ["Smudge", "Sharpen", "Burn", "Dodge"], correct: 3 },
+                    { no: "9", text: "Twirl, ripple and spherize are examples of distortion...", options: ["filters", "blending options", "image adjustments", "layer modes"], correct: 0 },
+                    { no: "11", text: "There are how many types of 2D graphics?", options: ["2 (Raster and Vector)", "3", "4", "5"], correct: 0 },
+                    { no: "12", text: "To delete a series of steps that have been used in a graphic design, you would need to use the...", options: ["layer", "action", "history", "path"], correct: 2 },
+                    { no: "13", text: "Drop shadow, inner glow and bevel are examples of..... you need to use with text.", options: ["filters", "blending options", "image adjustments", "layer modes"], correct: 1 },
+                    { no: "14", text: "When did Photoshop start?", options: ["1985", "1986", "1987", "1988"], correct: 2 },
+                    { no: "15", text: "The images are made of.", options: ["DPI", "Pixels", "Drawing", "Pictures"], correct: 1 },
+                    { no: "16", text: "What is the meaning of CMYK?", options: ["Cream Magenta Yellow Kole", "Cyan Magenta Yellow Blue", "Cyan Magenta Yellow Black", "Cyan Magenta Yellow Brown"], correct: 2 },
+                    { no: "18", text: "JPEG stands for?", options: ["Joint Photographic Experts Group", "Joint Photographic Exports Group", "Join Photographic Experts Group", "none"], correct: 0 },
+                    { no: "19", text: "For What work Photoshop is used?", options: ["For Graphics", "For Animation", "For Typing", "For Programming"], correct: 0 },
+                    { no: "20", text: "The.... tool in best selected when your need to select an abnormally shaped image.", options: ["marquee", "lasso", "magic wand", "clone stamp"], correct: 1 },
+                    { no: "21", text: "Which one of these formats is not an image format?", options: ["EPS", "PCX", "WPG", "DPI (DPI is a measurement)"], correct: 3 },
+                    { no: "22", text: "Which of these formats supports Transparency?", options: ["Jpeg", "Png", "Gif", "Jpg"], correct: 1 }
+                ]
+            },
+            {
+                id: "database",
+                title: "Database & MS Access",
+                icon: "fa-database",
+                questions: [
+                    { no: "23", text: "An organized collection of logically related data is known as.", options: ["Data", "Meta Data", "Database", "Information"], correct: 2 },
+                    { no: "25", text: "Which field type will you select when creating a new table if you require to enter long text in that field.", options: ["Text", "Memo", "Currency", "Hyperlink"], correct: 1 },
+                    { no: "26", text: "Shortcut key to create new database.", options: ["Ctrl+Shift+S", "Ctrl+New", "Ctrl+N", "Shift+N"], correct: 2 },
+                    { no: "27", text: "Which of the field has width 8 bytes?", options: ["Memo", "Date/Time", "Number", "Hyperlink"], correct: 1 },
+                    { no: "28", text: "Well-known database management system produced by Microsoft is?", options: ["Microsoft Access", "Microsoft Powerpoint", "Microsoft Edge", "MS Paint"], correct: 0 },
+                    { no: "29", text: "Help Menu", options: ["F2", "Ctrl+F1", "F1", "Ctrl+H"], correct: 2 },
+                    { no: "30", text: "A database object in MS Access that stores a question about the data in database?", options: ["Forms", "Table", "Query", "Report"], correct: 2 },
+                    { no: "31", text: "It is most common type of query. It retrieves records from one or more tables and then...", options: ["Parameter", "Select", "crosstab", "All of above"], correct: 1 },
+                    { no: "33", text: "In a database table, the category of information is called.", options: ["tuple", "field", "record", "All of above"], correct: 1 },
+                    { no: "34", text: "Which of the following is not a database object?", options: ["Table", "Form", "Worksheet", "Modules"], correct: 2 },
+                    { no: "35", text: "What is a relation in RDBMS?", options: ["Table", "Key", "Data Types", "Row"], correct: 0 },
+                    { no: "36", text: "This key uniquely identifies each record.", options: ["Field Name", "Key Record", "Unique Key", "primary key"], correct: 3 },
+                    { no: "37", text: "The command center of access file that appears when you create or open the MS Access database file.", options: ["Database Window", "Quesry Window", "Design View window", "Switchboard"], correct: 0 },
+                    { no: "63", text: "The size of a field with number data type cannot be.", options: ["2", "4", "8", "16"], correct: 3 },
+                    { no: "67", text: "The Yes/No data type is...", options: ["1 bit", "1 byte", "1 Character", "1 Kb"], correct: 0 }
+                ]
+            },
+            {
+                id: "financial",
+                title: "Digital Financial Services",
+                icon: "fa-money-bill-wave",
+                questions: [
+                    { no: "38", text: "Who started the ATM card first?", options: ["SBI", "HDFC", "HSBC", "ICICI"], correct: 2 },
+                    { no: "39", text: "IFS Code is a _ digit code.", options: ["7", "9", "11", "15"], correct: 2 },
+                    { no: "40", text: "The number of digits printed on ATM Debit cart is.", options: ["10", "16", "11", "13"], correct: 1 },
+                    { no: "41/57", text: "USSD was launched by?", options: ["RBI", "SBI", "Bank of Baroda", "Union Bank of India"], correct: 3 },
+                    { no: "42", text: "From what date all banks have started to share their ATM cost for the transaction?", options: ["September 1 2009", "January 1 2009", "April 1 2009", "March 1 2009"], correct: 2 },
+                    { no: "43", text: "UTR means.", options: ["Uniquely Transaction Reference", "Unique Transaction Reference", "Unique Transfer Reference", "None of the above"], correct: 1 },
+                    { no: "44", text: "RTGS stands for.", options: ["Real Time Gross Sale", "Real Time Gross Settlement", "Real Time Growth Settlement", "Real Time Group Service"], correct: 1 },
+                    { no: "45", text: "Which type of deposits earns highest interest rate.", options: ["Saving account", "Current account", "Fixed deposits"], correct: 2 },
+                    { no: "46/56", text: "What is the full form of USSD.", options: ["Unstructured Supplementary Service Data", "Unstructured Supplementary Service Date", "Unstructured System Service Data", "Unstructured System Service Date"], correct: 0 },
+                    { no: "47", text: "Under, PMSBY, accidental death claim is available for.", options: ["1 lakh", "2 lakh", "3 lakh", "4 lakh"], correct: 1 },
+                    { no: "48", text: "Payment Gateway refers to-", options: ["Authorising payment for e-business", "to resolve financial disputes", "Networking switch", "None of the above"], correct: 0 },
+                    { no: "49", text: "UPI was launched by whom.", options: ["R. Gandhi", "urjit patel", "Dr. Raghuram G Rajan", "SS mundra"], correct: 2 },
+                    { no: "50", text: "On which year NEFT start in India.", options: ["2002", "2004", "2005", "2006"], correct: 2 },
+                    { no: "51", text: "AEPS stands for:", options: ["Aadhaar Enabled Payment source", "Aadhaar Enrolled Payment System", "Aadhaar Enabled Payment system", "None of the above"], correct: 2 },
+                    { no: "52", text: "Identify the true statement with respect to IMPS.", options: ["the charges for remittances through IMPS are decided by NPCI", "In IMPS once a payment is initialed it cannot be stopped", "IMPS are not available on Sunday", "all are true"], correct: 1 },
+                    { no: "54", text: "How many digits does an American CVV have?", options: ["3", "4", "5", "6"], correct: 1 },
+                    { no: "55", text: "What is the full form of POS.", options: ["Point of Sale", "Point of Service", "Point of Security", "None of the above"], correct: 0 },
+                    { no: "58", text: "Which bank started Pocket wallet.", options: ["HDFC", "SBI", "ICICI", "HSBC"], correct: 2 },
+                    { no: "59A", text: "The IFSC has _ digit code and _ alpha characters.", options: ["13 digit code and 6 alpha character", "11 digit code and 4 alpha characters", "11", "12"], correct: 1 },
+                    { no: "60", text: "Instant money transfer under IMPS is available on how many days in a week.", options: ["4", "5", "6", "7"], correct: 3 },
+                    { no: "61", text: "Which is not required for accessing the service of PoS system?", options: ["PIN", "Internet", "Debit/Credit Card", "Account Number"], correct: 3 },
+                    { no: "62", text: "Full form of IFSC.", options: ["Indian Financial System Control", "Indian Financial System Code", "Indian Financial Structure Control", "Indian Financial Structure Code"], correct: 1 }
+                ]
+            },
+            {
+                id: "office",
+                title: "Office Automation",
+                icon: "fa-file-word",
+                questions: [
+                    { no: "64", text: "Which of the following is the shortcut key to insert a new slide between the current presentation.", options: ["Ctrl+N", "Ctrl+K", "Ctrl+M", "Ctrl+O"], correct: 2 },
+                    { no: "65", text: "Which commands are present in Quick Access Toolbar.", options: ["Save", "Undo", "Redo", "All of them"], correct: 3 },
+                    { no: "66", text: "Which can be used for quick access to commonly used commands and tools.", options: ["Status bar", "Toolbar", "Menu bar", "Title bar"], correct: 1 },
+                    { no: "70", text: "A collection of worksheets is called.", options: ["Spreadsheets", "Sheets", "Workbook", "Work sheets"], correct: 2 },
+                    { no: "82", text: "WYSIWYG stands for.", options: ["What You See Is What You Get", "What You Seek Is What You Get", "What You See Is What You Give", "What You Seek Is What You Give"], correct: 0 },
+                    { no: "83", text: "Which of the following is the file extension of the PowerPoint application.", options: [".ppt", ".jpg", ".html", ".doc"], correct: 0 },
+                    { no: "84", text: "The cell in which you are currently working on is the.", options: ["Current Cell", "Present Cell", "Active Cell", "Active table"], correct: 2 },
+                    { no: "87", text: "Microsoft Word is a... application.", options: ["Application", "Compiler", "System", "Programming"], correct: 0 },
+                    { no: "88", text: "In a Mail merge, data sources data or information is a.", options: ["Constant", "Variable", "Conditional", "None of these"], correct: 1 }
+                ]
             }
-        }
+        ];
 
-        // Modal Logic
-        const modal = document.getElementById('notificationModal');
-        const modalTitle = document.getElementById('modalTitle');
-        const modalMessage = document.getElementById('modalMessage');
-        const modalIconContainer = document.getElementById('modalIconContainer');
-        const modalCloseBtn = document.getElementById('modalCloseBtn');
-        let successState = false;
+        let currentCategory = quizData[0].id;
+        const labels = ['A', 'B', 'C', 'D'];
 
-        function showModal(title, message, type) {
-            modalTitle.textContent = title;
-            modalMessage.textContent = message;
+        // Initialize App
+        function init() {
+            renderTabs();
+            renderCategory(currentCategory);
             
-            // Set styles based on success or error
-            if (type === 'success') {
-                modalIconContainer.className = 'mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-green-100 sm:mx-0 sm:h-10 sm:w-10';
-                modalIconContainer.innerHTML = '<svg class="h-6 w-6 text-green-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M4.5 12.75l6 6 9-13.5" /></svg>';
-                modalCloseBtn.className = 'inline-flex w-full justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-green-500 sm:ml-3 sm:w-auto';
-                successState = true;
-            } else {
-                modalIconContainer.className = 'mx-auto flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:h-10 sm:w-10';
-                modalIconContainer.innerHTML = '<svg class="h-6 w-6 text-red-600" fill="none" viewBox="0 0 24 24" stroke-width="1.5" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" /></svg>';
-                modalCloseBtn.className = 'inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-sm hover:bg-red-500 sm:ml-3 sm:w-auto';
-                successState = false;
-            }
-
-            modal.classList.remove('hidden');
+            // Calculate total questions
+            const total = quizData.reduce((acc, cat) => acc + cat.questions.length, 0);
+            document.getElementById('total-questions').textContent = total;
         }
 
-        function closeModal() {
-            modal.classList.add('hidden');
-            if (successState) {
-                // Reset form on success
-                document.getElementById('submissionForm').reset();
-                document.getElementById('fileNameDisplay').classList.add('hidden');
-            }
+        // Render Navigation Tabs
+        function renderTabs() {
+            const tabsContainer = document.getElementById('tabs-container');
+            tabsContainer.innerHTML = '';
+            
+            quizData.forEach(cat => {
+                const isActive = cat.id === currentCategory;
+                const tab = document.createElement('button');
+                
+                tab.className = `pb-4 px-1 text-sm md:text-base whitespace-nowrap transition-colors duration-200 flex items-center gap-2 ${isActive ? 'tab-active' : 'text-slate-500 hover:text-slate-700 border-b-2 border-transparent hover:border-slate-300'}`;
+                
+                tab.innerHTML = `<i class="fa-solid ${cat.icon}"></i> ${cat.title} <span class="bg-slate-100 text-slate-500 text-xs px-2 py-0.5 rounded-full ml-1 font-normal">${cat.questions.length}</span>`;
+                
+                tab.onclick = () => {
+                    currentCategory = cat.id;
+                    renderTabs(); // Update active state
+                    renderCategory(currentCategory);
+                };
+                
+                tabsContainer.appendChild(tab);
+            });
         }
 
-        // Form Submission Logic
-        document.getElementById('submissionForm').addEventListener('submit', async function(e) {
-            e.preventDefault();
-
-            const name = document.getElementById('studentName').value.trim();
-            const roll = document.getElementById('rollNumber').value.trim();
-            const fileInput = document.getElementById('answerFile');
-            const files = fileInput.files;
-
-            if (files.length === 0) {
-                showModal('Validation Error', 'Please select at least one file to upload.', 'error');
-                return;
-            }
-
-            // Show loading overlay
-            const loadingOverlay = document.getElementById('loadingOverlay');
-            const loadingText = document.getElementById('loadingText');
-            loadingOverlay.classList.remove('hidden');
-            loadingOverlay.classList.add('flex');
-
-            try {
-                // Upload files sequentially
-                for (let i = 0; i < files.length; i++) {
-                    const file = files[i];
-                    if (loadingText) {
-                        loadingText.textContent = `Uploading file ${i + 1} of ${files.length}...`;
-                    }
-
-                    const formData = new FormData();
-                    formData.append('chat_id', CHAT_ID);
-                    formData.append('document', file);
+        // Render Questions for the selected category
+        function renderCategory(categoryId) {
+            const category = quizData.find(c => c.id === categoryId);
+            document.getElementById('category-title').innerHTML = `<i class="fa-solid ${category.icon} mr-2 text-blue-500"></i>${category.title}`;
+            
+            const container = document.getElementById('questions-container');
+            container.innerHTML = ''; // Clear current
+            
+            category.questions.forEach((q, index) => {
+                const card = document.createElement('div');
+                card.className = 'bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden fade-in';
+                // stagger animation slightly
+                card.style.animationDelay = `${index * 0.05}s`;
+                card.style.animationFillMode = 'both';
+                
+                let optionsHtml = '';
+                q.options.forEach((opt, optIndex) => {
+                    const isCorrect = optIndex === q.correct;
                     
-                    // Format caption: Detailed for the first file, brief for the rest
-                    if (i === 0) {
-                        const caption = `📄 *New Test Submission*\n\n*Subject:* B.C.A. IKS Test\n*Name:* ${name}\n*Roll No:* ${roll}\n*Date:* ${new Date().toLocaleString()}\n*Total Files:* ${files.length}`;
-                        formData.append('caption', caption);
-                        formData.append('parse_mode', 'Markdown');
-                    } else {
-                        formData.append('caption', `Part ${i + 1} of ${files.length} (${name})`);
-                    }
+                    // Style classes based on whether it is the correct option
+                    const baseClass = "flex items-center p-3 rounded-lg border-2 mb-2 last:mb-0 transition-all";
+                    const normalClass = "border-slate-100 bg-slate-50 text-slate-600";
+                    const correctClass = "border-green-500 bg-green-50 text-green-800 font-semibold shadow-sm";
+                    
+                    const labelBaseClass = "flex items-center justify-center w-8 h-8 rounded-md mr-3 font-bold text-sm shrink-0";
+                    const labelNormalClass = "bg-white text-slate-500 border border-slate-200";
+                    const labelCorrectClass = "bg-green-500 text-white border border-green-600 shadow-sm";
 
-                    const response = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendDocument`, {
-                        method: 'POST',
-                        body: formData
-                    });
+                    optionsHtml += `
+                        <div class="${baseClass} ${isCorrect ? correctClass : normalClass}">
+                            <div class="${labelBaseClass} ${isCorrect ? labelCorrectClass : labelNormalClass}">
+                                ${labels[optIndex]}
+                            </div>
+                            <span class="flex-grow">${opt}</span>
+                            ${isCorrect ? '<i class="fa-solid fa-circle-check text-green-500 text-xl ml-2 shrink-0"></i>' : ''}
+                        </div>
+                    `;
+                });
 
-                    const result = await response.json();
+                card.innerHTML = `
+                    <div class="p-5 md:p-6 bg-slate-50/50 border-b border-slate-100 flex items-start gap-4">
+                        <div class="bg-blue-100 text-blue-700 font-bold w-10 h-10 rounded-full flex items-center justify-center shrink-0">
+                            ${q.no}
+                        </div>
+                        <h3 class="text-lg font-medium text-slate-800 pt-1 leading-snug">
+                            ${q.text}
+                        </h3>
+                    </div>
+                    <div class="p-5 md:p-6 bg-white">
+                        ${optionsHtml}
+                    </div>
+                `;
+                
+                container.appendChild(card);
+            });
+        }
 
-                    if (!result.ok) {
-                        throw new Error(result.description || `Failed on file ${i + 1}`);
-                    }
-                }
-
-                showModal('Submission Successful', `Thank you ${name}. All ${files.length} files have been successfully uploaded and sent to the instructor.`, 'success');
-            } catch (error) {
-                console.error('Network/Upload Error:', error);
-                showModal('Upload Error', `An error occurred: ${error.message}. Please check your connection and try again.`, 'error');
-            } finally {
-                // Hide loading overlay
-                loadingOverlay.classList.add('hidden');
-                loadingOverlay.classList.remove('flex');
-                if (loadingText) {
-                    loadingText.textContent = 'Uploading your submission...'; // Reset text
-                }
-            }
-        });
+        // Run init on load
+        window.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
