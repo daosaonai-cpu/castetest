@@ -51,6 +51,19 @@
                 <!-- Tabs will be injected here by JS -->
             </nav>
         </div>
+        
+        <!-- Search Bar -->
+        <div class="max-w-5xl mx-auto px-4 sm:px-6 lg:px-8 mt-4 mb-2 pb-2">
+            <div class="relative">
+                <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+                    <i class="fa-solid fa-search text-slate-400"></i>
+                </div>
+                <input type="text" id="search-input" class="block w-full pl-10 pr-3 py-2 border border-slate-300 rounded-lg leading-5 bg-white placeholder-slate-500 focus:outline-none focus:placeholder-slate-400 focus:ring-1 focus:ring-blue-500 focus:border-blue-500 sm:text-sm transition duration-150 ease-in-out" placeholder="Search questions...">
+                <button id="clear-search" class="absolute inset-y-0 right-0 pr-3 flex items-center text-slate-400 hover:text-slate-600 hidden">
+                    <i class="fa-solid fa-times"></i>
+                </button>
+            </div>
+        </div>
     </header>
 
     <!-- Main Content -->
@@ -59,6 +72,12 @@
             <h2 id="category-title" class="text-2xl font-bold text-slate-800">Category Name</h2>
         </div>
         
+        <div id="no-results" class="hidden text-center py-10">
+            <i class="fa-solid fa-magnifying-glass text-4xl text-slate-300 mb-3"></i>
+            <h3 class="text-lg font-medium text-slate-900">No questions found</h3>
+            <p class="text-slate-500 mt-1">Try adjusting your search terms.</p>
+        </div>
+
         <div id="questions-container" class="space-y-6">
             <!-- Questions will be injected here by JS -->
         </div>
@@ -166,6 +185,7 @@
         ];
 
         let currentCategory = quizData[0].id;
+        let searchQuery = "";
         const labels = ['A', 'B', 'C', 'D'];
 
         // Initialize App
@@ -176,6 +196,30 @@
             // Calculate total questions
             const total = quizData.reduce((acc, cat) => acc + cat.questions.length, 0);
             document.getElementById('total-questions').textContent = total;
+
+            // Setup search listener
+            const searchInput = document.getElementById('search-input');
+            const clearButton = document.getElementById('clear-search');
+
+            searchInput.addEventListener('input', (e) => {
+                searchQuery = e.target.value.toLowerCase().trim();
+                
+                if (searchQuery.length > 0) {
+                    clearButton.classList.remove('hidden');
+                } else {
+                    clearButton.classList.add('hidden');
+                }
+                
+                renderCategory(currentCategory);
+            });
+
+            clearButton.addEventListener('click', () => {
+                searchInput.value = '';
+                searchQuery = '';
+                clearButton.classList.add('hidden');
+                renderCategory(currentCategory);
+                searchInput.focus();
+            });
         }
 
         // Render Navigation Tabs
@@ -204,12 +248,38 @@
         // Render Questions for the selected category
         function renderCategory(categoryId) {
             const category = quizData.find(c => c.id === categoryId);
-            document.getElementById('category-title').innerHTML = `<i class="fa-solid ${category.icon} mr-2 text-blue-500"></i>${category.title}`;
+            
+            // Filter questions if there's a search query
+            let questionsToRender = category.questions;
+            if (searchQuery) {
+                questionsToRender = category.questions.filter(q => {
+                    const textMatch = q.text.toLowerCase().includes(searchQuery);
+                    const optionsMatch = q.options.some(opt => opt.toLowerCase().includes(searchQuery));
+                    return textMatch || optionsMatch;
+                });
+            }
+
+            if (searchQuery) {
+                document.getElementById('category-title').innerHTML = `Search Results in <span class="text-slate-500 font-normal ml-2 text-lg">"${category.title}"</span>`;
+            } else {
+                document.getElementById('category-title').innerHTML = `<i class="fa-solid ${category.icon} mr-2 text-blue-500"></i>${category.title}`;
+            }
             
             const container = document.getElementById('questions-container');
+            const noResults = document.getElementById('no-results');
+            
             container.innerHTML = ''; // Clear current
             
-            category.questions.forEach((q, index) => {
+            if (questionsToRender.length === 0) {
+                container.classList.add('hidden');
+                noResults.classList.remove('hidden');
+                return;
+            } else {
+                container.classList.remove('hidden');
+                noResults.classList.add('hidden');
+            }
+
+            questionsToRender.forEach((q, index) => {
                 const card = document.createElement('div');
                 card.className = 'bg-white rounded-xl shadow-sm border border-slate-200 overflow-hidden fade-in';
                 // stagger animation slightly
