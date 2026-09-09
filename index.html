@@ -5,510 +5,588 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>Retro Camera App</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Inter:wght@400;600&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Oswald:wght@500&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #1a1a2e;
+            background-color: #121212; /* Fallback dark */
+            background-image: radial-gradient(circle at 50% 50%, #2a2a2a 0%, #151515 100%); /* Camera body texture simulation */
             color: #e0e0e0;
-            overflow: hidden; /* Prevent scrolling when interacting with camera */
-            touch-action: none; /* Prevent pinch zoom etc on mobile */
-        }
-        .pixel-font {
-            font-family: 'Press Start 2P', cursive;
-        }
-        
-        /* Main camera container */
-        #camera-container {
-            position: relative;
-            width: 100vw;
-            height: 100vh;
-            display: flex;
-            flex-direction: column;
-            justify-content: space-between;
+            overflow: hidden;
+            touch-action: none;
+            user-select: none;
+            -webkit-user-select: none;
         }
 
-        /* Hidden video element for source */
+        /* The main app container simulating the camera body */
+        #camera-body {
+            max-width: 500px;
+            margin: 0 auto;
+            height: 100dvh;
+            display: flex;
+            flex-direction: column;
+            position: relative;
+            background-color: #1c1c1e;
+            box-shadow: inset 0 0 50px rgba(0,0,0,0.8);
+        }
+
+        /* Viewfinder framing */
+        #viewfinder-container {
+            position: relative;
+            width: 90%;
+            aspect-ratio: 3 / 4;
+            margin: 0 auto;
+            background-color: #000;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 4px solid #000;
+            box-shadow: inset 0 0 20px rgba(0,0,0,1), 0 5px 15px rgba(0,0,0,0.5);
+            z-index: 10;
+        }
+
         #video-source {
             display: none;
         }
 
-        /* The canvas where filters are applied */
         #output-canvas {
             width: 100%;
             height: 100%;
             object-fit: cover;
+            display: block;
+        }
+
+        /* Grid overlay */
+        #grid-overlay {
             position: absolute;
-            top: 0;
-            left: 0;
-            z-index: 1;
+            top: 0; left: 0; width: 100%; height: 100%;
+            display: none;
+            pointer-events: none;
+            z-index: 20;
         }
+        .grid-line-h { width: 100%; height: 1px; background: rgba(255,255,255,0.4); position: absolute; left: 0; }
+        .grid-line-v { width: 1px; height: 100%; background: rgba(255,255,255,0.4); position: absolute; top: 0; }
 
-        /* UI Overlay */
-        #ui-layer {
-            position: relative;
-            z-index: 10;
-            height: 100%;
+        /* Secondary Control Bar (under viewfinder) */
+        #sub-controls {
+            width: 90%;
+            margin: 0 auto;
+            background-color: #0a0a0a;
+            border-bottom-left-radius: 12px;
+            border-bottom-right-radius: 12px;
             display: flex;
-            flex-direction: column;
             justify-content: space-between;
-            pointer-events: none; /* Let clicks pass through to background if needed, specific UI elements will have pointer-events: auto */
-        }
-
-        .ui-element {
-            pointer-events: auto;
-        }
-
-        /* Camera Selection Carousel */
-        #camera-selector {
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(5px);
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            overflow-x: auto;
-            scrollbar-width: none; /* Firefox */
-            scroll-behavior: smooth;
-        }
-        #camera-selector::-webkit-scrollbar {
-            display: none; /* Safari and Chrome */
-        }
-
-        .camera-option {
-            flex: 0 0 auto;
-            width: 80px;
-            opacity: 0.5;
-            transition: all 0.3s ease;
-            cursor: pointer;
-            display: flex;
-            flex-direction: column;
             align-items: center;
-            gap: 4px;
-        }
-        
-        .camera-option.active {
-            opacity: 1;
-            transform: scale(1.1);
+            padding: 12px 16px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            margin-top: -4px; /* Pull up to attach to viewfinder */
+            z-index: 5;
         }
 
-        .camera-icon-placeholder {
-            width: 50px;
-            height: 35px;
-            background-color: #333;
-            border-radius: 4px;
+        .icon-btn {
+            background: none;
+            border: none;
+            color: white;
+            cursor: pointer;
+            transition: transform 0.1s, opacity 0.2s;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 10px;
-            border: 2px solid #555;
+        }
+        .icon-btn:active {
+            transform: scale(0.85);
+            opacity: 0.7;
+        }
+
+        /* Main Bottom Area */
+        #main-controls {
+            flex-grow: 1;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            padding: 0 20px;
             position: relative;
         }
-        
-        .camera-option.active .camera-icon-placeholder {
-            border-color: #fbbf24; /* Amber-400 */
-            box-shadow: 0 0 10px rgba(251, 191, 36, 0.5);
-        }
 
-        /* Lens representation inside placeholder */
-        .camera-icon-placeholder::after {
-            content: '';
-            width: 15px;
-            height: 15px;
-            background: #111;
-            border-radius: 50%;
-            border: 2px solid #666;
-        }
-
-        /* Capture Button */
+        /* Shutter Button - Metallic Radial Gradient */
         #capture-btn {
-            width: 70px;
-            height: 70px;
+            width: 85px;
+            height: 85px;
             border-radius: 50%;
-            background-color: rgba(255, 255, 255, 0.8);
-            border: 4px solid #fff;
-            box-shadow: 0 0 15px rgba(0,0,0,0.5);
-            transition: transform 0.1s;
+            background: radial-gradient(circle at 30% 30%, #e8e8e8 0%, #c4c4c4 25%, #888888 50%, #4a4a4a 80%, #222222 100%);
+            border: 4px solid #111;
+            box-shadow: 
+                0 10px 20px rgba(0,0,0,0.6), 
+                inset 0 2px 4px rgba(255,255,255,0.6),
+                inset 0 -4px 8px rgba(0,0,0,0.6);
+            transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            cursor: pointer;
+            outline: none;
+            -webkit-tap-highlight-color: transparent;
         }
+        
+        #capture-btn::after {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 90%; height: 90%;
+            border-radius: 50%;
+            background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(0,0,0,0.1) 100%);
+            pointer-events: none;
+        }
+
         #capture-btn:active {
-            transform: scale(0.9);
-            background-color: rgba(200, 200, 200, 0.8);
+            transform: scale(0.95) translateY(2px);
+            box-shadow: 
+                0 4px 10px rgba(0,0,0,0.8), 
+                inset 0 4px 8px rgba(0,0,0,0.7);
         }
 
-        /* Camera Info Display */
-        #camera-info {
-            text-shadow: 1px 1px 2px black;
-        }
-
-        /* Flash screen effect */
+        /* Flash Screen */
         #flash-screen {
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+            top: 0; left: 0; right: 0; bottom: 0;
             background-color: white;
-            z-index: 20;
+            z-index: 100;
             opacity: 0;
             pointer-events: none;
-            transition: opacity 0.5s ease-out;
+            transition: opacity 0.4s ease-out;
         }
 
-        /* Snapshot preview */
+        /* Mini Preview */
         #preview-container {
-            position: absolute;
-            bottom: 90px;
-            right: 20px;
-            width: 60px;
-            height: 80px;
-            border: 2px solid white;
-            border-radius: 4px;
-            background-color: #333;
-            z-index: 10;
-            display: none; /* Hidden initially */
+            width: 55px;
+            height: 55px;
+            border-radius: 12px;
+            border: 2px solid #333;
             overflow: hidden;
+            background-color: #111;
             cursor: pointer;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-            pointer-events: auto;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
         }
-        
         #preview-img {
             width: 100%;
             height: 100%;
             object-fit: cover;
         }
 
-        /* Fullscreen view for captured image */
+        /* Green floating badge */
+        .badge-green {
+            background-color: #a3e635; /* lime-400 */
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: absolute;
+            top: -10px;
+            right: -25px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.4);
+            cursor: pointer;
+        }
+        .badge-close {
+            position: absolute;
+            top: -4px;
+            left: -4px;
+            background: white;
+            color: black;
+            border-radius: 50%;
+            width: 14px;
+            height: 14px;
+            font-size: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+        }
+
+        /* Toggle switch bottom */
+        .toggle-track {
+            width: 60px;
+            height: 24px;
+            background: #2a2a2a;
+            border-radius: 12px;
+            position: relative;
+            box-shadow: inset 0 2px 4px rgba(0,0,0,0.8), 0 1px 1px rgba(255,255,255,0.1);
+            display: flex;
+            align-items: center;
+            padding: 0 4px;
+        }
+        .toggle-dots {
+            display: flex;
+            justify-content: space-between;
+            width: 100%;
+            padding: 0 8px;
+        }
+        .toggle-dot {
+            width: 4px;
+            height: 4px;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.3);
+        }
+        .toggle-thumb {
+            width: 28px;
+            height: 18px;
+            background: linear-gradient(to bottom, #ccc, #888);
+            border-radius: 10px;
+            position: absolute;
+            left: 3px;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255,255,255,0.8);
+            transition: left 0.2s ease;
+        }
+
+        /* Pro CCD Icon */
+        .pro-ccd-icon {
+            width: 45px;
+            height: 35px;
+            background: linear-gradient(to bottom, #db2777, #9d174d);
+            border-radius: 4px;
+            border: 2px solid #333;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.4);
+        }
+        .pro-ccd-lens {
+            width: 16px;
+            height: 16px;
+            background: radial-gradient(circle, #444 0%, #111 100%);
+            border: 2px solid #e5e7eb;
+            border-radius: 50%;
+        }
+
+        /* LED Indicator */
+        .led-indicator {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background-color: #22c55e;
+            box-shadow: 0 0 8px #22c55e, 0 0 12px #22c55e;
+            margin-bottom: 8px;
+        }
+
+        /* Fullscreen Photo View */
         #fullscreen-view {
             display: none;
             position: absolute;
-            top: 0;
-            left: 0;
-            width: 100vw;
-            height: 100vh;
-            background-color: rgba(0,0,0,0.9);
-            z-index: 30;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background-color: rgba(10,10,10,0.95);
+            z-index: 50;
             flex-direction: column;
             align-items: center;
             justify-content: center;
-            pointer-events: auto;
+            backdrop-filter: blur(10px);
         }
-
         #fullscreen-img {
             max-width: 90%;
-            max-height: 80%;
+            max-height: 75%;
             object-fit: contain;
-            border: 10px solid white; /* Polaroid style border */
-            border-bottom-width: 40px;
-            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
         }
 
-        /* Error/Permission Message */
-        #message-box {
+        /* Filter Menu (Replaces old carousel) */
+        #filter-menu {
             display: none;
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            background: rgba(20, 20, 30, 0.9);
+            bottom: 0; left: 0; width: 100%;
+            background: rgba(20, 20, 25, 0.95);
+            border-top: 1px solid #333;
             padding: 20px;
-            border-radius: 8px;
-            border: 1px solid #444;
-            z-index: 50;
-            text-align: center;
-            max-width: 80%;
+            z-index: 40;
+            border-top-left-radius: 20px;
+            border-top-right-radius: 20px;
+            box-shadow: 0 -10px 40px rgba(0,0,0,0.8);
+            transform: translateY(100%);
+            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        #filter-menu.open {
+            transform: translateY(0);
+        }
+        .filter-list {
+            display: flex;
+            overflow-x: auto;
+            gap: 15px;
+            padding-bottom: 10px;
+            scrollbar-width: none; /* Firefox */
+        }
+        .filter-list::-webkit-scrollbar { display: none; } /* Chrome/Safari */
+        
+        .filter-option {
+            flex: 0 0 auto;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            opacity: 0.5;
+            transition: 0.2s;
+            cursor: pointer;
+        }
+        .filter-option.active {
+            opacity: 1;
+            transform: scale(1.1);
+        }
+        .filter-color-box {
+            width: 50px; height: 50px;
+            border-radius: 12px;
+            margin-bottom: 8px;
+            border: 2px solid #444;
+        }
+        .filter-option.active .filter-color-box {
+            border-color: #fff;
+            box-shadow: 0 0 15px rgba(255,255,255,0.3);
         }
 
     </style>
 </head>
 <body>
-
-    <div id="camera-container">
-        <!-- Hidden video element to get camera feed -->
-        <video id="video-source" autoplay playsinline></video>
+    <div id="camera-body">
         
-        <!-- Canvas to draw and filter the video feed -->
-        <canvas id="output-canvas"></canvas>
+        <!-- Top Navigation Icons -->
+        <div class="flex justify-between items-center p-6 text-gray-400">
+            <!-- Settings Hexagon Icon -->
+            <button class="icon-btn hover:text-white">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z"></path>
+                    <path d="M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"></path>
+                    <path d="M12 2v2"></path>
+                    <path d="M12 20v2"></path>
+                    <path d="m4.93 4.93 1.41 1.41"></path>
+                    <path d="m17.66 17.66 1.41 1.41"></path>
+                    <path d="M2 12h2"></path>
+                    <path d="M20 12h2"></path>
+                    <path d="m4.93 19.07 1.41-1.41"></path>
+                    <path d="m17.66 6.34 1.41-1.41"></path>
+                </svg>
+            </button>
+            <!-- Crown Icon -->
+            <button class="icon-btn hover:text-white">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14"></path>
+                </svg>
+            </button>
+        </div>
 
-        <!-- Flash effect layer -->
-        <div id="flash-screen"></div>
-
-        <!-- UI Layer -->
-        <div id="ui-layer">
+        <!-- Viewfinder (The Camera Screen) -->
+        <div id="viewfinder-container">
+            <video id="video-source" autoplay playsinline></video>
+            <canvas id="output-canvas"></canvas>
             
-            <!-- Top Bar: Camera Selector -->
-            <div id="camera-selector" class="ui-element flex px-4 py-3 gap-6">
-                <!-- Camera options injected via JS -->
+            <!-- Rule of Thirds Grid -->
+            <div id="grid-overlay">
+                <div class="grid-line-h" style="top: 33.33%;"></div>
+                <div class="grid-line-h" style="top: 66.66%;"></div>
+                <div class="grid-line-v" style="left: 33.33%;"></div>
+                <div class="grid-line-v" style="left: 66.66%;"></div>
+            </div>
+        </div>
+
+        <!-- Secondary Controls Bar (Black bar under viewfinder) -->
+        <div id="sub-controls">
+            <!-- Flash -->
+            <button class="icon-btn" id="btn-flash">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a1 1 0 0 0-1 1v11.16L2 22h14a1 1 0 0 0 .9-.55l5.2-11.4A1 1 0 0 0 21.19 9H15V2Z"/><circle cx="12" cy="12" r="10" stroke-width="1.5"/></svg>
+            </button>
+            <!-- Timer -->
+            <button class="icon-btn flex flex-col items-center gap-1" id="btn-timer">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M5 3 2 6"/><path d="m22 6-3-3"/><path d="M6.38 18.7 4 21"/><path d="M17.64 18.67 20 21"/></svg>
+                <span class="text-[8px] font-bold tracking-wider">OFF</span>
+            </button>
+            <!-- Flip Camera -->
+            <button class="icon-btn" id="btn-flip">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/></svg>
+            </button>
+            <!-- MENU -->
+            <button class="icon-btn border border-white px-2 py-0.5 rounded-sm text-xs font-bold" id="btn-menu">
+                MENU
+            </button>
+            <!-- Grid Toggle -->
+            <button class="icon-btn" id="btn-grid">
+                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <line x1="3" y1="9" x2="21" y2="9"></line>
+                    <line x1="3" y1="15" x2="21" y2="15"></line>
+                    <line x1="9" y1="3" x2="9" y2="21"></line>
+                    <line x1="15" y1="3" x2="15" y2="21"></line>
+                </svg>
+            </button>
+            <!-- DISP -->
+            <button class="icon-btn border border-white px-2 py-0.5 rounded-sm text-xs font-bold" id="btn-disp">
+                DISP.
+            </button>
+        </div>
+
+        <!-- Main Controls (Bottom Area) -->
+        <div id="main-controls">
+            
+            <!-- Left: PRO CCD Module -->
+            <div class="flex flex-col items-center justify-center cursor-pointer" id="pro-ccd-btn">
+                <div class="led-indicator"></div>
+                <div class="pro-ccd-icon">
+                    <div class="absolute top-1 left-1 w-2 h-1 bg-gray-300 rounded-sm"></div>
+                    <div class="pro-ccd-lens"></div>
+                </div>
+                <span class="text-[9px] text-gray-500 font-bold mt-2 tracking-widest uppercase" id="current-filter-name">PRO CCD</span>
             </div>
 
-            <!-- Middle: Camera Info -->
-            <div class="px-6 py-4 flex-grow flex flex-col justify-start mt-4 pointer-events-none">
-                <div class="flex items-center gap-2 mb-2">
-                    <span class="pixel-font text-xl text-white" id="info-name">> DISPO F <</span>
-                    <span class="text-xl" id="info-crown">👑</span>
-                </div>
-                <div class="pixel-font text-xs text-gray-300 mb-4" id="info-tags">
-                    [Disposable Camera] [Grain] [Warm]
-                </div>
-                <!-- Optional: short description if space permits, hidden on very small screens -->
-                <div class="pixel-font text-[10px] text-gray-200 leading-relaxed max-w-md hidden sm:block opacity-80" id="info-desc">
-                    Inspired by disposable film cameras...
-                </div>
-            </div>
-
-            <!-- Bottom Bar: Controls -->
-            <div class="ui-element flex justify-center items-center pb-8 pt-4 bg-gradient-to-t from-black/80 to-transparent">
-                <!-- Switch Camera Button (Front/Back) -->
-                <button id="switch-cam-btn" class="absolute left-8 p-3 bg-black/50 rounded-full text-white hover:bg-black/70">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/></svg>
-                </button>
-
-                <!-- Main Capture Button -->
+            <!-- Center: Shutter Button Area -->
+            <div class="relative flex items-center justify-center w-[120px] h-[120px]">
                 <button id="capture-btn" aria-label="Take Photo"></button>
-
-                <!-- Sub-filters (if applicable for the selected camera) -->
-                <div id="sub-filter-container" class="absolute right-8 flex flex-col gap-2 hidden">
-                    <!-- e.g., for ACTION camera: CC, NC, etc. -->
+                
+                <!-- Green Badge Overlay -->
+                <div class="badge-green">
+                    <div class="badge-close">×</div>
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-0-5H20"/><path d="M9 7h6"/><path d="M9 11h6"/></svg>
                 </div>
             </div>
 
-            <!-- Mini Preview of last captured photo -->
-            <div id="preview-container" class="ui-element">
-                <img id="preview-img" src="" alt="Preview">
+            <!-- Right: Photo Preview -->
+            <div id="preview-container">
+                <img id="preview-img" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="Preview">
             </div>
+
+        </div>
+
+        <!-- Bottom Mode Toggle (Photo/Video) -->
+        <div class="w-full flex justify-center items-center pb-8 gap-4 text-gray-400">
+            <!-- Photo Icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4" fill="#121212"/></svg>
+            
+            <!-- Toggle Slider -->
+            <div class="toggle-track">
+                <div class="toggle-dots">
+                    <div class="toggle-dot"></div>
+                    <div class="toggle-dot"></div>
+                    <div class="toggle-dot"></div>
+                </div>
+                <div class="toggle-thumb" id="mode-thumb"></div>
+            </div>
+
+            <!-- Video Icon -->
+            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
+        </div>
+
+    </div>
+
+    <!-- Flash Effect Layer -->
+    <div id="flash-screen"></div>
+
+    <!-- Filter Selection Menu (Hidden by default, slides up) -->
+    <div id="filter-menu">
+        <div class="flex justify-between items-center mb-4">
+            <h3 class="text-white font-bold text-sm tracking-widest">FILTERS</h3>
+            <button class="text-gray-400 font-bold hover:text-white" id="close-menu-btn">DONE</button>
+        </div>
+        <div class="filter-list" id="camera-selector">
+            <!-- Injected via JS -->
         </div>
     </div>
 
-    <!-- Fullscreen view for saving/closing -->
+    <!-- Fullscreen Output View -->
     <div id="fullscreen-view">
-        <div class="flex justify-between w-full px-6 py-4 absolute top-0">
-            <button id="close-fullscreen" class="text-white bg-black/50 p-2 rounded-full pixel-font text-xs">X CLOSE</button>
-            <button id="save-photo" class="text-white bg-blue-600/80 px-4 py-2 rounded pixel-font text-xs hover:bg-blue-500">SAVE</button>
+        <div class="flex justify-between w-full px-6 py-4 absolute top-0 z-10">
+            <button id="close-fullscreen" class="text-white bg-black/60 px-4 py-2 rounded-full text-xs font-bold shadow-lg">← BACK</button>
+            <button id="save-photo" class="text-white bg-blue-600 px-4 py-2 rounded-full text-xs font-bold shadow-lg shadow-blue-900/50">SAVE IMG</button>
         </div>
         <img id="fullscreen-img" src="" alt="Captured Photo">
     </div>
 
-    <!-- Error Messages -->
-    <div id="message-box">
-        <p id="message-text" class="mb-4 pixel-font text-xs leading-5">Message here</p>
-        <button id="close-message" class="bg-gray-700 px-4 py-2 rounded text-white text-sm">OK</button>
+    <!-- UI Overlay Messages -->
+    <div id="toast-msg" class="fixed top-1/4 left-1/2 transform -translate-x-1/2 bg-black/80 text-white px-4 py-2 rounded-full text-xs font-bold opacity-0 pointer-events-none transition-opacity duration-300 z-50">
+        Message
     </div>
 
     <script>
-        // Data structure for camera types based on the provided images
+        // Filter/Camera configurations (keeping original capabilities)
         const cameras = [
             {
-                id: 'dispo_f',
-                name: 'DISPO F',
-                tags: '[Disposable Camera] [Grain] [Warm]',
-                desc: 'Inspired by disposable film cameras. Features rough color noise enhancing retro film texture. Yellow-green and brown-red color shifts.',
-                iconColor: '#2dd4bf', // Teal-ish placeholder
-                hasSubFilters: true,
-                subFilters: ['+* 01', '+* 02'], // Fake sub-filters for UI
-                process: (ctx, canvas, width, height, time) => {
-                    // DISPO F Effect: Warm/Greenish tint, High Contrast, Heavy Grain
-                    
-                    // 1. Basic CSS filter equivalent (brightness, contrast, sepia)
-                    ctx.filter = 'contrast(1.2) brightness(1.05) sepia(0.3) hue-rotate(-10deg) saturate(1.2)';
-                    
-                    // We need to draw the video first if using ctx.filter (handled in main loop)
-                    // Then apply manual pixel manipulation for noise if needed, or use a composite trick.
-                    
-                    // To do real film grain performantly in JS canvas without WebGL is tricky on full res.
-                    // We will overlay a generated noise pattern.
-                },
-                postProcess: (ctx, width, height) => {
-                    // Overlay Noise
-                    drawNoise(ctx, width, height, 0.15, 'rgba(100, 100, 50, 0.1)'); // Greenish-warm noise
-                    applyVignette(ctx, width, height, 0.6, 1.0);
-                }
+                id: 'pro_ccd', name: 'PRO CCD', iconColor: '#db2777', 
+                process: (ctx) => { ctx.filter = 'contrast(1.1) saturate(1.1)'; }
             },
             {
-                id: 'z50',
-                name: 'Z50',
-                tags: '[Soft light] [Portrait] [Matte]',
-                desc: 'Inspired by Casio Z50. Excellent soft light effects with a matte feel, clear bright images with lower color saturation.',
-                iconColor: '#db2777', // Pink-ish
-                process: (ctx) => {
-                    // Z50 Effect: Soft, slightly overexposed, desaturated, matte (lowered blacks)
-                    ctx.filter = 'brightness(1.15) contrast(0.9) saturate(0.8) blur(0.5px)';
-                },
-                postProcess: (ctx, width, height) => {
-                    // Matte effect: wash out blacks slightly by overlaying a very faint white layer
-                    ctx.fillStyle = 'rgba(255, 255, 255, 0.05)';
-                    ctx.fillRect(0, 0, width, height);
-                }
+                id: 'dispo_f', name: 'DISPO F', iconColor: '#2dd4bf', 
+                process: (ctx) => { ctx.filter = 'contrast(1.2) brightness(1.05) sepia(0.3) hue-rotate(-10deg) saturate(1.2)'; },
+                postProcess: (ctx, w, h) => { drawNoise(ctx, w, h, 0.15, 'rgba(100, 100, 50, 0.1)'); applyVignette(ctx, w, h, 0.6, 1.0); }
             },
             {
-                id: 'action',
-                name: 'ACTION',
-                tags: '[High-quality] [Delicate] [Daily]',
-                desc: 'Cinematic quality. Fuji CC (soft & delicate).',
-                iconColor: '#4b5563', // Gray
-                process: (ctx) => {
-                    // Fuji CC Style: Slightly cool shadows, warm highlights, desaturated, soft contrast
-                    ctx.filter = 'contrast(0.95) saturate(0.85) sepia(0.1) hue-rotate(5deg)';
-                },
-                postProcess: (ctx, width, height) => {
-                    // Cyan/Blue tint in shadows (simulated simply here)
-                    ctx.fillStyle = 'rgba(0, 50, 100, 0.05)';
-                    ctx.globalCompositeOperation = 'overlay';
-                    ctx.fillRect(0, 0, width, height);
-                    ctx.globalCompositeOperation = 'source-over';
-                }
+                id: 'z50', name: 'Z50', iconColor: '#d946ef',
+                process: (ctx) => { ctx.filter = 'brightness(1.15) contrast(0.9) saturate(0.8) blur(0.5px)'; },
+                postProcess: (ctx, w, h) => { ctx.fillStyle = 'rgba(255, 255, 255, 0.05)'; ctx.fillRect(0, 0, w, h); }
             },
             {
-                id: 'booth',
-                name: 'BOOTH',
-                tags: '[Photo booth] [Portrait] [4 Cuts]',
-                desc: 'American retro photo booth. Antique bronze and color effects.',
-                iconColor: '#b45309', // Wood/Bronze color
-                process: (ctx) => {
-                    // Booth Effect: Warm, vintage, sepia heavy
-                    ctx.filter = 'sepia(0.6) contrast(1.1) brightness(0.9) saturate(1.2)';
-                },
-                postProcess: (ctx, width, height) => {
-                    applyVignette(ctx, width, height, 0.4, 0.9);
-                    // Add slight vertical streaks/scratches for booth feel
-                    drawScratches(ctx, width, height, 3, 0.05);
-                }
+                id: 'action', name: 'ACTION', iconColor: '#4b5563',
+                process: (ctx) => { ctx.filter = 'contrast(0.95) saturate(0.85) sepia(0.1) hue-rotate(5deg)'; },
+                postProcess: (ctx, w, h) => { ctx.fillStyle = 'rgba(0, 50, 100, 0.05)'; ctx.globalCompositeOperation = 'overlay'; ctx.fillRect(0, 0, w, h); ctx.globalCompositeOperation = 'source-over'; }
             },
             {
-                id: 'bigshot',
-                name: 'BIGSHOT',
-                tags: '[Packfilm] [Portrait] [Vintage]',
-                desc: 'Polaroid Big Shot pack film camera. Vintage filters and films.',
-                iconColor: '#d1d5db', // Light gray/silver
-                process: (ctx) => {
-                    // Packfilm: Faded, low contrast, slight color shifts (magenta/green)
-                    ctx.filter = 'contrast(0.8) brightness(1.1) sepia(0.2) hue-rotate(-20deg) saturate(0.7)';
-                },
-                postProcess: (ctx, width, height) => {
-                    drawNoise(ctx, width, height, 0.1);
-                    // Light leak effect
-                    drawLightLeak(ctx, width, height, 'left', 'rgba(255, 100, 0, 0.15)');
-                }
-            },
-            {
-                id: 'nx',
-                name: 'NX',
-                tags: '[Dreamcore] [Soft Light] [Scenery]',
-                desc: 'Refreshing color palette, high exposure, ethereal luminescence. Dreamlike atmosphere.',
-                iconColor: '#5eead4', // Light teal/cyan
-                process: (ctx) => {
-                    // Dreamcore: High exposure, bloom (blur), cyan/blue shift, high saturation
-                    ctx.filter = 'brightness(1.2) contrast(0.9) saturate(1.4) hue-rotate(15deg)';
-                },
-                postProcess: (ctx, width, height) => {
-                    // Soft glow effect (simulated by drawing a scaled up, blurred version over itself with screen)
-                    // Too expensive to do full bloom in real-time on basic canvas easily without WebGL, 
-                    // so we use a simple white overlay and strong CSS filters.
-                    ctx.fillStyle = 'rgba(200, 255, 255, 0.1)';
-                    ctx.globalCompositeOperation = 'screen';
-                    ctx.fillRect(0, 0, width, height);
-                    ctx.globalCompositeOperation = 'source-over';
-                }
-            },
-            {
-                id: 'inst_e',
-                name: 'INST E',
-                tags: '[Polaroid] [Daily] [Retro]',
-                desc: 'Digital instant camera. Capturing everyday memories.',
-                iconColor: '#9a3412', // Brown leather
-                process: (ctx) => {
-                    // Instax style: Blown highlights, crushed blacks, slight cool/magenta tint, soft
-                    ctx.filter = 'contrast(1.2) brightness(1.1) saturate(0.9) sepia(0.15)';
-                },
-                postProcess: (ctx, width, height) => {
-                    applyVignette(ctx, width, height, 0.5, 0.8);
-                    // Wash out edges slightly more (polaroid fade)
-                    ctx.fillStyle = 'rgba(255, 250, 240, 0.05)';
-                    ctx.fillRect(0, 0, width, height);
-                }
+                id: 'booth', name: 'BOOTH', iconColor: '#b45309',
+                process: (ctx) => { ctx.filter = 'sepia(0.6) contrast(1.1) brightness(0.9) saturate(1.2)'; },
+                postProcess: (ctx, w, h) => { applyVignette(ctx, w, h, 0.4, 0.9); drawScratches(ctx, w, h, 3, 0.05); }
             }
         ];
 
         let currentCameraIndex = 0;
         let videoStream = null;
-        let useFrontCamera = false; // Default back camera
-        
+        let useFrontCamera = true; // Use front camera by default for selfies
+        let showGrid = false;
+        let showTimestamp = true;
+
         // DOM Elements
         const videoElement = document.getElementById('video-source');
         const canvasElement = document.getElementById('output-canvas');
         const ctx = canvasElement.getContext('2d', { willReadFrequently: true });
-        const cameraSelector = document.getElementById('camera-selector');
-        
-        const infoName = document.getElementById('info-name');
-        const infoTags = document.getElementById('info-tags');
-        const infoDesc = document.getElementById('info-desc');
+        const viewfinderContainer = document.getElementById('viewfinder-container');
         
         const captureBtn = document.getElementById('capture-btn');
-        const switchCamBtn = document.getElementById('switch-cam-btn');
-        const flashScreen = document.getElementById('flash-screen');
+        const flipBtn = document.getElementById('btn-flip');
+        const gridBtn = document.getElementById('btn-grid');
+        const dispBtn = document.getElementById('btn-disp');
+        const menuBtn = document.getElementById('btn-menu');
+        const proCcdBtn = document.getElementById('pro-ccd-btn');
         
+        const flashScreen = document.getElementById('flash-screen');
+        const gridOverlay = document.getElementById('grid-overlay');
         const previewContainer = document.getElementById('preview-container');
         const previewImg = document.getElementById('preview-img');
+        const filterMenu = document.getElementById('filter-menu');
+        const cameraSelector = document.getElementById('camera-selector');
         
         const fullscreenView = document.getElementById('fullscreen-view');
         const fullscreenImg = document.getElementById('fullscreen-img');
-        const closeFullscreenBtn = document.getElementById('close-fullscreen');
-        const savePhotoBtn = document.getElementById('save-photo');
-
-        const messageBox = document.getElementById('message-box');
-        const messageText = document.getElementById('message-text');
-        const closeMessageBtn = document.getElementById('close-message');
-
+        
         let animationFrameId;
         let lastFrameTime = 0;
         const targetFPS = 30;
         const frameInterval = 1000 / targetFPS;
 
-        
-        // 1. Initialize UI (Camera Carousel)
-        function initUI() {
+        function initApp() {
+            buildFilterMenu();
+            attachEventListeners();
+            startCamera();
+        }
+
+        function buildFilterMenu() {
             cameras.forEach((cam, index) => {
                 const opt = document.createElement('div');
-                opt.className = `camera-option ${index === currentCameraIndex ? 'active' : ''}`;
-                opt.dataset.index = index;
-                
+                opt.className = `filter-option ${index === currentCameraIndex ? 'active' : ''}`;
                 opt.innerHTML = `
-                    <div class="camera-icon-placeholder" style="background-color: ${cam.iconColor}">
-                        <div style="position:absolute; top:2px; left:2px; font-size:6px; color:white;">PROC</div>
-                    </div>
-                    <span class="pixel-font text-[8px] text-center mt-1 text-white">${cam.name}</span>
+                    <div class="filter-color-box" style="background: linear-gradient(135deg, ${cam.iconColor}, #111)"></div>
+                    <span class="text-[10px] font-bold tracking-wider text-white">${cam.name}</span>
                 `;
-                
-                opt.addEventListener('click', () => selectCamera(index));
+                opt.addEventListener('click', () => {
+                    document.querySelectorAll('.filter-option').forEach(el => el.classList.remove('active'));
+                    opt.classList.add('active');
+                    currentCameraIndex = index;
+                    document.getElementById('current-filter-name').innerText = cam.name;
+                    showToast(`Filter: ${cam.name}`);
+                });
                 cameraSelector.appendChild(opt);
             });
-            updateCameraInfo();
         }
 
-        function selectCamera(index) {
-            const options = document.querySelectorAll('.camera-option');
-            options[currentCameraIndex].classList.remove('active');
-            
-            currentCameraIndex = index;
-            options[currentCameraIndex].classList.add('active');
-            
-            // Scroll selected into view
-            options[currentCameraIndex].scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
-            
-            updateCameraInfo();
-        }
-
-        function updateCameraInfo() {
-            const cam = cameras[currentCameraIndex];
-            infoName.innerText = `> ${cam.name} <`;
-            infoTags.innerText = cam.tags;
-            infoDesc.innerText = cam.desc;
-            
-            // Handle sub-filters UI if we wanted to implement them fully
-            const subContainer = document.getElementById('sub-filter-container');
-            if (cam.hasSubFilters && subContainer) {
-               // In a real app, populate this based on camera config
-            }
-        }
-
-
-        // 2. Setup Camera
         async function startCamera() {
             if (videoStream) {
                 videoStream.getTracks().forEach(track => track.stop());
@@ -517,8 +595,8 @@
             const constraints = {
                 video: {
                     facingMode: useFrontCamera ? 'user' : 'environment',
-                    width: { ideal: 1280 },
-                    height: { ideal: 720 }
+                    width: { ideal: 1080 },
+                    height: { ideal: 1440 } // Requesting a 3:4 ratio roughly
                 },
                 audio: false
             };
@@ -526,39 +604,29 @@
             try {
                 videoStream = await navigator.mediaDevices.getUserMedia(constraints);
                 videoElement.srcObject = videoStream;
-                
-                // Wait for video metadata to set canvas size
                 videoElement.onloadedmetadata = () => {
                     videoElement.play();
                     resizeCanvas();
-                    if (!animationFrameId) {
-                        renderLoop();
-                    }
+                    if (!animationFrameId) renderLoop();
                 };
             } catch (err) {
-                console.error("Error accessing camera:", err);
-                showMessage("Could not access camera. Please check permissions.");
+                console.error(err);
+                showToast("Camera access denied or unavailable.");
             }
         }
 
         function resizeCanvas() {
-            // Make canvas match window size, but keep aspect ratio of video to avoid stretching
-            const windowWidth = window.innerWidth;
-            const windowHeight = window.innerHeight;
-            
-            // For a simpler "full screen cover" effect, we just size canvas to window
-            // and use object-fit: cover via CSS, but we need the internal resolution to be decent.
-            canvasElement.width = windowWidth;
-            canvasElement.height = windowHeight;
+            // Match canvas drawing resolution to its physical container size
+            // We multiply by devicePixelRatio for higher quality on retina screens
+            const rect = viewfinderContainer.getBoundingClientRect();
+            const dpr = window.devicePixelRatio || 1;
+            canvasElement.width = rect.width * dpr;
+            canvasElement.height = rect.height * dpr;
         }
-        
         window.addEventListener('resize', resizeCanvas);
 
-        // 3. Render Loop (Drawing video to canvas and applying filters)
         function renderLoop(timestamp) {
             animationFrameId = requestAnimationFrame(renderLoop);
-
-            // Throttle FPS to save battery
             if (timestamp - lastFrameTime < frameInterval) return;
             lastFrameTime = timestamp;
 
@@ -567,34 +635,28 @@
                 const h = canvasElement.height;
                 const cam = cameras[currentCameraIndex];
 
-                // Clear canvas
                 ctx.clearRect(0, 0, w, h);
 
-                // Apply base CSS filters for the specific camera
-                if (cam.process) {
-                    cam.process(ctx, canvasElement, w, h, timestamp);
-                } else {
-                    ctx.filter = 'none';
-                }
+                // Apply Base Filters
+                if (cam.process) cam.process(ctx);
+                else ctx.filter = 'none';
 
-                // Handle mirroring for front camera
                 ctx.save();
+                // Handle mirroring for front camera
                 if (useFrontCamera) {
                     ctx.translate(w, 0);
                     ctx.scale(-1, 1);
                 }
 
-                // Draw video frame to cover canvas (simulate object-fit: cover)
+                // Object-fit: cover simulation
                 const vRatio = videoElement.videoWidth / videoElement.videoHeight;
                 const cRatio = w / h;
                 let drawX = 0, drawY = 0, drawW = w, drawH = h;
 
                 if (vRatio > cRatio) {
-                    // Video is wider than canvas
                     drawW = h * vRatio;
                     drawX = (w - drawW) / 2;
                 } else {
-                    // Video is taller than canvas
                     drawH = w / vRatio;
                     drawY = (h - drawH) / 2;
                 }
@@ -602,86 +664,71 @@
                 ctx.drawImage(videoElement, drawX, drawY, drawW, drawH);
                 ctx.restore();
 
-                // Reset filter for post-processing overlays
+                // Post Process Effects (Vignette, Noise)
                 ctx.filter = 'none';
+                if (cam.postProcess) cam.postProcess(ctx, w, h);
 
-                // Apply post-processing (grain, vignette, light leaks)
-                if (cam.postProcess) {
-                    cam.postProcess(ctx, w, h);
+                // Draw Date/Time Stamp (Always overlay on the final frame if enabled)
+                if(showTimestamp) {
+                    drawDateTimestamp(ctx, w, h);
                 }
             }
         }
 
+        function drawDateTimestamp(ctx, w, h) {
+            const now = new Date();
+            // Format: DD-MM-YYYY
+            const dateStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '-');
+            // Format: HH:MM PM
+            const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
 
-        // Helper: Static Noise Generator (Pre-rendered for performance)
-        let noiseCanvas, noiseCtx;
-        function getNoisePattern(width, height) {
-            if (!noiseCanvas || noiseCanvas.width !== width || noiseCanvas.height !== height) {
-                noiseCanvas = document.createElement('canvas');
-                noiseCanvas.width = width;
-                noiseCanvas.height = height;
-                noiseCtx = noiseCanvas.getContext('2d');
-                
-                const imgData = noiseCtx.createImageData(width, height);
-                const data = imgData.data;
-                for (let i = 0; i < data.length; i += 4) {
-                    const val = Math.random() * 255;
-                    data[i] = val;
-                    data[i+1] = val;
-                    data[i+2] = val;
-                    data[i+3] = 255; // Alpha
-                }
-                noiseCtx.putImageData(imgData, 0, 0);
-            }
-            return noiseCanvas;
+            // Setup Text Style (Simulating the digital camera font)
+            // Scaling font based on canvas width to keep it consistent
+            const fontSize = Math.max(16, w * 0.05); 
+            ctx.font = `bold ${fontSize}px "Oswald", "Inter", sans-serif`;
+            ctx.textAlign = 'right';
+            ctx.textBaseline = 'bottom';
+            
+            const padding = fontSize * 0.8;
+            
+            // Draw Time (Bottom Line)
+            drawTextWithOutline(ctx, timeStr, w - padding, h - padding);
+            
+            // Draw Date (Top Line)
+            drawTextWithOutline(ctx, dateStr, w - padding, h - padding - (fontSize * 1.2));
+        }
+
+        function drawTextWithOutline(ctx, text, x, y) {
+            ctx.lineJoin = 'round';
+            ctx.lineWidth = ctx.canvas.width * 0.01; // Scale outline with canvas
+            ctx.strokeStyle = 'rgba(0, 0, 0, 0.8)';
+            ctx.strokeText(text, x, y);
+            
+            // Inner text color (Slightly warm white)
+            ctx.fillStyle = '#fefae0'; 
+            ctx.fillText(text, x, y);
+            
+            // Add a slight inner glow/blur by drawing again with lower opacity
+            ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+            ctx.fillText(text, x, y);
         }
 
         function drawNoise(ctx, w, h, opacity, color = 'rgba(0,0,0,0.1)') {
-            // Draw pre-calculated noise (animated slightly by jittering position)
-            const jitterX = Math.random() * 50;
-            const jitterY = Math.random() * 50;
-            
             ctx.globalAlpha = opacity;
-            ctx.globalCompositeOperation = 'overlay';
-            // Assuming noise pattern is large enough, or we tile it. 
-            // For simplicity, generate a slightly larger noise map once or tile it.
-            // Here we just draw a colored box with noise composite.
-            
-            // Fallback simplistic noise if getting pattern is too slow:
-            // Just tinting with a composite operation creates a gritty feel when combined with video noise
-            
             ctx.fillStyle = color;
             ctx.fillRect(0,0,w,h);
-            
-            // We use globalAlpha to control intensity
-            ctx.globalCompositeOperation = 'source-over';
             ctx.globalAlpha = 1.0;
         }
 
         function applyVignette(ctx, w, h, intensity = 0.5, size = 0.8) {
             const gradient = ctx.createRadialGradient(
-                w / 2, h / 2, Math.min(w, h) * 0.2, // Inner circle
-                w / 2, h / 2, Math.min(w, h) * size  // Outer circle
+                w / 2, h / 2, Math.min(w, h) * 0.2,
+                w / 2, h / 2, Math.min(w, h) * size
             );
             gradient.addColorStop(0, 'rgba(0,0,0,0)');
             gradient.addColorStop(1, `rgba(0,0,0,${intensity})`);
-            
             ctx.fillStyle = gradient;
             ctx.fillRect(0, 0, w, h);
-        }
-
-        function drawLightLeak(ctx, w, h, side, color) {
-            const gradient = ctx.createLinearGradient(
-                side === 'left' ? 0 : w, 0, 
-                side === 'left' ? w * 0.3 : w * 0.7, h * 0.5
-            );
-            gradient.addColorStop(0, color);
-            gradient.addColorStop(1, 'rgba(0,0,0,0)');
-            
-            ctx.globalCompositeOperation = 'screen';
-            ctx.fillStyle = gradient;
-            ctx.fillRect(0, 0, w, h);
-            ctx.globalCompositeOperation = 'source-over';
         }
 
         function drawScratches(ctx, w, h, count, opacity) {
@@ -690,92 +737,103 @@
             for(let i=0; i<count; i++) {
                 const x = Math.random() * w;
                 ctx.moveTo(x, 0);
-                // Slight angle
-                ctx.lineTo(x + (Math.random() * 20 - 10), h);
-            }
-            ctx.stroke();
-            
-            ctx.strokeStyle = `rgba(0,0,0,${opacity * 0.5})`;
-            ctx.beginPath();
-            for(let i=0; i<count; i++) {
-                const x = Math.random() * w;
-                ctx.moveTo(x, 0);
                 ctx.lineTo(x + (Math.random() * 20 - 10), h);
             }
             ctx.stroke();
         }
 
-
-        // 4. Interaction Logic
-        switchCamBtn.addEventListener('click', () => {
-            useFrontCamera = !useFrontCamera;
-            startCamera();
-        });
-
-        captureBtn.addEventListener('click', () => {
-            // Flash Effect
-            flashScreen.style.opacity = '1';
-            setTimeout(() => {
-                flashScreen.style.opacity = '0';
-            }, 100);
-
-            // Play sound (simulated by a small delay before updating preview)
-            setTimeout(saveSnapshot, 150);
-        });
-
-        function saveSnapshot() {
-            // Get data URL from the canvas containing the filtered image
-            const dataURL = canvasElement.toDataURL('image/jpeg', 0.9);
-            
-            // Update Mini Preview
-            previewImg.src = dataURL;
-            previewContainer.style.display = 'block';
-            
-            // Optional: Animation for preview appearing
-            previewContainer.style.transform = 'scale(1.2)';
-            setTimeout(() => previewContainer.style.transform = 'scale(1)', 200);
-        }
-
-        // Fullscreen viewing
-        previewContainer.addEventListener('click', () => {
-            fullscreenImg.src = previewImg.src;
-            fullscreenView.style.display = 'flex';
-        });
-
-        closeFullscreenBtn.addEventListener('click', () => {
-            fullscreenView.style.display = 'none';
-        });
-
-        savePhotoBtn.addEventListener('click', () => {
-            const link = document.createElement('a');
-            link.download = `retro_cam_${Date.now()}.jpg`;
-            link.href = fullscreenImg.src;
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        });
-
-        // Utilities
-        function showMessage(text) {
-            messageText.innerText = text;
-            messageBox.style.display = 'block';
-        }
-
-        closeMessageBtn.addEventListener('click', () => {
-            messageBox.style.display = 'none';
-        });
-
-        // Initialize
-        window.addEventListener('DOMContentLoaded', () => {
-            initUI();
-            
-            // Request permissions and start
-            if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+        function attachEventListeners() {
+            // Flip Camera
+            flipBtn.addEventListener('click', () => {
+                useFrontCamera = !useFrontCamera;
                 startCamera();
-            } else {
-                showMessage("Your browser does not support camera access.");
-            }
-        });
+                showToast("Camera Switched");
+            });
+
+            // Grid Toggle
+            gridBtn.addEventListener('click', () => {
+                showGrid = !showGrid;
+                gridOverlay.style.display = showGrid ? 'block' : 'none';
+                showToast(showGrid ? "Grid ON" : "Grid OFF");
+            });
+
+            // DISP (Timestamp Toggle)
+            dispBtn.addEventListener('click', () => {
+                showTimestamp = !showTimestamp;
+                showToast(showTimestamp ? "Timestamp ON" : "Timestamp OFF");
+            });
+
+            // Menu / PRO CCD click -> Open filter drawer
+            const openMenu = () => { filterMenu.classList.add('open'); };
+            menuBtn.addEventListener('click', openMenu);
+            proCcdBtn.addEventListener('click', openMenu);
+            
+            document.getElementById('close-menu-btn').addEventListener('click', () => {
+                filterMenu.classList.remove('open');
+            });
+
+            // Capture Photo
+            captureBtn.addEventListener('click', () => {
+                // Haptic feedback if supported
+                if (navigator.vibrate) navigator.vibrate(50);
+                
+                // Flash animation
+                flashScreen.style.opacity = '1';
+                setTimeout(() => { flashScreen.style.opacity = '0'; }, 150);
+
+                // Small delay to let flash animation start before intense canvas operation
+                setTimeout(takeSnapshot, 50);
+            });
+
+            // Preview Click
+            previewContainer.addEventListener('click', () => {
+                if(previewImg.src && !previewImg.src.includes('data:image/gif')) {
+                    fullscreenImg.src = previewImg.src;
+                    fullscreenView.style.display = 'flex';
+                }
+            });
+
+            document.getElementById('close-fullscreen').addEventListener('click', () => {
+                fullscreenView.style.display = 'none';
+            });
+
+            document.getElementById('save-photo').addEventListener('click', () => {
+                const link = document.createElement('a');
+                link.download = `retro_photo_${Date.now()}.jpg`;
+                link.href = fullscreenImg.src;
+                document.body.appendChild(link);
+                link.click();
+                document.body.removeChild(link);
+                showToast("Saved to Device");
+            });
+
+            // Dismiss badges logic
+            document.querySelector('.badge-close').addEventListener('click', (e) => {
+                e.stopPropagation();
+                e.target.parentElement.style.display = 'none';
+            });
+        }
+
+        function takeSnapshot() {
+            // Because our canvas already contains the filtered frame + timestamp,
+            // we can just extract it directly.
+            const dataURL = canvasElement.toDataURL('image/jpeg', 0.95);
+            previewImg.src = dataURL;
+            
+            // Pop animation on preview
+            previewContainer.style.transform = 'scale(1.1)';
+            setTimeout(() => { previewContainer.style.transform = 'scale(1)'; }, 200);
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast-msg');
+            toast.innerText = msg;
+            toast.style.opacity = '1';
+            setTimeout(() => { toast.style.opacity = '0'; }, 2000);
+        }
+
+        // Run
+        window.addEventListener('DOMContentLoaded', initApp);
 
     </script>
 </body>
