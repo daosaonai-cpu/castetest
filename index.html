@@ -2,838 +2,842 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>Retro Camera App</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Indian Knowledge System (IKS) Quiz</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Oswald:wght@500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
         body {
             font-family: 'Inter', sans-serif;
-            background-color: #121212; /* Fallback dark */
-            background-image: radial-gradient(circle at 50% 50%, #2a2a2a 0%, #151515 100%); /* Camera body texture simulation */
-            color: #e0e0e0;
-            overflow: hidden;
-            touch-action: none;
-            user-select: none;
-            -webkit-user-select: none;
+            background-color: #f3f4f6;
         }
-
-        /* The main app container simulating the camera body */
-        #camera-body {
-            max-width: 500px;
-            margin: 0 auto;
-            height: 100dvh;
-            display: flex;
-            flex-direction: column;
-            position: relative;
-            background-color: #1c1c1e;
-            box-shadow: inset 0 0 50px rgba(0,0,0,0.8);
+        /* Custom scrollbar for a cleaner look */
+        ::-webkit-scrollbar {
+            width: 8px;
         }
-
-        /* Viewfinder framing */
-        #viewfinder-container {
-            position: relative;
-            width: 90%;
-            aspect-ratio: 3 / 4;
-            margin: 0 auto;
-            background-color: #000;
-            border-radius: 12px;
-            overflow: hidden;
-            border: 4px solid #000;
-            box-shadow: inset 0 0 20px rgba(0,0,0,1), 0 5px 15px rgba(0,0,0,0.5);
-            z-index: 10;
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1; 
         }
-
-        #video-source {
-            display: none;
-        }
-
-        #output-canvas {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-            display: block;
-        }
-
-        /* Grid overlay */
-        #grid-overlay {
-            position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            display: none;
-            pointer-events: none;
-            z-index: 20;
-        }
-        .grid-line-h { width: 100%; height: 1px; background: rgba(255,255,255,0.4); position: absolute; left: 0; }
-        .grid-line-v { width: 1px; height: 100%; background: rgba(255,255,255,0.4); position: absolute; top: 0; }
-
-        /* Secondary Control Bar (under viewfinder) */
-        #sub-controls {
-            width: 90%;
-            margin: 0 auto;
-            background-color: #0a0a0a;
-            border-bottom-left-radius: 12px;
-            border-bottom-right-radius: 12px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 12px 16px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
-            margin-top: -4px; /* Pull up to attach to viewfinder */
-            z-index: 5;
-        }
-
-        .icon-btn {
-            background: none;
-            border: none;
-            color: white;
-            cursor: pointer;
-            transition: transform 0.1s, opacity 0.2s;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        .icon-btn:active {
-            transform: scale(0.85);
-            opacity: 0.7;
-        }
-
-        /* Main Bottom Area */
-        #main-controls {
-            flex-grow: 1;
-            display: flex;
-            justify-content: space-around;
-            align-items: center;
-            padding: 0 20px;
-            position: relative;
-        }
-
-        /* Shutter Button - Metallic Radial Gradient */
-        #capture-btn {
-            width: 85px;
-            height: 85px;
-            border-radius: 50%;
-            background: radial-gradient(circle at 30% 30%, #e8e8e8 0%, #c4c4c4 25%, #888888 50%, #4a4a4a 80%, #222222 100%);
-            border: 4px solid #111;
-            box-shadow: 
-                0 10px 20px rgba(0,0,0,0.6), 
-                inset 0 2px 4px rgba(255,255,255,0.6),
-                inset 0 -4px 8px rgba(0,0,0,0.6);
-            transition: all 0.1s cubic-bezier(0.4, 0, 0.2, 1);
-            position: relative;
-            cursor: pointer;
-            outline: none;
-            -webkit-tap-highlight-color: transparent;
-        }
-        
-        #capture-btn::after {
-            content: '';
-            position: absolute;
-            top: 50%; left: 50%;
-            transform: translate(-50%, -50%);
-            width: 90%; height: 90%;
-            border-radius: 50%;
-            background: linear-gradient(135deg, rgba(255,255,255,0.2) 0%, rgba(0,0,0,0.1) 100%);
-            pointer-events: none;
-        }
-
-        #capture-btn:active {
-            transform: scale(0.95) translateY(2px);
-            box-shadow: 
-                0 4px 10px rgba(0,0,0,0.8), 
-                inset 0 4px 8px rgba(0,0,0,0.7);
-        }
-
-        /* Flash Screen */
-        #flash-screen {
-            position: absolute;
-            top: 0; left: 0; right: 0; bottom: 0;
-            background-color: white;
-            z-index: 100;
-            opacity: 0;
-            pointer-events: none;
-            transition: opacity 0.4s ease-out;
-        }
-
-        /* Mini Preview */
-        #preview-container {
-            width: 55px;
-            height: 55px;
-            border-radius: 12px;
-            border: 2px solid #333;
-            overflow: hidden;
-            background-color: #111;
-            cursor: pointer;
-            box-shadow: 0 4px 8px rgba(0,0,0,0.5);
-        }
-        #preview-img {
-            width: 100%;
-            height: 100%;
-            object-fit: cover;
-        }
-
-        /* Green floating badge */
-        .badge-green {
-            background-color: #a3e635; /* lime-400 */
-            width: 32px;
-            height: 32px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            position: absolute;
-            top: -10px;
-            right: -25px;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.4);
-            cursor: pointer;
-        }
-        .badge-close {
-            position: absolute;
-            top: -4px;
-            left: -4px;
-            background: white;
-            color: black;
-            border-radius: 50%;
-            width: 14px;
-            height: 14px;
-            font-size: 10px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.5);
-        }
-
-        /* Toggle switch bottom */
-        .toggle-track {
-            width: 60px;
-            height: 24px;
-            background: #2a2a2a;
-            border-radius: 12px;
-            position: relative;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.8), 0 1px 1px rgba(255,255,255,0.1);
-            display: flex;
-            align-items: center;
-            padding: 0 4px;
-        }
-        .toggle-dots {
-            display: flex;
-            justify-content: space-between;
-            width: 100%;
-            padding: 0 8px;
-        }
-        .toggle-dot {
-            width: 4px;
-            height: 4px;
-            border-radius: 50%;
-            background: rgba(255,255,255,0.3);
-        }
-        .toggle-thumb {
-            width: 28px;
-            height: 18px;
-            background: linear-gradient(to bottom, #ccc, #888);
-            border-radius: 10px;
-            position: absolute;
-            left: 3px;
-            box-shadow: 0 2px 4px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255,255,255,0.8);
-            transition: left 0.2s ease;
-        }
-
-        /* Pro CCD Icon */
-        .pro-ccd-icon {
-            width: 45px;
-            height: 35px;
-            background: linear-gradient(to bottom, #db2777, #9d174d);
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1; 
             border-radius: 4px;
-            border: 2px solid #333;
-            position: relative;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.4);
         }
-        .pro-ccd-lens {
-            width: 16px;
-            height: 16px;
-            background: radial-gradient(circle, #444 0%, #111 100%);
-            border: 2px solid #e5e7eb;
-            border-radius: 50%;
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8; 
         }
-
-        /* LED Indicator */
-        .led-indicator {
-            width: 6px;
-            height: 6px;
-            border-radius: 50%;
-            background-color: #22c55e;
-            box-shadow: 0 0 8px #22c55e, 0 0 12px #22c55e;
-            margin-bottom: 8px;
-        }
-
-        /* Fullscreen Photo View */
-        #fullscreen-view {
-            display: none;
+        /* Confetti animation */
+        .confetti {
             position: absolute;
-            top: 0; left: 0; width: 100%; height: 100%;
-            background-color: rgba(10,10,10,0.95);
-            z-index: 50;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            backdrop-filter: blur(10px);
+            width: 10px;
+            height: 10px;
+            background-color: #f00;
+            animation: fall 3s linear infinite;
         }
-        #fullscreen-img {
-            max-width: 90%;
-            max-height: 75%;
-            object-fit: contain;
-            border-radius: 8px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+        @keyframes fall {
+            0% { transform: translateY(-100vh) rotate(0deg); opacity: 1; }
+            100% { transform: translateY(100vh) rotate(360deg); opacity: 0; }
         }
-
-        /* Filter Menu (Replaces old carousel) */
-        #filter-menu {
-            position: absolute;
-            bottom: 0; left: 0; width: 100%;
-            background: rgba(20, 20, 25, 0.95);
-            border-top: 1px solid #333;
-            padding: 20px;
-            z-index: 40;
-            border-top-left-radius: 20px;
-            border-top-right-radius: 20px;
-            box-shadow: 0 -10px 40px rgba(0,0,0,0.8);
-            transform: translateY(100%);
-            transition: transform 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-        }
-        #filter-menu.open {
-            transform: translateY(0);
-        }
-        .filter-list {
-            display: flex;
-            overflow-x: auto;
-            gap: 15px;
-            padding-bottom: 10px;
-            scrollbar-width: none; /* Firefox */
-        }
-        .filter-list::-webkit-scrollbar { display: none; } /* Chrome/Safari */
-        
-        .filter-option {
-            flex: 0 0 auto;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            opacity: 0.5;
-            transition: 0.2s;
-            cursor: pointer;
-        }
-        .filter-option.active {
-            opacity: 1;
-            transform: scale(1.1);
-        }
-        .filter-color-box {
-            width: 50px; height: 50px;
-            border-radius: 12px;
-            margin-bottom: 8px;
-            border: 2px solid #444;
-        }
-        .filter-option.active .filter-color-box {
-            border-color: #fff;
-            box-shadow: 0 0 15px rgba(255,255,255,0.3);
-        }
-
     </style>
 </head>
-<body>
-    <div id="camera-body">
+<body class="text-gray-800 antialiased min-h-screen flex flex-col items-center py-10 px-4 relative overflow-x-hidden">
+
+    <div class="max-w-3xl w-full bg-white rounded-2xl shadow-xl overflow-hidden relative z-10">
         
-        <!-- Top Navigation Icons -->
-        <div class="flex justify-between items-center p-6 text-gray-400">
-            <!-- Settings Hexagon Icon -->
-            <button class="icon-btn hover:text-white">
-                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z"></path>
-                    <path d="M12 16a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"></path>
-                    <path d="M12 2v2"></path>
-                    <path d="M12 20v2"></path>
-                    <path d="m4.93 4.93 1.41 1.41"></path>
-                    <path d="m17.66 17.66 1.41 1.41"></path>
-                    <path d="M2 12h2"></path>
-                    <path d="M20 12h2"></path>
-                    <path d="m4.93 19.07 1.41-1.41"></path>
-                    <path d="m17.66 6.34 1.41-1.41"></path>
-                </svg>
-            </button>
-            <!-- Crown Icon -->
-            <button class="icon-btn hover:text-white">
-                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="m2 4 3 12h14l3-12-6 7-4-7-4 7-6-7zm3 16h14"></path>
-                </svg>
-            </button>
+        <!-- Header -->
+        <div class="bg-indigo-600 p-6 text-center">
+            <h1 class="text-2xl md:text-3xl font-bold text-white mb-2">Indian Knowledge System (IKS) Quiz</h1>
+            <p class="text-indigo-100 text-sm md:text-base">Test your knowledge on Ancient Indian Astronomy and Sciences</p>
         </div>
 
-        <!-- Viewfinder (The Camera Screen) -->
-        <div id="viewfinder-container">
-            <video id="video-source" autoplay playsinline></video>
-            <canvas id="output-canvas"></canvas>
+        <!-- Quiz Container -->
+        <div id="quiz-container" class="p-6 md:p-8">
             
-            <!-- Rule of Thirds Grid -->
-            <div id="grid-overlay">
-                <div class="grid-line-h" style="top: 33.33%;"></div>
-                <div class="grid-line-h" style="top: 66.66%;"></div>
-                <div class="grid-line-v" style="left: 33.33%;"></div>
-                <div class="grid-line-v" style="left: 66.66%;"></div>
-            </div>
-        </div>
-
-        <!-- Secondary Controls Bar (Black bar under viewfinder) -->
-        <div id="sub-controls">
-            <!-- Flash -->
-            <button class="icon-btn" id="btn-flash">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 2H6a1 1 0 0 0-1 1v11.16L2 22h14a1 1 0 0 0 .9-.55l5.2-11.4A1 1 0 0 0 21.19 9H15V2Z"/><circle cx="12" cy="12" r="10" stroke-width="1.5"/></svg>
-            </button>
-            <!-- Timer -->
-            <button class="icon-btn flex flex-col items-center gap-1" id="btn-timer">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="13" r="8"/><path d="M12 9v4l2 2"/><path d="M5 3 2 6"/><path d="m22 6-3-3"/><path d="M6.38 18.7 4 21"/><path d="M17.64 18.67 20 21"/></svg>
-                <span class="text-[8px] font-bold tracking-wider">OFF</span>
-            </button>
-            <!-- Flip Camera -->
-            <button class="icon-btn" id="btn-flip">
-                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.2"/></svg>
-            </button>
-            <!-- MENU -->
-            <button class="icon-btn border border-white px-2 py-0.5 rounded-sm text-xs font-bold" id="btn-menu">
-                MENU
-            </button>
-            <!-- Grid Toggle -->
-            <button class="icon-btn" id="btn-grid">
-                <svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
-                    <line x1="3" y1="9" x2="21" y2="9"></line>
-                    <line x1="3" y1="15" x2="21" y2="15"></line>
-                    <line x1="9" y1="3" x2="9" y2="21"></line>
-                    <line x1="15" y1="3" x2="15" y2="21"></line>
-                </svg>
-            </button>
-            <!-- DISP -->
-            <button class="icon-btn border border-white px-2 py-0.5 rounded-sm text-xs font-bold" id="btn-disp">
-                DISP.
-            </button>
-        </div>
-
-        <!-- Main Controls (Bottom Area) -->
-        <div id="main-controls">
-            
-            <!-- Left: PRO CCD Module -->
-            <div class="flex flex-col items-center justify-center cursor-pointer" id="pro-ccd-btn">
-                <div class="led-indicator"></div>
-                <div class="pro-ccd-icon">
-                    <div class="absolute top-1 left-1 w-2 h-1 bg-gray-300 rounded-sm"></div>
-                    <div class="pro-ccd-lens"></div>
+            <!-- Progress Bar -->
+            <div id="progress-container" class="mb-8 hidden">
+                <div class="flex justify-between text-sm font-medium text-gray-500 mb-2">
+                    <span id="question-count">Question 1 of 50</span>
+                    <span id="score-display">Score: 0</span>
                 </div>
-                <span class="text-[9px] text-gray-500 font-bold mt-2 tracking-widest uppercase" id="current-filter-name">PRO CCD</span>
+                <div class="w-full bg-gray-200 rounded-full h-2.5">
+                    <div id="progress-bar" class="bg-indigo-600 h-2.5 rounded-full transition-all duration-300" style="width: 0%"></div>
+                </div>
             </div>
 
-            <!-- Center: Shutter Button Area -->
-            <div class="relative flex items-center justify-center w-[120px] h-[120px]">
-                <button id="capture-btn" aria-label="Take Photo"></button>
+            <!-- Study Guide Screen -->
+            <div id="study-guide-screen" class="py-2 animate-fade-in">
+                <div class="mb-6 flex flex-col md:flex-row justify-between md:items-center bg-indigo-50 p-4 rounded-xl border border-indigo-100 gap-4">
+                    <div>
+                        <h2 class="text-xl md:text-2xl font-bold text-gray-800">Comprehensive Study Guide</h2>
+                        <p class="text-sm text-indigo-600 font-medium">Review the key concepts before starting</p>
+                    </div>
+                    <button id="proceed-to-quiz-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors duration-200 shadow-sm flex-shrink-0">
+                        Skip to Quiz
+                    </button>
+                </div>
                 
-                <!-- Green Badge Overlay -->
-                <div class="badge-green">
-                    <div class="badge-close">×</div>
-                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="black" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1-0-5H20"/><path d="M9 7h6"/><path d="M9 11h6"/></svg>
+                <div class="max-h-[55vh] overflow-y-auto pr-4 space-y-10 text-gray-700 leading-relaxed text-sm md:text-base border-b border-gray-100 pb-6 mb-6">
+                    
+                    <!-- Chapter 1: IKS Overview -->
+                    <section class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <h3 class="text-xl font-extrabold text-indigo-700 border-b-2 border-indigo-100 pb-3 mb-5 flex items-center">
+                            <span class="bg-indigo-100 text-indigo-700 w-8 h-8 rounded-full flex items-center justify-center mr-3 text-sm">1</span>
+                            Introduction to the Indian Knowledge System (IKS)
+                        </h3>
+                        <div class="space-y-5">
+                            <div>
+                                <h4 class="font-semibold text-lg text-gray-900 mb-2">Definition and Scope</h4>
+                                <p>The Indian Knowledge System (IKS) is a systematic, multi-disciplinary, and cumulative corpus of wisdom generated, preserved, and transmitted over millennia. It represents a <strong>holistic approach</strong> to understanding reality. Unlike modern compartmentalized education, disciplines such as mathematics, linguistics, astronomy, medicine, and philosophy were deeply interconnected.</p>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg text-gray-900 mb-2">Transmission: Shruti and Smriti</h4>
+                                <p>A significant portion of this knowledge was initially preserved through rigorous oral traditions known as <strong>Shruti</strong> (that which is heard). This ensured high fidelity in transmission across generations before being codified into written texts known as <strong>Smriti</strong> (that which is remembered).</p>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg text-gray-900 mb-2">Modern Relevance</h4>
+                                <ul class="list-disc pl-5 space-y-2">
+                                    <li><strong>Sustainable Living:</strong> Ancient texts offer profound insights into ecology, agriculture, and living in harmony with nature, highly relevant in the modern climate crisis.</li>
+                                    <li><strong>Cognitive Sciences:</strong> Yoga and meditation practices are now globally recognized for their deep understanding of the human mind and consciousness.</li>
+                                    <li><strong>Holistic Health:</strong> Systems like Ayurveda provide a preventive and personalized approach to wellness, complementing modern allopathic medicine.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Chapter 2: Literature & Heritage -->
+                    <section class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <h3 class="text-xl font-extrabold text-indigo-700 border-b-2 border-indigo-100 pb-3 mb-5 flex items-center">
+                            <span class="bg-indigo-100 text-indigo-700 w-8 h-8 rounded-full flex items-center justify-center mr-3 text-sm">2</span>
+                            Foundational Literature & Scientific Heritage
+                        </h3>
+                        <div class="space-y-5">
+                            <div>
+                                <h4 class="font-semibold text-lg text-gray-900 mb-2">The Vedic Corpus</h4>
+                                <p>The foundation of IKS lies in the Vedic corpus:</p>
+                                <ul class="list-disc pl-5 space-y-2 mt-2">
+                                    <li><strong>The Four Vedas:</strong> Rig, Yajur, Sama, and Atharva Vedas form the core of the Shruti tradition, containing hymns, rituals, melodies, and practical knowledge.</li>
+                                    <li><strong>The Upanishads (Vedanta):</strong> The philosophical culmination exploring metaphysical reality, the nature of self (Atman), and the ultimate truth (Brahman).</li>
+                                    <li><strong>Itihasas & Puranas:</strong> Epics like the Ramayana and Mahabharata (which includes the Bhagavad Gita) disseminate complex ethical frameworks and societal norms through engaging historical narratives.</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg text-gray-900 mb-2">The Six Vedangas (Ancillary Disciplines)</h4>
+                                <p>These auxiliary disciplines were essential for properly understanding and applying Vedic knowledge:</p>
+                                <ul class="list-disc pl-5 space-y-2 mt-2">
+                                    <li><strong>Siksha & Chandas:</strong> Phonetics and Meter. The precise science of pronunciation and poetic rhythm, crucial for accurate oral transmission.</li>
+                                    <li><strong>Vyakarana & Nirukta:</strong> Grammar and Etymology. <em>Panini's grammar</em> famously structured Sanskrit algorithmically, preventing corruption of knowledge and laying early conceptual foundations for modern computer science.</li>
+                                    <li><strong>Jyotisha & Kalpa:</strong> Astronomy (observation of celestial bodies for timekeeping) and Rituals (standardized procedures for ceremonies, including early geometry).</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg text-gray-900 mb-2">Beyond Philosophy: Technological Heritage</h4>
+                                <p>IKS extends far beyond spirituality. It includes highly advanced ancient systems of <strong>town planning, metallurgy, water management, shipbuilding, and architecture</strong>. Texts like the <em>Arthashastra</em> detailed economics and statecraft, while treatises on civil engineering guided the construction of complex stepwells and grand temples.</p>
+                            </div>
+                        </div>
+                    </section>
+                    
+                    <!-- Chapter 3: Ayurveda -->
+                    <section class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <h3 class="text-xl font-extrabold text-indigo-700 border-b-2 border-indigo-100 pb-3 mb-5 flex items-center">
+                            <span class="bg-indigo-100 text-indigo-700 w-8 h-8 rounded-full flex items-center justify-center mr-3 text-sm">3</span>
+                            Ayurveda (The Health Sciences)
+                        </h3>
+                        <div class="space-y-5">
+                            <div>
+                                <h4 class="font-semibold text-lg text-gray-900 mb-2">Pancha-Mahabhuta (The Five Elements)</h4>
+                                <p>Ayurveda is built on the foundational concept that both the universe and the human body are composed of five elements: <strong>Earth (Prithvi), Water (Jala), Fire (Tejas), Air (Vayu), and Space (Akasha)</strong>.</p>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg text-gray-900 mb-2">The Tridosha Theory</h4>
+                                <p>Health is defined as the delicate balance of three vital energies or <em>Doshas</em>. Diseases manifest when these are imbalanced:</p>
+                                <ul class="list-disc pl-5 space-y-1 mt-2">
+                                    <li><strong>Vata:</strong> Associated with movement and air/space elements.</li>
+                                    <li><strong>Pitta:</strong> Associated with metabolism, digestion, and fire/water elements.</li>
+                                    <li><strong>Kapha:</strong> Associated with structure, lubrication, and earth/water elements.</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg text-gray-900 mb-2">Sapta-Dhatu & Wellness</h4>
+                                <p>The system identifies seven fundamental tissues (<strong>Sapta-Dhatu</strong>). Treatment emphasizes restoring balance across these tissues through targeted diet, herbal medicines, detoxification, and rigorous daily lifestyle routines known as <strong>Dinacharya</strong>.</p>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Chapter 4: Khagola Shastra Basics -->
+                    <section class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <h3 class="text-xl font-extrabold text-indigo-700 border-b-2 border-indigo-100 pb-3 mb-5 flex items-center">
+                            <span class="bg-indigo-100 text-indigo-700 w-8 h-8 rounded-full flex items-center justify-center mr-3 text-sm">4</span>
+                            Khagola Shastra (Introduction to Astronomy)
+                        </h3>
+                        <div class="space-y-5">
+                            <div>
+                                <h4 class="font-semibold text-lg text-gray-900 mb-2">What is Jyotisha?</h4>
+                                <p>The term "Jyotisha" translates to <strong>"the science of light"</strong> or "the study of celestial luminaries." It is one of the six Vedangas. The <em>Vedanga Jyotisha</em>, attributed to the ancient sage <strong>Lagadha</strong>, is one of the earliest known Indian texts dedicated entirely to astronomy, establishing a mathematical framework for timekeeping.</p>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg text-gray-900 mb-2">Core Motivations</h4>
+                                <p>Early Indian astronomy was driven by three main practical needs:</p>
+                                <ul class="list-disc pl-5 space-y-1 mt-2">
+                                    <li><strong>Timekeeping and Calendrics:</strong> Accurate measurement of time (Kala) to regulate daily life and agricultural cycles.</li>
+                                    <li><strong>Ritual Precision:</strong> Vedic rituals (Yajnas) required exact timing based on planetary and lunar alignments.</li>
+                                    <li><strong>Navigation and Geography:</strong> Using stellar coordinates to navigate land and oceans.</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg text-gray-900 mb-2">Ancient Observations in the Vedic Corpus</h4>
+                                <p>The Vedas contain highly precise observational data, not just poetry:</p>
+                                <ul class="list-disc pl-5 space-y-1 mt-2">
+                                    <li>The <strong>Rigveda</strong> details a solar year divided into 12 lunar months and 360 days.</li>
+                                    <li>The <strong>Yajurveda and Atharvaveda</strong> provide the earliest complete lists of the Nakshatras.</li>
+                                    <li>The <strong>Shatapatha Brahmana</strong> explicitly documents the movement of the Pleiades (<em>Krittika</em>), noting they do not swerve from the East—indicating a deep understanding of cardinal directions.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Chapter 5: Solar & Lunar Mechanics -->
+                    <section class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <h3 class="text-xl font-extrabold text-indigo-700 border-b-2 border-indigo-100 pb-3 mb-5 flex items-center">
+                            <span class="bg-indigo-100 text-indigo-700 w-8 h-8 rounded-full flex items-center justify-center mr-3 text-sm">5</span>
+                            Solar & Lunar Mechanics
+                        </h3>
+                        <div class="space-y-5">
+                            <div>
+                                <h4 class="font-semibold text-lg text-gray-900 mb-2">The Sun (Surya): Ecliptic & Seasons</h4>
+                                <p>Ancient astronomers mapped the Sun's apparent path across the celestial sphere, known as the ecliptic or <strong>Kranti-vritta</strong>. The year was divided by solstices (Ayanas):</p>
+                                <ul class="list-disc pl-5 space-y-1 mt-2 mb-3">
+                                    <li><strong>Uttarayan:</strong> The Northern transit (winter to summer solstice), where days grow progressively longer.</li>
+                                    <li><strong>Dakshinayan:</strong> The Southern transit (summer to winter solstice), where days grow progressively shorter.</li>
+                                </ul>
+                                <p>Equinoxes (Vishuvas) and the Sun's movement dictated the six Indian seasons (<strong>Ritus</strong>): Vasanta (Spring), Grishma (Summer), Varsha (Monsoon), Sharad (Autumn), Hemanta (Pre-winter), and Shishira (Winter).</p>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg text-gray-900 mb-2">The Moon (Chandra): Lunisolar Synchronization</h4>
+                                <p>Because of its rapid motion, the Moon was the cornerstone of daily timekeeping. The Indian calendar is Lunisolar. Lunar months are measured either from new moon to new moon (<strong>Amavasyant</strong>) or full moon to full moon (<strong>Purnimant</strong>).</p>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg text-gray-900 mb-2">Tithis, Pakshas, and Adhika Masa</h4>
+                                <ul class="list-disc pl-5 space-y-2 mt-2">
+                                    <li><strong>Tithis:</strong> Mathematical lunar days. A Tithi is defined as the time it takes for the longitudinal angle between the Moon and the Sun to increase by exactly <strong>12 degrees</strong>.</li>
+                                    <li><strong>Pakshas:</strong> A lunar month has 30 Tithis split into two phases: <strong>Shukla Paksha</strong> (Waxing Phase to Purnima) and <strong>Krishna Paksha</strong> (Waning Phase to Amavasya).</li>
+                                    <li><strong>Adhika Masa:</strong> A purely lunar year is ~354 days; a solar year is ~365.24 days. To prevent the seasons from drifting, an intercalary (extra) month called Adhika Masa was ingeniously added approximately every 32.5 months to perfectly sync the two calendars.</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </section>
+
+                    <!-- Chapter 6: Nakshatras, Grahas & The Panchanga -->
+                    <section class="bg-white p-6 rounded-xl shadow-sm border border-gray-100">
+                        <h3 class="text-xl font-extrabold text-indigo-700 border-b-2 border-indigo-100 pb-3 mb-5 flex items-center">
+                            <span class="bg-indigo-100 text-indigo-700 w-8 h-8 rounded-full flex items-center justify-center mr-3 text-sm">6</span>
+                            The Stellar Coordinate System & Siddhantic Era
+                        </h3>
+                        <div class="space-y-5">
+                            <div>
+                                <h4 class="font-semibold text-lg text-gray-900 mb-2">The Nakshatras</h4>
+                                <p>Lacking a standardized equatorial grid, ancient astronomers used fixed stars to map the sky. The 360-degree ecliptic was divided into <strong>27 equal segments</strong> called Nakshatras (lunar mansions). Each covers exactly <strong>13 degrees and 20 minutes</strong>. To achieve high mathematical precision, each Nakshatra was subdivided into 4 quarters called <strong>Padas</strong>, yielding a highly granular grid of exactly 108 sectors.</p>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg text-gray-900 mb-2">The Navagraha System</h4>
+                                <p>The Sanskrit root of <em>Graha</em> means "to seize" or "to grasp", denoting bodies that appear to move against the fixed stars. This system tracked:</p>
+                                <ul class="list-disc pl-5 space-y-1 mt-2 mb-3">
+                                    <li><strong>The 5 Visible Planets:</strong> Budha (Mercury), Shukra (Venus), Mangala (Mars - noted for its red hue and retrograde motion/Vakra Gati), Brihaspati (Jupiter), and Shani (Saturn).</li>
+                                    <li><strong>Rahu and Ketu (The Nodes):</strong> These are not physical planets, but the mathematically calculated orbital intersection points of the Sun and the Moon (Ascending and Descending nodes). Tracking Rahu and Ketu was absolutely essential for accurately predicting solar and lunar eclipses.</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg text-gray-900 mb-2">The Panchanga (Five Limbs)</h4>
+                                <p>The integration of all these metrics resulted in the traditional almanac, the Panchanga. It calculates five key things for every single day: <strong>Tithi</strong> (lunar day), <strong>Vara</strong> (weekday), <strong>Nakshatra</strong> (lunar constellation), <strong>Yoga</strong> (combined longitudes), and <strong>Karana</strong> (half a Tithi).</p>
+                            </div>
+                            <div>
+                                <h4 class="font-semibold text-lg text-gray-900 mb-2">The Siddhantic Era</h4>
+                                <p>While the Vedic era laid observational groundwork, the Siddhantic era (around 5th century CE) birthed classical mathematical astronomy. Giant leaps were made by scholars like <strong>Aryabhata</strong> (who famously proposed that the Earth rotates on its axis), <strong>Varahamihira</strong> (who compiled the five great treatises in the <em>Pancha-Siddhantika</em>), and <strong>Brahmagupta</strong> (who formalized complex algebra and trigonometry for planetary calculations).</p>
+                            </div>
+                        </div>
+                    </section>
+                </div>
+                
+                <div class="flex justify-center">
+                    <button id="proceed-to-quiz-btn-bottom" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-full transition-colors duration-200 transform hover:scale-105 shadow-md">
+                        I'm Ready - Start the Quiz
+                    </button>
                 </div>
             </div>
 
-            <!-- Right: Photo Preview -->
-            <div id="preview-container">
-                <img id="preview-img" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" alt="Preview">
+            <!-- Start Screen -->
+            <div id="start-screen" class="text-center py-10 hidden">
+                <h2 class="text-xl font-semibold mb-4 text-gray-700">Ready to test your knowledge?</h2>
+                <p class="text-gray-500 mb-8 max-w-md mx-auto">This quiz consists of 50 multiple-choice questions covering topics from the Indian Knowledge System, including Jyotisha, Ayurveda, and the Vedic Corpus.</p>
+                <button id="start-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-full transition-colors duration-200 transform hover:scale-105 shadow-md">
+                    Start Quiz
+                </button>
             </div>
 
-        </div>
+            <!-- Question Screen -->
+            <div id="question-screen" class="hidden">
+                <h2 id="question-text" class="text-lg md:text-xl font-semibold text-gray-800 mb-6 leading-relaxed"></h2>
+                
+                <div id="options-container" class="space-y-3">
+                    <!-- Options will be injected here by JS -->
+                </div>
 
-        <!-- Bottom Mode Toggle (Photo/Video) -->
-        <div class="w-full flex justify-center items-center pb-8 gap-4 text-gray-400">
-            <!-- Photo Icon -->
-            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4" fill="#121212"/></svg>
+                <div class="mt-8 flex justify-end">
+                    <button id="next-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors duration-200 hidden opacity-0 transition-opacity">
+                        Next Question
+                    </button>
+                </div>
+            </div>
+
+            <!-- Result Screen -->
+            <div id="result-screen" class="hidden text-center py-8">
+                <h2 class="text-3xl font-bold text-gray-800 mb-2">Quiz Complete!</h2>
+                <p class="text-gray-500 mb-6">Here is how you did:</p>
+                
+                <div class="bg-indigo-50 rounded-xl p-6 mb-8 inline-block">
+                    <div class="text-5xl font-extrabold text-indigo-600 mb-2" id="final-score">0/50</div>
+                    <div class="text-sm font-medium text-indigo-400 uppercase tracking-wide" id="score-percentage">0%</div>
+                </div>
+
+                <p id="feedback-message" class="text-lg font-medium text-gray-700 mb-8"></p>
+
+                <div class="flex justify-center gap-4">
+                     <button id="restart-btn" class="bg-white border-2 border-indigo-600 text-indigo-600 hover:bg-indigo-50 font-semibold py-2 px-6 rounded-lg transition-colors duration-200">
+                        Try Again
+                    </button>
+                    <button id="review-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-2 px-6 rounded-lg transition-colors duration-200">
+                        Review Answers
+                    </button>
+                </div>
+            </div>
             
-            <!-- Toggle Slider -->
-            <div class="toggle-track">
-                <div class="toggle-dots">
-                    <div class="toggle-dot"></div>
-                    <div class="toggle-dot"></div>
-                    <div class="toggle-dot"></div>
+            <!-- Review Screen -->
+            <div id="review-screen" class="hidden">
+                 <h2 class="text-2xl font-bold text-gray-800 mb-6 flex items-center">
+                    <button id="back-to-results-btn" class="mr-4 text-gray-500 hover:text-indigo-600 transition-colors">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18" />
+                        </svg>
+                    </button>
+                    Review Your Answers
+                </h2>
+                <div id="review-container" class="space-y-6 max-h-[60vh] overflow-y-auto pr-2">
+                    <!-- Review items injected here -->
                 </div>
-                <div class="toggle-thumb" id="mode-thumb"></div>
             </div>
 
-            <!-- Video Icon -->
-            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="currentColor" stroke="none"><path d="M23 7l-7 5 7 5V7z"/><rect x="1" y="5" width="15" height="14" rx="2" ry="2"/></svg>
         </div>
-
-    </div>
-
-    <!-- Flash Effect Layer -->
-    <div id="flash-screen"></div>
-
-    <!-- Filter Selection Menu (Hidden by default, slides up) -->
-    <div id="filter-menu">
-        <div class="flex justify-between items-center mb-4">
-            <h3 class="text-white font-bold text-sm tracking-widest">FILTERS</h3>
-            <button class="text-gray-400 font-bold hover:text-white" id="close-menu-btn">DONE</button>
-        </div>
-        <div class="filter-list" id="camera-selector">
-            <!-- Injected via JS -->
-        </div>
-    </div>
-
-    <!-- Fullscreen Output View -->
-    <div id="fullscreen-view">
-        <div class="flex justify-between w-full px-6 py-4 absolute top-0 z-10">
-            <button id="close-fullscreen" class="text-white bg-black/60 px-4 py-2 rounded-full text-xs font-bold shadow-lg">← BACK</button>
-            <button id="save-photo" class="text-white bg-blue-600 px-4 py-2 rounded-full text-xs font-bold shadow-lg shadow-blue-900/50">SAVE IMG</button>
-        </div>
-        <img id="fullscreen-img" src="" alt="Captured Photo">
-    </div>
-
-    <!-- UI Overlay Messages -->
-    <div id="toast-msg" class="fixed top-1/4 left-1/2 transform -translate-x-1/2 bg-black/80 text-white px-4 py-2 rounded-full text-xs font-bold opacity-0 pointer-events-none transition-opacity duration-300 z-50">
-        Message
     </div>
 
     <script>
-        // Filter/Camera configurations (keeping original capabilities)
-        const cameras = [
+        // Quiz Data based on provided PDF context
+        const quizData = [
             {
-                id: 'pro_ccd', name: 'PRO CCD', iconColor: '#db2777', 
-                process: (ctx) => { ctx.filter = 'contrast(1.1) saturate(1.1)'; }
+                question: "What does the term 'Jyotisha' translate to?",
+                options: ["The science of agriculture", "The science of light", "The study of the mind", "The science of life"],
+                answer: 1
             },
             {
-                id: 'dispo_f', name: 'DISPO F', iconColor: '#2dd4bf', 
-                process: (ctx) => { ctx.filter = 'contrast(1.2) brightness(1.05) sepia(0.3) hue-rotate(-10deg) saturate(1.2)'; },
-                postProcess: (ctx, w, h) => { drawNoise(ctx, w, h, 0.15, 'rgba(100, 100, 50, 0.1)'); applyVignette(ctx, w, h, 0.6, 1.0); }
+                question: "Jyotisha is recognized as one of the six...",
+                options: ["Puranas", "Upanishads", "Vedangas", "Itihasas"],
+                answer: 2
             },
             {
-                id: 'z50', name: 'Z50', iconColor: '#d946ef',
-                process: (ctx) => { ctx.filter = 'brightness(1.15) contrast(0.9) saturate(0.8) blur(0.5px)'; },
-                postProcess: (ctx, w, h) => { ctx.fillStyle = 'rgba(255, 255, 255, 0.05)'; ctx.fillRect(0, 0, w, h); }
+                question: "Which ancient sage is attributed to the Vedanga Jyotisha?",
+                options: ["Aryabhata", "Panini", "Lagadha", "Varahamihira"],
+                answer: 2
             },
             {
-                id: 'action', name: 'ACTION', iconColor: '#4b5563',
-                process: (ctx) => { ctx.filter = 'contrast(0.95) saturate(0.85) sepia(0.1) hue-rotate(5deg)'; },
-                postProcess: (ctx, w, h) => { ctx.fillStyle = 'rgba(0, 50, 100, 0.05)'; ctx.globalCompositeOperation = 'overlay'; ctx.fillRect(0, 0, w, h); ctx.globalCompositeOperation = 'source-over'; }
+                question: "Which Veda contains hymns detailing a solar year divided into 12 lunar months and 360 days?",
+                options: ["Rigveda", "Yajurveda", "Samaveda", "Atharvaveda"],
+                answer: 0
             },
             {
-                id: 'booth', name: 'BOOTH', iconColor: '#b45309',
-                process: (ctx) => { ctx.filter = 'sepia(0.6) contrast(1.1) brightness(0.9) saturate(1.2)'; },
-                postProcess: (ctx, w, h) => { applyVignette(ctx, w, h, 0.4, 0.9); drawScratches(ctx, w, h, 3, 0.05); }
+                question: "What is an 'Adhika Masa'?",
+                options: ["A solar eclipse", "An intercalary (extra) month", "A lunar mansion", "A type of season"],
+                answer: 1
+            },
+            {
+                question: "Why was an intercalary month (Adhika Masa) introduced?",
+                options: ["To reconcile the lunar and solar years", "To celebrate harvest festivals", "To track planetary retrograde motion", "To honor the sage Lagadha"],
+                answer: 0
+            },
+            {
+                question: "Which texts provide the earliest complete lists of the 27 or 28 Nakshatras?",
+                options: ["Rigveda and Samaveda", "Yajurveda and Atharvaveda", "Upanishads and Puranas", "Ramayana and Mahabharata"],
+                answer: 1
+            },
+            {
+                question: "The Shatapatha Brahmana discusses the movement of which star cluster, noting they do not swerve from the East?",
+                options: ["Orion (Mrigashira)", "Big Dipper (Saptarishi)", "Pleiades (Krittika)", "Sirius (Lubdhaka)"],
+                answer: 2
+            },
+            {
+                question: "What is the 'Kranti-vritta'?",
+                options: ["The lunar orbit", "The Sun's apparent path across the celestial sphere (ecliptic)", "The celestial equator", "The path of Jupiter"],
+                answer: 1
+            },
+            {
+                question: "The period from the winter solstice to the summer solstice is called:",
+                options: ["Dakshinayan", "Uttarayan", "Vishuvas", "Shukla Paksha"],
+                answer: 1
+            },
+            {
+                question: "During Uttarayan, the days grow...",
+                options: ["Progressively shorter", "Remain the same length", "Progressively longer", "Erratic in length"],
+                answer: 2
+            },
+            {
+                question: "How many seasons (Ritus) are identified in the Indian calendar based on the Sun's movement?",
+                options: ["Four", "Five", "Six", "Seven"],
+                answer: 2
+            },
+            {
+                question: "Which of the following is NOT one of the six seasons (Ritus)?",
+                options: ["Vasanta", "Grishma", "Phalguni", "Sharad"],
+                answer: 2
+            },
+            {
+                question: "An 'Amavasyant' lunar month is measured from:",
+                options: ["Full moon to full moon", "New moon to new moon", "First quarter to third quarter", "Equinox to equinox"],
+                answer: 1
+            },
+            {
+                question: "A 'Purnimant' lunar month is measured from:",
+                options: ["New moon to new moon", "Full moon to full moon", "Solstice to solstice", "Sunrise to sunrise"],
+                answer: 1
+            },
+            {
+                question: "Instead of 24-hour solar days, the lunar calendar uses mathematical days called:",
+                options: ["Karana", "Yoga", "Tithis", "Padas"],
+                answer: 2
+            },
+            {
+                question: "A Tithi is defined as the time it takes for the longitudinal angle between the Moon and Sun to increase by exactly:",
+                options: ["10 degrees", "12 degrees", "13 degrees 20 minutes", "15 degrees"],
+                answer: 1
+            },
+            {
+                question: "The waxing phase of the moon, ending in Purnima, is called:",
+                options: ["Krishna Paksha", "Shukla Paksha", "Dakshinayan", "Uttarayan"],
+                answer: 1
+            },
+            {
+                question: "The 360-degree ecliptic is divided into 27 equal segments known as:",
+                options: ["Grahas", "Tithis", "Nakshatras", "Vakras"],
+                answer: 2
+            },
+            {
+                question: "Each Nakshatra covers an arc of:",
+                options: ["12 degrees", "13 degrees and 20 minutes", "15 degrees", "30 degrees"],
+                answer: 1
+            },
+            {
+                question: "Each Nakshatra is subdivided into four quarters called:",
+                options: ["Karanas", "Padas", "Yogas", "Pakshas"],
+                answer: 1
+            },
+            {
+                question: "What is the total number of Padas (quarters) in the Nakshatra system?",
+                options: ["27", "54", "108", "360"],
+                answer: 2
+            },
+            {
+                question: "The Sanskrit term 'Graha' is derived from a root meaning:",
+                options: ["To shine", "To seize or grasp", "To wander", "To orbit"],
+                answer: 1
+            },
+            {
+                question: "Which of the following is NOT one of the five visible physical planets tracked by ancient observers?",
+                options: ["Budha (Mercury)", "Shukra (Venus)", "Mangala (Mars)", "Varuna (Neptune)"],
+                answer: 3
+            },
+            {
+                question: "In the Navagraha system, what are Rahu and Ketu?",
+                options: ["Moons of Jupiter", "Dwarf planets", "The orbital intersection points of the Sun and the Moon", "Comets"],
+                answer: 2
+            },
+            {
+                question: "Rahu represents the:",
+                options: ["Descending node", "Ascending node", "Summer solstice", "Winter solstice"],
+                answer: 1
+            },
+            {
+                question: "Tracking Rahu and Ketu was essential for mathematically predicting:",
+                options: ["The monsoon rains", "Earthquakes", "Solar and lunar eclipses", "Planetary retrograde motion"],
+                answer: 2
+            },
+            {
+                question: "The traditional Indian almanac is called the:",
+                options: ["Samhita", "Panchanga", "Siddhanta", "Brahmana"],
+                answer: 1
+            },
+            {
+                question: "Which of the following is NOT one of the 'five limbs' (metrics) of the Panchanga?",
+                options: ["Tithi", "Vara", "Ritu", "Yoga"],
+                answer: 2
+            },
+            {
+                question: "In the Panchanga, 'Vara' refers to the:",
+                options: ["Lunar day", "Weekday", "Half-Tithi", "Mathematical combined longitude"],
+                answer: 1
+            },
+            {
+                question: "Which scholar from the Siddhantic era proposed that the Earth rotates on its axis?",
+                options: ["Varahamihira", "Brahmagupta", "Aryabhata", "Lagadha"],
+                answer: 2
+            },
+            {
+                question: "Who compiled the Pancha-Siddhantika?",
+                options: ["Aryabhata", "Varahamihira", "Panini", "Brahmagupta"],
+                answer: 1
+            },
+            {
+                question: "The Indian Knowledge System (IKS) can be described as:",
+                options: ["Compartmentalized and specialized", "Holistic and interdisciplinary", "Focused solely on spirituality", "Lacking empirical observation"],
+                answer: 1
+            },
+            {
+                question: "Before being codified into texts (Smriti), a significant portion of IKS was preserved through rigorous oral traditions known as:",
+                options: ["Itihasa", "Shruti", "Darshana", "Tantra"],
+                answer: 1
+            },
+            {
+                question: "The core of the Shruti tradition consists of:",
+                options: ["The Epics", "The Puranas", "The Four Vedas", "The Vedangas"],
+                answer: 2
+            },
+            {
+                question: "The philosophical culmination exploring metaphysical reality is found in the:",
+                options: ["Brahmanas", "Aranyakas", "Upanishads (Vedanta)", "Samhitas"],
+                answer: 2
+            },
+            {
+                question: "Which texts disseminate complex ethical frameworks through historical narratives?",
+                options: ["Itihasas & Puranas", "Siksha & Chandas", "Vyakarana & Nirukta", "Jyotisha & Kalpa"],
+                answer: 0
+            },
+            {
+                question: "The foundational concept in Ayurveda that the universe and human body are composed of five elements is called:",
+                options: ["Tridosha", "Pancha-Mahabhuta", "Sapta-Dhatu", "Dinacharya"],
+                answer: 1
+            },
+            {
+                question: "According to the Tridosha Theory, health is defined as the balance of:",
+                options: ["Mind, Body, Spirit", "Earth, Water, Fire", "Vata, Pitta, Kapha", "Sattva, Rajas, Tamas"],
+                answer: 2
+            },
+            {
+                question: "In Ayurveda, 'Pitta' is associated with:",
+                options: ["Movement", "Metabolism", "Structure", "Space"],
+                answer: 1
+            },
+            {
+                question: "The Vedanga known as 'Siksha' deals with:",
+                options: ["Grammar", "Phonetics and pronunciation", "Astronomy", "Rituals"],
+                answer: 1
+            },
+            {
+                question: "Which ancient scholar structured Sanskrit algorithmically, laying early conceptual foundations for linguistics and computer science?",
+                options: ["Lagadha", "Aryabhata", "Panini", "Varahamihira"],
+                answer: 2
+            },
+            {
+                question: "The Vedanga dealing with Grammar and Etymology includes:",
+                options: ["Siksha & Chandas", "Vyakarana & Nirukta", "Jyotisha & Kalpa", "Ayurveda & Dhanurveda"],
+                answer: 1
+            },
+            {
+                question: "According to IKS texts, 'Dinacharya' refers to:",
+                options: ["Dietary restrictions", "Daily lifestyle routines for wellness", "Surgical procedures", "Meditation techniques"],
+                answer: 1
+            },
+            {
+                question: "In the context of planetary motion, 'Vakra Gati' refers to:",
+                options: ["Swift movement", "Stationary position", "Retrograde motion", "Forward motion"],
+                answer: 2
+            },
+            {
+                question: "Which planet is identified by its reddish hue in ancient observations?",
+                options: ["Shukra (Venus)", "Budha (Mercury)", "Mangala (Mars)", "Shani (Saturn)"],
+                answer: 2
+            },
+            {
+                question: "In the Panchanga, 'Karana' is defined as:",
+                options: ["A full Lunar Day", "Half of a Tithi", "The moon's mansion", "A solar month"],
+                answer: 1
+            },
+            {
+                question: "Which discipline involves standardized procedures for ceremonies and includes early geometry?",
+                options: ["Jyotisha", "Nirukta", "Kalpa", "Siksha"],
+                answer: 2
+            },
+            {
+                question: "The 'Sapta-Dhatu' concept in Ayurveda identifies:",
+                options: ["Seven fundamental tissues", "Seven chakras", "Seven types of diseases", "Seven medicinal herbs"],
+                answer: 0
+            },
+            {
+                question: "Ancient Indian systems of town planning, metallurgy, and water management indicate that IKS extends beyond:",
+                options: ["Agriculture", "Philosophy and spirituality", "Trade and commerce", "Linguistics"],
+                answer: 1
             }
         ];
 
-        let currentCameraIndex = 0;
-        let videoStream = null;
-        let useFrontCamera = true; // Use front camera by default for selfies
-        let showGrid = false;
-        let showTimestamp = true;
+        let currentQuestionIndex = 0;
+        let score = 0;
+        let userAnswers = new Array(quizData.length).fill(null);
+        let quizCompleted = false;
 
         // DOM Elements
-        const videoElement = document.getElementById('video-source');
-        const canvasElement = document.getElementById('output-canvas');
-        const ctx = canvasElement.getContext('2d', { willReadFrequently: true });
-        const viewfinderContainer = document.getElementById('viewfinder-container');
+        const studyGuideScreen = document.getElementById('study-guide-screen');
+        const proceedToQuizBtn = document.getElementById('proceed-to-quiz-btn');
+        const proceedToQuizBtnBottom = document.getElementById('proceed-to-quiz-btn-bottom');
+
+        const startScreen = document.getElementById('start-screen');
+        const questionScreen = document.getElementById('question-screen');
+        const resultScreen = document.getElementById('result-screen');
+        const reviewScreen = document.getElementById('review-screen');
+        const progressContainer = document.getElementById('progress-container');
         
-        const captureBtn = document.getElementById('capture-btn');
-        const flipBtn = document.getElementById('btn-flip');
-        const gridBtn = document.getElementById('btn-grid');
-        const dispBtn = document.getElementById('btn-disp');
-        const menuBtn = document.getElementById('btn-menu');
-        const proCcdBtn = document.getElementById('pro-ccd-btn');
+        const startBtn = document.getElementById('start-btn');
+        const nextBtn = document.getElementById('next-btn');
+        const restartBtn = document.getElementById('restart-btn');
+        const reviewBtn = document.getElementById('review-btn');
+        const backToResultsBtn = document.getElementById('back-to-results-btn');
+
+        const questionText = document.getElementById('question-text');
+        const optionsContainer = document.getElementById('options-container');
+        const questionCount = document.getElementById('question-count');
+        const scoreDisplay = document.getElementById('score-display');
+        const progressBar = document.getElementById('progress-bar');
         
-        const flashScreen = document.getElementById('flash-screen');
-        const gridOverlay = document.getElementById('grid-overlay');
-        const previewContainer = document.getElementById('preview-container');
-        const previewImg = document.getElementById('preview-img');
-        const filterMenu = document.getElementById('filter-menu');
-        const cameraSelector = document.getElementById('camera-selector');
-        
-        const fullscreenView = document.getElementById('fullscreen-view');
-        const fullscreenImg = document.getElementById('fullscreen-img');
-        
-        let animationFrameId;
-        let lastFrameTime = 0;
-        const targetFPS = 30;
-        const frameInterval = 1000 / targetFPS;
+        const finalScoreDisplay = document.getElementById('final-score');
+        const scorePercentageDisplay = document.getElementById('score-percentage');
+        const feedbackMessage = document.getElementById('feedback-message');
+        const reviewContainer = document.getElementById('review-container');
 
-        function initApp() {
-            buildFilterMenu();
-            attachEventListeners();
-            startCamera();
+        const proceedToStartScreen = () => {
+            studyGuideScreen.classList.add('hidden');
+            startScreen.classList.remove('hidden');
+        };
+        proceedToQuizBtn.addEventListener('click', proceedToStartScreen);
+        proceedToQuizBtnBottom.addEventListener('click', proceedToStartScreen);
+
+        startBtn.addEventListener('click', startQuiz);
+        nextBtn.addEventListener('click', handleNextButton);
+        restartBtn.addEventListener('click', resetQuiz);
+        reviewBtn.addEventListener('click', showReviewScreen);
+        backToResultsBtn.addEventListener('click', () => {
+            reviewScreen.classList.add('hidden');
+            resultScreen.classList.remove('hidden');
+        });
+
+        function startQuiz() {
+            startScreen.classList.add('hidden');
+            questionScreen.classList.remove('hidden');
+            progressContainer.classList.remove('hidden');
+            loadQuestion();
         }
 
-        function buildFilterMenu() {
-            cameras.forEach((cam, index) => {
-                const opt = document.createElement('div');
-                opt.className = `filter-option ${index === currentCameraIndex ? 'active' : ''}`;
-                opt.innerHTML = `
-                    <div class="filter-color-box" style="background: linear-gradient(135deg, ${cam.iconColor}, #111)"></div>
-                    <span class="text-[10px] font-bold tracking-wider text-white">${cam.name}</span>
-                `;
-                opt.addEventListener('click', () => {
-                    document.querySelectorAll('.filter-option').forEach(el => el.classList.remove('active'));
-                    opt.classList.add('active');
-                    currentCameraIndex = index;
-                    document.getElementById('current-filter-name').innerText = cam.name;
-                    showToast(`Filter: ${cam.name}`);
-                });
-                cameraSelector.appendChild(opt);
-            });
-        }
-
-        async function startCamera() {
-            if (videoStream) {
-                videoStream.getTracks().forEach(track => track.stop());
-            }
-
-            const constraints = {
-                video: {
-                    facingMode: useFrontCamera ? 'user' : 'environment',
-                    width: { ideal: 1080 },
-                    height: { ideal: 1440 } // Requesting a 3:4 ratio roughly
-                },
-                audio: false
-            };
-
-            try {
-                videoStream = await navigator.mediaDevices.getUserMedia(constraints);
-                videoElement.srcObject = videoStream;
-                videoElement.onloadedmetadata = () => {
-                    videoElement.play();
-                    resizeCanvas();
-                    if (!animationFrameId) renderLoop();
-                };
-            } catch (err) {
-                console.error(err);
-                showToast("Camera access denied or unavailable.");
-            }
-        }
-
-        function resizeCanvas() {
-            // Match canvas drawing resolution to its physical container size
-            // We multiply by devicePixelRatio for higher quality on retina screens
-            const rect = viewfinderContainer.getBoundingClientRect();
-            const dpr = window.devicePixelRatio || 1;
-            canvasElement.width = rect.width * dpr;
-            canvasElement.height = rect.height * dpr;
-        }
-        window.addEventListener('resize', resizeCanvas);
-
-        function renderLoop(timestamp) {
-            animationFrameId = requestAnimationFrame(renderLoop);
-            if (timestamp - lastFrameTime < frameInterval) return;
-            lastFrameTime = timestamp;
-
-            if (videoElement.readyState === videoElement.HAVE_ENOUGH_DATA) {
-                const w = canvasElement.width;
-                const h = canvasElement.height;
-                const cam = cameras[currentCameraIndex];
-
-                ctx.clearRect(0, 0, w, h);
-
-                // Apply Base Filters
-                if (cam.process) cam.process(ctx);
-                else ctx.filter = 'none';
-
-                ctx.save();
-                // Handle mirroring for front camera
-                if (useFrontCamera) {
-                    ctx.translate(w, 0);
-                    ctx.scale(-1, 1);
-                }
-
-                // Object-fit: cover simulation
-                const vRatio = videoElement.videoWidth / videoElement.videoHeight;
-                const cRatio = w / h;
-                let drawX = 0, drawY = 0, drawW = w, drawH = h;
-
-                if (vRatio > cRatio) {
-                    drawW = h * vRatio;
-                    drawX = (w - drawW) / 2;
-                } else {
-                    drawH = w / vRatio;
-                    drawY = (h - drawH) / 2;
-                }
-
-                ctx.drawImage(videoElement, drawX, drawY, drawW, drawH);
-                ctx.restore();
-
-                // Post Process Effects (Vignette, Noise)
-                ctx.filter = 'none';
-                if (cam.postProcess) cam.postProcess(ctx, w, h);
-
-                // Draw Date/Time Stamp (Always overlay on the final frame if enabled)
-                if(showTimestamp) {
-                    drawDateTimestamp(ctx, w, h);
-                }
-            }
-        }
-
-        function drawDateTimestamp(ctx, w, h) {
-            const now = new Date();
-            // Format: DD-MM-YYYY
-            const dateStr = now.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' }).replace(/\//g, '-');
-            // Format: HH:MM PM
-            const timeStr = now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit', hour12: true });
-
-            // Setup Text Style (Simulating the digital camera font)
-            // Scaling font based on canvas width to keep it consistent
-            const fontSize = Math.max(16, w * 0.05); 
-            ctx.font = `bold ${fontSize}px "Oswald", "Inter", sans-serif`;
-            ctx.textAlign = 'right';
-            ctx.textBaseline = 'bottom';
+        function loadQuestion() {
+            const currentQuestion = quizData[currentQuestionIndex];
             
-            const padding = fontSize * 0.8;
+            // Update UI text
+            questionText.textContent = `${currentQuestionIndex + 1}. ${currentQuestion.question}`;
+            questionCount.textContent = `Question ${currentQuestionIndex + 1} of ${quizData.length}`;
+            scoreDisplay.textContent = `Score: ${score}`;
             
-            // Draw Time (Bottom Line)
-            drawTextWithOutline(ctx, timeStr, w - padding, h - padding);
-            
-            // Draw Date (Top Line)
-            drawTextWithOutline(ctx, dateStr, w - padding, h - padding - (fontSize * 1.2));
-        }
+            // Update Progress Bar
+            const progressPercentage = ((currentQuestionIndex) / quizData.length) * 100;
+            progressBar.style.width = `${progressPercentage}%`;
 
-        function drawTextWithOutline(ctx, text, x, y) {
-            ctx.lineJoin = 'round';
-            ctx.lineWidth = ctx.canvas.width * 0.01; // Scale outline with canvas
-            ctx.strokeStyle = 'rgba(0, 0, 0, 0.8)';
-            ctx.strokeText(text, x, y);
-            
-            // Inner text color (Slightly warm white)
-            ctx.fillStyle = '#fefae0'; 
-            ctx.fillText(text, x, y);
-            
-            // Add a slight inner glow/blur by drawing again with lower opacity
-            ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-            ctx.fillText(text, x, y);
-        }
+            // Reset options container and next button
+            optionsContainer.innerHTML = '';
+            nextBtn.classList.add('hidden');
+            nextBtn.classList.remove('opacity-100');
+            nextBtn.classList.add('opacity-0');
 
-        function drawNoise(ctx, w, h, opacity, color = 'rgba(0,0,0,0.1)') {
-            ctx.globalAlpha = opacity;
-            ctx.fillStyle = color;
-            ctx.fillRect(0,0,w,h);
-            ctx.globalAlpha = 1.0;
-        }
-
-        function applyVignette(ctx, w, h, intensity = 0.5, size = 0.8) {
-            const gradient = ctx.createRadialGradient(
-                w / 2, h / 2, Math.min(w, h) * 0.2,
-                w / 2, h / 2, Math.min(w, h) * size
-            );
-            gradient.addColorStop(0, 'rgba(0,0,0,0)');
-            gradient.addColorStop(1, `rgba(0,0,0,${intensity})`);
-            ctx.fillStyle = gradient;
-            ctx.fillRect(0, 0, w, h);
-        }
-
-        function drawScratches(ctx, w, h, count, opacity) {
-            ctx.strokeStyle = `rgba(255,255,255,${opacity})`;
-            ctx.beginPath();
-            for(let i=0; i<count; i++) {
-                const x = Math.random() * w;
-                ctx.moveTo(x, 0);
-                ctx.lineTo(x + (Math.random() * 20 - 10), h);
-            }
-            ctx.stroke();
-        }
-
-        function attachEventListeners() {
-            // Flip Camera
-            flipBtn.addEventListener('click', () => {
-                useFrontCamera = !useFrontCamera;
-                startCamera();
-                showToast("Camera Switched");
-            });
-
-            // Grid Toggle
-            gridBtn.addEventListener('click', () => {
-                showGrid = !showGrid;
-                gridOverlay.style.display = showGrid ? 'block' : 'none';
-                showToast(showGrid ? "Grid ON" : "Grid OFF");
-            });
-
-            // DISP (Timestamp Toggle)
-            dispBtn.addEventListener('click', () => {
-                showTimestamp = !showTimestamp;
-                showToast(showTimestamp ? "Timestamp ON" : "Timestamp OFF");
-            });
-
-            // Menu / PRO CCD click -> Open filter drawer
-            const openMenu = () => { filterMenu.classList.add('open'); };
-            menuBtn.addEventListener('click', openMenu);
-            proCcdBtn.addEventListener('click', openMenu);
-            
-            document.getElementById('close-menu-btn').addEventListener('click', () => {
-                filterMenu.classList.remove('open');
-            });
-
-            // Capture Photo
-            captureBtn.addEventListener('click', () => {
-                // Haptic feedback if supported
-                if (navigator.vibrate) navigator.vibrate(50);
+            // Create options
+            currentQuestion.options.forEach((option, index) => {
+                const button = document.createElement('button');
+                button.className = 'w-full text-left p-4 rounded-xl border-2 border-gray-200 hover:border-indigo-300 hover:bg-indigo-50 transition-all duration-200 text-gray-700 font-medium relative overflow-hidden group';
                 
-                // Flash animation
-                flashScreen.style.opacity = '1';
-                setTimeout(() => { flashScreen.style.opacity = '0'; }, 150);
+                // Add inner HTML for better styling
+                button.innerHTML = `
+                    <div class="flex items-center">
+                        <span class="w-8 h-8 rounded-full bg-gray-100 text-gray-500 flex items-center justify-center mr-3 font-semibold group-hover:bg-indigo-100 group-hover:text-indigo-600 transition-colors">${String.fromCharCode(65 + index)}</span>
+                        <span>${option}</span>
+                    </div>
+                `;
 
-                // Small delay to let flash animation start before intense canvas operation
-                setTimeout(takeSnapshot, 50);
-            });
-
-            // Preview Click
-            previewContainer.addEventListener('click', () => {
-                if(previewImg.src && !previewImg.src.includes('data:image/gif')) {
-                    fullscreenImg.src = previewImg.src;
-                    fullscreenView.style.display = 'flex';
+                button.onclick = () => selectOption(index, button);
+                
+                // Restore state if navigating back (not implemented in simple linear flow, but good practice)
+                if (userAnswers[currentQuestionIndex] === index) {
+                     button.classList.add('border-indigo-500', 'bg-indigo-50');
                 }
-            });
 
-            document.getElementById('close-fullscreen').addEventListener('click', () => {
-                fullscreenView.style.display = 'none';
-            });
-
-            document.getElementById('save-photo').addEventListener('click', () => {
-                const link = document.createElement('a');
-                link.download = `retro_photo_${Date.now()}.jpg`;
-                link.href = fullscreenImg.src;
-                document.body.appendChild(link);
-                link.click();
-                document.body.removeChild(link);
-                showToast("Saved to Device");
-            });
-
-            // Dismiss badges logic
-            document.querySelector('.badge-close').addEventListener('click', (e) => {
-                e.stopPropagation();
-                e.target.parentElement.style.display = 'none';
+                optionsContainer.appendChild(button);
             });
         }
 
-        function takeSnapshot() {
-            // Because our canvas already contains the filtered frame + timestamp,
-            // we can just extract it directly.
-            const dataURL = canvasElement.toDataURL('image/jpeg', 0.95);
-            previewImg.src = dataURL;
+        function selectOption(selectedIndex, selectedButton) {
+            // Prevent changing answer once selected in this simple flow
+            if (userAnswers[currentQuestionIndex] !== null) return;
+
+            const currentQuestion = quizData[currentQuestionIndex];
+            const isCorrect = selectedIndex === currentQuestion.answer;
             
-            // Pop animation on preview
-            previewContainer.style.transform = 'scale(1.1)';
-            setTimeout(() => { previewContainer.style.transform = 'scale(1)'; }, 200);
+            // Store answer
+            userAnswers[currentQuestionIndex] = selectedIndex;
+
+            // Disable all buttons
+            const allButtons = optionsContainer.querySelectorAll('button');
+            allButtons.forEach(btn => {
+                btn.disabled = true;
+                btn.classList.remove('hover:border-indigo-300', 'hover:bg-indigo-50', 'cursor-pointer');
+                btn.classList.add('cursor-default', 'opacity-75');
+            });
+
+            // Style selected button
+            const iconSpan = selectedButton.querySelector('span:first-child');
+            if (isCorrect) {
+                selectedButton.classList.remove('border-gray-200');
+                selectedButton.classList.add('border-green-500', 'bg-green-50');
+                iconSpan.classList.remove('bg-gray-100', 'text-gray-500');
+                iconSpan.classList.add('bg-green-500', 'text-white');
+                score++;
+                scoreDisplay.textContent = `Score: ${score}`;
+            } else {
+                selectedButton.classList.remove('border-gray-200');
+                selectedButton.classList.add('border-red-500', 'bg-red-50');
+                iconSpan.classList.remove('bg-gray-100', 'text-gray-500');
+                iconSpan.classList.add('bg-red-500', 'text-white');
+                
+                // Highlight correct answer
+                const correctButton = allButtons[currentQuestion.answer];
+                correctButton.classList.remove('border-gray-200', 'opacity-75');
+                correctButton.classList.add('border-green-500', 'bg-green-50', 'opacity-100');
+                const correctIcon = correctButton.querySelector('span:first-child');
+                correctIcon.classList.remove('bg-gray-100', 'text-gray-500');
+                correctIcon.classList.add('bg-green-500', 'text-white');
+            }
+
+            // Show Next Button
+            nextBtn.classList.remove('hidden');
+            // Small timeout to allow display:block to apply before animating opacity
+            setTimeout(() => {
+                nextBtn.classList.remove('opacity-0');
+                nextBtn.classList.add('opacity-100');
+            }, 10);
+            
+            if (currentQuestionIndex === quizData.length - 1) {
+                nextBtn.textContent = 'Finish Quiz';
+            }
         }
 
-        function showToast(msg) {
-            const toast = document.getElementById('toast-msg');
-            toast.innerText = msg;
-            toast.style.opacity = '1';
-            setTimeout(() => { toast.style.opacity = '0'; }, 2000);
+        function handleNextButton() {
+            if (currentQuestionIndex < quizData.length - 1) {
+                currentQuestionIndex++;
+                loadQuestion();
+            } else {
+                showResults();
+            }
         }
 
-        // Run
-        window.addEventListener('DOMContentLoaded', initApp);
+        function showResults() {
+            quizCompleted = true;
+            questionScreen.classList.add('hidden');
+            progressContainer.classList.add('hidden');
+            resultScreen.classList.remove('hidden');
 
+            const percentage = Math.round((score / quizData.length) * 100);
+            
+            finalScoreDisplay.textContent = `${score}/${quizData.length}`;
+            scorePercentageDisplay.textContent = `${percentage}% Accuracy`;
+
+            if (percentage >= 90) {
+                feedbackMessage.textContent = "Outstanding! You are a master of the Indian Knowledge System.";
+                feedbackMessage.className = "text-xl font-medium text-green-600 mb-8";
+                triggerConfetti();
+            } else if (percentage >= 70) {
+                feedbackMessage.textContent = "Great job! You have a solid understanding of ancient Indian sciences.";
+                feedbackMessage.className = "text-xl font-medium text-blue-600 mb-8";
+            } else if (percentage >= 50) {
+                feedbackMessage.textContent = "Good effort. Reviewing the materials will help you grasp more concepts.";
+                feedbackMessage.className = "text-xl font-medium text-yellow-600 mb-8";
+            } else {
+                feedbackMessage.textContent = "Keep learning! The Indian Knowledge System is vast and fascinating.";
+                feedbackMessage.className = "text-xl font-medium text-gray-600 mb-8";
+            }
+        }
+
+        function showReviewScreen() {
+            resultScreen.classList.add('hidden');
+            reviewScreen.classList.remove('hidden');
+            
+            reviewContainer.innerHTML = ''; // Clear previous
+
+            quizData.forEach((q, index) => {
+                const userAnswerIdx = userAnswers[index];
+                const isCorrect = userAnswerIdx === q.answer;
+                
+                const reviewItem = document.createElement('div');
+                reviewItem.className = `p-4 rounded-xl border-l-4 ${isCorrect ? 'border-green-500 bg-green-50/50' : 'border-red-500 bg-red-50/50'}`;
+                
+                let optionsHtml = '';
+                q.options.forEach((opt, optIdx) => {
+                    let optClass = 'text-gray-600';
+                    let icon = '';
+                    if (optIdx === q.answer) {
+                        optClass = 'text-green-700 font-semibold';
+                        icon = '✓ ';
+                    } else if (optIdx === userAnswerIdx && !isCorrect) {
+                        optClass = 'text-red-700 line-through';
+                        icon = '✗ ';
+                    }
+                    
+                    optionsHtml += `<div class="ml-4 text-sm mt-1 ${optClass}">${icon}${String.fromCharCode(65 + optIdx)}. ${opt}</div>`;
+                });
+
+                reviewItem.innerHTML = `
+                    <p class="font-medium text-gray-800 mb-2">${index + 1}. ${q.question}</p>
+                    ${optionsHtml}
+                `;
+                reviewContainer.appendChild(reviewItem);
+            });
+        }
+
+        function resetQuiz() {
+            currentQuestionIndex = 0;
+            score = 0;
+            userAnswers = new Array(quizData.length).fill(null);
+            quizCompleted = false;
+            
+            resultScreen.classList.add('hidden');
+            reviewScreen.classList.add('hidden');
+            startScreen.classList.add('hidden');
+            studyGuideScreen.classList.remove('hidden');
+            progressBar.style.width = '0%';
+            
+            // Clear confetti if exists
+            document.querySelectorAll('.confetti').forEach(e => e.remove());
+        }
+
+        function triggerConfetti() {
+            const colors = ['#4f46e5', '#10b981', '#f59e0b', '#ef4444', '#8b5cf6'];
+            for (let i = 0; i < 50; i++) {
+                const confetti = document.createElement('div');
+                confetti.classList.add('confetti');
+                confetti.style.left = Math.random() * 100 + 'vw';
+                confetti.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
+                confetti.style.animationDuration = (Math.random() * 2 + 2) + 's';
+                confetti.style.animationDelay = (Math.random() * 2) + 's';
+                document.body.appendChild(confetti);
+                
+                // Cleanup
+                setTimeout(() => confetti.remove(), 5000);
+            }
+        }
     </script>
 </body>
 </html>
