@@ -3,634 +3,351 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BCA IKS Assessment App</title>
+    <title>Combined Image Formatter</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        .fade-in { animation: fadeIn 0.5s ease-in-out; }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
-        }
-        .correct-animation { animation: pulseGreen 0.5s ease-in-out; }
-        @keyframes pulseGreen {
-            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
-            50% { transform: scale(1.02); box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
-            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
-        }
-        .incorrect-animation { animation: shakeRed 0.5s ease-in-out; }
-        @keyframes shakeRed {
-            0%, 100% { transform: translateX(0); }
-            20%, 60% { transform: translateX(-5px); }
-            40%, 80% { transform: translateX(5px); }
-        }
-        .timer-warning { color: #ef4444; animation: pulseRed 1s infinite; }
-        @keyframes pulseRed {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
-        }
+        body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
+        .drop-zone { border: 2px dashed #9ca3af; transition: all 0.3s ease; }
+        .drop-zone.dragover { border-color: #4f46e5; background-color: #e0e7ff; }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800 h-screen flex flex-col">
+<body class="min-h-screen flex flex-col items-center justify-center p-4">
 
-    <header class="bg-indigo-600 text-white p-4 shadow-md sticky top-0 z-10">
-        <div class="max-w-4xl mx-auto flex justify-between items-center">
-            <h1 class="text-xl md:text-2xl font-bold">BCA IKS Assessment</h1>
-            <div class="flex items-center space-x-4">
-                <div id="timerDisplay" class="font-mono text-lg bg-indigo-700 px-3 py-1 rounded-md shadow-inner">60:00</div>
-                <div id="scoreDisplay" class="font-semibold bg-indigo-500 px-3 py-1 rounded-md">Score: 0</div>
-            </div>
-        </div>
-        <!-- Progress Bar -->
-        <div class="w-full bg-indigo-200 h-1.5 mt-2 absolute bottom-0 left-0">
-            <div id="progressBar" class="bg-yellow-400 h-1.5 transition-all duration-300 w-0"></div>
-        </div>
-    </header>
-
-    <main class="flex-grow container mx-auto p-4 md:p-8 max-w-4xl flex flex-col justify-center">
+    <main class="w-full max-w-3xl bg-white rounded-xl shadow-lg p-6 md:p-8">
         
-        <!-- Registration Screen -->
-        <div id="registrationScreen" class="bg-white rounded-xl shadow-lg p-8 text-center fade-in">
-            <h2 class="text-3xl font-bold text-indigo-700 mb-4">Student Registration</h2>
-            <p class="text-gray-600 mb-8 max-w-xl mx-auto">Please enter your details to begin the BCA IKS Assessment.</p>
-            
-            <form id="registrationForm" class="max-w-md mx-auto space-y-4">
-                <div>
-                    <label for="studentName" class="block text-left text-sm font-medium text-gray-700">Full Name</label>
-                    <input type="text" id="studentName" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-                </div>
-                <div>
-                    <label for="rollNumber" class="block text-left text-sm font-medium text-gray-700">Roll Number</label>
-                    <input type="text" id="rollNumber" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-                </div>
-                <button type="submit" class="w-full mt-6 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-10 rounded-lg shadow-lg transition duration-200">Continue to Instructions</button>
-            </form>
-        </div>
-
-        <!-- Start Screen -->
-        <div id="startScreen" class="hidden bg-white rounded-xl shadow-lg p-8 text-center fade-in">
-            <h2 class="text-3xl font-bold text-indigo-700 mb-4">Indian Knowledge System Test</h2>
-            <p class="text-gray-600 mb-8 max-w-2xl mx-auto">Welcome, <span id="displayStudentName" class="font-semibold"></span>! This comprehensive assessment contains 100 multiple-choice questions derived from the study guide, covering Mathematics, Astronomy (Khagola Shastra), and Philosophical Development. You have exactly <strong>60 minutes</strong> to complete the test.</p>
-            <button id="startBtn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-10 rounded-full shadow-lg transition duration-200">Begin Assessment</button>
-        </div>
-        
-        <!-- Quiz Screen -->
-        <div id="quizScreen" class="hidden bg-white rounded-xl shadow-lg p-6 md:p-8 fade-in flex flex-col flex-grow">
-            <div class="flex justify-between items-center mb-6 border-b pb-4">
-                <span id="questionCounter" class="text-sm font-semibold text-gray-500 uppercase tracking-wider">Question 1 of 100</span>
-                <span id="categoryBadge" class="bg-indigo-100 text-indigo-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Category</span>
-            </div>
-            
-            <h3 id="questionText" class="text-xl md:text-2xl font-semibold text-gray-800 mb-6"></h3>
-            
-            <div id="optionsContainer" class="space-y-3 mb-8 flex-grow">
-                <!-- Options injected here via JS -->
-            </div>
-            
-            <div class="flex justify-between items-center mt-auto border-t pt-4">
-                <div id="feedbackText" class="text-sm font-medium h-6 flex items-center"></div>
-                <button id="nextBtn" class="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-2 px-6 rounded shadow transition duration-200" disabled>Next Question</button>
+        <!-- Toggle Switch -->
+        <div class="flex justify-center mb-8">
+            <div class="bg-gray-100 p-1 rounded-lg inline-flex relative shadow-inner">
+                <button id="modeDoc" class="px-6 py-2.5 rounded-md bg-white shadow-sm text-sm font-semibold text-indigo-700 transition-all">
+                    Doc Editor (170x132)
+                </button>
+                <button id="modePic" class="px-6 py-2.5 rounded-md text-sm font-medium text-gray-500 hover:text-gray-700 transition-all">
+                    Pic Editor (132x170)
+                </button>
             </div>
         </div>
 
-        <!-- Results Screen -->
-        <div id="resultsScreen" class="hidden bg-white rounded-xl shadow-lg p-8 text-center fade-in">
-            <h2 class="text-3xl font-bold text-gray-800 mb-2">Assessment Complete!</h2>
-            <p class="text-gray-500 mb-6" id="completionStatus">Here is how you performed.</p>
-            
-            <div id="telegramStatus" class="mb-4 text-sm font-medium hidden rounded p-2"></div>
-            
-            <div class="flex justify-center items-center mb-8">
-                <div class="relative w-48 h-48">
-                    <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                        <path class="text-gray-200 stroke-current" stroke-width="3" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                        <path id="scoreCircle" class="text-indigo-600 stroke-current" stroke-width="3" stroke-dasharray="0, 100" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                    </svg>
-                    <div class="absolute inset-0 flex flex-col items-center justify-center">
-                        <span id="finalScoreText" class="text-4xl font-bold text-gray-800">0%</span>
-                        <span id="finalScoreFraction" class="text-sm text-gray-500">0 / 100</span>
+        <header class="text-center mb-6">
+            <h1 id="mainTitle" class="text-2xl font-bold text-gray-800 mb-2">Document Formatter</h1>
+            <p id="mainSubtitle" class="text-gray-600 text-sm">Resize to <span class="font-semibold text-indigo-600">170x132</span> pixels and compress to <span class="font-semibold text-indigo-600">5-20 KB</span> at 150 DPI.</p>
+        </header>
+
+        <div id="dropZone" class="drop-zone rounded-lg p-8 flex flex-col items-center justify-center cursor-pointer mb-6 text-center">
+            <svg class="w-12 h-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
+            </svg>
+            <p class="text-gray-700 font-medium mb-1">Drag and drop your image here</p>
+            <p class="text-gray-500 text-sm mb-4">or</p>
+            <label class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-md cursor-pointer transition duration-200">
+                Browse Files
+                <input type="file" id="fileInput" class="hidden" accept="image/png, image/jpeg, image/jpg, image/webp">
+            </label>
+        </div>
+
+        <div id="errorMessage" class="hidden mb-4 p-3 bg-red-100 text-red-700 rounded-md text-sm text-center"></div>
+
+        <div id="workspace" class="hidden">
+            <div class="flex flex-col md:flex-row gap-6">
+                <!-- Original Image Preview -->
+                <div class="flex-1 flex flex-col items-center">
+                    <h3 class="text-sm font-semibold text-gray-700 mb-2">Original</h3>
+                    <div class="w-full max-w-[200px] min-h-[150px] border border-gray-200 p-2 rounded bg-gray-50 flex items-center justify-center">
+                        <img id="originalPreview" src="" alt="Original Image" class="max-w-full max-h-[200px] object-contain">
+                    </div>
+                    <div class="mt-2 text-xs text-gray-500 text-center" id="originalStats"></div>
+                </div>
+
+                <!-- Controls and Processed Output -->
+                <div class="flex-1 flex flex-col">
+                    <div class="bg-gray-50 p-4 rounded-lg border border-gray-200 mb-4">
+                        <h3 class="text-sm font-semibold text-gray-700 mb-3">Adjust Quality</h3>
+                        <p class="text-xs text-gray-500 mb-3" id="qualityHint">Adjust the slider to meet the KB file size requirement.</p>
+                        
+                        <div class="flex items-center gap-3">
+                            <span class="text-xs font-medium text-gray-600">Low</span>
+                            <input type="range" id="qualitySlider" min="0.1" max="1.0" step="0.05" value="0.8" class="flex-1 h-2 bg-gray-300 rounded-lg appearance-none cursor-pointer">
+                            <span class="text-xs font-medium text-gray-600">High</span>
+                        </div>
+                        <div class="text-center mt-2 text-sm font-medium text-indigo-600">
+                            Quality: <span id="qualityValue">80</span>%
+                        </div>
+                    </div>
+
+                    <!-- Result Preview -->
+                    <div class="flex flex-col items-center">
+                         <h3 class="text-sm font-semibold text-gray-700 mb-2" id="resultTitle">Result</h3>
+                         <div class="border-2 border-dashed border-gray-300 p-4 bg-gray-100 flex items-center justify-center min-h-[200px] w-full">
+                            <canvas id="outputCanvas" class="border border-gray-400 bg-white shadow-sm block"></canvas>
+                         </div>
+                         
+                         <div id="resultStats" class="mt-3 flex flex-wrap gap-2 justify-center text-xs">
+                             <span id="sizeBadge" class="px-2 py-1 rounded-full bg-gray-200 text-gray-700">Size: -- KB</span>
+                             <span id="dimBadge" class="px-2 py-1 rounded-full bg-green-100 text-green-700">170x132 px</span>
+                             <span class="px-2 py-1 rounded-full bg-blue-100 text-blue-700">150 DPI</span>
+                         </div>
                     </div>
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 text-left max-w-2xl mx-auto">
-                <div class="bg-green-50 p-3 rounded border border-green-100">
-                    <p class="text-xs text-green-600 font-bold uppercase">Correct</p>
-                    <p id="correctCount" class="text-xl font-bold text-green-800">0</p>
-                </div>
-                <div class="bg-red-50 p-3 rounded border border-red-100">
-                    <p class="text-xs text-red-600 font-bold uppercase">Incorrect</p>
-                    <p id="incorrectCount" class="text-xl font-bold text-red-800">0</p>
-                </div>
-                <div class="bg-gray-50 p-3 rounded border border-gray-200">
-                    <p class="text-xs text-gray-500 font-bold uppercase">Unanswered</p>
-                    <p id="unansweredCount" class="text-xl font-bold text-gray-700">0</p>
-                </div>
-                <div class="bg-indigo-50 p-3 rounded border border-indigo-100">
-                    <p class="text-xs text-indigo-600 font-bold uppercase">Time Remaining</p>
-                    <p id="timeTakenText" class="text-xl font-bold text-indigo-800">00:00</p>
-                </div>
+            <div class="mt-8 flex justify-center gap-4 border-t pt-6">
+                <button id="resetBtn" class="px-4 py-2 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium rounded-md transition duration-200">
+                    Start Over
+                </button>
+                <button id="downloadBtn" class="px-6 py-2 bg-indigo-600 hover:bg-indigo-700 text-white font-medium rounded-md transition duration-200 shadow-md disabled:opacity-50 disabled:cursor-not-allowed">
+                    Download JPG
+                </button>
             </div>
-
-            <div id="performanceMessage" class="text-lg font-medium mb-8 text-gray-700"></div>
-
-            <button id="restartBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-full shadow transition duration-200">Take Assessment Again</button>
         </div>
-
     </main>
 
     <script>
-        // The 100 Questions Database based on the provided PDFs
-        const questionsData = [
-            // Category: Mathematics & The Concept of Zero
-            { q: "Ancient Indian mathematicians treated 'zero' primarily as:", options: ["A blank placeholder", "An independent number with properties", "A symbol for infinity", "An error in calculation"], answer: 1, category: "Mathematics" },
-            { q: "Who used a symbol for zero in his early binary system?", options: ["Aryabhata", "Brahmagupta", "Pingala", "Mahavira"], answer: 2, category: "Mathematics" },
-            { q: "Which mathematician gave the first formal mathematical rules for arithmetic operations with zero?", options: ["Brahmagupta", "Aryabhata", "Bhaskaracharya II", "Varahamihira"], answer: 0, category: "Mathematics" },
-            { q: "In which text did Brahmagupta outline the rules for zero?", options: ["Aryabhatiya", "Brahmasphutasiddhanta", "Beejaganita", "Vedanga Jyotisha"], answer: 1, category: "Mathematics" },
-            { q: "In ancient Indian mathematics, the numerator of a fraction was called:", options: ["Lava or Amsa", "Hara or Cheda", "Shunya", "Varna"], answer: 0, category: "Mathematics" },
-            { q: "In ancient Indian mathematics, the denominator of a fraction was called:", options: ["Lava or Amsa", "Hara or Cheda", "Bhinna", "Kalaka"], answer: 1, category: "Mathematics" },
-            { q: "How did the ancient Indian representation of fractions differ from the modern one?", options: ["They put the denominator on top", "They did not draw a horizontal dividing line", "They used letters instead of numbers", "They only used decimals"], answer: 1, category: "Mathematics" },
-            { q: "Who added the horizontal dividing line to fractions?", options: ["Indian mathematicians", "Greek mathematicians", "Arab mathematicians", "European mathematicians"], answer: 2, category: "Mathematics" },
-            { q: "Which two mathematicians are noted for establishing step-by-step rules for operations on fractions?", options: ["Pingala and Aryabhata", "Brahmagupta and Mahavira", "Bhaskaracharya and Lagadha", "Panini and Yaska"], answer: 1, category: "Mathematics" },
-            { q: "What is the ancient Indian term for Algebra?", options: ["Bhinna", "Shunya", "Beejaganita", "Jyotisha"], answer: 2, category: "Mathematics" },
-            
-            // Category: Algebra
-            { q: "Beejaganita translates to:", options: ["Mathematics of the stars", "Mathematics of seeds/elements", "Mathematics of fractions", "Mathematics of nothingness"], answer: 1, category: "Algebra" },
-            { q: "How did Indian mathematicians creatively represent unknown variables in algebra?", options: ["Using Greek letters like Alpha", "Using names of colors like Kalaka (black)", "Using animal names", "Using shapes"], answer: 1, category: "Algebra" },
-            { q: "What does the term 'Varna' refer to in the context of Indian algebra?", options: ["Fractions", "Variables/Unknowns", "Equations", "Zero"], answer: 1, category: "Algebra" },
-            { q: "Who provided integer solutions to linear equations?", options: ["Brahmagupta", "Bhaskaracharya II", "Aryabhata", "Pingala"], answer: 2, category: "Algebra" },
-            { q: "Who gave the first explicit general formula for solving quadratic equations?", options: ["Aryabhata", "Brahmagupta", "Mahavira", "Bhaskaracharya II"], answer: 1, category: "Algebra" },
-            { q: "Which 12th-century mathematician authored the definitive text 'Beejaganita' exploring polynomial equations?", options: ["Brahmagupta", "Aryabhata", "Bhaskaracharya II", "Lagadha"], answer: 2, category: "Algebra" },
-
-            // Category: Vedanga Jyotisha
-            { q: "What is the Vedanga Jyotisha?", options: ["A text on grammar", "An auxiliary limb of the Vedas devoted to astronomy", "A text on domestic rituals", "A philosophical treatise"], answer: 1, category: "Astronomy" },
-            { q: "Who compiled the Vedanga Jyotisha?", options: ["Sage Panini", "Sage Lagadha", "Sage Yaska", "Sage Pingala"], answer: 1, category: "Astronomy" },
-            { q: "What was the primary purpose of the Vedanga Jyotisha?", options: ["Predictive astrology (horoscopes)", "Calculating precise times for Vedic sacrifices", "Navigating the oceans", "Meteorological forecasting"], answer: 1, category: "Astronomy" },
-            { q: "What is the term for the precise, auspicious time calculated for performing rituals?", options: ["Yuga", "Tithi", "Muhurta", "Nakshatra"], answer: 2, category: "Astronomy" },
-            { q: "The Vedanga Jyotisha introduced a fundamental cycle to synchronize the solar and lunar years. How long is this Yuga?", options: ["1 year", "5 years", "12 years", "60 years"], answer: 1, category: "Astronomy" },
-            { q: "How many Nakshatras (lunar mansions) are detailed in the Vedanga Jyotisha?", options: ["12", "27", "30", "365"], answer: 1, category: "Astronomy" },
-            { q: "How many Tithis (lunar days) are described in the texts?", options: ["27", "28", "29.5", "30"], answer: 3, category: "Astronomy" },
-            { q: "What is 'Adhimasa'?", options: ["A solar eclipse", "A lunar eclipse", "An intercalary (leap) month", "A falling star"], answer: 2, category: "Astronomy" },
-            { q: "Why was the Adhimasa necessary?", options: ["To align the shorter lunar year with the solar year", "To predict eclipses", "To match the 5 visible planets", "To correct the length of a day"], answer: 0, category: "Astronomy" },
-
-            // Category: Philosophical Development
-            { q: "Which texts represent the foundational stage focusing on nature worship in the Vedic corpus?", options: ["Upanishads", "Brahmanas", "Samhitas", "Aranyakas"], answer: 2, category: "Philosophy" },
-            { q: "The concept of 'Rita' introduced in the Samhitas refers to:", options: ["A specific ritual fire", "The physical and moral cosmic order", "The individual soul", "Liberation"], answer: 1, category: "Philosophy" },
-            { q: "The famous Nasadiya Sukta (Creation Hymn) is found in which Veda?", options: ["Atharva Veda", "Sama Veda", "Yajur Veda", "Rig Veda"], answer: 3, category: "Philosophy" },
-            { q: "The 'Brahmanas' stage of Vedic philosophy shifted focus to:", options: ["Internal meditation", "The mechanics of Yajna (sacrificial rituals)", "Nature worship", "Grammar"], answer: 1, category: "Philosophy" },
-            { q: "Which text details complex rules for constructing fire altars as a microcosm of the universe?", options: ["Chandogya Upanishad", "Rig Veda", "Shatapatha Brahmana", "Vedanga Jyotisha"], answer: 2, category: "Philosophy" },
-            { q: "The Aranyakas are also known as:", options: ["Forest Treatises", "Fire Manuals", "Grammar Books", "Star Charts"], answer: 0, category: "Philosophy" },
-            { q: "What do the Aranyakas act as a bridge between?", options: ["Grammar and Poetry", "External materialistic rituals and internal symbolic meditation", "Solar and Lunar calendars", "Mathematics and Astronomy"], answer: 1, category: "Philosophy" },
-            { q: "What is 'Prana-agnihotra'?", options: ["A type of physical fire altar", "Offering breath into the internal fire through meditation", "A solar eclipse ritual", "A mathematical equation"], answer: 1, category: "Philosophy" },
-            { q: "Which texts represent the philosophical climax (Vedanta) of the Vedic corpus?", options: ["Samhitas", "Brahmanas", "Aranyakas", "Upanishads"], answer: 3, category: "Philosophy" },
-            { q: "The Upanishads completely shift the focus to:", options: ["Karma (Action)", "Yajna (Ritual)", "Jnana (Knowledge)", "Bhakti (Devotion)"], answer: 2, category: "Philosophy" },
-            { q: "In Vedanta, the universal supreme reality is called:", options: ["Atman", "Brahman", "Moksha", "Rita"], answer: 1, category: "Philosophy" },
-            { q: "The Mahavakya 'Tat Tvam Asi' (Thou art That) is found in which Upanishad?", options: ["Katha", "Isha", "Chandogya", "Mundaka"], answer: 2, category: "Philosophy" },
-
-            // Category: Inter-relationship of Disciplines
-            { q: "In ancient India, mathematics primarily evolved to serve the needs of which discipline?", options: ["Architecture", "Astronomy", "Medicine", "Linguistics"], answer: 1, category: "IKS Integration" },
-            { q: "Which mathematical concept was developed to calculate planetary orbits and spherical geometry?", options: ["Binary system", "Trigonometry", "Algebraic variables", "Fractions"], answer: 1, category: "IKS Integration" },
-            { q: "Ayurvedic health routines are dictated by:", options: ["Random selection", "Only the patient's age", "Solar and lunar cycles studied in astronomy", "The alignment of the 5 visible planets only"], answer: 2, category: "IKS Integration" },
-            { q: "Daily routines in Ayurveda are called:", options: ["Ritucharya", "Dinacharya", "Panchanga", "Muhurta"], answer: 1, category: "IKS Integration" },
-            { q: "According to IKS, lunar cycles were believed to affect:", options: ["Only the tides", "The sap and medicinal properties of plants", "The grammar of chants", "The construction of altars"], answer: 1, category: "IKS Integration" },
-            { q: "Diagnosing ailments through pulse reading (Nadi Pariksha) is fundamentally an observation of:", options: ["The patient's breath", "The alignment of stars at birth", "The body's cardiovascular rhythm (mathematical observation)", "The temperature of the skin"], answer: 2, category: "IKS Integration" },
-
-            // Category: Relevance Today
-            { q: "Pingala's Chanda Shastra is relevant to modern computing because it introduced:", options: ["The earliest known binary numeral system", "The concept of zero", "Silicon chips", "Algebraic algorithms"], answer: 0, category: "Modern Relevance" },
-            { q: "Panini's Ashtadhyayi is heavily studied today for advancements in:", options: ["Astrophysics", "Natural Language Processing (NLP)", "Civil Engineering", "Cardiology"], answer: 1, category: "Modern Relevance" },
-            { q: "How does Ayurveda differ from typical modern medicine approaches?", options: ["It only uses surgery", "It focuses on root causes and preventive personalized health", "It ignores the environment", "It relies entirely on astrology"], answer: 1, category: "Modern Relevance" },
-            { q: "Ancient civil engineering of the Indus Valley and Vastu Shastra principles are relevant today for:", options: ["Developing new programming languages", "Space exploration", "Sustainable architecture and urban planning", "Creating new pharmaceutical drugs"], answer: 2, category: "Modern Relevance" },
-            { q: "The principle of doing one's duty without attachment to outcomes, useful in modern stress management, is called:", options: ["Nishkama Karma", "Prana-agnihotra", "Dinacharya", "Tat Tvam Asi"], answer: 0, category: "Modern Relevance" },
-
-            // Category: Six Vedangas
-            { q: "The term 'Vedanga' translates to:", options: ["Heart of the Vedas", "Limbs of the Vedas", "End of the Vedas", "Summary of the Vedas"], answer: 1, category: "Vedangas" },
-            { q: "While Vedas are Shruti (divine revelation), Vedangas are considered:", options: ["Also Shruti", "Smriti (human-authored traditions)", "Upanishads", "Puranas"], answer: 1, category: "Vedangas" },
-            { q: "Which Vedanga represents the 'Nose' of the Veda Purusha?", options: ["Kalpa", "Shiksha", "Nirukta", "Chhanda"], answer: 1, category: "Vedangas" },
-            { q: "What is the purpose of Shiksha?", options: ["Grammar rules", "Exact pronunciation, accent, and intonation", "Etymology", "Ritual instructions"], answer: 1, category: "Vedangas" },
-            { q: "Which Vedanga represents the 'Arms' of the Veda Purusha and acts as a manual for action?", options: ["Kalpa", "Vyakarana", "Jyotisha", "Shiksha"], answer: 0, category: "Vedangas" },
-            { q: "Which Kalpa Sutra provides complex geometric rules for constructing fire altars?", options: ["Shrauta Sutras", "Grihya Sutras", "Dharma Sutras", "Shulba Sutras"], answer: 3, category: "Vedangas" },
-            { q: "Vyakarana (Grammar) represents which part of the Veda Purusha?", options: ["Eyes", "Ears", "Mouth", "Feet"], answer: 2, category: "Vedangas" },
-            { q: "Sage Panini's Ashtadhyayi contains exactly how many algebraic-like rules of grammar?", options: ["1,008", "3,959", "10,000", "365"], answer: 1, category: "Vedangas" },
-            { q: "Which Vedanga is the science of etymology, acting as the 'Ears'?", options: ["Nirukta", "Chhanda", "Kalpa", "Jyotisha"], answer: 0, category: "Vedangas" },
-            { q: "Who authored the famous text Nirukta?", options: ["Panini", "Pingala", "Yaska", "Lagadha"], answer: 2, category: "Vedangas" },
-            { q: "Chhanda defines the poetic meter and represents the ______ of the Veda Purusha.", options: ["Arms", "Mouth", "Nose", "Feet"], answer: 3, category: "Vedangas" },
-            { q: "The famous Gayatri meter contains how many syllables?", options: ["12", "24", "36", "44"], answer: 1, category: "Vedangas" },
-            { q: "Jyotisha (Astronomy) represents which part of the Veda Purusha?", options: ["Eyes", "Ears", "Nose", "Mouth"], answer: 0, category: "Vedangas" },
-
-            // Category: Khagola Shastra - Basics
-            { q: "Khagola Shastra refers to the ancient Indian science of:", options: ["Medicine", "Grammar", "The Firmament/Astronomy", "Architecture"], answer: 2, category: "Khagola Shastra" },
-            { q: "What method was primarily used for tracking celestial bodies in ancient Khagola Shastra?", options: ["Radio telescopes", "Naked-eye observation", "Optical telescopes", "Satellite imaging"], answer: 1, category: "Khagola Shastra" },
-            { q: "How many verses are in the Rigveda Recension of the Vedanga Jyotisha?", options: ["36", "43", "108", "360"], answer: 0, category: "Khagola Shastra" },
-            { q: "How many verses are in the Yajurveda Recension of the Vedanga Jyotisha?", options: ["36", "43", "108", "360"], answer: 1, category: "Khagola Shastra" },
-            { q: "Besides Yajna (timing rituals), why else did ancient Indians track the stars?", options: ["Only for philosophical reasons", "Krishi (Agriculture) and Kala (Civic Calendar)", "To predict personal fortunes only", "To navigate trade routes to Europe"], answer: 1, category: "Khagola Shastra" },
-            { q: "In Indian astronomy, Time (Kala) is considered:", options: ["An illusion", "A fundamental property of the cosmos defined by celestial motion", "Only relevant on Earth", "Unmeasurable"], answer: 1, category: "Khagola Shastra" },
-
-            // Category: Khagola Shastra - Sun & Year
-            { q: "In Khagola Shastra, what is referred to as the 'Soul of the Universe'?", options: ["The Moon", "The Earth", "Surya (The Sun)", "Jupiter"], answer: 2, category: "Khagola Shastra" },
-            { q: "A 'Savana Day' is defined as the period from:", options: ["Midnight to Midnight", "Sunset to Sunset", "Sunrise to Sunrise", "Noon to Noon"], answer: 2, category: "Khagola Shastra" },
-            { q: "The northern drift of the Sun (from winter solstice to summer solstice) is called:", options: ["Dakshinayana", "Uttarayana", "Equinox", "Adhimasa"], answer: 1, category: "Khagola Shastra" },
-            { q: "The southern drift of the Sun (from summer solstice to winter solstice) is called:", options: ["Dakshinayana", "Uttarayana", "Yuga", "Graha"], answer: 0, category: "Khagola Shastra" },
-            { q: "Uttarayana is generally associated with:", options: ["Shorter days", "Longer days and light", "Lunar eclipses", "Monsoon season"], answer: 1, category: "Khagola Shastra" },
-            { q: "Dakshinayana is generally associated with:", options: ["Longer days", "Solar eclipses", "Shorter days", "The harvest festival"], answer: 2, category: "Khagola Shastra" },
-
-            // Category: Khagola Shastra - Moon & Calendar
-            { q: "Who/what is referred to as 'The Timekeeper' due to its rapid movement?", options: ["Surya (Sun)", "Chandra (Moon)", "Shani (Saturn)", "Mangala (Mars)"], answer: 1, category: "Khagola Shastra" },
-            { q: "A Synodic Month is the duration from:", options: ["New moon to first quarter", "Full moon to full moon", "Sunrise to sunset", "Winter to summer solstice"], answer: 1, category: "Khagola Shastra" },
-            { q: "Approximately how many days are in a Synodic Month?", options: ["27.3 days", "28 days", "29.5 days", "30 days"], answer: 2, category: "Khagola Shastra" },
-            { q: "To synchronize the lunar and solar calendars over a 5-year Yuga, how many Adhika Masas (intercalary months) are added?", options: ["1", "2", "5", "7"], answer: 1, category: "Khagola Shastra" },
-            { q: "The ecliptic is mapped into how many divisions known as Lunar Mansions (Nakshatras)?", options: ["12", "27", "30", "360"], answer: 1, category: "Khagola Shastra" },
-            { q: "Each Nakshatra represents roughly how many degrees of the sky?", options: ["10°", "13° 20'", "15°", "30°"], answer: 1, category: "Khagola Shastra" },
-            { q: "The span of one Nakshatra corresponds to the distance the Moon travels in:", options: ["One solar day", "One week", "One lunar month", "One year"], answer: 0, category: "Khagola Shastra" },
-            { q: "Which of the following is NOT listed as a Nakshatra in the provided map?", options: ["Ashwini", "Krittika", "Orion", "Rohini"], answer: 2, category: "Khagola Shastra" },
-            
-            // Category: Khagola Shastra - Planets & Eclipses
-            { q: "The term 'Graha' translates to:", options: ["Wanderer", "Seizer of the sky", "Bright one", "Star"], answer: 1, category: "Khagola Shastra" },
-            { q: "How many visible planets (Pancha-Tara Grahas) are identified in the text?", options: ["3", "5", "7", "9"], answer: 1, category: "Khagola Shastra" },
-            { q: "Mangala corresponds to which planet?", options: ["Mercury", "Venus", "Mars", "Jupiter"], answer: 2, category: "Khagola Shastra" },
-            { q: "Budha corresponds to which planet?", options: ["Mercury", "Venus", "Mars", "Saturn"], answer: 0, category: "Khagola Shastra" },
-            { q: "Guru corresponds to which planet?", options: ["Venus", "Jupiter", "Saturn", "Mars"], answer: 1, category: "Khagola Shastra" },
-            { q: "Shukra corresponds to which planet?", options: ["Mercury", "Jupiter", "Venus", "Saturn"], answer: 2, category: "Khagola Shastra" },
-            { q: "Shani corresponds to which planet?", options: ["Mars", "Jupiter", "Venus", "Saturn"], answer: 3, category: "Khagola Shastra" },
-            { q: "Indian astronomy modeled eclipses mathematically using:", options: ["Telescopes", "Lunar nodes (Rahu and Ketu)", "Comet sightings", "Weather patterns"], answer: 1, category: "Khagola Shastra" },
-            { q: "Rahu represents the:", options: ["Descending Node", "Ascending Node", "Sun's corona", "Dark side of the moon"], answer: 1, category: "Khagola Shastra" },
-            { q: "Ketu represents the:", options: ["Descending Node", "Ascending Node", "Lunar crater", "Solar flare"], answer: 0, category: "Khagola Shastra" },
-
-            // Category: Khagola Shastra - Instruments & Legacy
-            { q: "What were Yantras in ancient Indian astronomy?", options: ["Spells to control weather", "Naked-eye masonry observatories and instruments", "Types of calendars", "Books on astrology"], answer: 1, category: "Khagola Shastra" },
-            { q: "What is a 'Shanku'?", options: ["A water clock", "A gnomon used for observing solar shadows", "A type of telescope", "A mathematical equation"], answer: 1, category: "Khagola Shastra" },
-            { q: "What was a 'Ghati Yantra' used for?", options: ["Measuring rainfall", "Calculating eclipses", "Water clock for timekeeping", "Sighting planets"], answer: 2, category: "Khagola Shastra" },
-            { q: "Early Indian astronomy is described as being heavily:", options: ["Mythological only", "Algorithmic and computationally driven", "Dependent on Greek translations", "Focused on astrology"], answer: 1, category: "Khagola Shastra" },
-            { q: "Calculating Yugas and Adhika Masas requires the use of:", options: ["Calculus", "Geometry only", "Modular arithmetic and cyclical logic", "Trigonometry only"], answer: 2, category: "Khagola Shastra" },
-            { q: "The logic used in ancient Indian astronomy establishes the historical foundation of which field in India?", options: ["Discrete mathematics", "Quantum physics", "Organic chemistry", "Biology"], answer: 0, category: "Khagola Shastra" },
-
-            // Category: Deep Dive / Mixed Details
-            { q: "According to the philosophy of the Brahmanas, what sustains the cosmic order?", options: ["Meticulously performed rituals (Yajna)", "Silent meditation", "Building temples", "Studying grammar"], answer: 0, category: "Philosophy" },
-            { q: "In the context of Algebra, what color does 'Nilaka' represent?", options: ["Black", "Red", "Blue", "White"], answer: 2, category: "Algebra" },
-            { q: "The text Brahmasphutasiddhanta was written by:", options: ["Aryabhata", "Brahmagupta", "Mahavira", "Bhaskaracharya"], answer: 1, category: "Mathematics" },
-            { q: "What does the Mahavakya 'Tat Tvam Asi' establish?", options: ["The earth is round", "The individual soul and universal reality are one", "The rules of karma", "The structure of grammar"], answer: 1, category: "Philosophy" },
-            { q: "How did IKS view different disciplines like Mathematics and Medicine?", options: ["As strictly separate subjects", "As competing theories", "As interconnected facets of a holistic universe", "As irrelevant to daily life"], answer: 2, category: "IKS Integration" },
-            { q: "What was calculated using astronomical data in Ayurveda to ensure maximum medicinal potency?", options: ["The patient's bill", "The timing for harvesting specific herbs", "The size of the clinic", "The number of bandages needed"], answer: 1, category: "IKS Integration" },
-            { q: "Which text provides the earliest known conceptualization of the binary numeral system?", options: ["Ashtadhyayi", "Nirukta", "Chhanda Shastra", "Shatapatha Brahmana"], answer: 2, category: "Vedangas" },
-            { q: "The Trishtubh meter contains how many syllables?", options: ["24", "36", "44", "48"], answer: 2, category: "Vedangas" },
-            { q: "Which Vedanga ensures the Veda is not lost to time by explaining obscure root meanings of words?", options: ["Vyakarana", "Nirukta", "Shiksha", "Kalpa"], answer: 1, category: "Vedangas" },
-            { q: "The intersection point moving north across the ecliptic is called:", options: ["Ketu", "Rahu", "Mangala", "Shukra"], answer: 1, category: "Khagola Shastra" },
-            { q: "The intersection point moving south across the ecliptic is called:", options: ["Ketu", "Rahu", "Budha", "Guru"], answer: 0, category: "Khagola Shastra" },
-            { q: "What famous Indian observatory is mentioned as an example of immense masonry instruments?", options: ["Taj Mahal", "Jantar Mantar", "Red Fort", "Qutub Minar"], answer: 1, category: "Khagola Shastra" },
-            { q: "In the 5-year Yuga cycle, the goal is to mathematically synchronize the lunar year with the:", options: ["Jovian (Jupiter) year", "Solar year", "Stellar year", "Martian year"], answer: 1, category: "Astronomy" },
-            
-            // Reaching 100 questions - creating variations and deeper factual checks from the texts
-            { q: "The concept that the macrocosm (universe) and microcosm (human body) are deeply linked is central to:", options: ["Modern allopathy", "Indian Knowledge System (IKS)", "Greek philosophy only", "European astronomy"], answer: 1, category: "IKS Integration" },
-            { q: "Determining Ayurvedic dosage required mathematical calculations based on:", options: ["The phase of the moon only", "Patient's age, weight, and disease severity", "The day of the week", "The cost of herbs"], answer: 1, category: "IKS Integration" },
-            { q: "IKS promotes sustainable living by viewing humans and nature as:", options: ["Competitors", "Exploiter and resource", "Interconnected", "Unrelated entities"], answer: 2, category: "Modern Relevance" },
-            { q: "Which of these is NOT one of the three Doshas in Ayurveda?", options: ["Vata", "Pitta", "Prana", "Kapha"], answer: 2, category: "IKS Integration" },
-            { q: "The Shulba Sutras are a sub-category of which Vedanga?", options: ["Shiksha", "Vyakarana", "Kalpa", "Nirukta"], answer: 2, category: "Vedangas" },
-            { q: "The Grihya Sutras deal with:", options: ["Large public sacrifices", "Domestic rituals and rites of passage", "Social laws", "Geometry"], answer: 1, category: "Vedangas" },
-            { q: "The Dharma Sutras deal with:", options: ["Domestic rituals", "Large public sacrifices", "Social duties, ethics, and laws", "Poetic meter"], answer: 2, category: "Vedangas" },
-            { q: "The Shrauta Sutras deal with:", options: ["Guidelines for large, public Vedic sacrifices", "Etymology", "Astronomy", "Domestic rites"], answer: 0, category: "Vedangas" },
-            { q: "Which sage is associated with the text Nirukta?", options: ["Panini", "Yaska", "Pingala", "Lagadha"], answer: 1, category: "Vedangas" },
-            { q: "Which sage is associated with the Chhanda Shastra?", options: ["Panini", "Yaska", "Pingala", "Lagadha"], answer: 2, category: "Vedangas" },
-            { q: "Which sage is associated with the Ashtadhyayi?", options: ["Panini", "Yaska", "Pingala", "Lagadha"], answer: 0, category: "Vedangas" },
-            { q: "The earliest stage of Vedic philosophy focused on praising personified forces of nature like Sun, Wind, and:", options: ["Earth", "Fire", "Water", "Space"], answer: 1, category: "Philosophy" },
-            { q: "The Rig Veda contains hymns dedicated to deity Indra, representing:", options: ["Fire", "Sun", "Rain/Thunder", "Wind"], answer: 2, category: "Philosophy" },
-            { q: "The Rig Veda contains hymns dedicated to deity Agni, representing:", options: ["Fire", "Sun", "Rain/Thunder", "Wind"], answer: 0, category: "Philosophy" },
-            
-            // Fleshing out the remaining to hit 100
-            { q: "What distinguishes the ancient Indian concept of zero from prior uses by other civilizations?", options: ["It was only a dot", "It was treated as an independent number with mathematical properties", "It meant infinity", "It was only used in astronomy"], answer: 1, category: "Mathematics" },
-            { q: "In the context of the Veda Purusha, what do the Samhitas primarily represent in terms of philosophical evolution?", options: ["The Philosophical Climax", "The Ritualistic Phase", "The Bridge", "The Foundation (Nature Worship)"], answer: 3, category: "Philosophy" },
-            { q: "Which texts were written by hermits retreating to the forests?", options: ["Brahmanas", "Samhitas", "Aranyakas", "Vedangas"], answer: 2, category: "Philosophy" },
-            { q: "According to the Vedanga Jyotisha, the main objective of tracking celestial bodies was NOT:", options: ["Calculating solar years", "Predictive astrology (horoscopes)", "Synchronizing calendars", "Timing Yajnas"], answer: 1, category: "Astronomy" },
-            { q: "The formulation of Ayurvedic medicines required complex mathematical ratios for mixing herbs, minerals, and:", options: ["Plastics", "Metals", "Synthetic chemicals", "Gases"], answer: 1, category: "IKS Integration" },
-            { q: "Which mathematical concept explicitly developed by Indian mathematicians helped calculate spherical geometry?", options: ["Calculus", "Trigonometry", "Probability", "Statistics"], answer: 1, category: "Mathematics" },
-            { q: "The practice of Yoga and meditation is cited as relevant today for:", options: ["Learning Sanskrit", "Physical fitness and mental resilience", "Performing fire rituals", "Calculating eclipses"], answer: 1, category: "Modern Relevance" },
-            { q: "Vastu Shastra teaches how to build structures that are:", options: ["Temporary", "Climate-responsive and energy-efficient", "Made only of wood", "Resistant to modern technology"], answer: 1, category: "Modern Relevance" },
-            { q: "What does the phonetic science of Shiksha aim to preserve?", options: ["The written characters of Sanskrit", "The exact pronunciation and sonic precision of hymns", "The historical dates of texts", "The translation into other languages"], answer: 1, category: "Vedangas" },
-            { q: "Why was a strict mathematical meter (Chhanda) crucial for the Vedas?", options: ["To make them easier to write down", "To prevent words from being added or dropped during oral transmission", "To translate them into music", "To confuse the uninitiated"], answer: 1, category: "Vedangas" },
-            { q: "The word 'Graha' in ancient astronomy implies that planets:", options: ["Produce their own light", "Are 'Seizers' moving against the background stars", "Are gods of war", "Are perfect spheres"], answer: 1, category: "Khagola Shastra" },
-            { q: "What visual phenomenon is caused by the Moon's intersection at Rahu or Ketu?", options: ["A monsoon", "An eclipse (Grahana)", "A shooting star", "A rainbow"], answer: 1, category: "Khagola Shastra" },
-            { q: "Which planet is NOT one of the Pancha-Tara Grahas?", options: ["Mangala", "Budha", "Earth", "Shani"], answer: 2, category: "Khagola Shastra" },
-            { q: "The balance of Doshas in the human body is believed to fluctuate with:", options: ["Seasonal changes and planetary positions", "The clothes one wears", "The language spoken", "The size of one's house"], answer: 0, category: "IKS Integration" },
-            { q: "The Indian Knowledge System integrates technological progress with:", options: ["Unrestricted consumption", "Ecological balance and mental peace", "Industrial revolution principles", "Conquering nature"], answer: 1, category: "Modern Relevance" },
-            
-            // Completing the 100
-            { q: "Which ancient text is known as the 'mathematics of seeds'?", options: ["Sulba Sutra", "Beejaganita", "Aryabhatiya", "Chhanda Shastra"], answer: 1, category: "Algebra" },
-            { q: "The 'mouth' of the Veda Purusha is represented by which discipline?", options: ["Etymology", "Astronomy", "Grammar (Vyakarana)", "Phonetics"], answer: 2, category: "Vedangas" },
-            { q: "If a ritual is a microcosm, what is the macrocosm?", options: ["The human body", "The village", "The universe", "The forest"], answer: 2, category: "Philosophy" },
-            { q: "What role did Pingala play in mathematical history?", options: ["Invented fractions", "Authored early text containing binary system concepts", "Calculated distance to the sun", "Built the Jantar Mantar"], answer: 1, category: "Mathematics" }
-        ];
-
-        // Shuffle questions function
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-        }
-
-        // State variables
-        let currentQuestions = [];
-        let currentQuestionIndex = 0;
-        let score = 0;
-        let correctCount = 0;
-        let incorrectCount = 0;
-        let unansweredCount = 0;
-        let timerInterval;
-        let timeRemaining = 3600; // 60 minutes in seconds
-        let hasAnsweredCurrent = false;
-        
-        // Student Details
-        let studentDetails = {
-            name: '',
-            rollNo: ''
-        };
-        
-        // Telegram Bot Details
-        const TELEGRAM_BOT_TOKEN = '8867692600:AAHBY_ueLG0bTPx3998gaq3IrlEku6MqZtc';
-        const TELEGRAM_CHAT_ID = '2147403583';
-
-        // DOM Elements
-        const registrationScreen = document.getElementById('registrationScreen');
-        const startScreen = document.getElementById('startScreen');
-        const quizScreen = document.getElementById('quizScreen');
-        const resultsScreen = document.getElementById('resultsScreen');
-        
-        const startBtn = document.getElementById('startBtn');
-        const restartBtn = document.getElementById('restartBtn');
-        const nextBtn = document.getElementById('nextBtn');
-        
-        const questionText = document.getElementById('questionText');
-        const optionsContainer = document.getElementById('optionsContainer');
-        const questionCounter = document.getElementById('questionCounter');
-        const categoryBadge = document.getElementById('categoryBadge');
-        const feedbackText = document.getElementById('feedbackText');
-        
-        const timerDisplay = document.getElementById('timerDisplay');
-        const scoreDisplay = document.getElementById('scoreDisplay');
-        const progressBar = document.getElementById('progressBar');
-        const completionStatus = document.getElementById('completionStatus');
-        
-        const registrationForm = document.getElementById('registrationForm');
-        const telegramStatus = document.getElementById('telegramStatus');
-
-        registrationForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            studentDetails.name = document.getElementById('studentName').value.trim();
-            studentDetails.rollNo = document.getElementById('rollNumber').value.trim();
-            
-            if(studentDetails.name && studentDetails.rollNo) {
-                document.getElementById('displayStudentName').textContent = studentDetails.name;
-                registrationScreen.classList.add('hidden');
-                startScreen.classList.remove('hidden');
-            }
-        });
-
-        startBtn.addEventListener('click', startQuiz);
-        restartBtn.addEventListener('click', () => {
-            resultsScreen.classList.add('hidden');
-            registrationScreen.classList.remove('hidden');
-            document.getElementById('registrationForm').reset();
-        });
-        nextBtn.addEventListener('click', loadNextQuestion);
-
-        function startQuiz() {
-            // Copy and shuffle
-            currentQuestions = [...questionsData];
-            shuffleArray(currentQuestions);
-            
-            // Reset state
-            currentQuestionIndex = 0;
-            score = 0;
-            correctCount = 0;
-            incorrectCount = 0;
-            unansweredCount = 0;
-            timeRemaining = 3600; // 60 minutes
-            timerDisplay.classList.remove('timer-warning');
-            telegramStatus.classList.add('hidden');
-            
-            updateScoreDisplay();
-            startTimer();
-
-            startScreen.classList.add('hidden');
-            resultsScreen.classList.add('hidden');
-            quizScreen.classList.remove('hidden');
-            
-            loadQuestion();
-        }
-
-        function startTimer() {
-            clearInterval(timerInterval);
-            updateTimerDisplay();
-            timerInterval = setInterval(() => {
-                timeRemaining--;
-                updateTimerDisplay();
-                
-                if (timeRemaining <= 300) { // 5 minutes warning
-                    timerDisplay.classList.add('timer-warning');
+        document.addEventListener('DOMContentLoaded', () => {
+            // Configuration for modes
+            const CONFIG = {
+                doc: {
+                    w: 170, h: 132, minKb: 5, maxKb: 20, 
+                    title: "Document Formatter", 
+                    subtitle: 'Resize to <span class="font-semibold text-indigo-600">170x132</span> pixels and compress to <span class="font-semibold text-indigo-600">5-20 KB</span> at 150 DPI.',
+                    filename: 'editdoc.jpg'
+                },
+                pic: {
+                    w: 132, h: 170, minKb: 0, maxKb: 9999, // No strict KB limits for pic
+                    title: "Picture Resizer", 
+                    subtitle: 'Crop & Resize to <span class="font-semibold text-indigo-600">132x170</span> pixels at 150 DPI.',
+                    filename: 'editpic.jpg'
                 }
-                
-                if (timeRemaining <= 0) {
-                    clearInterval(timerInterval);
-                    timerDisplay.textContent = "00:00";
-                    forceEndQuiz();
-                }
-            }, 1000);
-        }
-
-        function updateTimerDisplay() {
-            const minutes = Math.floor(timeRemaining / 60).toString().padStart(2, '0');
-            const seconds = (timeRemaining % 60).toString().padStart(2, '0');
-            timerDisplay.textContent = `${minutes}:${seconds}`;
-        }
-
-        function loadQuestion() {
-            hasAnsweredCurrent = false;
-            nextBtn.disabled = true;
-            feedbackText.textContent = '';
+            };
             
-            const qData = currentQuestions[currentQuestionIndex];
+            let currentMode = 'doc';
+            let currentImage = null;
+            let processedBlobUrl = null;
+
+            // DOM Elements
+            const modeDocBtn = document.getElementById('modeDoc');
+            const modePicBtn = document.getElementById('modePic');
+            const mainTitle = document.getElementById('mainTitle');
+            const mainSubtitle = document.getElementById('mainSubtitle');
             
-            questionCounter.textContent = `Question ${currentQuestionIndex + 1} of ${currentQuestions.length}`;
-            categoryBadge.textContent = qData.category;
-            questionText.textContent = qData.q;
+            const dropZone = document.getElementById('dropZone');
+            const fileInput = document.getElementById('fileInput');
+            const workspace = document.getElementById('workspace');
+            const errorMessage = document.getElementById('errorMessage');
             
-            // Update progress bar
-            const progress = ((currentQuestionIndex) / currentQuestions.length) * 100;
-            progressBar.style.width = `${progress}%`;
-
-            optionsContainer.innerHTML = '';
+            const originalPreview = document.getElementById('originalPreview');
+            const originalStats = document.getElementById('originalStats');
+            const qualitySlider = document.getElementById('qualitySlider');
+            const qualityValueDisplay = document.getElementById('qualityValue');
             
-            qData.options.forEach((opt, index) => {
-                const btn = document.createElement('button');
-                btn.className = 'w-full text-left p-4 rounded-lg border-2 border-gray-200 hover:border-indigo-400 hover:bg-indigo-50 transition-colors duration-200 text-gray-700 font-medium focus:outline-none flex justify-between items-center';
-                btn.innerHTML = `
-                    <span>${opt}</span>
-                    <svg class="w-6 h-6 hidden check-icon text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                    <svg class="w-6 h-6 hidden cross-icon text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                `;
-                btn.onclick = () => handleAnswer(index, btn, qData.answer);
-                optionsContainer.appendChild(btn);
-            });
-        }
-
-        function handleAnswer(selectedIndex, selectedBtn, correctIndex) {
-            if (hasAnsweredCurrent) return;
-            hasAnsweredCurrent = true;
-            nextBtn.disabled = false;
-
-            const buttons = optionsContainer.querySelectorAll('button');
+            const outputCanvas = document.getElementById('outputCanvas');
+            const ctx = outputCanvas.getContext('2d');
+            const resultTitle = document.getElementById('resultTitle');
+            const sizeBadge = document.getElementById('sizeBadge');
+            const dimBadge = document.getElementById('dimBadge');
             
-            // Disable all buttons
-            buttons.forEach(btn => {
-                btn.disabled = true;
-                btn.classList.remove('hover:border-indigo-400', 'hover:bg-indigo-50', 'cursor-pointer');
-            });
+            const downloadBtn = document.getElementById('downloadBtn');
+            const resetBtn = document.getElementById('resetBtn');
 
-            if (selectedIndex === correctIndex) {
-                // Correct
-                score++;
-                correctCount++;
-                selectedBtn.classList.add('border-green-500', 'bg-green-50', 'text-green-800', 'correct-animation');
-                selectedBtn.classList.remove('border-gray-200');
-                selectedBtn.querySelector('.check-icon').classList.remove('hidden');
-                
-                feedbackText.textContent = 'Correct!';
-                feedbackText.className = 'text-sm font-bold text-green-600';
-            } else {
-                // Incorrect
-                incorrectCount++;
-                selectedBtn.classList.add('border-red-500', 'bg-red-50', 'text-red-800', 'incorrect-animation');
-                selectedBtn.classList.remove('border-gray-200');
-                selectedBtn.querySelector('.cross-icon').classList.remove('hidden');
-                
-                // Highlight correct
-                const correctBtn = buttons[correctIndex];
-                correctBtn.classList.add('border-green-500', 'bg-green-50');
-                correctBtn.classList.remove('border-gray-200');
-                correctBtn.querySelector('.check-icon').classList.remove('hidden');
-
-                feedbackText.textContent = 'Incorrect.';
-                feedbackText.className = 'text-sm font-bold text-red-600';
-            }
-            
-            updateScoreDisplay();
-        }
-
-        function updateScoreDisplay() {
-            scoreDisplay.textContent = `Score: ${score}`;
-        }
-
-        function loadNextQuestion() {
-            if (!hasAnsweredCurrent) {
-                unansweredCount++;
-            }
-
-            currentQuestionIndex++;
-            if (currentQuestionIndex < currentQuestions.length) {
-                loadQuestion();
-            } else {
-                showResults(false);
-            }
-        }
-        
-        function forceEndQuiz() {
-            // Count remaining unattempted questions
-            unansweredCount = currentQuestions.length - (correctCount + incorrectCount);
-            showResults(true);
-        }
-
-        function showResults(timedOut) {
-            clearInterval(timerInterval);
-            progressBar.style.width = '100%';
-            
-            quizScreen.classList.add('hidden');
-            resultsScreen.classList.remove('hidden');
-            
-            if (timedOut) {
-                completionStatus.textContent = "Time is up! Here is how you performed.";
-                completionStatus.classList.add("text-red-500", "font-bold");
-            } else {
-                completionStatus.textContent = "Here is how you performed.";
-                completionStatus.classList.remove("text-red-500", "font-bold");
-            }
-
-            const percentage = Math.round((score / currentQuestions.length) * 100);
-            
-            document.getElementById('finalScoreText').textContent = `${percentage}%`;
-            document.getElementById('finalScoreFraction').textContent = `${score} / ${currentQuestions.length}`;
-            
-            // Animate circle
-            const circle = document.getElementById('scoreCircle');
-            circle.style.strokeDasharray = `${percentage}, 100`;
-
-            document.getElementById('correctCount').textContent = correctCount;
-            document.getElementById('incorrectCount').textContent = incorrectCount;
-            document.getElementById('unansweredCount').textContent = unansweredCount;
-            
-            const minutes = Math.floor(timeRemaining / 60).toString().padStart(2, '0');
-            const seconds = (timeRemaining % 60).toString().padStart(2, '0');
-            document.getElementById('timeTakenText').textContent = `${minutes}:${seconds}`;
-
-            const msgEl = document.getElementById('performanceMessage');
-            if (percentage >= 90) {
-                msgEl.textContent = "Excellent! You have a profound mastery of the Indian Knowledge System concepts.";
-                msgEl.className = "text-lg font-bold mb-8 text-green-600";
-            } else if (percentage >= 70) {
-                msgEl.textContent = "Great job! You have a solid understanding of the material.";
-                msgEl.className = "text-lg font-bold mb-8 text-blue-600";
-            } else if (percentage >= 50) {
-                msgEl.textContent = "Good effort. Reviewing the texts again will help solidify your knowledge.";
-                msgEl.className = "text-lg font-bold mb-8 text-yellow-600";
-            } else {
-                msgEl.textContent = "Keep studying! The IKS is vast, reviewing the source material will help.";
-                msgEl.className = "text-lg font-bold mb-8 text-red-600";
-            }
-
-            sendToTelegram();
-        }
-
-        async function sendToTelegram() {
-            telegramStatus.classList.remove('hidden');
-            telegramStatus.textContent = "Sending results...";
-            telegramStatus.className = "mb-4 text-sm font-medium rounded p-2 bg-blue-100 text-blue-700";
-
-            const message = `
-📝 *BCA IKS Assessment Completed*
-👤 Name: ${studentDetails.name}
-🔢 Roll No: ${studentDetails.rollNo}
-✅ Score: ${score} / ${currentQuestions.length}
-⏱ Time Remaining: ${Math.floor(timeRemaining / 60).toString().padStart(2, '0')}:${(timeRemaining % 60).toString().padStart(2, '0')}
-`;
-
-            const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
-            
-            try {
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        chat_id: TELEGRAM_CHAT_ID,
-                        text: message,
-                        parse_mode: 'Markdown'
-                    })
-                });
-
-                if (response.ok) {
-                    telegramStatus.textContent = "Results successfully recorded.";
-                    telegramStatus.className = "mb-4 text-sm font-medium rounded p-2 bg-green-100 text-green-700";
+            // --- Toggle Logic ---
+            function setMode(mode) {
+                currentMode = mode;
+                if (mode === 'doc') {
+                    modeDocBtn.className = "px-6 py-2.5 rounded-md bg-white shadow-sm text-sm font-semibold text-indigo-700 transition-all";
+                    modePicBtn.className = "px-6 py-2.5 rounded-md text-sm font-medium text-gray-500 hover:text-gray-700 transition-all";
                 } else {
-                    telegramStatus.textContent = "Failed to send results. Please notify the instructor.";
-                    telegramStatus.className = "mb-4 text-sm font-medium rounded p-2 bg-red-100 text-red-700";
-                    console.error("Telegram API Error", await response.text());
+                    modePicBtn.className = "px-6 py-2.5 rounded-md bg-white shadow-sm text-sm font-semibold text-indigo-700 transition-all";
+                    modeDocBtn.className = "px-6 py-2.5 rounded-md text-sm font-medium text-gray-500 hover:text-gray-700 transition-all";
                 }
-            } catch (error) {
-                telegramStatus.textContent = "Network error while sending results.";
-                telegramStatus.className = "mb-4 text-sm font-medium rounded p-2 bg-red-100 text-red-700";
-                console.error("Fetch Error", error);
+                
+                mainTitle.textContent = CONFIG[mode].title;
+                mainSubtitle.innerHTML = CONFIG[mode].subtitle;
+                resultTitle.textContent = `Result (${CONFIG[mode].w}x${CONFIG[mode].h})`;
+                dimBadge.textContent = `${CONFIG[mode].w}x${CONFIG[mode].h} px`;
+                
+                if (currentImage) processImage();
             }
-        }
+
+            modeDocBtn.addEventListener('click', () => setMode('doc'));
+            modePicBtn.addEventListener('click', () => setMode('pic'));
+
+            // --- File Handling ---
+            ['dragover', 'dragleave', 'drop'].forEach(evt => {
+                dropZone.addEventListener(evt, e => e.preventDefault());
+            });
+
+            dropZone.addEventListener('dragover', () => dropZone.classList.add('dragover'));
+            dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
+            dropZone.addEventListener('drop', e => {
+                dropZone.classList.remove('dragover');
+                if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+            });
+
+            fileInput.addEventListener('change', e => {
+                if (e.target.files.length) handleFile(e.target.files[0]);
+            });
+
+            qualitySlider.addEventListener('input', e => {
+                qualityValueDisplay.textContent = Math.round(e.target.value * 100);
+                if (currentImage) processImage();
+            });
+
+            resetBtn.addEventListener('click', () => {
+                workspace.classList.add('hidden');
+                dropZone.classList.remove('hidden');
+                fileInput.value = '';
+                currentImage = null;
+                if (processedBlobUrl) URL.revokeObjectURL(processedBlobUrl);
+                errorMessage.classList.add('hidden');
+            });
+
+            downloadBtn.addEventListener('click', () => {
+                if (!downloadBtn.disabled && processedBlobUrl) {
+                    const a = document.createElement('a');
+                    a.href = processedBlobUrl;
+                    a.download = CONFIG[currentMode].filename;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                }
+            });
+
+            function handleFile(file) {
+                errorMessage.classList.add('hidden');
+                if (!file.type.startsWith('image/')) {
+                    errorMessage.textContent = "Please upload a valid image file.";
+                    errorMessage.classList.remove('hidden');
+                    return;
+                }
+
+                originalStats.innerHTML = `Size: ${(file.size/1024).toFixed(2)} KB<br>Type: ${file.type}`;
+
+                const reader = new FileReader();
+                reader.onload = e => {
+                    originalPreview.src = e.target.result;
+                    const img = new Image();
+                    img.onload = () => {
+                        currentImage = img;
+                        dropZone.classList.add('hidden');
+                        workspace.classList.remove('hidden');
+                        originalStats.innerHTML += `<br>Dim: ${img.width}x${img.height}px`;
+                        processImage();
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+
+            // --- Canvas Processing & Constraints ---
+            function processImage() {
+                if (!currentImage) return;
+
+                const cfg = CONFIG[currentMode];
+                outputCanvas.width = cfg.w;
+                outputCanvas.height = cfg.h;
+                
+                ctx.fillStyle = "#FFFFFF";
+                ctx.fillRect(0, 0, cfg.w, cfg.h);
+                ctx.imageSmoothingEnabled = true;
+                ctx.imageSmoothingQuality = 'high';
+
+                // Drawing logic varies by mode
+                if (currentMode === 'doc') {
+                    // Stretches to fill exactly
+                    ctx.drawImage(currentImage, 0, 0, cfg.w, cfg.h);
+                } else {
+                    // Center crop to fill (maintains aspect ratio for pics)
+                    const imgRatio = currentImage.width / currentImage.height;
+                    const canvasRatio = cfg.w / cfg.h;
+                    let renderW = cfg.w, renderH = cfg.h, offsetX = 0, offsetY = 0;
+
+                    if (imgRatio > canvasRatio) {
+                        renderW = cfg.h * imgRatio;
+                        offsetX = (cfg.w - renderW) / 2;
+                    } else if (imgRatio < canvasRatio) {
+                        renderH = cfg.w / imgRatio;
+                        offsetY = (cfg.h - renderH) / 2;
+                    }
+                    ctx.drawImage(currentImage, offsetX, offsetY, renderW, renderH);
+                }
+
+                const quality = parseFloat(qualitySlider.value);
+                const rawDataUrl = outputCanvas.toDataURL('image/jpeg', quality);
+                const dpiDataUrl = changeDpiJpegBase64(rawDataUrl, 150);
+                
+                const blob = dataURItoBlob(dpiDataUrl);
+                const sizeInKb = (blob.size / 1024).toFixed(2);
+                
+                sizeBadge.textContent = `Size: ${sizeInKb} KB`;
+
+                // Validation based on mode config
+                if (currentMode === 'doc') {
+                    if (sizeInKb < cfg.minKb) {
+                        setSizeBadgeState('red', 'Too Small');
+                    } else if (sizeInKb > cfg.maxKb) {
+                        setSizeBadgeState('red', 'Too Large');
+                    } else {
+                        setSizeBadgeState('green', 'Valid');
+                    }
+                } else {
+                    setSizeBadgeState('green', 'Valid'); // Pics have no size constraints
+                }
+
+                if (processedBlobUrl) URL.revokeObjectURL(processedBlobUrl);
+                processedBlobUrl = URL.createObjectURL(blob);
+            }
+
+            function setSizeBadgeState(color, status) {
+                if (color === 'red') {
+                    sizeBadge.className = 'px-2 py-1 rounded-full bg-red-100 text-red-700 font-medium';
+                    downloadBtn.disabled = true;
+                } else {
+                    sizeBadge.className = 'px-2 py-1 rounded-full bg-green-100 text-green-800 font-medium border border-green-300';
+                    downloadBtn.disabled = false;
+                }
+                if (currentMode === 'doc') sizeBadge.textContent += ` (${status})`;
+            }
+
+            // --- Utilities ---
+            function dataURItoBlob(dataURI) {
+                const byteString = window.atob(dataURI.split(',')[1]);
+                const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0]
+                const ab = new ArrayBuffer(byteString.length);
+                const ia = new Uint8Array(ab);
+                for (let i = 0; i < byteString.length; i++) ia[i] = byteString.charCodeAt(i);
+                return new Blob([ab], {type: mimeString});
+            }
+
+            function changeDpiJpegBase64(base64Image, dpi) {
+                const dataParts = base64Image.split(',');
+                const binaryString = window.atob(dataParts[1]);
+                const bytes = new Uint8Array(binaryString.length);
+                for (let i = 0; i < binaryString.length; i++) bytes[i] = binaryString.charCodeAt(i);
+
+                let offset = 2; // Skip SOI (FF D8)
+                while (offset < bytes.length) {
+                    if (bytes[offset] === 0xFF && bytes[offset + 1] === 0xE0) { // APP0 JFIF
+                        const identifier = String.fromCharCode(bytes[offset+4], bytes[offset+5], bytes[offset+6], bytes[offset+7], bytes[offset+8]);
+                        if (identifier === "JFIF\0") {
+                            bytes[offset + 11] = 1; // Dots per inch
+                            bytes[offset + 12] = (dpi >> 8) & 0xFF; bytes[offset + 13] = dpi & 0xFF; // X
+                            bytes[offset + 14] = (dpi >> 8) & 0xFF; bytes[offset + 15] = dpi & 0xFF; // Y
+                            break;
+                        }
+                    } else if (bytes[offset] === 0xFF && bytes[offset + 1] === 0xDA) { // SOS
+                        break;
+                    }
+                    const markerLen = (bytes[offset + 2] << 8) | bytes[offset + 3];
+                    offset += 2 + markerLen;
+                }
+
+                let newBinaryString = '';
+                for (let j = 0; j < bytes.length; j++) newBinaryString += String.fromCharCode(bytes[j]);
+                return dataParts[0] + ',' + window.btoa(newBinaryString);
+            }
+            
+            // Init default state
+            setMode('doc');
+        });
     </script>
 </body>
 </html>
