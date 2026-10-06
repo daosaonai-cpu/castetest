@@ -3,15 +3,19 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Combined Image Formatter</title>
+    <title>Combined Image Formatter with Cropper</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Cropper.css -->
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css" rel="stylesheet">
     <style>
         body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
         .drop-zone { border: 2px dashed #9ca3af; transition: all 0.3s ease; }
         .drop-zone.dragover { border-color: #4f46e5; background-color: #e0e7ff; }
-        /* Mirror the video horizontally for a natural selfie-cam feel */
         .mirror-video { transform: scaleX(-1); }
+        /* Cropper container constraint */
+        .crop-container { max-height: 50vh; width: 100%; display: flex; justify-content: center; }
+        .crop-container img { display: block; max-width: 100%; }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-4">
@@ -35,6 +39,7 @@
             <p id="mainSubtitle" class="text-gray-600 text-sm">Resize to <span class="font-semibold text-indigo-600">170x132</span> pixels and compress to <span class="font-semibold text-indigo-600">5-20 KB</span> at 150 DPI.</p>
         </header>
 
+        <!-- Initial Upload/Camera Screen -->
         <div id="dropZone" class="drop-zone rounded-lg p-8 flex flex-col items-center justify-center mb-6 text-center">
             <svg class="w-12 h-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
@@ -56,13 +61,14 @@
 
         <div id="errorMessage" class="hidden mb-4 p-3 bg-red-100 text-red-700 rounded-md text-sm text-center"></div>
 
+        <!-- Processing Workspace -->
         <div id="workspace" class="hidden">
             <div class="flex flex-col md:flex-row gap-6">
                 <!-- Original Image Preview -->
                 <div class="flex-1 flex flex-col items-center">
-                    <h3 class="text-sm font-semibold text-gray-700 mb-2">Original</h3>
+                    <h3 class="text-sm font-semibold text-gray-700 mb-2">Cropped Original</h3>
                     <div class="w-full max-w-[200px] min-h-[150px] border border-gray-200 p-2 rounded bg-gray-50 flex items-center justify-center">
-                        <img id="originalPreview" src="" alt="Original Image" class="max-w-full max-h-[200px] object-contain">
+                        <img id="originalPreview" src="" alt="Cropped Image" class="max-w-full max-h-[200px] object-contain">
                     </div>
                     <div class="mt-2 text-xs text-gray-500 text-center" id="originalStats"></div>
                 </div>
@@ -111,11 +117,18 @@
     </main>
 
     <!-- Camera Modal -->
-    <div id="cameraModal" class="hidden fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center p-4">
+    <div id="cameraModal" class="hidden fixed inset-0 bg-black bg-opacity-80 z-[60] flex items-center justify-center p-4">
         <div class="bg-white rounded-xl p-6 w-full max-w-md flex flex-col items-center">
-            <h3 class="text-lg font-bold text-gray-800 mb-4">Take a Picture</h3>
+            <div class="flex justify-between items-center w-full mb-4">
+                <h3 class="text-lg font-bold text-gray-800">Take a Picture</h3>
+                <button id="flipCameraBtn" class="text-indigo-600 hover:text-indigo-800 font-medium flex items-center gap-1 bg-indigo-50 px-3 py-1.5 rounded-full transition-colors">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path></svg>
+                    Flip
+                </button>
+            </div>
+            
             <div class="w-full bg-black rounded-lg overflow-hidden mb-6 flex justify-center border-2 border-gray-200">
-                <video id="cameraFeed" autoplay playsinline class="mirror-video max-h-[60vh] w-auto object-cover"></video>
+                <video id="cameraFeed" autoplay playsinline class="max-h-[60vh] w-auto object-cover"></video>
             </div>
             <div class="flex gap-4 w-full">
                 <button id="closeCameraBtn" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-3 rounded-md transition duration-200">
@@ -129,9 +142,32 @@
         </div>
     </div>
 
+    <!-- Crop Modal -->
+    <div id="cropModal" class="hidden fixed inset-0 bg-black bg-opacity-80 z-[70] flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl p-6 w-full max-w-2xl flex flex-col">
+            <h3 class="text-lg font-bold text-gray-800 mb-4 text-center">Crop Image</h3>
+            
+            <div class="crop-container bg-gray-100 rounded-lg overflow-hidden mb-6 border border-gray-300">
+                <img id="cropImageTarget" src="" alt="To Crop">
+            </div>
+            
+            <div class="flex gap-4 w-full">
+                <button id="cancelCropBtn" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-2 rounded-md transition duration-200">
+                    Cancel
+                </button>
+                <button id="applyCropBtn" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 rounded-md transition duration-200 shadow-md">
+                    Apply & Format
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Cropper.js Script -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Configuration for modes
+            // --- Configuration ---
             const CONFIG = {
                 doc: {
                     w: 170, h: 132, minKb: 5, maxKb: 20, 
@@ -140,9 +176,9 @@
                     filename: 'editdoc.jpg'
                 },
                 pic: {
-                    w: 132, h: 170, minKb: 0, maxKb: 9999, // No strict KB limits for pic
+                    w: 132, h: 170, minKb: 0, maxKb: 9999, // No strict KB limits
                     title: "Picture Resizer", 
-                    subtitle: 'Crop & Resize to <span class="font-semibold text-indigo-600">132x170</span> pixels at 150 DPI.',
+                    subtitle: 'Resize to <span class="font-semibold text-indigo-600">132x170</span> pixels at 150 DPI.',
                     filename: 'editpic.jpg'
                 }
             };
@@ -150,9 +186,13 @@
             let currentMode = 'doc';
             let currentImage = null;
             let processedBlobUrl = null;
+            
             let cameraStream = null;
+            let currentFacingMode = 'user'; // 'user' for front, 'environment' for back
+            
+            let cropper = null;
 
-            // DOM Elements
+            // --- DOM Elements ---
             const modeDocBtn = document.getElementById('modeDoc');
             const modePicBtn = document.getElementById('modePic');
             const mainTitle = document.getElementById('mainTitle');
@@ -183,6 +223,13 @@
             const cameraFeed = document.getElementById('cameraFeed');
             const captureBtn = document.getElementById('captureBtn');
             const closeCameraBtn = document.getElementById('closeCameraBtn');
+            const flipCameraBtn = document.getElementById('flipCameraBtn');
+
+            // Crop Elements
+            const cropModal = document.getElementById('cropModal');
+            const cropImageTarget = document.getElementById('cropImageTarget');
+            const cancelCropBtn = document.getElementById('cancelCropBtn');
+            const applyCropBtn = document.getElementById('applyCropBtn');
 
             // --- Toggle Logic ---
             function setMode(mode) {
@@ -206,11 +253,8 @@
             modeDocBtn.addEventListener('click', () => setMode('doc'));
             modePicBtn.addEventListener('click', () => setMode('pic'));
 
-            // --- File Handling ---
-            ['dragover', 'dragleave', 'drop'].forEach(evt => {
-                dropZone.addEventListener(evt, e => e.preventDefault());
-            });
-
+            // --- File Handling (Uploads) ---
+            ['dragover', 'dragleave', 'drop'].forEach(evt => { dropZone.addEventListener(evt, e => e.preventDefault()); });
             dropZone.addEventListener('dragover', () => dropZone.classList.add('dragover'));
             dropZone.addEventListener('dragleave', () => dropZone.classList.remove('dragover'));
             dropZone.addEventListener('drop', e => {
@@ -228,67 +272,146 @@
                     showError("Please upload a valid image file.");
                     return;
                 }
-
-                originalStats.innerHTML = `Size: ${(file.size/1024).toFixed(2)} KB<br>Type: ${file.type}`;
-
+                
+                // Read and send to Cropper
                 const reader = new FileReader();
-                reader.onload = e => loadImageData(e.target.result);
+                reader.onload = e => openCropModal(e.target.result, file.type, file.size);
                 reader.readAsDataURL(file);
             }
 
             // --- Camera Handling ---
-            cameraBtn.addEventListener('click', async () => {
-                errorMessage.classList.add('hidden');
+            async function startCamera(facingMode) {
+                if (cameraStream) stopCamera();
                 try {
                     cameraStream = await navigator.mediaDevices.getUserMedia({ 
-                        video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } } 
+                        video: { facingMode: facingMode, width: { ideal: 1280 }, height: { ideal: 720 } } 
                     });
                     cameraFeed.srcObject = cameraStream;
+                    
+                    // Mirror the video ONLY for the front-facing camera
+                    if (facingMode === 'user') {
+                        cameraFeed.classList.add('mirror-video');
+                    } else {
+                        cameraFeed.classList.remove('mirror-video');
+                    }
                     cameraModal.classList.remove('hidden');
                 } catch (err) {
                     showError("Camera access denied or unavailable.");
                 }
-            });
+            }
 
             function stopCamera() {
                 if (cameraStream) {
                     cameraStream.getTracks().forEach(track => track.stop());
                     cameraStream = null;
                 }
-                cameraModal.classList.add('hidden');
             }
 
-            closeCameraBtn.addEventListener('click', stopCamera);
+            cameraBtn.addEventListener('click', () => {
+                errorMessage.classList.add('hidden');
+                startCamera(currentFacingMode);
+            });
+            
+            flipCameraBtn.addEventListener('click', () => {
+                currentFacingMode = currentFacingMode === 'user' ? 'environment' : 'user';
+                startCamera(currentFacingMode);
+            });
+
+            closeCameraBtn.addEventListener('click', () => {
+                stopCamera();
+                cameraModal.classList.add('hidden');
+            });
 
             captureBtn.addEventListener('click', () => {
-                // Create a temporary canvas to capture the video frame
                 const tempCanvas = document.createElement('canvas');
                 tempCanvas.width = cameraFeed.videoWidth;
                 tempCanvas.height = cameraFeed.videoHeight;
                 const tempCtx = tempCanvas.getContext('2d');
                 
-                // Flip horizontally so the captured image matches the mirrored video preview
-                tempCtx.translate(tempCanvas.width, 0);
-                tempCtx.scale(-1, 1);
+                // If mirroring is active, flip the canvas before drawing so the result is WYSIWYG
+                if (currentFacingMode === 'user') {
+                    tempCtx.translate(tempCanvas.width, 0);
+                    tempCtx.scale(-1, 1);
+                }
+                
                 tempCtx.drawImage(cameraFeed, 0, 0, tempCanvas.width, tempCanvas.height);
-                
                 const dataUrl = tempCanvas.toDataURL('image/jpeg', 0.95);
-                stopCamera();
                 
-                originalStats.innerHTML = `Source: Camera<br>Type: image/jpeg`;
-                loadImageData(dataUrl);
+                stopCamera();
+                cameraModal.classList.add('hidden');
+                
+                // Open crop modal with the captured frame
+                openCropModal(dataUrl, 'Camera Image', 0);
             });
 
-            // --- Core Image Loading & Processing ---
-            function loadImageData(dataUrl) {
+            // --- Cropping Handling ---
+            let pendingImgStats = { type: '', sizeStr: '' };
+            
+            function openCropModal(dataUrl, sourceType = 'image/jpeg', sourceSize = 0) {
+                // Store stats to display later in workspace
+                pendingImgStats = {
+                    type: sourceType,
+                    sizeStr: sourceSize > 0 ? (sourceSize/1024).toFixed(2) + ' KB' : 'N/A'
+                };
+
+                cropImageTarget.src = dataUrl;
+                cropModal.classList.remove('hidden');
+                
+                // Initialize Cropper JS once modal is visible
+                const cfg = CONFIG[currentMode];
+                const aspect = cfg.w / cfg.h;
+                
+                if (cropper) { cropper.destroy(); }
+                
+                cropper = new Cropper(cropImageTarget, {
+                    aspectRatio: aspect,
+                    viewMode: 1,      // Restrict crop box to not exceed canvas
+                    autoCropArea: 0.9,
+                    background: false,
+                    zoomable: true,
+                });
+            }
+
+            cancelCropBtn.addEventListener('click', () => {
+                cropModal.classList.add('hidden');
+                if (cropper) cropper.destroy();
+                // If camera was used and canceled, maybe they want to restart, but simplest is dropping them to home
+            });
+
+            applyCropBtn.addEventListener('click', () => {
+                if (!cropper) return;
+                
+                const cfg = CONFIG[currentMode];
+                // Force cropper to export at the exact target dimensions natively
+                const croppedCanvas = cropper.getCroppedCanvas({
+                    width: cfg.w,
+                    height: cfg.h,
+                    imageSmoothingEnabled: true,
+                    imageSmoothingQuality: 'high',
+                });
+                
+                const finalDataUrl = croppedCanvas.toDataURL('image/jpeg', 0.95);
+                
+                cropModal.classList.add('hidden');
+                cropper.destroy();
+                
+                loadFinalImageData(finalDataUrl);
+            });
+
+            // --- Core Processing Logic ---
+            function loadFinalImageData(dataUrl) {
                 originalPreview.src = dataUrl;
+                
+                originalStats.innerHTML = `Source Size: ${pendingImgStats.sizeStr}<br>Type: ${pendingImgStats.type}`;
+                
                 const img = new Image();
                 img.onload = () => {
                     currentImage = img;
                     dropZone.classList.add('hidden');
                     workspace.classList.remove('hidden');
-                    originalStats.innerHTML += `<br>Dim: ${img.width}x${img.height}px`;
-                    processImage();
+                    originalStats.innerHTML += `<br>Cropped: ${img.width}x${img.height}px`;
+                    
+                    processImage(); // Begin formatting loop
                 };
                 img.src = dataUrl;
             }
@@ -305,27 +428,15 @@
                 ctx.imageSmoothingEnabled = true;
                 ctx.imageSmoothingQuality = 'high';
 
-                if (currentMode === 'doc') {
-                    // Stretch to fill
-                    ctx.drawImage(currentImage, 0, 0, cfg.w, cfg.h);
-                } else {
-                    // Center crop to fill
-                    const imgRatio = currentImage.width / currentImage.height;
-                    const canvasRatio = cfg.w / cfg.h;
-                    let renderW = cfg.w, renderH = cfg.h, offsetX = 0, offsetY = 0;
+                // Because we cropped exactly to the aspect ratio & size, 
+                // drawing it 0,0,w,h fits perfectly natively.
+                ctx.drawImage(currentImage, 0, 0, cfg.w, cfg.h);
 
-                    if (imgRatio > canvasRatio) {
-                        renderW = cfg.h * imgRatio;
-                        offsetX = (cfg.w - renderW) / 2;
-                    } else if (imgRatio < canvasRatio) {
-                        renderH = cfg.w / imgRatio;
-                        offsetY = (cfg.h - renderH) / 2;
-                    }
-                    ctx.drawImage(currentImage, offsetX, offsetY, renderW, renderH);
-                }
-
+                // Export to JPEG with Quality slider
                 const quality = parseFloat(qualitySlider.value);
                 const rawDataUrl = outputCanvas.toDataURL('image/jpeg', quality);
+                
+                // Inject 150 DPI Requirement
                 const dpiDataUrl = changeDpiJpegBase64(rawDataUrl, 150);
                 
                 const blob = dataURItoBlob(dpiDataUrl);
@@ -333,6 +444,7 @@
                 
                 sizeBadge.textContent = `Size: ${sizeInKb} KB`;
 
+                // Status Validation
                 if (currentMode === 'doc') {
                     if (sizeInKb < cfg.minKb) setSizeBadgeState('red', 'Too Small');
                     else if (sizeInKb > cfg.maxKb) setSizeBadgeState('red', 'Too Large');
@@ -356,7 +468,7 @@
                 if (currentMode === 'doc') sizeBadge.textContent += ` (${status})`;
             }
 
-            // --- Slider & Buttons ---
+            // --- Interactivity & Utilities ---
             qualitySlider.addEventListener('input', e => {
                 qualityValueDisplay.textContent = Math.round(e.target.value * 100);
                 if (currentImage) processImage();
@@ -387,7 +499,6 @@
                 errorMessage.classList.remove('hidden');
             }
 
-            // --- Utilities ---
             function dataURItoBlob(dataURI) {
                 const byteString = window.atob(dataURI.split(',')[1]);
                 const mimeString = dataURI.split(',')[0].split(':')[1].split(';')[0]
