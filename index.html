@@ -10,6 +10,8 @@
         body { font-family: 'Inter', sans-serif; background-color: #f3f4f6; }
         .drop-zone { border: 2px dashed #9ca3af; transition: all 0.3s ease; }
         .drop-zone.dragover { border-color: #4f46e5; background-color: #e0e7ff; }
+        /* Mirror the video horizontally for a natural selfie-cam feel */
+        .mirror-video { transform: scaleX(-1); }
     </style>
 </head>
 <body class="min-h-screen flex flex-col items-center justify-center p-4">
@@ -33,16 +35,23 @@
             <p id="mainSubtitle" class="text-gray-600 text-sm">Resize to <span class="font-semibold text-indigo-600">170x132</span> pixels and compress to <span class="font-semibold text-indigo-600">5-20 KB</span> at 150 DPI.</p>
         </header>
 
-        <div id="dropZone" class="drop-zone rounded-lg p-8 flex flex-col items-center justify-center cursor-pointer mb-6 text-center">
+        <div id="dropZone" class="drop-zone rounded-lg p-8 flex flex-col items-center justify-center mb-6 text-center">
             <svg class="w-12 h-12 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12"></path>
             </svg>
             <p class="text-gray-700 font-medium mb-1">Drag and drop your image here</p>
-            <p class="text-gray-500 text-sm mb-4">or</p>
-            <label class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-md cursor-pointer transition duration-200">
-                Browse Files
-                <input type="file" id="fileInput" class="hidden" accept="image/png, image/jpeg, image/jpg, image/webp">
-            </label>
+            <p class="text-gray-500 text-sm mb-4">or choose an option</p>
+            
+            <div class="flex flex-wrap gap-3 justify-center">
+                <label class="bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-2 px-4 rounded-md cursor-pointer transition duration-200">
+                    Browse Files
+                    <input type="file" id="fileInput" class="hidden" accept="image/png, image/jpeg, image/jpg, image/webp">
+                </label>
+                <button id="cameraBtn" class="bg-gray-700 hover:bg-gray-800 text-white font-medium py-2 px-4 rounded-md transition duration-200 flex items-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 13a3 3 0 11-6 0 3 3 0 016 0z"></path></svg>
+                    Use Camera
+                </button>
+            </div>
         </div>
 
         <div id="errorMessage" class="hidden mb-4 p-3 bg-red-100 text-red-700 rounded-md text-sm text-center"></div>
@@ -101,6 +110,25 @@
         </div>
     </main>
 
+    <!-- Camera Modal -->
+    <div id="cameraModal" class="hidden fixed inset-0 bg-black bg-opacity-80 z-50 flex items-center justify-center p-4">
+        <div class="bg-white rounded-xl p-6 w-full max-w-md flex flex-col items-center">
+            <h3 class="text-lg font-bold text-gray-800 mb-4">Take a Picture</h3>
+            <div class="w-full bg-black rounded-lg overflow-hidden mb-6 flex justify-center border-2 border-gray-200">
+                <video id="cameraFeed" autoplay playsinline class="mirror-video max-h-[60vh] w-auto object-cover"></video>
+            </div>
+            <div class="flex gap-4 w-full">
+                <button id="closeCameraBtn" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-800 font-medium py-3 rounded-md transition duration-200">
+                    Cancel
+                </button>
+                <button id="captureBtn" class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white font-medium py-3 rounded-md transition duration-200 flex items-center justify-center gap-2">
+                    <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 9a2 2 0 012-2h.93a2 2 0 001.664-.89l.812-1.22A2 2 0 0110.07 4h3.86a2 2 0 011.664.89l.812 1.22A2 2 0 0018.07 7H19a2 2 0 012 2v9a2 2 0 01-2 2H5a2 2 0 01-2-2V9z"></path><circle cx="12" cy="13" r="4" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></circle></svg>
+                    Capture
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script>
         document.addEventListener('DOMContentLoaded', () => {
             // Configuration for modes
@@ -122,6 +150,7 @@
             let currentMode = 'doc';
             let currentImage = null;
             let processedBlobUrl = null;
+            let cameraStream = null;
 
             // DOM Elements
             const modeDocBtn = document.getElementById('modeDoc');
@@ -147,6 +176,13 @@
             
             const downloadBtn = document.getElementById('downloadBtn');
             const resetBtn = document.getElementById('resetBtn');
+
+            // Camera Elements
+            const cameraBtn = document.getElementById('cameraBtn');
+            const cameraModal = document.getElementById('cameraModal');
+            const cameraFeed = document.getElementById('cameraFeed');
+            const captureBtn = document.getElementById('captureBtn');
+            const closeCameraBtn = document.getElementById('closeCameraBtn');
 
             // --- Toggle Logic ---
             function setMode(mode) {
@@ -186,6 +222,141 @@
                 if (e.target.files.length) handleFile(e.target.files[0]);
             });
 
+            function handleFile(file) {
+                errorMessage.classList.add('hidden');
+                if (!file.type.startsWith('image/')) {
+                    showError("Please upload a valid image file.");
+                    return;
+                }
+
+                originalStats.innerHTML = `Size: ${(file.size/1024).toFixed(2)} KB<br>Type: ${file.type}`;
+
+                const reader = new FileReader();
+                reader.onload = e => loadImageData(e.target.result);
+                reader.readAsDataURL(file);
+            }
+
+            // --- Camera Handling ---
+            cameraBtn.addEventListener('click', async () => {
+                errorMessage.classList.add('hidden');
+                try {
+                    cameraStream = await navigator.mediaDevices.getUserMedia({ 
+                        video: { facingMode: 'user', width: { ideal: 1280 }, height: { ideal: 720 } } 
+                    });
+                    cameraFeed.srcObject = cameraStream;
+                    cameraModal.classList.remove('hidden');
+                } catch (err) {
+                    showError("Camera access denied or unavailable.");
+                }
+            });
+
+            function stopCamera() {
+                if (cameraStream) {
+                    cameraStream.getTracks().forEach(track => track.stop());
+                    cameraStream = null;
+                }
+                cameraModal.classList.add('hidden');
+            }
+
+            closeCameraBtn.addEventListener('click', stopCamera);
+
+            captureBtn.addEventListener('click', () => {
+                // Create a temporary canvas to capture the video frame
+                const tempCanvas = document.createElement('canvas');
+                tempCanvas.width = cameraFeed.videoWidth;
+                tempCanvas.height = cameraFeed.videoHeight;
+                const tempCtx = tempCanvas.getContext('2d');
+                
+                // Flip horizontally so the captured image matches the mirrored video preview
+                tempCtx.translate(tempCanvas.width, 0);
+                tempCtx.scale(-1, 1);
+                tempCtx.drawImage(cameraFeed, 0, 0, tempCanvas.width, tempCanvas.height);
+                
+                const dataUrl = tempCanvas.toDataURL('image/jpeg', 0.95);
+                stopCamera();
+                
+                originalStats.innerHTML = `Source: Camera<br>Type: image/jpeg`;
+                loadImageData(dataUrl);
+            });
+
+            // --- Core Image Loading & Processing ---
+            function loadImageData(dataUrl) {
+                originalPreview.src = dataUrl;
+                const img = new Image();
+                img.onload = () => {
+                    currentImage = img;
+                    dropZone.classList.add('hidden');
+                    workspace.classList.remove('hidden');
+                    originalStats.innerHTML += `<br>Dim: ${img.width}x${img.height}px`;
+                    processImage();
+                };
+                img.src = dataUrl;
+            }
+
+            function processImage() {
+                if (!currentImage) return;
+
+                const cfg = CONFIG[currentMode];
+                outputCanvas.width = cfg.w;
+                outputCanvas.height = cfg.h;
+                
+                ctx.fillStyle = "#FFFFFF";
+                ctx.fillRect(0, 0, cfg.w, cfg.h);
+                ctx.imageSmoothingEnabled = true;
+                ctx.imageSmoothingQuality = 'high';
+
+                if (currentMode === 'doc') {
+                    // Stretch to fill
+                    ctx.drawImage(currentImage, 0, 0, cfg.w, cfg.h);
+                } else {
+                    // Center crop to fill
+                    const imgRatio = currentImage.width / currentImage.height;
+                    const canvasRatio = cfg.w / cfg.h;
+                    let renderW = cfg.w, renderH = cfg.h, offsetX = 0, offsetY = 0;
+
+                    if (imgRatio > canvasRatio) {
+                        renderW = cfg.h * imgRatio;
+                        offsetX = (cfg.w - renderW) / 2;
+                    } else if (imgRatio < canvasRatio) {
+                        renderH = cfg.w / imgRatio;
+                        offsetY = (cfg.h - renderH) / 2;
+                    }
+                    ctx.drawImage(currentImage, offsetX, offsetY, renderW, renderH);
+                }
+
+                const quality = parseFloat(qualitySlider.value);
+                const rawDataUrl = outputCanvas.toDataURL('image/jpeg', quality);
+                const dpiDataUrl = changeDpiJpegBase64(rawDataUrl, 150);
+                
+                const blob = dataURItoBlob(dpiDataUrl);
+                const sizeInKb = (blob.size / 1024).toFixed(2);
+                
+                sizeBadge.textContent = `Size: ${sizeInKb} KB`;
+
+                if (currentMode === 'doc') {
+                    if (sizeInKb < cfg.minKb) setSizeBadgeState('red', 'Too Small');
+                    else if (sizeInKb > cfg.maxKb) setSizeBadgeState('red', 'Too Large');
+                    else setSizeBadgeState('green', 'Valid');
+                } else {
+                    setSizeBadgeState('green', 'Valid');
+                }
+
+                if (processedBlobUrl) URL.revokeObjectURL(processedBlobUrl);
+                processedBlobUrl = URL.createObjectURL(blob);
+            }
+
+            function setSizeBadgeState(color, status) {
+                if (color === 'red') {
+                    sizeBadge.className = 'px-2 py-1 rounded-full bg-red-100 text-red-700 font-medium';
+                    downloadBtn.disabled = true;
+                } else {
+                    sizeBadge.className = 'px-2 py-1 rounded-full bg-green-100 text-green-800 font-medium border border-green-300';
+                    downloadBtn.disabled = false;
+                }
+                if (currentMode === 'doc') sizeBadge.textContent += ` (${status})`;
+            }
+
+            // --- Slider & Buttons ---
             qualitySlider.addEventListener('input', e => {
                 qualityValueDisplay.textContent = Math.round(e.target.value * 100);
                 if (currentImage) processImage();
@@ -211,100 +382,9 @@
                 }
             });
 
-            function handleFile(file) {
-                errorMessage.classList.add('hidden');
-                if (!file.type.startsWith('image/')) {
-                    errorMessage.textContent = "Please upload a valid image file.";
-                    errorMessage.classList.remove('hidden');
-                    return;
-                }
-
-                originalStats.innerHTML = `Size: ${(file.size/1024).toFixed(2)} KB<br>Type: ${file.type}`;
-
-                const reader = new FileReader();
-                reader.onload = e => {
-                    originalPreview.src = e.target.result;
-                    const img = new Image();
-                    img.onload = () => {
-                        currentImage = img;
-                        dropZone.classList.add('hidden');
-                        workspace.classList.remove('hidden');
-                        originalStats.innerHTML += `<br>Dim: ${img.width}x${img.height}px`;
-                        processImage();
-                    };
-                    img.src = e.target.result;
-                };
-                reader.readAsDataURL(file);
-            }
-
-            // --- Canvas Processing & Constraints ---
-            function processImage() {
-                if (!currentImage) return;
-
-                const cfg = CONFIG[currentMode];
-                outputCanvas.width = cfg.w;
-                outputCanvas.height = cfg.h;
-                
-                ctx.fillStyle = "#FFFFFF";
-                ctx.fillRect(0, 0, cfg.w, cfg.h);
-                ctx.imageSmoothingEnabled = true;
-                ctx.imageSmoothingQuality = 'high';
-
-                // Drawing logic varies by mode
-                if (currentMode === 'doc') {
-                    // Stretches to fill exactly
-                    ctx.drawImage(currentImage, 0, 0, cfg.w, cfg.h);
-                } else {
-                    // Center crop to fill (maintains aspect ratio for pics)
-                    const imgRatio = currentImage.width / currentImage.height;
-                    const canvasRatio = cfg.w / cfg.h;
-                    let renderW = cfg.w, renderH = cfg.h, offsetX = 0, offsetY = 0;
-
-                    if (imgRatio > canvasRatio) {
-                        renderW = cfg.h * imgRatio;
-                        offsetX = (cfg.w - renderW) / 2;
-                    } else if (imgRatio < canvasRatio) {
-                        renderH = cfg.w / imgRatio;
-                        offsetY = (cfg.h - renderH) / 2;
-                    }
-                    ctx.drawImage(currentImage, offsetX, offsetY, renderW, renderH);
-                }
-
-                const quality = parseFloat(qualitySlider.value);
-                const rawDataUrl = outputCanvas.toDataURL('image/jpeg', quality);
-                const dpiDataUrl = changeDpiJpegBase64(rawDataUrl, 150);
-                
-                const blob = dataURItoBlob(dpiDataUrl);
-                const sizeInKb = (blob.size / 1024).toFixed(2);
-                
-                sizeBadge.textContent = `Size: ${sizeInKb} KB`;
-
-                // Validation based on mode config
-                if (currentMode === 'doc') {
-                    if (sizeInKb < cfg.minKb) {
-                        setSizeBadgeState('red', 'Too Small');
-                    } else if (sizeInKb > cfg.maxKb) {
-                        setSizeBadgeState('red', 'Too Large');
-                    } else {
-                        setSizeBadgeState('green', 'Valid');
-                    }
-                } else {
-                    setSizeBadgeState('green', 'Valid'); // Pics have no size constraints
-                }
-
-                if (processedBlobUrl) URL.revokeObjectURL(processedBlobUrl);
-                processedBlobUrl = URL.createObjectURL(blob);
-            }
-
-            function setSizeBadgeState(color, status) {
-                if (color === 'red') {
-                    sizeBadge.className = 'px-2 py-1 rounded-full bg-red-100 text-red-700 font-medium';
-                    downloadBtn.disabled = true;
-                } else {
-                    sizeBadge.className = 'px-2 py-1 rounded-full bg-green-100 text-green-800 font-medium border border-green-300';
-                    downloadBtn.disabled = false;
-                }
-                if (currentMode === 'doc') sizeBadge.textContent += ` (${status})`;
+            function showError(msg) {
+                errorMessage.textContent = msg;
+                errorMessage.classList.remove('hidden');
             }
 
             // --- Utilities ---
@@ -323,17 +403,17 @@
                 const bytes = new Uint8Array(binaryString.length);
                 for (let i = 0; i < binaryString.length; i++) bytes[i] = binaryString.charCodeAt(i);
 
-                let offset = 2; // Skip SOI (FF D8)
+                let offset = 2; 
                 while (offset < bytes.length) {
-                    if (bytes[offset] === 0xFF && bytes[offset + 1] === 0xE0) { // APP0 JFIF
+                    if (bytes[offset] === 0xFF && bytes[offset + 1] === 0xE0) { 
                         const identifier = String.fromCharCode(bytes[offset+4], bytes[offset+5], bytes[offset+6], bytes[offset+7], bytes[offset+8]);
                         if (identifier === "JFIF\0") {
-                            bytes[offset + 11] = 1; // Dots per inch
-                            bytes[offset + 12] = (dpi >> 8) & 0xFF; bytes[offset + 13] = dpi & 0xFF; // X
-                            bytes[offset + 14] = (dpi >> 8) & 0xFF; bytes[offset + 15] = dpi & 0xFF; // Y
+                            bytes[offset + 11] = 1; 
+                            bytes[offset + 12] = (dpi >> 8) & 0xFF; bytes[offset + 13] = dpi & 0xFF; 
+                            bytes[offset + 14] = (dpi >> 8) & 0xFF; bytes[offset + 15] = dpi & 0xFF; 
                             break;
                         }
-                    } else if (bytes[offset] === 0xFF && bytes[offset + 1] === 0xDA) { // SOS
+                    } else if (bytes[offset] === 0xFF && bytes[offset + 1] === 0xDA) {
                         break;
                     }
                     const markerLen = (bytes[offset + 2] << 8) | bytes[offset + 3];
