@@ -3,841 +3,632 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Khagola Shastra Quiz</title>
+    <title>BCA IKS Assessment App</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
     <style>
-        .hidden { display: none !important; }
-        .correct { background-color: #d1fae5; border-color: #10b981; } /* Tailwind green-100, green-500 */
-        .incorrect { background-color: #fee2e2; border-color: #ef4444; } /* Tailwind red-100, red-500 */
-        .option-btn { transition: all 0.2s ease-in-out; }
-        .option-btn:hover:not(:disabled) { transform: translateY(-2px); box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06); }
-        .latex-container { display: inline-block; }
+        body { font-family: 'Inter', sans-serif; }
+        .fade-in { animation: fadeIn 0.5s ease-in-out; }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .correct-animation { animation: pulseGreen 0.5s ease-in-out; }
+        @keyframes pulseGreen {
+            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
+            50% { transform: scale(1.02); box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
+            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        }
+        .incorrect-animation { animation: shakeRed 0.5s ease-in-out; }
+        @keyframes shakeRed {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-5px); }
+            40%, 80% { transform: translateX(5px); }
+        }
+        .timer-warning { color: #ef4444; animation: pulseRed 1s infinite; }
+        @keyframes pulseRed {
+            0% { opacity: 1; }
+            50% { opacity: 0.5; }
+            100% { opacity: 1; }
+        }
     </style>
-    <!-- MathJax for rendering LaTeX if needed, though most text is plain here -->
-    <script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
-    <script id="MathJax-script" async src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
 </head>
-<body class="bg-gray-100 min-h-screen font-sans text-gray-800">
+<body class="bg-gray-50 text-gray-800 h-screen flex flex-col">
 
-    <div class="container mx-auto px-4 py-8 max-w-3xl">
-        <!-- Header -->
-        <header class="text-center mb-8">
-            <h1 class="text-4xl font-bold text-indigo-700 mb-2">Khagola Shastra Quiz</h1>
-            <p class="text-gray-600">Test your knowledge of Ancient Indian Astronomy</p>
-        </header>
+    <header class="bg-indigo-600 text-white p-4 shadow-md sticky top-0 z-10">
+        <div class="max-w-4xl mx-auto flex justify-between items-center">
+            <h1 class="text-xl md:text-2xl font-bold">BCA IKS Assessment</h1>
+            <div class="flex items-center space-x-4">
+                <div id="timerDisplay" class="font-mono text-lg bg-indigo-700 px-3 py-1 rounded-md shadow-inner">60:00</div>
+                <div id="scoreDisplay" class="font-semibold bg-indigo-500 px-3 py-1 rounded-md">Score: 0</div>
+            </div>
+        </div>
+        <!-- Progress Bar -->
+        <div class="w-full bg-indigo-200 h-1.5 mt-2 absolute bottom-0 left-0">
+            <div id="progressBar" class="bg-yellow-400 h-1.5 transition-all duration-300 w-0"></div>
+        </div>
+    </header>
+
+    <main class="flex-grow container mx-auto p-4 md:p-8 max-w-4xl flex flex-col justify-center">
+        
+        <!-- Registration Screen -->
+        <div id="registrationScreen" class="bg-white rounded-xl shadow-lg p-8 text-center fade-in">
+            <h2 class="text-3xl font-bold text-indigo-700 mb-4">Student Registration</h2>
+            <p class="text-gray-600 mb-8 max-w-xl mx-auto">Please enter your details to begin the BCA IKS Assessment.</p>
+            
+            <form id="registrationForm" class="max-w-md mx-auto space-y-4">
+                <div>
+                    <label for="studentName" class="block text-left text-sm font-medium text-gray-700">Full Name</label>
+                    <input type="text" id="studentName" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+                <div>
+                    <label for="rollNumber" class="block text-left text-sm font-medium text-gray-700">Roll Number</label>
+                    <input type="text" id="rollNumber" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
+                </div>
+                <button type="submit" class="w-full mt-6 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-10 rounded-lg shadow-lg transition duration-200">Continue to Instructions</button>
+            </form>
+        </div>
 
         <!-- Start Screen -->
-        <div id="start-screen" class="bg-white rounded-lg shadow-lg p-6 md:p-10">
-            <div class="text-center mb-8">
-                <h2 class="text-3xl font-bold mb-4 text-gray-800">Welcome to the Quiz!</h2>
-                <p class="mb-6 text-gray-700 text-lg">Before you begin, please review the comprehensive study guide below based on the principles of Khagola Shastra. You can also skip directly to the test.</p>
-                <button id="start-btn-top" class="bg-indigo-100 hover:bg-indigo-200 text-indigo-700 font-bold py-3 px-8 rounded-full shadow transition duration-300 border border-indigo-300">
-                    Skip Guide & Start Quiz
-                </button>
-            </div>
-
-            <hr class="my-8 border-gray-200">
-
-            <!-- Study Guide Content -->
-            <article class="text-gray-800 space-y-10">
-                
-                <!-- Introduction -->
-                <div class="text-center max-w-2xl mx-auto">
-                    <h2 class="text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-700 to-purple-600 mb-4">Khagola Shastra Study Guide</h2>
-                    <p class="text-gray-600 text-lg leading-relaxed">An in-depth exploration of the Indian Knowledge System (IKS), tracing the mathematical logic of ancient Indian astronomy through the observation of celestial bodies in the Vedic corpus.</p>
-                </div>
-
-                <!-- Section 1: The Science of the Firmament & Texts -->
-                <section class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 relative overflow-hidden">
-                    <div class="absolute top-0 left-0 w-2 h-full bg-indigo-500"></div>
-                    <h3 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
-                        <span class="bg-indigo-100 text-indigo-700 w-8 h-8 rounded-full inline-flex items-center justify-center mr-3 text-sm">1</span>
-                        The Science of the Firmament & Texts
-                    </h3>
-                    <p class="mb-6 text-gray-700 leading-relaxed">Early Indian astronomy transitioned from pure mythology to rigorous mathematical logic. The cosmos was understood through a triad of foundational scientific practices:</p>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-                        <div class="bg-indigo-50 p-5 rounded-xl border border-indigo-100">
-                            <h4 class="font-bold text-indigo-800 mb-2">Observation</h4>
-                            <p class="text-sm text-gray-600">Meticulous, long-term naked-eye tracking of celestial bodies, mapping stars, and planetary motion.</p>
-                        </div>
-                        <div class="bg-purple-50 p-5 rounded-xl border border-purple-100">
-                            <h4 class="font-bold text-purple-800 mb-2">Mathematics</h4>
-                            <p class="text-sm text-gray-600">The development of algorithmic calculations to predict planetary orbits and celestial events.</p>
-                        </div>
-                        <div class="bg-blue-50 p-5 rounded-xl border border-blue-100">
-                            <h4 class="font-bold text-blue-800 mb-2">Timekeeping</h4>
-                            <p class="text-sm text-gray-600">The complex synchronization of the diverging lunar and solar calendars to maintain seasonal accuracy.</p>
-                        </div>
-                    </div>
-
-                    <div class="bg-gray-50 p-6 rounded-xl border-l-4 border-gray-400">
-                        <h4 class="text-lg font-bold text-gray-800 mb-2">The Vedanga Jyotisha</h4>
-                        <p class="text-gray-700 mb-4">Authored by the ancient <strong>Sage Lagadha</strong>, the <em>Vedanga Jyotisha</em> stands as the earliest known Indian text dedicated explicitly to positional astronomy. Its primary and most critical purpose was determining the precise timing for Vedic rituals.</p>
-                        <ul class="flex flex-col sm:flex-row gap-4">
-                            <li class="bg-white px-4 py-2 rounded shadow-sm border border-gray-200 flex-1 text-center"><strong>Rigveda Recension:</strong> 36 verses</li>
-                            <li class="bg-white px-4 py-2 rounded shadow-sm border border-gray-200 flex-1 text-center"><strong>Yajurveda Recension:</strong> 43 verses</li>
-                        </ul>
-                    </div>
-                </section>
-
-                <!-- Section 2: Purpose & Architecture of Time -->
-                <section class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 relative overflow-hidden">
-                    <div class="absolute top-0 left-0 w-2 h-full bg-blue-500"></div>
-                    <h3 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
-                        <span class="bg-blue-100 text-blue-700 w-8 h-8 rounded-full inline-flex items-center justify-center mr-3 text-sm">2</span>
-                        Purpose & The Architecture of Time (Kala)
-                    </h3>
-                    <p class="mb-6 text-gray-700 leading-relaxed">The intense focus on tracking the stars was not merely academic; it was fundamentally tied to the survival, culture, and administration of ancient Indian society.</p>
-                    
-                    <ul class="space-y-4 mb-6 text-gray-700">
-                        <li class="flex items-start">
-                            <span class="text-blue-500 mr-2 mt-1">✦</span>
-                            <div><strong>Yajna (Rituals):</strong> Timing seasonal Vedic rituals accurately was considered essential for maintaining cosmic order.</div>
-                        </li>
-                        <li class="flex items-start">
-                            <span class="text-blue-500 mr-2 mt-1">✦</span>
-                            <div><strong>Krishi (Agriculture):</strong> An agrarian society depended heavily on agricultural planning and predicting the arrival of the monsoons based on stellar positions.</div>
-                        </li>
-                        <li class="flex items-start">
-                            <span class="text-blue-500 mr-2 mt-1">✦</span>
-                            <div><strong>Kala (Civic Calendar):</strong> Establishing a universal, standardized civic calendar for society to function cohesively.</div>
-                        </li>
-                    </ul>
-
-                    <div class="bg-blue-50 p-5 rounded-lg border border-blue-100 text-center">
-                        <p class="text-lg text-blue-900 italic font-medium">"Kala (Time) in Indian astronomy is not merely an abstract measurement, but a fundamental property of the cosmos defined entirely by celestial motion."</p>
-                    </div>
-                </section>
-
-                <!-- Section 3: Surya & The Solar Path -->
-                <section class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 relative overflow-hidden">
-                    <div class="absolute top-0 left-0 w-2 h-full bg-orange-500"></div>
-                    <h3 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
-                        <span class="bg-orange-100 text-orange-700 w-8 h-8 rounded-full inline-flex items-center justify-center mr-3 text-sm">3</span>
-                        Surya (The Sun) & The Solar Path
-                    </h3>
-                    <p class="mb-6 text-gray-700 leading-relaxed">Revered as <em>"The Soul of the Universe,"</em> Surya (the Sun) is the absolute anchor of the solar year. The Sun's position strictly dictates the length of the year, the manifestation of seasons, and the core framework of the solar calendar. A <strong>Savana Day</strong> is practically defined as the exact period from one sunrise to the next sunrise.</p>
-                    
-                    <h4 class="font-bold text-gray-800 mb-4 border-b pb-2">The Solar Path (Ayanas)</h4>
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <div class="bg-orange-50 p-6 rounded-xl border border-orange-200">
-                            <div class="text-orange-600 font-bold text-xl mb-2">Uttarayana</div>
-                            <div class="text-sm font-semibold text-orange-800 mb-3 uppercase tracking-wider">Northern Drift</div>
-                            <p class="text-gray-700 text-sm">Marks the Sun's journey from the Winter Solstice (approx. Dec 22) to the Summer Solstice (approx. June 21). This half of the year is characterized by progressively <strong>longer days and increasing light</strong>.</p>
-                        </div>
-                        <div class="bg-gray-100 p-6 rounded-xl border border-gray-300">
-                            <div class="text-gray-800 font-bold text-xl mb-2">Dakshinayana</div>
-                            <div class="text-sm font-semibold text-gray-600 mb-3 uppercase tracking-wider">Southern Drift</div>
-                            <p class="text-gray-700 text-sm">Marks the Sun's journey from the Summer Solstice (approx. June 21) back down to the Winter Solstice (approx. Dec 22). This period is associated with progressively <strong>shorter days and decreasing light</strong>.</p>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Section 4: Chandra & Synchronization -->
-                <section class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 relative overflow-hidden">
-                    <div class="absolute top-0 left-0 w-2 h-full bg-slate-800"></div>
-                    <h3 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
-                        <span class="bg-slate-200 text-slate-800 w-8 h-8 rounded-full inline-flex items-center justify-center mr-3 text-sm">4</span>
-                        Chandra (The Moon) & Synchronization
-                    </h3>
-                    <p class="mb-6 text-gray-700 leading-relaxed">If the Sun is the anchor of the year, Chandra (the Moon) is <em>"The Timekeeper"</em> of the day. Because the Moon moves so rapidly against the background of the stars, it provides an ideal, highly visible anchor for daily timekeeping.</p>
-                    
-                    <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
-                        <div class="space-y-4">
-                            <div class="bg-slate-50 p-4 rounded border border-slate-200">
-                                <h4 class="font-bold text-slate-800">Synodic Month</h4>
-                                <p class="text-sm text-gray-600">The duration from one full moon to the next full moon, calculating to approximately <strong>29.5 days</strong>.</p>
-                            </div>
-                            <div class="bg-slate-50 p-4 rounded border border-slate-200">
-                                <h4 class="font-bold text-slate-800">Tithis</h4>
-                                <p class="text-sm text-gray-600">The synodic month is mathematically divided into exactly <strong>30 Tithis</strong> (lunar days).</p>
-                            </div>
-                        </div>
-                        
-                        <div class="bg-indigo-50 p-6 rounded-xl border border-indigo-200 flex flex-col justify-center">
-                            <h4 class="font-bold text-indigo-800 text-lg mb-3">Luni-Solar Synchronization</h4>
-                            <p class="text-sm text-gray-700 mb-4">Because 12 lunar months (~354 days) fall short of a solar year (~365.25 days), the calendars quickly drift. Vedic astronomy solves this using a <strong>5-Year Yuga</strong> cycle.</p>
-                            <div class="bg-white p-3 rounded shadow-inner text-center">
-                                <span class="block text-2xl font-black text-indigo-600">5 Year Yuga</span>
-                                <span class="block text-sm text-gray-500 font-bold mt-1">+ 2 Adhika Masas</span>
-                                <span class="block text-xs text-gray-400 mt-1">(Intercalary months added to sync cycles)</span>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Section 5: Nakshatras & Grahas -->
-                <section class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 relative overflow-hidden">
-                    <div class="absolute top-0 left-0 w-2 h-full bg-teal-500"></div>
-                    <h3 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
-                        <span class="bg-teal-100 text-teal-700 w-8 h-8 rounded-full inline-flex items-center justify-center mr-3 text-sm">5</span>
-                        Nakshatras & Grahas
-                    </h3>
-                    
-                    <div class="mb-8">
-                        <h4 class="text-xl font-bold text-gray-800 mb-3 border-b pb-2">Lunar Mansions (Nakshatras)</h4>
-                        <p class="text-gray-700 mb-4">The ecliptic (the apparent path of the Sun and Moon) is divided into <strong>27 divisions</strong> known as Nakshatras, mapping the Moon's path amongst the background stars. Each Nakshatra spans exactly <strong>13° 20'</strong> of the sky (since 27 × 13.33° ≈ 360°). This distance perfectly corresponds to the distance the Moon travels in one solar day.</p>
-                        
-                        <!-- List of 27 Nakshatras extracted from the wheel image -->
-                        <div class="bg-teal-50 p-5 rounded-xl border border-teal-100">
-                            <h5 class="font-bold text-teal-800 mb-3 text-sm uppercase tracking-wide">The 27 Nakshatras of the Ecliptic</h5>
-                            <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-2 text-sm text-gray-700">
-                                <div>1. Ashwini</div><div>2. Bharani</div><div>3. Krittika</div><div>4. Rohini</div>
-                                <div>5. Mrigashira</div><div>6. Ardra</div><div>7. Punarvasu</div><div>8. Pushya</div>
-                                <div>9. Aslesha</div><div>10. Magha</div><div>11. Purva Phalguni</div><div>12. Uttara Phalguni</div>
-                                <div>13. Hasta</div><div>14. Chitra</div><div>15. Swati</div><div>16. Vishakha</div>
-                                <div>17. Anuradha</div><div>18. Jyestha</div><div>19. Mula</div><div>20. Purva Ashada</div>
-                                <div>21. Uttara Ashada</div><div>22. Shravana</div><div>23. Dhanistha</div><div>24. Shatabhisa</div>
-                                <div>25. Purva Bhadra Pada</div><div>26. Uttara Bhadra Pada</div><div>27. Revati</div>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <h4 class="text-xl font-bold text-gray-800 mb-3 border-b pb-2">Grahas ("The Seizers" of the Sky)</h4>
-                        <p class="text-gray-700 mb-4">Ancient Indians identified 5 distinct visible planets wandering through these Nakshatras, referring to them as the <em>Pancha-Tara Grahas</em>. They were named for their observable characteristics:</p>
-                        <div class="grid grid-cols-2 md:grid-cols-5 gap-4 text-center">
-                            <div class="bg-red-50 p-4 rounded-lg border border-red-100 hover:shadow-md transition">
-                                <div class="w-8 h-8 rounded-full bg-red-600 mx-auto mb-2"></div>
-                                <strong class="text-red-900 block">Mangala</strong>
-                                <span class="text-xs text-red-600 font-semibold uppercase">Mars</span>
-                            </div>
-                            <div class="bg-gray-100 p-4 rounded-lg border border-gray-200 hover:shadow-md transition">
-                                <div class="w-8 h-8 rounded-full bg-gray-600 mx-auto mb-2"></div>
-                                <strong class="text-gray-900 block">Budha</strong>
-                                <span class="text-xs text-gray-600 font-semibold uppercase">Mercury</span>
-                            </div>
-                            <div class="bg-orange-50 p-4 rounded-lg border border-orange-200 hover:shadow-md transition">
-                                <div class="w-8 h-8 rounded-full bg-orange-500 mx-auto mb-2"></div>
-                                <strong class="text-orange-900 block">Guru</strong>
-                                <span class="text-xs text-orange-600 font-semibold uppercase">Jupiter</span>
-                            </div>
-                            <div class="bg-yellow-50 p-4 rounded-lg border border-yellow-200 hover:shadow-md transition">
-                                <div class="w-8 h-8 rounded-full bg-yellow-400 mx-auto mb-2"></div>
-                                <strong class="text-yellow-900 block">Shukra</strong>
-                                <span class="text-xs text-yellow-600 font-semibold uppercase">Venus</span>
-                            </div>
-                            <div class="bg-amber-100 p-4 rounded-lg border border-amber-300 hover:shadow-md transition">
-                                <div class="w-8 h-8 rounded-full bg-amber-700 mx-auto mb-2"></div>
-                                <strong class="text-amber-900 block">Shani</strong>
-                                <span class="text-xs text-amber-700 font-semibold uppercase">Saturn</span>
-                            </div>
-                        </div>
-                    </div>
-                </section>
-
-                <!-- Section 6: Eclipses & Observatories -->
-                <section class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 relative overflow-hidden">
-                    <div class="absolute top-0 left-0 w-2 h-full bg-rose-500"></div>
-                    <h3 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
-                        <span class="bg-rose-100 text-rose-700 w-8 h-8 rounded-full inline-flex items-center justify-center mr-3 text-sm">6</span>
-                        Eclipses & Observatories (Yantras)
-                    </h3>
-                    
-                    <div class="mb-8">
-                        <h4 class="font-bold text-gray-800 mb-2">Predicting Eclipses (Grahana)</h4>
-                        <p class="text-gray-700 mb-4">Moving far beyond mythology, early Indian astronomers modeled eclipses mathematically. They recognized that eclipses only occur at specific geometric intersection points between the Moon's orbit and the ecliptic, known as lunar nodes:</p>
-                        <div class="flex flex-col md:flex-row gap-4">
-                            <div class="flex-1 bg-rose-50 p-4 rounded-lg border border-rose-100">
-                                <strong class="text-rose-800 text-lg">Rahu</strong>
-                                <span class="block text-xs font-bold text-rose-600 uppercase mb-2">The Ascending Node</span>
-                                <p class="text-sm text-gray-700">The specific intersection point where the Moon moves <em>north</em> across the ecliptic plane.</p>
-                            </div>
-                            <div class="flex-1 bg-rose-50 p-4 rounded-lg border border-rose-100">
-                                <strong class="text-rose-800 text-lg">Ketu</strong>
-                                <span class="block text-xs font-bold text-rose-600 uppercase mb-2">The Descending Node</span>
-                                <p class="text-sm text-gray-700">The specific intersection point where the Moon moves <em>south</em> across the ecliptic plane.</p>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div>
-                        <h4 class="font-bold text-gray-800 mb-2">Naked-Eye Observatories</h4>
-                        <p class="text-gray-700 mb-4">Centuries before the invention of optical telescopes, Indian astronomers built immense masonry instruments known as <strong>Yantras</strong> (like those seen at Jantar Mantar) to achieve incredibly high-precision naked-eye measurements of the heavens.</p>
-                        <ul class="list-none space-y-3">
-                            <li class="bg-gray-50 p-3 rounded border border-gray-200 flex items-center">
-                                <span class="w-2 h-2 bg-rose-500 rounded-full mr-3"></span>
-                                <div><strong>Shanku:</strong> A specialized Gnomon (vertical pillar) used for meticulously tracking solar shadows to determine time, seasons, and latitude.</div>
-                            </li>
-                            <li class="bg-gray-50 p-3 rounded border border-gray-200 flex items-center">
-                                <span class="w-2 h-2 bg-rose-500 rounded-full mr-3"></span>
-                                <div><strong>Ghati Yantra:</strong> A highly calibrated water clock utilized for precise timekeeping, independent of cloud cover or sunlight.</div>
-                            </li>
-                        </ul>
-                    </div>
-                </section>
-
-                <!-- Section 7: Algorithmic Roots -->
-                <section class="bg-white p-8 rounded-2xl shadow-sm border border-gray-100 relative overflow-hidden">
-                    <div class="absolute top-0 left-0 w-2 h-full bg-fuchsia-500"></div>
-                    <h3 class="text-2xl font-bold text-gray-800 mb-4 flex items-center">
-                        <span class="bg-fuchsia-100 text-fuchsia-700 w-8 h-8 rounded-full inline-flex items-center justify-center mr-3 text-sm">7</span>
-                        Algorithmic Roots & The Legacy of Khagola Shastra
-                    </h3>
-                    <p class="text-gray-700 mb-5 leading-relaxed">The profound necessity of tracking long-term cyclical celestial events dictated the evolution of mathematics in India.</p>
-                    
-                    <div class="bg-gradient-to-br from-gray-900 to-gray-800 rounded-xl p-6 text-white shadow-lg">
-                        <ul class="space-y-4">
-                            <li class="flex items-start">
-                                <span class="text-fuchsia-400 font-bold mr-3">01</span>
-                                <p class="text-sm text-gray-300">Early Indian astronomy was heavily <strong>algorithmic and computationally driven</strong>, focusing on formulas rather than geometric models alone.</p>
-                            </li>
-                            <li class="flex items-start">
-                                <span class="text-fuchsia-400 font-bold mr-3">02</span>
-                                <p class="text-sm text-gray-300">Calculating complex, overlapping cycles like Yugas and inserting Adhika Masas (intercalary months) properly required a deep understanding of <strong>modular arithmetic and cyclical logic</strong>.</p>
-                            </li>
-                            <li class="flex items-start">
-                                <span class="text-fuchsia-400 font-bold mr-3">03</span>
-                                <p class="text-sm text-white font-medium">This relentless pursuit of astronomical precision directly established the historical foundation for <strong>discrete mathematics</strong> in India, shaping global mathematics forever.</p>
-                            </li>
-                        </ul>
-                    </div>
-                </section>
-
-            </article>
-
-            <div class="text-center mt-12 pt-8 border-t border-gray-200">
-                <h3 class="text-2xl font-semibold mb-6">Ready to test your knowledge?</h3>
-                <button id="start-btn-bottom" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-4 px-12 rounded-full shadow-lg text-lg transition duration-300 transform hover:-translate-y-1">
-                    Start the Quiz Now
-                </button>
-            </div>
+        <div id="startScreen" class="hidden bg-white rounded-xl shadow-lg p-8 text-center fade-in">
+            <h2 class="text-3xl font-bold text-indigo-700 mb-4">Indian Knowledge System Test</h2>
+            <p class="text-gray-600 mb-8 max-w-2xl mx-auto">Welcome, <span id="displayStudentName" class="font-semibold"></span>! This comprehensive assessment contains 100 multiple-choice questions derived from the study guide, covering Mathematics, Astronomy (Khagola Shastra), and Philosophical Development. You have exactly <strong>60 minutes</strong> to complete the test.</p>
+            <button id="startBtn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-10 rounded-full shadow-lg transition duration-200">Begin Assessment</button>
         </div>
-
-        <!-- Quiz Container -->
-        <div id="quiz-container" class="hidden bg-white rounded-lg shadow-lg p-6 md:p-8">
-            
+        
+        <!-- Quiz Screen -->
+        <div id="quizScreen" class="hidden bg-white rounded-xl shadow-lg p-6 md:p-8 fade-in flex flex-col flex-grow">
             <div class="flex justify-between items-center mb-6 border-b pb-4">
-                <span id="question-tracker" class="text-sm font-semibold text-gray-500 uppercase tracking-wider">Question 1 of 30</span>
-                <span id="score-tracker" class="text-sm font-semibold text-indigo-600 bg-indigo-100 py-1 px-3 rounded-full">Score: 0</span>
+                <span id="questionCounter" class="text-sm font-semibold text-gray-500 uppercase tracking-wider">Question 1 of 100</span>
+                <span id="categoryBadge" class="bg-indigo-100 text-indigo-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Category</span>
             </div>
-
-            <div id="question-area" class="mb-8">
-                <h3 id="question-text" class="text-xl md:text-2xl font-medium text-gray-800 mb-6 leading-relaxed">
-                    <!-- Question will appear here -->
-                </h3>
-
-                <div id="options-area" class="space-y-4">
-                    <!-- Options will be generated here -->
-                </div>
+            
+            <h3 id="questionText" class="text-xl md:text-2xl font-semibold text-gray-800 mb-6"></h3>
+            
+            <div id="optionsContainer" class="space-y-3 mb-8 flex-grow">
+                <!-- Options injected here via JS -->
             </div>
-
-            <!-- Feedback Area -->
-            <div id="feedback-area" class="hidden mt-6 p-4 rounded-md">
-                <h4 id="feedback-title" class="font-bold text-lg mb-2"></h4>
-                <p id="feedback-rationale" class="text-gray-700"></p>
-                <div class="mt-4 text-right">
-                    <button id="next-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-2 px-6 rounded shadow transition duration-300">
-                        Next Question
-                    </button>
-                </div>
+            
+            <div class="flex justify-between items-center mt-auto border-t pt-4">
+                <div id="feedbackText" class="text-sm font-medium h-6 flex items-center"></div>
+                <button id="nextBtn" class="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-2 px-6 rounded shadow transition duration-200" disabled>Next Question</button>
             </div>
         </div>
 
-        <!-- End Screen -->
-        <div id="end-screen" class="hidden bg-white rounded-lg shadow-lg p-8 text-center">
-            <h2 class="text-3xl font-bold text-gray-800 mb-4">Quiz Completed!</h2>
-            <p class="text-lg text-gray-600 mb-2">You have finished the Khagola Shastra Quiz.</p>
-            <div class="text-5xl font-extrabold text-indigo-600 my-6">
-                <span id="final-score">0</span> / 30
+        <!-- Results Screen -->
+        <div id="resultsScreen" class="hidden bg-white rounded-xl shadow-lg p-8 text-center fade-in">
+            <h2 class="text-3xl font-bold text-gray-800 mb-2">Assessment Complete!</h2>
+            <p class="text-gray-500 mb-6" id="completionStatus">Here is how you performed.</p>
+            
+            <div id="telegramStatus" class="mb-4 text-sm font-medium hidden rounded p-2"></div>
+            
+            <div class="flex justify-center items-center mb-8">
+                <div class="relative w-48 h-48">
+                    <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
+                        <path class="text-gray-200 stroke-current" stroke-width="3" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                        <path id="scoreCircle" class="text-indigo-600 stroke-current" stroke-width="3" stroke-dasharray="0, 100" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
+                    </svg>
+                    <div class="absolute inset-0 flex flex-col items-center justify-center">
+                        <span id="finalScoreText" class="text-4xl font-bold text-gray-800">0%</span>
+                        <span id="finalScoreFraction" class="text-sm text-gray-500">0 / 100</span>
+                    </div>
+                </div>
             </div>
-            <p id="final-message" class="text-lg font-medium text-gray-700 mb-8"></p>
-            <button id="restart-btn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-full shadow-md transition duration-300">
-                Retake Quiz
-            </button>
+
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 text-left max-w-2xl mx-auto">
+                <div class="bg-green-50 p-3 rounded border border-green-100">
+                    <p class="text-xs text-green-600 font-bold uppercase">Correct</p>
+                    <p id="correctCount" class="text-xl font-bold text-green-800">0</p>
+                </div>
+                <div class="bg-red-50 p-3 rounded border border-red-100">
+                    <p class="text-xs text-red-600 font-bold uppercase">Incorrect</p>
+                    <p id="incorrectCount" class="text-xl font-bold text-red-800">0</p>
+                </div>
+                <div class="bg-gray-50 p-3 rounded border border-gray-200">
+                    <p class="text-xs text-gray-500 font-bold uppercase">Unanswered</p>
+                    <p id="unansweredCount" class="text-xl font-bold text-gray-700">0</p>
+                </div>
+                <div class="bg-indigo-50 p-3 rounded border border-indigo-100">
+                    <p class="text-xs text-indigo-600 font-bold uppercase">Time Remaining</p>
+                    <p id="timeTakenText" class="text-xl font-bold text-indigo-800">00:00</p>
+                </div>
+            </div>
+
+            <div id="performanceMessage" class="text-lg font-medium mb-8 text-gray-700"></div>
+
+            <button id="restartBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-full shadow transition duration-200">Take Assessment Again</button>
         </div>
 
-    </div>
+    </main>
 
     <script>
-        const quizData = [
-            {
-                question: "According to the presentation, what is the primary purpose outlined in the earliest known Indian text on positional astronomy?",
-                options: [
-                    "To navigate the oceans for trade.",
-                    "To determine precise times for rituals.",
-                    "To predict the outcomes of battles.",
-                    "To establish a universal currency."
-                ],
-                correctAnswer: 1,
-                rationale: "The Vedanga Jyotisha, authored by Sage Lagadha, is described as the earliest known text on positional astronomy, with its purpose being 'Determining precise times for rituals.'"
-            },
-            {
-                question: "Which sage is credited as the author of the Vedanga Jyotisha?",
-                options: [
-                    "Sage Bharadwaja",
-                    "Sage Vishwamitra",
-                    "Sage Vashistha",
-                    "Sage Lagadha"
-                ],
-                correctAnswer: 3,
-                rationale: "The presentation explicitly states that the Vedanga Jyotisha was 'Authored by Sage Lagadha'."
-            },
-            {
-                question: "The Vedanga Jyotisha recension belonging to the Rigveda contains how many verses?",
-                options: [
-                    "27 verses",
-                    "36 verses",
-                    "43 verses",
-                    "60 verses"
-                ],
-                correctAnswer: 1,
-                rationale: "The slide on Foundational Texts details that the 'Rigveda Recension' has '36 verses'."
-            },
-            {
-                question: "The Vedanga Jyotisha recension belonging to the Yajurveda contains how many verses?",
-                options: [
-                    "30 verses",
-                    "36 verses",
-                    "43 verses",
-                    "52 verses"
-                ],
-                correctAnswer: 2,
-                rationale: "The slide on Foundational Texts details that the 'Yajurveda Recension' has '43 verses'."
-            },
-            {
-                question: "In the context of why ancient Indians tracked the stars, what does 'Krishi' refer to?",
-                options: [
-                    "Timing seasonal Vedic rituals",
-                    "Establishing a civic calendar",
-                    "Agricultural planning and monsoons",
-                    "Predicting solar eclipses"
-                ],
-                correctAnswer: 2,
-                rationale: "Under the heading 'Why track the stars?', 'Krishi' is directly associated with 'Agricultural planning and monsoons'."
-            },
-            {
-                question: "How is 'Kala' (Time) defined in Indian astronomy according to the architecture of time?",
-                options: [
-                    "Merely an abstract mathematical measurement.",
-                    "A property of the cosmos defined by celestial motion.",
-                    "A linear progression unrelated to planetary orbits.",
-                    "A subjective experience independent of stars."
-                ],
-                correctAnswer: 1,
-                rationale: "The presentation defines Kala as 'not merely a measurement, but a fundamental property of the cosmos defined by celestial motion.'"
-            },
-            {
-                question: "What celestial body is referred to as 'The Soul of the Universe' and determines the framework of the solar calendar?",
-                options: [
-                    "Chandra (The Moon)",
-                    "Surya (The Sun)",
-                    "Guru (Jupiter)",
-                    "Shukra (Venus)"
-                ],
-                correctAnswer: 1,
-                rationale: "The slide titled 'SURYA The Soul of the Universe' states that 'The Sun's position determines... the fundamental framework of the solar calendar.'"
-            },
-            {
-                question: "What defines a 'Savana Day' in ancient Indian astronomy?",
-                options: [
-                    "The period from sunset to sunset.",
-                    "The duration from full moon to full moon.",
-                    "The period from sunrise to sunrise.",
-                    "The time taken by the sun to cross the equator."
-                ],
-                correctAnswer: 2,
-                rationale: "The presentation explicitly defines a 'Savana Day' as 'The period from sunrise to sunrise.'"
-            },
-            {
-                question: "What is the term for the northern drift of the Sun, from the winter solstice to the summer solstice?",
-                options: [
-                    "Dakshinayana",
-                    "Adhika Masa",
-                    "Uttarayana",
-                    "Synodic Month"
-                ],
-                correctAnswer: 2,
-                rationale: "Uttarayana is defined as the 'Northern drift of the Sun. From winter solstice to summer solstice.'"
-            },
-            {
-                question: "Dakshinayana is associated with the Sun's drift in which direction?",
-                options: [
-                    "Northern drift",
-                    "Southern drift",
-                    "Eastern drift",
-                    "Western drift"
-                ],
-                correctAnswer: 1,
-                rationale: "Dakshinayana is defined as the 'Southern drift of the Sun. From summer solstice to winter solstice.'"
-            },
-            {
-                question: "Which of the following describes a 'Synodic Month'?",
-                options: [
-                    "The time the sun takes to complete one orbit.",
-                    "Duration from full moon to full moon (~29.5 days).",
-                    "The time a planet takes to cross a Nakshatra.",
-                    "Duration of the northern drift of the sun."
-                ],
-                correctAnswer: 1,
-                rationale: "Under the slide for Chandra, a Synodic Month is defined as the 'Duration from full moon to full moon (~29.5 days).'"
-            },
-            {
-                question: "How many Tithis (lunar days) are there in a standard synodic month?",
-                options: [
-                    "27 Tithis",
-                    "28 Tithis",
-                    "29 Tithis",
-                    "30 Tithis"
-                ],
-                correctAnswer: 3,
-                rationale: "The presentation states there are '30 Tithis' which are 'Lunar days in a synodic month.'"
-            },
-            {
-                question: "In the Vedic astronomical cycle for Luni-Solar Synchronization, a 'Yuga' consists of how many years?",
-                options: [
-                    "3 Year Yuga",
-                    "5 Year Yuga",
-                    "7 Year Yuga",
-                    "12 Year Yuga"
-                ],
-                correctAnswer: 1,
-                rationale: "The Luni-Solar Synchronization slide shows a diagram with '5 Year Yuga' representing the Vedic astronomical cycle."
-            },
-            {
-                question: "What mechanism is used to synchronize the lunar cycles with the solar year in the 5-year Yuga system?",
-                options: [
-                    "Skipping two Tithis every year.",
-                    "Adding two Adhika Masas (intercalary months).",
-                    "Subtracting one Savana day every month.",
-                    "Adding five extra days at the end of the year."
-                ],
-                correctAnswer: 1,
-                rationale: "The graphic for Luni-Solar Synchronization indicates '+2 Adhika Masas' which are described as 'Intercalary months to sync cycles' within the 5-year Yuga."
-            },
-            {
-                question: "How many divisions (lunar mansions) is the ecliptic divided into in the Nakshatra system?",
-                options: [
-                    "12 divisions",
-                    "27 divisions",
-                    "30 divisions",
-                    "36 divisions"
-                ],
-                correctAnswer: 1,
-                rationale: "The slide titled 'Lunar Mansions' states there are '27 Divisions of the ecliptic, mapping the Moon's path...'"
-            },
-            {
-                question: "Roughly how much of the sky does a single Nakshatra represent?",
-                options: [
-                    "$10^{\\circ}$ $30^{\\prime}$",
-                    "$12^{\\circ}$ $00^{\\prime}$",
-                    "$13^{\\circ}$ $20^{\\prime}$",
-                    "$15^{\\circ}$ $00^{\\prime}$"
-                ],
-                correctAnswer: 2,
-                rationale: "The presentation notes that 'Each Nakshatra represents roughly $13^{\\circ}$ $20^{\\prime}$ of the sky...'"
-            },
-            {
-                question: "The distance covered by one Nakshatra corresponds to the distance travelled by which celestial body in one solar day?",
-                options: [
-                    "The Sun",
-                    "The Earth",
-                    "Jupiter",
-                    "The Moon"
-                ],
-                correctAnswer: 3,
-                rationale: "The text explains that the span of a Nakshatra corresponds 'to the distance the Moon travels in one solar day.'"
-            },
-            {
-                question: "What term is used in the presentation to describe the planets, translating to the 'Seizers' of the Sky?",
-                options: [
-                    "Taras",
-                    "Grahas",
-                    "Yantras",
-                    "Ayanas"
-                ],
-                correctAnswer: 1,
-                rationale: "The slide titled 'Grahas' is subtitled 'The \"Seizers\" of the Sky'."
-            },
-            {
-                question: "Which of the following is NOT one of the 5 Visible Planets (Pancha-Tara Grahas) listed?",
-                options: [
-                    "Mangala (Mars)",
-                    "Guru (Jupiter)",
-                    "Shani (Saturn)",
-                    "Rahu (Ascending Node)"
-                ],
-                correctAnswer: 3,
-                rationale: "The 5 visible planets listed are Mangala, Budha, Guru, Shukra, and Shani. Rahu is a lunar node, not one of the visible planets."
-            },
-            {
-                question: "In Indian astronomy, what name is given to the planet Mercury?",
-                options: [
-                    "Mangala",
-                    "Budha",
-                    "Shukra",
-                    "Shani"
-                ],
-                correctAnswer: 1,
-                rationale: "The 'Pancha-Tara Grahas' slide identifies 'Budha' as 'Mercury'."
-            },
-            {
-                question: "What is the ancient Indian astronomical term for the planet Venus?",
-                options: [
-                    "Guru",
-                    "Budha",
-                    "Shukra",
-                    "Mangala"
-                ],
-                correctAnswer: 2,
-                rationale: "The 'Pancha-Tara Grahas' slide identifies 'Shukra' as 'Venus'."
-            },
-            {
-                question: "How did ancient Indian astronomy mathematically model eclipses (Grahana)?",
-                options: [
-                    "By calculating the speed of passing comets.",
-                    "By using the intersection points known as lunar nodes.",
-                    "By observing the phases of Venus.",
-                    "By measuring the shadow of the Earth directly."
-                ],
-                correctAnswer: 1,
-                rationale: "The slide 'Predicting Eclipses (Grahana)' states that Indian astronomy modeled eclipses mathematically 'using lunar nodes'."
-            },
-            {
-                question: "What does 'Rahu' represent in the mathematical model of eclipses?",
-                options: [
-                    "The Descending Node (moving south)",
-                    "The Ascending Node (moving north)",
-                    "The central point of a solar eclipse",
-                    "The deepest part of Earth's shadow"
-                ],
-                correctAnswer: 1,
-                rationale: "Rahu is defined on the eclipses slide as the 'Ascending Node', the 'Intersection point moving north across the ecliptic.'"
-            },
-            {
-                question: "What does 'Ketu' represent in the mathematical model of eclipses?",
-                options: [
-                    "The Ascending Node",
-                    "The Descending Node",
-                    "A rogue asteroid",
-                    "The peak of a lunar eclipse"
-                ],
-                correctAnswer: 1,
-                rationale: "Ketu is defined on the eclipses slide as the 'Descending Node', the 'Intersection point moving south across the ecliptic.'"
-            },
-            {
-                question: "What is the general term used for naked-eye masonry astronomical instruments?",
-                options: [
-                    "Grahas",
-                    "Nakshatras",
-                    "Yantras",
-                    "Ayanas"
-                ],
-                correctAnswer: 2,
-                rationale: "The slide showing naked-eye observatories is titled 'YANTRAS'."
-            },
-            {
-                question: "Which Yantra functions as a Gnomon used for measuring solar shadows?",
-                options: [
-                    "Ghati Yantra",
-                    "Shanku",
-                    "Jantar Mantar",
-                    "Kala Yantra"
-                ],
-                correctAnswer: 1,
-                rationale: "The presentation lists 'Shanku' as a 'Gnomon for solar shadows.'"
-            },
-            {
-                question: "What is the purpose of the 'Ghati Yantra'?",
-                options: [
-                    "Measuring planetary distances.",
-                    "Observing lunar nodes.",
-                    "Acting as a water clock for timekeeping.",
-                    "Tracking the northern drift of the sun."
-                ],
-                correctAnswer: 2,
-                rationale: "The presentation defines 'Ghati Yantra' as a 'Water clock for timekeeping.'"
-            },
-            {
-                question: "According to the presentation, early Indian astronomy was heavily driven by what method?",
-                options: [
-                    "Purely mythological interpretations.",
-                    "Algorithmic and computational methods.",
-                    "Telescopic observations alone.",
-                    "Astrological divination only."
-                ],
-                correctAnswer: 1,
-                rationale: "The 'Algorithmic Roots' slide states that 'Early Indian astronomy was heavily algorithmic and computationally driven.'"
-            },
-            {
-                question: "Calculating Yugas and Adhika Masas (intercalary months) requires what kind of mathematics?",
-                options: [
-                    "Calculus and differential equations",
-                    "Topology and geometry",
-                    "Modular arithmetic and cyclical logic",
-                    "Trigonometry and statistics"
-                ],
-                correctAnswer: 2,
-                rationale: "The slide on 'Algorithmic Roots' explicitly states that 'Calculating Yugas and Adhika Masas requires modular arithmetic and cyclical logic.'"
-            },
-            {
-                question: "The computational methods used in ancient Indian astronomy establish the historical foundation for which branch of mathematics in India?",
-                options: [
-                    "Calculus",
-                    "Discrete mathematics",
-                    "Linear algebra",
-                    "Probability theory"
-                ],
-                correctAnswer: 1,
-                rationale: "The final point on the 'Algorithmic Roots' slide claims that these astronomical calculations 'Establishes the historical foundation of discrete mathematics in India.'"
-            }
+        // The 100 Questions Database based on the provided PDFs
+        const questionsData = [
+            // Category: Mathematics & The Concept of Zero
+            { q: "Ancient Indian mathematicians treated 'zero' primarily as:", options: ["A blank placeholder", "An independent number with properties", "A symbol for infinity", "An error in calculation"], answer: 1, category: "Mathematics" },
+            { q: "Who used a symbol for zero in his early binary system?", options: ["Aryabhata", "Brahmagupta", "Pingala", "Mahavira"], answer: 2, category: "Mathematics" },
+            { q: "Which mathematician gave the first formal mathematical rules for arithmetic operations with zero?", options: ["Brahmagupta", "Aryabhata", "Bhaskaracharya II", "Varahamihira"], answer: 0, category: "Mathematics" },
+            { q: "In which text did Brahmagupta outline the rules for zero?", options: ["Aryabhatiya", "Brahmasphutasiddhanta", "Beejaganita", "Vedanga Jyotisha"], answer: 1, category: "Mathematics" },
+            { q: "In ancient Indian mathematics, the numerator of a fraction was called:", options: ["Lava or Amsa", "Hara or Cheda", "Shunya", "Varna"], answer: 0, category: "Mathematics" },
+            { q: "In ancient Indian mathematics, the denominator of a fraction was called:", options: ["Lava or Amsa", "Hara or Cheda", "Bhinna", "Kalaka"], answer: 1, category: "Mathematics" },
+            { q: "How did the ancient Indian representation of fractions differ from the modern one?", options: ["They put the denominator on top", "They did not draw a horizontal dividing line", "They used letters instead of numbers", "They only used decimals"], answer: 1, category: "Mathematics" },
+            { q: "Who added the horizontal dividing line to fractions?", options: ["Indian mathematicians", "Greek mathematicians", "Arab mathematicians", "European mathematicians"], answer: 2, category: "Mathematics" },
+            { q: "Which two mathematicians are noted for establishing step-by-step rules for operations on fractions?", options: ["Pingala and Aryabhata", "Brahmagupta and Mahavira", "Bhaskaracharya and Lagadha", "Panini and Yaska"], answer: 1, category: "Mathematics" },
+            { q: "What is the ancient Indian term for Algebra?", options: ["Bhinna", "Shunya", "Beejaganita", "Jyotisha"], answer: 2, category: "Mathematics" },
+            
+            // Category: Algebra
+            { q: "Beejaganita translates to:", options: ["Mathematics of the stars", "Mathematics of seeds/elements", "Mathematics of fractions", "Mathematics of nothingness"], answer: 1, category: "Algebra" },
+            { q: "How did Indian mathematicians creatively represent unknown variables in algebra?", options: ["Using Greek letters like Alpha", "Using names of colors like Kalaka (black)", "Using animal names", "Using shapes"], answer: 1, category: "Algebra" },
+            { q: "What does the term 'Varna' refer to in the context of Indian algebra?", options: ["Fractions", "Variables/Unknowns", "Equations", "Zero"], answer: 1, category: "Algebra" },
+            { q: "Who provided integer solutions to linear equations?", options: ["Brahmagupta", "Bhaskaracharya II", "Aryabhata", "Pingala"], answer: 2, category: "Algebra" },
+            { q: "Who gave the first explicit general formula for solving quadratic equations?", options: ["Aryabhata", "Brahmagupta", "Mahavira", "Bhaskaracharya II"], answer: 1, category: "Algebra" },
+            { q: "Which 12th-century mathematician authored the definitive text 'Beejaganita' exploring polynomial equations?", options: ["Brahmagupta", "Aryabhata", "Bhaskaracharya II", "Lagadha"], answer: 2, category: "Algebra" },
+
+            // Category: Vedanga Jyotisha
+            { q: "What is the Vedanga Jyotisha?", options: ["A text on grammar", "An auxiliary limb of the Vedas devoted to astronomy", "A text on domestic rituals", "A philosophical treatise"], answer: 1, category: "Astronomy" },
+            { q: "Who compiled the Vedanga Jyotisha?", options: ["Sage Panini", "Sage Lagadha", "Sage Yaska", "Sage Pingala"], answer: 1, category: "Astronomy" },
+            { q: "What was the primary purpose of the Vedanga Jyotisha?", options: ["Predictive astrology (horoscopes)", "Calculating precise times for Vedic sacrifices", "Navigating the oceans", "Meteorological forecasting"], answer: 1, category: "Astronomy" },
+            { q: "What is the term for the precise, auspicious time calculated for performing rituals?", options: ["Yuga", "Tithi", "Muhurta", "Nakshatra"], answer: 2, category: "Astronomy" },
+            { q: "The Vedanga Jyotisha introduced a fundamental cycle to synchronize the solar and lunar years. How long is this Yuga?", options: ["1 year", "5 years", "12 years", "60 years"], answer: 1, category: "Astronomy" },
+            { q: "How many Nakshatras (lunar mansions) are detailed in the Vedanga Jyotisha?", options: ["12", "27", "30", "365"], answer: 1, category: "Astronomy" },
+            { q: "How many Tithis (lunar days) are described in the texts?", options: ["27", "28", "29.5", "30"], answer: 3, category: "Astronomy" },
+            { q: "What is 'Adhimasa'?", options: ["A solar eclipse", "A lunar eclipse", "An intercalary (leap) month", "A falling star"], answer: 2, category: "Astronomy" },
+            { q: "Why was the Adhimasa necessary?", options: ["To align the shorter lunar year with the solar year", "To predict eclipses", "To match the 5 visible planets", "To correct the length of a day"], answer: 0, category: "Astronomy" },
+
+            // Category: Philosophical Development
+            { q: "Which texts represent the foundational stage focusing on nature worship in the Vedic corpus?", options: ["Upanishads", "Brahmanas", "Samhitas", "Aranyakas"], answer: 2, category: "Philosophy" },
+            { q: "The concept of 'Rita' introduced in the Samhitas refers to:", options: ["A specific ritual fire", "The physical and moral cosmic order", "The individual soul", "Liberation"], answer: 1, category: "Philosophy" },
+            { q: "The famous Nasadiya Sukta (Creation Hymn) is found in which Veda?", options: ["Atharva Veda", "Sama Veda", "Yajur Veda", "Rig Veda"], answer: 3, category: "Philosophy" },
+            { q: "The 'Brahmanas' stage of Vedic philosophy shifted focus to:", options: ["Internal meditation", "The mechanics of Yajna (sacrificial rituals)", "Nature worship", "Grammar"], answer: 1, category: "Philosophy" },
+            { q: "Which text details complex rules for constructing fire altars as a microcosm of the universe?", options: ["Chandogya Upanishad", "Rig Veda", "Shatapatha Brahmana", "Vedanga Jyotisha"], answer: 2, category: "Philosophy" },
+            { q: "The Aranyakas are also known as:", options: ["Forest Treatises", "Fire Manuals", "Grammar Books", "Star Charts"], answer: 0, category: "Philosophy" },
+            { q: "What do the Aranyakas act as a bridge between?", options: ["Grammar and Poetry", "External materialistic rituals and internal symbolic meditation", "Solar and Lunar calendars", "Mathematics and Astronomy"], answer: 1, category: "Philosophy" },
+            { q: "What is 'Prana-agnihotra'?", options: ["A type of physical fire altar", "Offering breath into the internal fire through meditation", "A solar eclipse ritual", "A mathematical equation"], answer: 1, category: "Philosophy" },
+            { q: "Which texts represent the philosophical climax (Vedanta) of the Vedic corpus?", options: ["Samhitas", "Brahmanas", "Aranyakas", "Upanishads"], answer: 3, category: "Philosophy" },
+            { q: "The Upanishads completely shift the focus to:", options: ["Karma (Action)", "Yajna (Ritual)", "Jnana (Knowledge)", "Bhakti (Devotion)"], answer: 2, category: "Philosophy" },
+            { q: "In Vedanta, the universal supreme reality is called:", options: ["Atman", "Brahman", "Moksha", "Rita"], answer: 1, category: "Philosophy" },
+            { q: "The Mahavakya 'Tat Tvam Asi' (Thou art That) is found in which Upanishad?", options: ["Katha", "Isha", "Chandogya", "Mundaka"], answer: 2, category: "Philosophy" },
+
+            // Category: Inter-relationship of Disciplines
+            { q: "In ancient India, mathematics primarily evolved to serve the needs of which discipline?", options: ["Architecture", "Astronomy", "Medicine", "Linguistics"], answer: 1, category: "IKS Integration" },
+            { q: "Which mathematical concept was developed to calculate planetary orbits and spherical geometry?", options: ["Binary system", "Trigonometry", "Algebraic variables", "Fractions"], answer: 1, category: "IKS Integration" },
+            { q: "Ayurvedic health routines are dictated by:", options: ["Random selection", "Only the patient's age", "Solar and lunar cycles studied in astronomy", "The alignment of the 5 visible planets only"], answer: 2, category: "IKS Integration" },
+            { q: "Daily routines in Ayurveda are called:", options: ["Ritucharya", "Dinacharya", "Panchanga", "Muhurta"], answer: 1, category: "IKS Integration" },
+            { q: "According to IKS, lunar cycles were believed to affect:", options: ["Only the tides", "The sap and medicinal properties of plants", "The grammar of chants", "The construction of altars"], answer: 1, category: "IKS Integration" },
+            { q: "Diagnosing ailments through pulse reading (Nadi Pariksha) is fundamentally an observation of:", options: ["The patient's breath", "The alignment of stars at birth", "The body's cardiovascular rhythm (mathematical observation)", "The temperature of the skin"], answer: 2, category: "IKS Integration" },
+
+            // Category: Relevance Today
+            { q: "Pingala's Chanda Shastra is relevant to modern computing because it introduced:", options: ["The earliest known binary numeral system", "The concept of zero", "Silicon chips", "Algebraic algorithms"], answer: 0, category: "Modern Relevance" },
+            { q: "Panini's Ashtadhyayi is heavily studied today for advancements in:", options: ["Astrophysics", "Natural Language Processing (NLP)", "Civil Engineering", "Cardiology"], answer: 1, category: "Modern Relevance" },
+            { q: "How does Ayurveda differ from typical modern medicine approaches?", options: ["It only uses surgery", "It focuses on root causes and preventive personalized health", "It ignores the environment", "It relies entirely on astrology"], answer: 1, category: "Modern Relevance" },
+            { q: "Ancient civil engineering of the Indus Valley and Vastu Shastra principles are relevant today for:", options: ["Developing new programming languages", "Space exploration", "Sustainable architecture and urban planning", "Creating new pharmaceutical drugs"], answer: 2, category: "Modern Relevance" },
+            { q: "The principle of doing one's duty without attachment to outcomes, useful in modern stress management, is called:", options: ["Nishkama Karma", "Prana-agnihotra", "Dinacharya", "Tat Tvam Asi"], answer: 0, category: "Modern Relevance" },
+
+            // Category: Six Vedangas
+            { q: "The term 'Vedanga' translates to:", options: ["Heart of the Vedas", "Limbs of the Vedas", "End of the Vedas", "Summary of the Vedas"], answer: 1, category: "Vedangas" },
+            { q: "While Vedas are Shruti (divine revelation), Vedangas are considered:", options: ["Also Shruti", "Smriti (human-authored traditions)", "Upanishads", "Puranas"], answer: 1, category: "Vedangas" },
+            { q: "Which Vedanga represents the 'Nose' of the Veda Purusha?", options: ["Kalpa", "Shiksha", "Nirukta", "Chhanda"], answer: 1, category: "Vedangas" },
+            { q: "What is the purpose of Shiksha?", options: ["Grammar rules", "Exact pronunciation, accent, and intonation", "Etymology", "Ritual instructions"], answer: 1, category: "Vedangas" },
+            { q: "Which Vedanga represents the 'Arms' of the Veda Purusha and acts as a manual for action?", options: ["Kalpa", "Vyakarana", "Jyotisha", "Shiksha"], answer: 0, category: "Vedangas" },
+            { q: "Which Kalpa Sutra provides complex geometric rules for constructing fire altars?", options: ["Shrauta Sutras", "Grihya Sutras", "Dharma Sutras", "Shulba Sutras"], answer: 3, category: "Vedangas" },
+            { q: "Vyakarana (Grammar) represents which part of the Veda Purusha?", options: ["Eyes", "Ears", "Mouth", "Feet"], answer: 2, category: "Vedangas" },
+            { q: "Sage Panini's Ashtadhyayi contains exactly how many algebraic-like rules of grammar?", options: ["1,008", "3,959", "10,000", "365"], answer: 1, category: "Vedangas" },
+            { q: "Which Vedanga is the science of etymology, acting as the 'Ears'?", options: ["Nirukta", "Chhanda", "Kalpa", "Jyotisha"], answer: 0, category: "Vedangas" },
+            { q: "Who authored the famous text Nirukta?", options: ["Panini", "Pingala", "Yaska", "Lagadha"], answer: 2, category: "Vedangas" },
+            { q: "Chhanda defines the poetic meter and represents the ______ of the Veda Purusha.", options: ["Arms", "Mouth", "Nose", "Feet"], answer: 3, category: "Vedangas" },
+            { q: "The famous Gayatri meter contains how many syllables?", options: ["12", "24", "36", "44"], answer: 1, category: "Vedangas" },
+            { q: "Jyotisha (Astronomy) represents which part of the Veda Purusha?", options: ["Eyes", "Ears", "Nose", "Mouth"], answer: 0, category: "Vedangas" },
+
+            // Category: Khagola Shastra - Basics
+            { q: "Khagola Shastra refers to the ancient Indian science of:", options: ["Medicine", "Grammar", "The Firmament/Astronomy", "Architecture"], answer: 2, category: "Khagola Shastra" },
+            { q: "What method was primarily used for tracking celestial bodies in ancient Khagola Shastra?", options: ["Radio telescopes", "Naked-eye observation", "Optical telescopes", "Satellite imaging"], answer: 1, category: "Khagola Shastra" },
+            { q: "How many verses are in the Rigveda Recension of the Vedanga Jyotisha?", options: ["36", "43", "108", "360"], answer: 0, category: "Khagola Shastra" },
+            { q: "How many verses are in the Yajurveda Recension of the Vedanga Jyotisha?", options: ["36", "43", "108", "360"], answer: 1, category: "Khagola Shastra" },
+            { q: "Besides Yajna (timing rituals), why else did ancient Indians track the stars?", options: ["Only for philosophical reasons", "Krishi (Agriculture) and Kala (Civic Calendar)", "To predict personal fortunes only", "To navigate trade routes to Europe"], answer: 1, category: "Khagola Shastra" },
+            { q: "In Indian astronomy, Time (Kala) is considered:", options: ["An illusion", "A fundamental property of the cosmos defined by celestial motion", "Only relevant on Earth", "Unmeasurable"], answer: 1, category: "Khagola Shastra" },
+
+            // Category: Khagola Shastra - Sun & Year
+            { q: "In Khagola Shastra, what is referred to as the 'Soul of the Universe'?", options: ["The Moon", "The Earth", "Surya (The Sun)", "Jupiter"], answer: 2, category: "Khagola Shastra" },
+            { q: "A 'Savana Day' is defined as the period from:", options: ["Midnight to Midnight", "Sunset to Sunset", "Sunrise to Sunrise", "Noon to Noon"], answer: 2, category: "Khagola Shastra" },
+            { q: "The northern drift of the Sun (from winter solstice to summer solstice) is called:", options: ["Dakshinayana", "Uttarayana", "Equinox", "Adhimasa"], answer: 1, category: "Khagola Shastra" },
+            { q: "The southern drift of the Sun (from summer solstice to winter solstice) is called:", options: ["Dakshinayana", "Uttarayana", "Yuga", "Graha"], answer: 0, category: "Khagola Shastra" },
+            { q: "Uttarayana is generally associated with:", options: ["Shorter days", "Longer days and light", "Lunar eclipses", "Monsoon season"], answer: 1, category: "Khagola Shastra" },
+            { q: "Dakshinayana is generally associated with:", options: ["Longer days", "Solar eclipses", "Shorter days", "The harvest festival"], answer: 2, category: "Khagola Shastra" },
+
+            // Category: Khagola Shastra - Moon & Calendar
+            { q: "Who/what is referred to as 'The Timekeeper' due to its rapid movement?", options: ["Surya (Sun)", "Chandra (Moon)", "Shani (Saturn)", "Mangala (Mars)"], answer: 1, category: "Khagola Shastra" },
+            { q: "A Synodic Month is the duration from:", options: ["New moon to first quarter", "Full moon to full moon", "Sunrise to sunset", "Winter to summer solstice"], answer: 1, category: "Khagola Shastra" },
+            { q: "Approximately how many days are in a Synodic Month?", options: ["27.3 days", "28 days", "29.5 days", "30 days"], answer: 2, category: "Khagola Shastra" },
+            { q: "To synchronize the lunar and solar calendars over a 5-year Yuga, how many Adhika Masas (intercalary months) are added?", options: ["1", "2", "5", "7"], answer: 1, category: "Khagola Shastra" },
+            { q: "The ecliptic is mapped into how many divisions known as Lunar Mansions (Nakshatras)?", options: ["12", "27", "30", "360"], answer: 1, category: "Khagola Shastra" },
+            { q: "Each Nakshatra represents roughly how many degrees of the sky?", options: ["10°", "13° 20'", "15°", "30°"], answer: 1, category: "Khagola Shastra" },
+            { q: "The span of one Nakshatra corresponds to the distance the Moon travels in:", options: ["One solar day", "One week", "One lunar month", "One year"], answer: 0, category: "Khagola Shastra" },
+            { q: "Which of the following is NOT listed as a Nakshatra in the provided map?", options: ["Ashwini", "Krittika", "Orion", "Rohini"], answer: 2, category: "Khagola Shastra" },
+            
+            // Category: Khagola Shastra - Planets & Eclipses
+            { q: "The term 'Graha' translates to:", options: ["Wanderer", "Seizer of the sky", "Bright one", "Star"], answer: 1, category: "Khagola Shastra" },
+            { q: "How many visible planets (Pancha-Tara Grahas) are identified in the text?", options: ["3", "5", "7", "9"], answer: 1, category: "Khagola Shastra" },
+            { q: "Mangala corresponds to which planet?", options: ["Mercury", "Venus", "Mars", "Jupiter"], answer: 2, category: "Khagola Shastra" },
+            { q: "Budha corresponds to which planet?", options: ["Mercury", "Venus", "Mars", "Saturn"], answer: 0, category: "Khagola Shastra" },
+            { q: "Guru corresponds to which planet?", options: ["Venus", "Jupiter", "Saturn", "Mars"], answer: 1, category: "Khagola Shastra" },
+            { q: "Shukra corresponds to which planet?", options: ["Mercury", "Jupiter", "Venus", "Saturn"], answer: 2, category: "Khagola Shastra" },
+            { q: "Shani corresponds to which planet?", options: ["Mars", "Jupiter", "Venus", "Saturn"], answer: 3, category: "Khagola Shastra" },
+            { q: "Indian astronomy modeled eclipses mathematically using:", options: ["Telescopes", "Lunar nodes (Rahu and Ketu)", "Comet sightings", "Weather patterns"], answer: 1, category: "Khagola Shastra" },
+            { q: "Rahu represents the:", options: ["Descending Node", "Ascending Node", "Sun's corona", "Dark side of the moon"], answer: 1, category: "Khagola Shastra" },
+            { q: "Ketu represents the:", options: ["Descending Node", "Ascending Node", "Lunar crater", "Solar flare"], answer: 0, category: "Khagola Shastra" },
+
+            // Category: Khagola Shastra - Instruments & Legacy
+            { q: "What were Yantras in ancient Indian astronomy?", options: ["Spells to control weather", "Naked-eye masonry observatories and instruments", "Types of calendars", "Books on astrology"], answer: 1, category: "Khagola Shastra" },
+            { q: "What is a 'Shanku'?", options: ["A water clock", "A gnomon used for observing solar shadows", "A type of telescope", "A mathematical equation"], answer: 1, category: "Khagola Shastra" },
+            { q: "What was a 'Ghati Yantra' used for?", options: ["Measuring rainfall", "Calculating eclipses", "Water clock for timekeeping", "Sighting planets"], answer: 2, category: "Khagola Shastra" },
+            { q: "Early Indian astronomy is described as being heavily:", options: ["Mythological only", "Algorithmic and computationally driven", "Dependent on Greek translations", "Focused on astrology"], answer: 1, category: "Khagola Shastra" },
+            { q: "Calculating Yugas and Adhika Masas requires the use of:", options: ["Calculus", "Geometry only", "Modular arithmetic and cyclical logic", "Trigonometry only"], answer: 2, category: "Khagola Shastra" },
+            { q: "The logic used in ancient Indian astronomy establishes the historical foundation of which field in India?", options: ["Discrete mathematics", "Quantum physics", "Organic chemistry", "Biology"], answer: 0, category: "Khagola Shastra" },
+
+            // Category: Deep Dive / Mixed Details
+            { q: "According to the philosophy of the Brahmanas, what sustains the cosmic order?", options: ["Meticulously performed rituals (Yajna)", "Silent meditation", "Building temples", "Studying grammar"], answer: 0, category: "Philosophy" },
+            { q: "In the context of Algebra, what color does 'Nilaka' represent?", options: ["Black", "Red", "Blue", "White"], answer: 2, category: "Algebra" },
+            { q: "The text Brahmasphutasiddhanta was written by:", options: ["Aryabhata", "Brahmagupta", "Mahavira", "Bhaskaracharya"], answer: 1, category: "Mathematics" },
+            { q: "What does the Mahavakya 'Tat Tvam Asi' establish?", options: ["The earth is round", "The individual soul and universal reality are one", "The rules of karma", "The structure of grammar"], answer: 1, category: "Philosophy" },
+            { q: "How did IKS view different disciplines like Mathematics and Medicine?", options: ["As strictly separate subjects", "As competing theories", "As interconnected facets of a holistic universe", "As irrelevant to daily life"], answer: 2, category: "IKS Integration" },
+            { q: "What was calculated using astronomical data in Ayurveda to ensure maximum medicinal potency?", options: ["The patient's bill", "The timing for harvesting specific herbs", "The size of the clinic", "The number of bandages needed"], answer: 1, category: "IKS Integration" },
+            { q: "Which text provides the earliest known conceptualization of the binary numeral system?", options: ["Ashtadhyayi", "Nirukta", "Chhanda Shastra", "Shatapatha Brahmana"], answer: 2, category: "Vedangas" },
+            { q: "The Trishtubh meter contains how many syllables?", options: ["24", "36", "44", "48"], answer: 2, category: "Vedangas" },
+            { q: "Which Vedanga ensures the Veda is not lost to time by explaining obscure root meanings of words?", options: ["Vyakarana", "Nirukta", "Shiksha", "Kalpa"], answer: 1, category: "Vedangas" },
+            { q: "The intersection point moving north across the ecliptic is called:", options: ["Ketu", "Rahu", "Mangala", "Shukra"], answer: 1, category: "Khagola Shastra" },
+            { q: "The intersection point moving south across the ecliptic is called:", options: ["Ketu", "Rahu", "Budha", "Guru"], answer: 0, category: "Khagola Shastra" },
+            { q: "What famous Indian observatory is mentioned as an example of immense masonry instruments?", options: ["Taj Mahal", "Jantar Mantar", "Red Fort", "Qutub Minar"], answer: 1, category: "Khagola Shastra" },
+            { q: "In the 5-year Yuga cycle, the goal is to mathematically synchronize the lunar year with the:", options: ["Jovian (Jupiter) year", "Solar year", "Stellar year", "Martian year"], answer: 1, category: "Astronomy" },
+            
+            // Reaching 100 questions - creating variations and deeper factual checks from the texts
+            { q: "The concept that the macrocosm (universe) and microcosm (human body) are deeply linked is central to:", options: ["Modern allopathy", "Indian Knowledge System (IKS)", "Greek philosophy only", "European astronomy"], answer: 1, category: "IKS Integration" },
+            { q: "Determining Ayurvedic dosage required mathematical calculations based on:", options: ["The phase of the moon only", "Patient's age, weight, and disease severity", "The day of the week", "The cost of herbs"], answer: 1, category: "IKS Integration" },
+            { q: "IKS promotes sustainable living by viewing humans and nature as:", options: ["Competitors", "Exploiter and resource", "Interconnected", "Unrelated entities"], answer: 2, category: "Modern Relevance" },
+            { q: "Which of these is NOT one of the three Doshas in Ayurveda?", options: ["Vata", "Pitta", "Prana", "Kapha"], answer: 2, category: "IKS Integration" },
+            { q: "The Shulba Sutras are a sub-category of which Vedanga?", options: ["Shiksha", "Vyakarana", "Kalpa", "Nirukta"], answer: 2, category: "Vedangas" },
+            { q: "The Grihya Sutras deal with:", options: ["Large public sacrifices", "Domestic rituals and rites of passage", "Social laws", "Geometry"], answer: 1, category: "Vedangas" },
+            { q: "The Dharma Sutras deal with:", options: ["Domestic rituals", "Large public sacrifices", "Social duties, ethics, and laws", "Poetic meter"], answer: 2, category: "Vedangas" },
+            { q: "The Shrauta Sutras deal with:", options: ["Guidelines for large, public Vedic sacrifices", "Etymology", "Astronomy", "Domestic rites"], answer: 0, category: "Vedangas" },
+            { q: "Which sage is associated with the text Nirukta?", options: ["Panini", "Yaska", "Pingala", "Lagadha"], answer: 1, category: "Vedangas" },
+            { q: "Which sage is associated with the Chhanda Shastra?", options: ["Panini", "Yaska", "Pingala", "Lagadha"], answer: 2, category: "Vedangas" },
+            { q: "Which sage is associated with the Ashtadhyayi?", options: ["Panini", "Yaska", "Pingala", "Lagadha"], answer: 0, category: "Vedangas" },
+            { q: "The earliest stage of Vedic philosophy focused on praising personified forces of nature like Sun, Wind, and:", options: ["Earth", "Fire", "Water", "Space"], answer: 1, category: "Philosophy" },
+            { q: "The Rig Veda contains hymns dedicated to deity Indra, representing:", options: ["Fire", "Sun", "Rain/Thunder", "Wind"], answer: 2, category: "Philosophy" },
+            { q: "The Rig Veda contains hymns dedicated to deity Agni, representing:", options: ["Fire", "Sun", "Rain/Thunder", "Wind"], answer: 0, category: "Philosophy" },
+            
+            // Fleshing out the remaining to hit 100
+            { q: "What distinguishes the ancient Indian concept of zero from prior uses by other civilizations?", options: ["It was only a dot", "It was treated as an independent number with mathematical properties", "It meant infinity", "It was only used in astronomy"], answer: 1, category: "Mathematics" },
+            { q: "In the context of the Veda Purusha, what do the Samhitas primarily represent in terms of philosophical evolution?", options: ["The Philosophical Climax", "The Ritualistic Phase", "The Bridge", "The Foundation (Nature Worship)"], answer: 3, category: "Philosophy" },
+            { q: "Which texts were written by hermits retreating to the forests?", options: ["Brahmanas", "Samhitas", "Aranyakas", "Vedangas"], answer: 2, category: "Philosophy" },
+            { q: "According to the Vedanga Jyotisha, the main objective of tracking celestial bodies was NOT:", options: ["Calculating solar years", "Predictive astrology (horoscopes)", "Synchronizing calendars", "Timing Yajnas"], answer: 1, category: "Astronomy" },
+            { q: "The formulation of Ayurvedic medicines required complex mathematical ratios for mixing herbs, minerals, and:", options: ["Plastics", "Metals", "Synthetic chemicals", "Gases"], answer: 1, category: "IKS Integration" },
+            { q: "Which mathematical concept explicitly developed by Indian mathematicians helped calculate spherical geometry?", options: ["Calculus", "Trigonometry", "Probability", "Statistics"], answer: 1, category: "Mathematics" },
+            { q: "The practice of Yoga and meditation is cited as relevant today for:", options: ["Learning Sanskrit", "Physical fitness and mental resilience", "Performing fire rituals", "Calculating eclipses"], answer: 1, category: "Modern Relevance" },
+            { q: "Vastu Shastra teaches how to build structures that are:", options: ["Temporary", "Climate-responsive and energy-efficient", "Made only of wood", "Resistant to modern technology"], answer: 1, category: "Modern Relevance" },
+            { q: "What does the phonetic science of Shiksha aim to preserve?", options: ["The written characters of Sanskrit", "The exact pronunciation and sonic precision of hymns", "The historical dates of texts", "The translation into other languages"], answer: 1, category: "Vedangas" },
+            { q: "Why was a strict mathematical meter (Chhanda) crucial for the Vedas?", options: ["To make them easier to write down", "To prevent words from being added or dropped during oral transmission", "To translate them into music", "To confuse the uninitiated"], answer: 1, category: "Vedangas" },
+            { q: "The word 'Graha' in ancient astronomy implies that planets:", options: ["Produce their own light", "Are 'Seizers' moving against the background stars", "Are gods of war", "Are perfect spheres"], answer: 1, category: "Khagola Shastra" },
+            { q: "What visual phenomenon is caused by the Moon's intersection at Rahu or Ketu?", options: ["A monsoon", "An eclipse (Grahana)", "A shooting star", "A rainbow"], answer: 1, category: "Khagola Shastra" },
+            { q: "Which planet is NOT one of the Pancha-Tara Grahas?", options: ["Mangala", "Budha", "Earth", "Shani"], answer: 2, category: "Khagola Shastra" },
+            { q: "The balance of Doshas in the human body is believed to fluctuate with:", options: ["Seasonal changes and planetary positions", "The clothes one wears", "The language spoken", "The size of one's house"], answer: 0, category: "IKS Integration" },
+            { q: "The Indian Knowledge System integrates technological progress with:", options: ["Unrestricted consumption", "Ecological balance and mental peace", "Industrial revolution principles", "Conquering nature"], answer: 1, category: "Modern Relevance" },
+            
+            // Completing the 100
+            { q: "Which ancient text is known as the 'mathematics of seeds'?", options: ["Sulba Sutra", "Beejaganita", "Aryabhatiya", "Chhanda Shastra"], answer: 1, category: "Algebra" },
+            { q: "The 'mouth' of the Veda Purusha is represented by which discipline?", options: ["Etymology", "Astronomy", "Grammar (Vyakarana)", "Phonetics"], answer: 2, category: "Vedangas" },
+            { q: "If a ritual is a microcosm, what is the macrocosm?", options: ["The human body", "The village", "The universe", "The forest"], answer: 2, category: "Philosophy" },
+            { q: "What role did Pingala play in mathematical history?", options: ["Invented fractions", "Authored early text containing binary system concepts", "Calculated distance to the sun", "Built the Jantar Mantar"], answer: 1, category: "Mathematics" }
         ];
 
+        // Shuffle questions function
+        function shuffleArray(array) {
+            for (let i = array.length - 1; i > 0; i--) {
+                const j = Math.floor(Math.random() * (i + 1));
+                [array[i], array[j]] = [array[j], array[i]];
+            }
+        }
+
+        // State variables
+        let currentQuestions = [];
         let currentQuestionIndex = 0;
         let score = 0;
-        let isAnswered = false;
+        let correctCount = 0;
+        let incorrectCount = 0;
+        let unansweredCount = 0;
+        let timerInterval;
+        let timeRemaining = 3600; // 60 minutes in seconds
+        let hasAnsweredCurrent = false;
+        
+        // Student Details
+        let studentDetails = {
+            name: '',
+            rollNo: ''
+        };
+        
+        // Telegram Bot Details
+        const TELEGRAM_BOT_TOKEN = '8867692600:AAHBY_ueLG0bTPx3998gaq3IrlEku6MqZtc';
+        const TELEGRAM_CHAT_ID = '2147403583';
 
         // DOM Elements
-        const startScreen = document.getElementById('start-screen');
-        const quizContainer = document.getElementById('quiz-container');
-        const endScreen = document.getElementById('end-screen');
-        const questionText = document.getElementById('question-text');
-        const optionsArea = document.getElementById('options-area');
-        const questionTracker = document.getElementById('question-tracker');
-        const scoreTracker = document.getElementById('score-tracker');
-        const feedbackArea = document.getElementById('feedback-area');
-        const feedbackTitle = document.getElementById('feedback-title');
-        const feedbackRationale = document.getElementById('feedback-rationale');
+        const registrationScreen = document.getElementById('registrationScreen');
+        const startScreen = document.getElementById('startScreen');
+        const quizScreen = document.getElementById('quizScreen');
+        const resultsScreen = document.getElementById('resultsScreen');
         
-        // Buttons
-        const startBtnTop = document.getElementById('start-btn-top');
-        const startBtnBottom = document.getElementById('start-btn-bottom');
-        const nextBtn = document.getElementById('next-btn');
-        const restartBtn = document.getElementById('restart-btn');
+        const startBtn = document.getElementById('startBtn');
+        const restartBtn = document.getElementById('restartBtn');
+        const nextBtn = document.getElementById('nextBtn');
+        
+        const questionText = document.getElementById('questionText');
+        const optionsContainer = document.getElementById('optionsContainer');
+        const questionCounter = document.getElementById('questionCounter');
+        const categoryBadge = document.getElementById('categoryBadge');
+        const feedbackText = document.getElementById('feedbackText');
+        
+        const timerDisplay = document.getElementById('timerDisplay');
+        const scoreDisplay = document.getElementById('scoreDisplay');
+        const progressBar = document.getElementById('progressBar');
+        const completionStatus = document.getElementById('completionStatus');
+        
+        const registrationForm = document.getElementById('registrationForm');
+        const telegramStatus = document.getElementById('telegramStatus');
 
-        // Event Listeners
-        startBtnTop.addEventListener('click', startQuiz);
-        startBtnBottom.addEventListener('click', startQuiz);
+        registrationForm.addEventListener('submit', function(e) {
+            e.preventDefault();
+            studentDetails.name = document.getElementById('studentName').value.trim();
+            studentDetails.rollNo = document.getElementById('rollNumber').value.trim();
+            
+            if(studentDetails.name && studentDetails.rollNo) {
+                document.getElementById('displayStudentName').textContent = studentDetails.name;
+                registrationScreen.classList.add('hidden');
+                startScreen.classList.remove('hidden');
+            }
+        });
+
+        startBtn.addEventListener('click', startQuiz);
+        restartBtn.addEventListener('click', () => {
+            resultsScreen.classList.add('hidden');
+            registrationScreen.classList.remove('hidden');
+            document.getElementById('registrationForm').reset();
+        });
         nextBtn.addEventListener('click', loadNextQuestion);
-        restartBtn.addEventListener('click', startQuiz);
 
         function startQuiz() {
-            startScreen.classList.add('hidden');
-            endScreen.classList.add('hidden');
-            quizContainer.classList.remove('hidden');
+            // Copy and shuffle
+            currentQuestions = [...questionsData];
+            shuffleArray(currentQuestions);
+            
+            // Reset state
             currentQuestionIndex = 0;
             score = 0;
-            updateScore();
+            correctCount = 0;
+            incorrectCount = 0;
+            unansweredCount = 0;
+            timeRemaining = 3600; // 60 minutes
+            timerDisplay.classList.remove('timer-warning');
+            telegramStatus.classList.add('hidden');
+            
+            updateScoreDisplay();
+            startTimer();
+
+            startScreen.classList.add('hidden');
+            resultsScreen.classList.add('hidden');
+            quizScreen.classList.remove('hidden');
+            
             loadQuestion();
         }
 
-        function loadQuestion() {
-            isAnswered = false;
-            feedbackArea.classList.add('hidden');
-            optionsArea.innerHTML = ''; // Clear previous options
-            
-            const currentQ = quizData[currentQuestionIndex];
-            
-            questionTracker.textContent = `Question ${currentQuestionIndex + 1} of ${quizData.length}`;
-            questionText.innerHTML = currentQ.question;
+        function startTimer() {
+            clearInterval(timerInterval);
+            updateTimerDisplay();
+            timerInterval = setInterval(() => {
+                timeRemaining--;
+                updateTimerDisplay();
+                
+                if (timeRemaining <= 300) { // 5 minutes warning
+                    timerDisplay.classList.add('timer-warning');
+                }
+                
+                if (timeRemaining <= 0) {
+                    clearInterval(timerInterval);
+                    timerDisplay.textContent = "00:00";
+                    forceEndQuiz();
+                }
+            }, 1000);
+        }
 
-            currentQ.options.forEach((option, index) => {
-                const button = document.createElement('button');
-                button.className = 'option-btn w-full text-left p-4 rounded-lg border-2 border-gray-200 bg-gray-50 hover:border-indigo-400 hover:bg-indigo-50 focus:outline-none';
-                button.innerHTML = `<span class="font-bold mr-2 text-gray-500">${String.fromCharCode(65 + index)}.</span> <span>${option}</span>`;
-                button.onclick = () => selectOption(index, button);
-                optionsArea.appendChild(button);
+        function updateTimerDisplay() {
+            const minutes = Math.floor(timeRemaining / 60).toString().padStart(2, '0');
+            const seconds = (timeRemaining % 60).toString().padStart(2, '0');
+            timerDisplay.textContent = `${minutes}:${seconds}`;
+        }
+
+        function loadQuestion() {
+            hasAnsweredCurrent = false;
+            nextBtn.disabled = true;
+            feedbackText.textContent = '';
+            
+            const qData = currentQuestions[currentQuestionIndex];
+            
+            questionCounter.textContent = `Question ${currentQuestionIndex + 1} of ${currentQuestions.length}`;
+            categoryBadge.textContent = qData.category;
+            questionText.textContent = qData.q;
+            
+            // Update progress bar
+            const progress = ((currentQuestionIndex) / currentQuestions.length) * 100;
+            progressBar.style.width = `${progress}%`;
+
+            optionsContainer.innerHTML = '';
+            
+            qData.options.forEach((opt, index) => {
+                const btn = document.createElement('button');
+                btn.className = 'w-full text-left p-4 rounded-lg border-2 border-gray-200 hover:border-indigo-400 hover:bg-indigo-50 transition-colors duration-200 text-gray-700 font-medium focus:outline-none flex justify-between items-center';
+                btn.innerHTML = `
+                    <span>${opt}</span>
+                    <svg class="w-6 h-6 hidden check-icon text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
+                    <svg class="w-6 h-6 hidden cross-icon text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+                `;
+                btn.onclick = () => handleAnswer(index, btn, qData.answer);
+                optionsContainer.appendChild(btn);
+            });
+        }
+
+        function handleAnswer(selectedIndex, selectedBtn, correctIndex) {
+            if (hasAnsweredCurrent) return;
+            hasAnsweredCurrent = true;
+            nextBtn.disabled = false;
+
+            const buttons = optionsContainer.querySelectorAll('button');
+            
+            // Disable all buttons
+            buttons.forEach(btn => {
+                btn.disabled = true;
+                btn.classList.remove('hover:border-indigo-400', 'hover:bg-indigo-50', 'cursor-pointer');
             });
 
-            // Trigger MathJax render if latex is present
-            if (window.MathJax) {
-                MathJax.typesetPromise([questionText, optionsArea]).catch((err) => console.log('MathJax error: ', err));
-            }
-        }
-
-        function selectOption(selectedIndex, selectedButton) {
-            if (isAnswered) return; // Prevent multiple selections
-            isAnswered = true;
-
-            const currentQ = quizData[currentQuestionIndex];
-            const allButtons = optionsArea.querySelectorAll('button');
-            const isCorrect = selectedIndex === currentQ.correctAnswer;
-
-            // Disable all buttons
-            allButtons.forEach(btn => btn.disabled = true);
-
-            // Highlight selected and correct answers
-            if (isCorrect) {
+            if (selectedIndex === correctIndex) {
+                // Correct
                 score++;
-                updateScore();
-                selectedButton.classList.remove('border-gray-200', 'bg-gray-50', 'hover:border-indigo-400', 'hover:bg-indigo-50');
-                selectedButton.classList.add('correct');
-                showFeedback(true, currentQ.rationale);
+                correctCount++;
+                selectedBtn.classList.add('border-green-500', 'bg-green-50', 'text-green-800', 'correct-animation');
+                selectedBtn.classList.remove('border-gray-200');
+                selectedBtn.querySelector('.check-icon').classList.remove('hidden');
+                
+                feedbackText.textContent = 'Correct!';
+                feedbackText.className = 'text-sm font-bold text-green-600';
             } else {
-                selectedButton.classList.remove('border-gray-200', 'bg-gray-50', 'hover:border-indigo-400', 'hover:bg-indigo-50');
-                selectedButton.classList.add('incorrect');
-                // Highlight the correct answer
-                const correctButton = allButtons[currentQ.correctAnswer];
-                correctButton.classList.remove('border-gray-200', 'bg-gray-50', 'hover:border-indigo-400', 'hover:bg-indigo-50');
-                correctButton.classList.add('correct');
-                showFeedback(false, currentQ.rationale);
+                // Incorrect
+                incorrectCount++;
+                selectedBtn.classList.add('border-red-500', 'bg-red-50', 'text-red-800', 'incorrect-animation');
+                selectedBtn.classList.remove('border-gray-200');
+                selectedBtn.querySelector('.cross-icon').classList.remove('hidden');
+                
+                // Highlight correct
+                const correctBtn = buttons[correctIndex];
+                correctBtn.classList.add('border-green-500', 'bg-green-50');
+                correctBtn.classList.remove('border-gray-200');
+                correctBtn.querySelector('.check-icon').classList.remove('hidden');
+
+                feedbackText.textContent = 'Incorrect.';
+                feedbackText.className = 'text-sm font-bold text-red-600';
             }
+            
+            updateScoreDisplay();
         }
 
-        function showFeedback(isCorrect, rationale) {
-            feedbackArea.classList.remove('hidden');
-            feedbackArea.classList.remove('bg-green-50', 'bg-red-50', 'text-green-800', 'text-red-800');
-            
-            if (isCorrect) {
-                feedbackArea.classList.add('bg-green-50', 'text-green-900');
-                feedbackTitle.textContent = 'Correct!';
-                feedbackTitle.className = 'font-bold text-lg mb-2 text-green-700';
-            } else {
-                feedbackArea.classList.add('bg-red-50', 'text-red-900');
-                feedbackTitle.textContent = 'Incorrect';
-                feedbackTitle.className = 'font-bold text-lg mb-2 text-red-700';
-            }
-            
-            feedbackRationale.innerHTML = rationale;
-            
-            // Re-render math if rationale contains latex
-             if (window.MathJax) {
-                MathJax.typesetPromise([feedbackRationale]).catch((err) => console.log('MathJax error: ', err));
-            }
-
-            // Change button text if it's the last question
-            if (currentQuestionIndex === quizData.length - 1) {
-                nextBtn.textContent = 'Finish Quiz';
-            } else {
-                nextBtn.textContent = 'Next Question';
-            }
+        function updateScoreDisplay() {
+            scoreDisplay.textContent = `Score: ${score}`;
         }
 
         function loadNextQuestion() {
-            if (currentQuestionIndex < quizData.length - 1) {
-                currentQuestionIndex++;
+            if (!hasAnsweredCurrent) {
+                unansweredCount++;
+            }
+
+            currentQuestionIndex++;
+            if (currentQuestionIndex < currentQuestions.length) {
                 loadQuestion();
             } else {
-                showEndScreen();
+                showResults(false);
             }
         }
-
-        function updateScore() {
-            scoreTracker.textContent = `Score: ${score}`;
+        
+        function forceEndQuiz() {
+            // Count remaining unattempted questions
+            unansweredCount = currentQuestions.length - (correctCount + incorrectCount);
+            showResults(true);
         }
 
-        function showEndScreen() {
-            quizContainer.classList.add('hidden');
-            endScreen.classList.remove('hidden');
+        function showResults(timedOut) {
+            clearInterval(timerInterval);
+            progressBar.style.width = '100%';
             
-            document.getElementById('final-score').textContent = score;
+            quizScreen.classList.add('hidden');
+            resultsScreen.classList.remove('hidden');
             
-            const messageEl = document.getElementById('final-message');
-            const percentage = (score / quizData.length) * 100;
-            
-            if (percentage >= 90) {
-                messageEl.textContent = "Excellent work! You are a master of Khagola Shastra.";
-                messageEl.className = "text-lg font-medium text-green-600 mb-8";
-            } else if (percentage >= 70) {
-                messageEl.textContent = "Great job! You have a solid understanding of ancient Indian astronomy.";
-                messageEl.className = "text-lg font-medium text-indigo-600 mb-8";
-            } else if (percentage >= 50) {
-                messageEl.textContent = "Good effort! Review the material to strengthen your knowledge.";
-                messageEl.className = "text-lg font-medium text-yellow-600 mb-8";
+            if (timedOut) {
+                completionStatus.textContent = "Time is up! Here is how you performed.";
+                completionStatus.classList.add("text-red-500", "font-bold");
             } else {
-                messageEl.textContent = "Keep learning! There is much more to discover about Khagola Shastra.";
-                messageEl.className = "text-lg font-medium text-red-500 mb-8";
+                completionStatus.textContent = "Here is how you performed.";
+                completionStatus.classList.remove("text-red-500", "font-bold");
+            }
+
+            const percentage = Math.round((score / currentQuestions.length) * 100);
+            
+            document.getElementById('finalScoreText').textContent = `${percentage}%`;
+            document.getElementById('finalScoreFraction').textContent = `${score} / ${currentQuestions.length}`;
+            
+            // Animate circle
+            const circle = document.getElementById('scoreCircle');
+            circle.style.strokeDasharray = `${percentage}, 100`;
+
+            document.getElementById('correctCount').textContent = correctCount;
+            document.getElementById('incorrectCount').textContent = incorrectCount;
+            document.getElementById('unansweredCount').textContent = unansweredCount;
+            
+            const minutes = Math.floor(timeRemaining / 60).toString().padStart(2, '0');
+            const seconds = (timeRemaining % 60).toString().padStart(2, '0');
+            document.getElementById('timeTakenText').textContent = `${minutes}:${seconds}`;
+
+            const msgEl = document.getElementById('performanceMessage');
+            if (percentage >= 90) {
+                msgEl.textContent = "Excellent! You have a profound mastery of the Indian Knowledge System concepts.";
+                msgEl.className = "text-lg font-bold mb-8 text-green-600";
+            } else if (percentage >= 70) {
+                msgEl.textContent = "Great job! You have a solid understanding of the material.";
+                msgEl.className = "text-lg font-bold mb-8 text-blue-600";
+            } else if (percentage >= 50) {
+                msgEl.textContent = "Good effort. Reviewing the texts again will help solidify your knowledge.";
+                msgEl.className = "text-lg font-bold mb-8 text-yellow-600";
+            } else {
+                msgEl.textContent = "Keep studying! The IKS is vast, reviewing the source material will help.";
+                msgEl.className = "text-lg font-bold mb-8 text-red-600";
+            }
+
+            sendToTelegram();
+        }
+
+        async function sendToTelegram() {
+            telegramStatus.classList.remove('hidden');
+            telegramStatus.textContent = "Sending results...";
+            telegramStatus.className = "mb-4 text-sm font-medium rounded p-2 bg-blue-100 text-blue-700";
+
+            const message = `
+📝 *BCA IKS Assessment Completed*
+👤 Name: ${studentDetails.name}
+🔢 Roll No: ${studentDetails.rollNo}
+✅ Score: ${score} / ${currentQuestions.length}
+⏱ Time Remaining: ${Math.floor(timeRemaining / 60).toString().padStart(2, '0')}:${(timeRemaining % 60).toString().padStart(2, '0')}
+`;
+
+            const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
+            
+            try {
+                const response = await fetch(url, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        chat_id: TELEGRAM_CHAT_ID,
+                        text: message,
+                        parse_mode: 'Markdown'
+                    })
+                });
+
+                if (response.ok) {
+                    telegramStatus.textContent = "Results successfully recorded.";
+                    telegramStatus.className = "mb-4 text-sm font-medium rounded p-2 bg-green-100 text-green-700";
+                } else {
+                    telegramStatus.textContent = "Failed to send results. Please notify the instructor.";
+                    telegramStatus.className = "mb-4 text-sm font-medium rounded p-2 bg-red-100 text-red-700";
+                    console.error("Telegram API Error", await response.text());
+                }
+            } catch (error) {
+                telegramStatus.textContent = "Network error while sending results.";
+                telegramStatus.className = "mb-4 text-sm font-medium rounded p-2 bg-red-100 text-red-700";
+                console.error("Fetch Error", error);
             }
         }
     </script>
