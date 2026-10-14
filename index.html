@@ -3,608 +3,955 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>BCA IKS Assessment App</title>
+    <title>Ayurveda Master - Interactive Study Game</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
     <style>
-        body { font-family: 'Inter', sans-serif; }
-        .fade-in { animation: fadeIn 0.5s ease-in-out; }
-        @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(10px); }
-            to { opacity: 1; transform: translateY(0); }
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f4f7f5;
+            color: #1f2937;
         }
-        .correct-animation { animation: pulseGreen 0.5s ease-in-out; }
-        @keyframes pulseGreen {
-            0% { transform: scale(1); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7); }
-            50% { transform: scale(1.02); box-shadow: 0 0 0 10px rgba(34, 197, 94, 0); }
-            100% { transform: scale(1); box-shadow: 0 0 0 0 rgba(34, 197, 94, 0); }
+        .heading-font {
+            font-family: 'Merriweather', serif;
         }
-        .incorrect-animation { animation: shakeRed 0.5s ease-in-out; }
-        @keyframes shakeRed {
-            0%, 100% { transform: translateX(0); }
-            20%, 60% { transform: translateX(-5px); }
-            40%, 80% { transform: translateX(5px); }
+        .ayurveda-pattern {
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%232c5234' fill-opacity='0.05'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
         }
-        .timer-warning { color: #ef4444; animation: pulseRed 1s infinite; }
-        @keyframes pulseRed {
-            0% { opacity: 1; }
-            50% { opacity: 0.5; }
-            100% { opacity: 1; }
+        
+        .study-content h3 {
+            font-family: 'Merriweather', serif;
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #166534;
+            margin-top: 1.5rem;
+            margin-bottom: 0.75rem;
+        }
+        .study-content p {
+            margin-bottom: 1rem;
+            line-height: 1.7;
+        }
+        .study-content ul {
+            list-style-type: disc;
+            padding-left: 1.5rem;
+            margin-bottom: 1rem;
+        }
+        .study-content li {
+            margin-bottom: 0.5rem;
+            line-height: 1.6;
+        }
+        .study-content b {
+            color: #064e3b;
+        }
+        .module-card {
+            transition: all 0.3s ease;
+        }
+        .module-card:hover:not(.locked) {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+        }
+        .locked {
+            opacity: 0.6;
+            cursor: not-allowed;
+            filter: grayscale(100%);
+        }
+        
+        .no-select {
+            -webkit-user-select: none; /* Safari */
+            -ms-user-select: none; /* IE 10 and IE 11 */
+            user-select: none; /* Standard syntax */
+        }
+        
+        /* Custom scrollbar for content area */
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: #e5e7eb;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background: #166534;
+            border-radius: 4px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+            background: #14532d;
+        }
+
+        .loader {
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #166534;
+            border-radius: 50%;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
         }
     </style>
 </head>
-<body class="bg-gray-50 text-gray-800 h-screen flex flex-col">
+<body class="h-screen flex flex-col ayurveda-pattern">
 
-    <header class="bg-indigo-600 text-white p-4 shadow-md sticky top-0 z-10">
-        <div class="max-w-4xl mx-auto flex justify-between items-center">
-            <h1 class="text-xl md:text-2xl font-bold">BCA IKS Assessment</h1>
-            <div class="flex items-center space-x-4">
-                <div id="timerDisplay" class="font-mono text-lg bg-indigo-700 px-3 py-1 rounded-md shadow-inner">60:00</div>
-                <div id="scoreDisplay" class="font-semibold bg-indigo-500 px-3 py-1 rounded-md">Score: 0</div>
+    <header class="bg-green-900 text-white shadow-md z-10">
+        <div class="container mx-auto px-6 py-4 flex justify-between items-center">
+            <div class="flex items-center gap-3">
+                <i class="fa-solid fa-leaf text-2xl text-green-300"></i>
+                <h1 class="text-2xl heading-font font-bold tracking-wide">Path of the Vaidya</h1>
             </div>
-        </div>
-        <!-- Progress Bar -->
-        <div class="w-full bg-indigo-200 h-1.5 mt-2 absolute bottom-0 left-0">
-            <div id="progressBar" class="bg-yellow-400 h-1.5 transition-all duration-300 w-0"></div>
+            <div class="text-sm font-medium bg-green-800 px-4 py-2 rounded-full border border-green-700">
+                <i class="fa-solid fa-graduation-cap mr-2"></i> Master Indian Health Sciences
+            </div>
         </div>
     </header>
 
-    <main class="flex-grow container mx-auto p-4 md:p-8 max-w-4xl flex flex-col justify-center">
+    <main class="flex-1 flex overflow-hidden container mx-auto px-4 py-6 gap-6">
         
-        <!-- Registration Screen -->
-        <div id="registrationScreen" class="bg-white rounded-xl shadow-lg p-8 text-center fade-in">
-            <h2 class="text-3xl font-bold text-indigo-700 mb-4">Student Registration</h2>
-            <p class="text-gray-600 mb-8 max-w-xl mx-auto">Please enter your details to begin the BCA IKS Assessment.</p>
-            
-            <form id="registrationForm" class="max-w-md mx-auto space-y-4">
-                <div>
-                    <label for="studentName" class="block text-left text-sm font-medium text-gray-700">Full Name</label>
-                    <input type="text" id="studentName" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-                </div>
-                <div>
-                    <label for="rollNumber" class="block text-left text-sm font-medium text-gray-700">Roll Number</label>
-                    <input type="text" id="rollNumber" required class="mt-1 block w-full px-4 py-2 border border-gray-300 rounded-md shadow-sm focus:ring-indigo-500 focus:border-indigo-500">
-                </div>
-                <button type="submit" class="w-full mt-6 bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-10 rounded-lg shadow-lg transition duration-200">Continue to Instructions</button>
-            </form>
-        </div>
+        <aside class="w-1/3 max-w-sm flex flex-col bg-white rounded-2xl shadow-lg border border-gray-100 overflow-hidden">
+            <div class="p-5 bg-green-50 border-b border-green-100">
+                <h2 class="text-xl heading-font font-bold text-green-900">Study Modules</h2>
+                <p class="text-sm text-green-700 mt-1">Unlock modules by passing AI evaluations.</p>
+            </div>
+            <div id="module-list" class="flex-1 overflow-y-auto p-4 space-y-3 custom-scrollbar">
+                <!-- Modules will be injected here via JS -->
+            </div>
+        </aside>
 
-        <!-- Start Screen -->
-        <div id="startScreen" class="hidden bg-white rounded-xl shadow-lg p-8 text-center fade-in">
-            <h2 class="text-3xl font-bold text-indigo-700 mb-4">Indian Knowledge System Test</h2>
-            <p class="text-gray-600 mb-8 max-w-2xl mx-auto">Welcome, <span id="displayStudentName" class="font-semibold"></span>! This comprehensive assessment contains 80 multiple-choice questions derived from the study guide, covering Mathematics, Astronomy (Khagola Shastra), and Philosophical Development. You have exactly <strong>60 minutes</strong> to complete the test.</p>
-            <button id="startBtn" class="bg-green-600 hover:bg-green-700 text-white font-bold py-3 px-10 rounded-full shadow-lg transition duration-200">Begin Assessment</button>
-        </div>
-        
-        <!-- Quiz Screen -->
-        <div id="quizScreen" class="hidden bg-white rounded-xl shadow-lg p-6 md:p-8 fade-in flex flex-col flex-grow">
-            <div class="flex justify-between items-center mb-6 border-b pb-4">
-                <span id="questionCounter" class="text-sm font-semibold text-gray-500 uppercase tracking-wider">Question 1 of 80</span>
-                <span id="categoryBadge" class="bg-indigo-100 text-indigo-800 text-xs font-bold px-3 py-1 rounded-full uppercase tracking-wider">Category</span>
-            </div>
+        <section class="flex-1 bg-white rounded-2xl shadow-lg border border-gray-100 flex flex-col overflow-hidden relative">
             
-            <h3 id="questionText" class="text-xl md:text-2xl font-semibold text-gray-800 mb-6"></h3>
-            
-            <div id="optionsContainer" class="space-y-3 mb-8 flex-grow">
-                <!-- Options injected here via JS -->
+            <!-- Default Empty State -->
+            <div id="empty-state" class="absolute inset-0 flex flex-col items-center justify-center text-center p-8 z-20 bg-white">
+                <div class="w-24 h-24 bg-green-100 rounded-full flex items-center justify-center mb-6">
+                    <i class="fa-solid fa-book-open text-4xl text-green-700"></i>
+                </div>
+                <h2 class="text-2xl heading-font font-bold text-gray-800 mb-2">Welcome to Ayurveda Master</h2>
+                <p class="text-gray-500 max-w-md">Select a module from the left to begin your journey. Read the original texts carefully, then test your understanding.</p>
             </div>
-            
-            <div class="flex justify-between items-center mt-auto border-t pt-4">
-                <div id="feedbackText" class="text-sm font-medium h-6 flex items-center"></div>
-                <button id="nextBtn" class="bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 disabled:cursor-not-allowed text-white font-bold py-2 px-6 rounded shadow transition duration-200" disabled>Next Question</button>
-            </div>
-        </div>
 
-        <!-- Results Screen -->
-        <div id="resultsScreen" class="hidden bg-white rounded-xl shadow-lg p-8 text-center fade-in">
-            <h2 class="text-3xl font-bold text-gray-800 mb-2">Assessment Complete!</h2>
-            <p class="text-gray-500 mb-6" id="completionStatus">Here is how you performed.</p>
-            
-            <div id="telegramStatus" class="mb-4 text-sm font-medium hidden rounded p-2"></div>
-            
-            <div class="flex justify-center items-center mb-8">
-                <div class="relative w-48 h-48">
-                    <svg class="w-full h-full transform -rotate-90" viewBox="0 0 36 36">
-                        <path class="text-gray-200 stroke-current" stroke-width="3" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                        <path id="scoreCircle" class="text-indigo-600 stroke-current" stroke-width="3" stroke-dasharray="0, 100" fill="none" d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831" />
-                    </svg>
-                    <div class="absolute inset-0 flex flex-col items-center justify-center">
-                        <span id="finalScoreText" class="text-4xl font-bold text-gray-800">0%</span>
-                        <span id="finalScoreFraction" class="text-sm text-gray-500">0 / 80</span>
+            <!-- Header of the active module -->
+            <div id="active-header" class="hidden p-6 border-b border-gray-200 bg-gray-50 flex justify-between items-center z-10">
+                <div>
+                    <span id="active-module-number" class="text-xs font-bold uppercase tracking-wider text-green-600 bg-green-100 px-2 py-1 rounded">Module 1</span>
+                    <h2 id="active-module-title" class="text-2xl heading-font font-bold text-gray-800 mt-2">Title</h2>
+                </div>
+                <div id="mode-toggle-container">
+                    <button id="btn-read" class="px-4 py-2 bg-green-700 text-white font-medium rounded-l-lg hover:bg-green-800 transition-colors no-select">Study Notes</button>
+                    <button id="btn-test" class="px-4 py-2 bg-gray-200 text-gray-700 font-medium rounded-r-lg hover:bg-gray-300 transition-colors no-select">Take Test</button>
+                </div>
+            </div>
+
+            <!-- Reading Area -->
+            <div id="reading-area" class="hidden flex-1 overflow-y-auto p-8 custom-scrollbar no-select" oncopy="return false;" oncut="return false;" onpaste="return false;">
+                <div id="study-content" class="study-content max-w-3xl mx-auto">
+                    <!-- Study material injected here -->
+                </div>
+                <div class="max-w-3xl mx-auto mt-10 text-center">
+                    <button id="btn-start-test-bottom" class="bg-green-600 hover:bg-green-700 text-white text-lg font-semibold py-3 px-8 rounded-full shadow-lg transition-transform hover:scale-105">
+                        I'm ready to test my knowledge <i class="fa-solid fa-arrow-right ml-2"></i>
+                    </button>
+                </div>
+            </div>
+
+            <!-- Testing Area -->
+            <div id="testing-area" class="hidden flex-1 overflow-y-auto p-8 custom-scrollbar bg-green-50/30 no-select">
+                <div class="max-w-3xl mx-auto">
+                    <div class="bg-white p-6 rounded-xl shadow-sm border border-green-100 mb-6">
+                        <h3 class="text-lg font-bold text-green-900 mb-2"><i class="fa-solid fa-pen-nib mr-2"></i> Your Challenge</h3>
+                        <p id="test-prompt" class="text-gray-700 text-lg leading-relaxed"></p>
+                    </div>
+                    
+                    <textarea id="student-answer" class="w-full h-64 p-5 border-2 border-green-200 rounded-xl focus:border-green-600 focus:ring-0 text-gray-800 text-lg resize-none shadow-inner" placeholder="Explain in your own words..." onpaste="return false;" ondrop="return false;"></textarea>
+                    
+                    <div class="flex justify-between items-center mt-6">
+                        <p class="text-sm text-gray-500"><i class="fa-solid fa-robot mr-1"></i> Evaluated by AI Guru</p>
+                        <button id="btn-submit" class="bg-green-700 hover:bg-green-800 text-white font-bold py-3 px-8 rounded-xl shadow-lg transition-all flex items-center">
+                            <span>Submit Answer</span>
+                            <div id="submit-spinner" class="hidden ml-3 loader" style="width: 20px; height: 20px; border-width: 3px; border-top-color: white;"></div>
+                        </button>
                     </div>
                 </div>
             </div>
 
-            <div class="grid grid-cols-2 md:grid-cols-4 gap-4 mb-8 text-left max-w-2xl mx-auto">
-                <div class="bg-green-50 p-3 rounded border border-green-100">
-                    <p class="text-xs text-green-600 font-bold uppercase">Correct</p>
-                    <p id="correctCount" class="text-xl font-bold text-green-800">0</p>
-                </div>
-                <div class="bg-red-50 p-3 rounded border border-red-100">
-                    <p class="text-xs text-red-600 font-bold uppercase">Incorrect</p>
-                    <p id="incorrectCount" class="text-xl font-bold text-red-800">0</p>
-                </div>
-                <div class="bg-gray-50 p-3 rounded border border-gray-200">
-                    <p class="text-xs text-gray-500 font-bold uppercase">Unanswered</p>
-                    <p id="unansweredCount" class="text-xl font-bold text-gray-700">0</p>
-                </div>
-                <div class="bg-indigo-50 p-3 rounded border border-indigo-100">
-                    <p class="text-xs text-indigo-600 font-bold uppercase">Time Remaining</p>
-                    <p id="timeTakenText" class="text-xl font-bold text-indigo-800">00:00</p>
+            <!-- Feedback Area -->
+            <div id="feedback-area" class="hidden flex-1 overflow-y-auto p-8 custom-scrollbar bg-gray-50">
+                <div class="max-w-3xl mx-auto">
+                    <div class="text-center mb-8">
+                        <h2 class="text-3xl heading-font font-bold text-gray-800 mb-2">Guru's Evaluation</h2>
+                        <p class="text-gray-600">Based on ancient wisdom and your understanding.</p>
+                    </div>
+
+                    <div class="bg-white rounded-2xl shadow-md overflow-hidden border border-gray-200">
+                        <div class="p-6 border-b border-gray-100 flex items-center justify-between bg-gradient-to-r from-green-50 to-emerald-50">
+                            <div>
+                                <h3 class="text-lg font-semibold text-green-900 uppercase tracking-wide">Wisdom Score</h3>
+                            </div>
+                            <div class="flex items-center">
+                                <span id="score-display" class="text-5xl font-bold text-green-700 heading-font">0</span>
+                                <span class="text-xl text-gray-400 font-bold ml-1">/ 10</span>
+                            </div>
+                        </div>
+                        
+                        <div class="p-8">
+                            <h4 class="text-sm uppercase font-bold text-gray-400 mb-3 tracking-wider">General Feedback</h4>
+                            <p id="feedback-general" class="text-lg text-gray-800 leading-relaxed mb-8 italic border-l-4 border-green-400 pl-4"></p>
+                            
+                            <h4 class="text-sm uppercase font-bold text-gray-400 mb-4 tracking-wider">Constructive Suggestions</h4>
+                            <ul id="feedback-suggestions" class="space-y-4">
+                                <!-- Suggestions injected here -->
+                            </ul>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 flex justify-center gap-4">
+                        <button id="btn-retry" class="px-6 py-3 bg-white border-2 border-gray-300 text-gray-700 font-bold rounded-xl hover:bg-gray-50 transition-colors">
+                            <i class="fa-solid fa-rotate-right mr-2"></i> Try Again
+                        </button>
+                        <button id="btn-next-module" class="hidden px-6 py-3 bg-green-700 text-white font-bold rounded-xl shadow-lg hover:bg-green-800 transition-transform hover:scale-105">
+                            Next Module <i class="fa-solid fa-arrow-right ml-2"></i>
+                        </button>
+                    </div>
                 </div>
             </div>
 
-            <div id="performanceMessage" class="text-lg font-medium mb-8 text-gray-700"></div>
-
-            <button id="restartBtn" class="bg-indigo-600 hover:bg-indigo-700 text-white font-bold py-3 px-8 rounded-full shadow transition duration-200">Take Assessment Again</button>
-        </div>
-
+        </section>
     </main>
 
     <script>
-        // The 100 Questions Database based on the provided PDFs
-        const questionsData = [
-            // Category: Mathematics & The Concept of Zero
-            { q: "Ancient Indian mathematicians treated 'zero' primarily as:", options: ["A blank placeholder", "An independent number with properties", "A symbol for infinity", "An error in calculation"], answer: 1, category: "Mathematics" },
-            { q: "Who used a symbol for zero in his early binary system?", options: ["Aryabhata", "Brahmagupta", "Pingala", "Mahavira"], answer: 2, category: "Mathematics" },
-            { q: "Which mathematician gave the first formal mathematical rules for arithmetic operations with zero?", options: ["Brahmagupta", "Aryabhata", "Bhaskaracharya II", "Varahamihira"], answer: 0, category: "Mathematics" },
-            { q: "In which text did Brahmagupta outline the rules for zero?", options: ["Aryabhatiya", "Brahmasphutasiddhanta", "Beejaganita", "Vedanga Jyotisha"], answer: 1, category: "Mathematics" },
-            { q: "In ancient Indian mathematics, the numerator of a fraction was called:", options: ["Lava or Amsa", "Hara or Cheda", "Shunya", "Varna"], answer: 0, category: "Mathematics" },
-            { q: "In ancient Indian mathematics, the denominator of a fraction was called:", options: ["Lava or Amsa", "Hara or Cheda", "Bhinna", "Kalaka"], answer: 1, category: "Mathematics" },
-            { q: "How did the ancient Indian representation of fractions differ from the modern one?", options: ["They put the denominator on top", "They did not draw a horizontal dividing line", "They used letters instead of numbers", "They only used decimals"], answer: 1, category: "Mathematics" },
-            { q: "Who added the horizontal dividing line to fractions?", options: ["Indian mathematicians", "Greek mathematicians", "Arab mathematicians", "European mathematicians"], answer: 2, category: "Mathematics" },
-            { q: "Which two mathematicians are noted for establishing step-by-step rules for operations on fractions?", options: ["Pingala and Aryabhata", "Brahmagupta and Mahavira", "Bhaskaracharya and Lagadha", "Panini and Yaska"], answer: 1, category: "Mathematics" },
-            { q: "What is the ancient Indian term for Algebra?", options: ["Bhinna", "Shunya", "Beejaganita", "Jyotisha"], answer: 2, category: "Mathematics" },
+        // EXTREMELY STRICT CONSTRAINT: Do NOT shorten the study material.
+        // Copying verbatim from "BCA IKS Study Notes_ Foundations of Ayurveda (1).pdf" 
+        // and "Descriptive Study Notes_ Ayurveda & Yoga.pdf"
+
+        const studyData = [
+            {
+                id: 1,
+                title: "Vedic Foundations & Divine Lineage",
+                prompt: "In your own words, explain the origin of Ayurveda in the Vedas, trace its divine lineage down to the earthly sages, and describe the significance of the Brihat Trayi.",
+                content: `
+                    <h3>1. VEDIC FOUNDATIONS OF AYURVEDA</h3>
+                    <p><b>Etymology:</b> The word Ayurveda is derived from two Sanskrit roots: Ayur (Life) and Veda (Knowledge/Science). It translates to "The Science of Life."</p>
+                    
+                    <p><b>Vedic Origins</b></p>
+                    <ul>
+                        <li>Ayurveda is considered an Upaveda (subsidiary or applied knowledge) of the Atharva Veda.</li>
+                        <li>However, the earliest references to medicinal plants, healing therapies, and the concept of tridosha are found in the Rig Veda.</li>
+                    </ul>
+
+                    <p><b>The Divine Lineage (Descent of Ayurveda):</b></p>
+                    <p>According to ancient texts, the knowledge flowed in this sequence:<br>
+                    Brahma (The Creator) &rarr; Daksha Prajapati &rarr; Ashwini Kumaras (Physicians of the Gods) &rarr; Lord Indra &rarr; Earthly Sages (Bharadvaja for internal medicine, Dhanvantari for surgery).</p>
+
+                    <p><b>The Brihat Trayi (The Great Triad) - Core Classical Texts:</b></p>
+                    <ul>
+                        <li><b>1. Charaka Samhita:</b> Compiled by Sage Charaka. The ultimate authority on Kayachikitsa (Internal Medicine).</li>
+                        <li><b>2. Sushruta Samhita:</b> Compiled by Sage Sushruta (known as the Father of Surgery). The foundational text for Shalya Tantra (Surgery). Details anatomical structures and surgical instruments.</li>
+                        <li><b>3. Ashtanga Hridaya:</b> Written by Vagbhata. A concise, poetic synthesis of both Charaka and Sushruta Samhitas.</li>
+                    </ul>
+
+                    <h3>Detailed Explanation (Q&A)</h3>
+                    <p><b>Q1. Explain the Vedic foundations and the lineage of Ayurveda. Discuss the significance of the Brihat Trayi.</b></p>
+                    <p><b>Answer:</b></p>
+                    <p><b>Vedic Foundations:</b> Ayurveda, meaning "The Science of Life," is deeply rooted in the Vedas. It is primarily considered an Upaveda (applied knowledge) of the Atharva Veda. However, the fundamental concepts of Ayurveda, including the use of medicinal plants, healing therapies, and the early ideas of the tridosha system, are first mentioned in the oldest Veda, the Rig Veda.</p>
+                    
+                    <p><b>Divine Lineage:</b> According to Ayurvedic tradition, this knowledge has a divine origin and was passed down in a specific sequence before reaching humanity:</p>
+                    <ul>
+                        <li>Brahma (The Creator) recalled the science of Ayurveda.</li>
+                        <li>He taught it to Daksha Prajapati.</li>
+                        <li>Prajapati passed it to the Ashwini Kumaras (the divine physicians).</li>
+                        <li>They taught it to Lord Indra.</li>
+                        <li>From Indra, the knowledge was transmitted to earthly sages. Sage Bharadvaja received the knowledge of internal medicine, while Sage Dhanvantari received the knowledge of surgery.</li>
+                    </ul>
+
+                    <p><b>The Brihat Trayi (The Great Triad):</b> These are the three foundational classical texts of Ayurveda that remain authoritative today:</p>
+                    <ul>
+                        <li><b>Charaka Samhita:</b> Compiled by Sage Charaka, this text is the definitive guide on Kayachikitsa (Internal Medicine). It focuses on diagnosing and treating systemic diseases.</li>
+                        <li><b>Sushruta Samhita:</b> Compiled by Sage Sushruta, recognized as the "Father of Surgery." This text is the foundational work for Shalya Tantra (Surgery) and provides detailed descriptions of anatomical structures, surgical procedures, and instruments.</li>
+                        <li><b>Ashtanga Hridaya:</b> Written by Vagbhata, this text is a poetic and concise synthesis of the principles found in both the Charaka and Sushruta Samhitas, making it highly accessible for study.</li>
+                    </ul>
+                `
+            },
             
-            // Category: Algebra
-            { q: "Beejaganita translates to:", options: ["Mathematics of the stars", "Mathematics of seeds/elements", "Mathematics of fractions", "Mathematics of nothingness"], answer: 1, category: "Algebra" },
-            { q: "How did Indian mathematicians creatively represent unknown variables in algebra?", options: ["Using Greek letters like Alpha", "Using names of colors like Kalaka (black)", "Using animal names", "Using shapes"], answer: 1, category: "Algebra" },
-            { q: "What does the term 'Varna' refer to in the context of Indian algebra?", options: ["Fractions", "Variables/Unknowns", "Equations", "Zero"], answer: 1, category: "Algebra" },
-            { q: "Who provided integer solutions to linear equations?", options: ["Brahmagupta", "Bhaskaracharya II", "Aryabhata", "Pingala"], answer: 2, category: "Algebra" },
-            { q: "Who gave the first explicit general formula for solving quadratic equations?", options: ["Aryabhata", "Brahmagupta", "Mahavira", "Bhaskaracharya II"], answer: 1, category: "Algebra" },
-            { q: "Which 12th-century mathematician authored the definitive text 'Beejaganita' exploring polynomial equations?", options: ["Brahmagupta", "Aryabhata", "Bhaskaracharya II", "Lagadha"], answer: 2, category: "Algebra" },
+            {
+                id: 2,
+                title: "Basic Concepts & The Three Gunas",
+                prompt: "Define Swasthya (Health) according to Sushruta, explain the twofold objective of Ayurveda, and describe the three Gunas (mental qualities) using the tech analogies provided in the text.",
+                content: `
+                    <h3>2. BASIC CONCEPTS OF AYURVEDA</h3>
+                    <p><b>The Twofold Objective of Ayurveda:</b></p>
+                    <ul>
+                        <li><b>Swasthyashya Swasthya Rakshanam:</b> To maintain the health of a healthy person (Preventive).</li>
+                        <li><b>Aturashya Vikara Prashamanam:</b> To cure the disease of a sick person (Curative).</li>
+                    </ul>
 
-            // Category: Vedanga Jyotisha
-            { q: "What is the Vedanga Jyotisha?", options: ["A text on grammar", "An auxiliary limb of the Vedas devoted to astronomy", "A text on domestic rituals", "A philosophical treatise"], answer: 1, category: "Astronomy" },
-            { q: "Who compiled the Vedanga Jyotisha?", options: ["Sage Panini", "Sage Lagadha", "Sage Yaska", "Sage Pingala"], answer: 1, category: "Astronomy" },
-            { q: "What was the primary purpose of the Vedanga Jyotisha?", options: ["Predictive astrology (horoscopes)", "Calculating precise times for Vedic sacrifices", "Navigating the oceans", "Meteorological forecasting"], answer: 1, category: "Astronomy" },
-            { q: "What is the term for the precise, auspicious time calculated for performing rituals?", options: ["Yuga", "Tithi", "Muhurta", "Nakshatra"], answer: 2, category: "Astronomy" },
-            { q: "The Vedanga Jyotisha introduced a fundamental cycle to synchronize the solar and lunar years. How long is this Yuga?", options: ["1 year", "5 years", "12 years", "60 years"], answer: 1, category: "Astronomy" },
-            { q: "How many Nakshatras (lunar mansions) are detailed in the Vedanga Jyotisha?", options: ["12", "27", "30", "365"], answer: 1, category: "Astronomy" },
-            { q: "How many Tithis (lunar days) are described in the texts?", options: ["27", "28", "29.5", "30"], answer: 3, category: "Astronomy" },
-            { q: "What is 'Adhimasa'?", options: ["A solar eclipse", "A lunar eclipse", "An intercalary (leap) month", "A falling star"], answer: 2, category: "Astronomy" },
-            { q: "Why was the Adhimasa necessary?", options: ["To align the shorter lunar year with the solar year", "To predict eclipses", "To match the 5 visible planets", "To correct the length of a day"], answer: 0, category: "Astronomy" },
+                    <p><b>Definition of Swasthya (Health):</b></p>
+                    <p>Sushruta defined health beautifully in a holistic way. Health is not just the absence of disease, but a state where:</p>
+                    <ul>
+                        <li>Doshas (biological humors) are balanced.</li>
+                        <li>Agni (metabolic/digestive fire) is functioning optimally.</li>
+                        <li>Dhatus (tissues) and Malas (waste products) are in equilibrium.</li>
+                        <li>The Soul (Atma), Senses (Indriya), and Mind (Manas) are in a state of deep bliss and clarity.</li>
+                    </ul>
 
-            // Category: Philosophical Development
-            { q: "Which texts represent the foundational stage focusing on nature worship in the Vedic corpus?", options: ["Upanishads", "Brahmanas", "Samhitas", "Aranyakas"], answer: 2, category: "Philosophy" },
-            { q: "The concept of 'Rita' introduced in the Samhitas refers to:", options: ["A specific ritual fire", "The physical and moral cosmic order", "The individual soul", "Liberation"], answer: 1, category: "Philosophy" },
-            { q: "The famous Nasadiya Sukta (Creation Hymn) is found in which Veda?", options: ["Atharva Veda", "Sama Veda", "Yajur Veda", "Rig Veda"], answer: 3, category: "Philosophy" },
-            { q: "The 'Brahmanas' stage of Vedic philosophy shifted focus to:", options: ["Internal meditation", "The mechanics of Yajna (sacrificial rituals)", "Nature worship", "Grammar"], answer: 1, category: "Philosophy" },
-            { q: "Which text details complex rules for constructing fire altars as a microcosm of the universe?", options: ["Chandogya Upanishad", "Rig Veda", "Shatapatha Brahmana", "Vedanga Jyotisha"], answer: 2, category: "Philosophy" },
-            { q: "The Aranyakas are also known as:", options: ["Forest Treatises", "Fire Manuals", "Grammar Books", "Star Charts"], answer: 0, category: "Philosophy" },
-            { q: "What do the Aranyakas act as a bridge between?", options: ["Grammar and Poetry", "External materialistic rituals and internal symbolic meditation", "Solar and Lunar calendars", "Mathematics and Astronomy"], answer: 1, category: "Philosophy" },
-            { q: "What is 'Prana-agnihotra'?", options: ["A type of physical fire altar", "Offering breath into the internal fire through meditation", "A solar eclipse ritual", "A mathematical equation"], answer: 1, category: "Philosophy" },
-            { q: "Which texts represent the philosophical climax (Vedanta) of the Vedic corpus?", options: ["Samhitas", "Brahmanas", "Aranyakas", "Upanishads"], answer: 3, category: "Philosophy" },
-            { q: "The Upanishads completely shift the focus to:", options: ["Karma (Action)", "Yajna (Ritual)", "Jnana (Knowledge)", "Bhakti (Devotion)"], answer: 2, category: "Philosophy" },
-            { q: "In Vedanta, the universal supreme reality is called:", options: ["Atman", "Brahman", "Moksha", "Rita"], answer: 1, category: "Philosophy" },
-            { q: "The Mahavakya 'Tat Tvam Asi' (Thou art That) is found in which Upanishad?", options: ["Katha", "Isha", "Chandogya", "Mundaka"], answer: 2, category: "Philosophy" },
+                    <h3>3. THE THREE GUNAS (MENTAL QUALITIES / STATES OF MIND)</h3>
+                    <p>The mind (Manas) operates under the influence of three fundamental energies known as Gunas.</p>
+                    
+                    <ul>
+                        <li><b>Sattva (Purity, Clarity, Light):</b>
+                            <ul>
+                                <li>Characteristics: Truth, compassion, knowledge, balance, and peace.</li>
+                                <li>Tech Analogy: Clean, optimized, bug-free code running smoothly.</li>
+                            </ul>
+                        </li>
+                        <li><b>Rajas (Activity, Passion, Movement):</b>
+                            <ul>
+                                <li>Characteristics: Ambition, restlessness, desire, aggression, and stress.</li>
+                                <li>Tech Analogy: High CPU utilization, background processes running on overdrive, leading to overheating.</li>
+                            </ul>
+                        </li>
+                        <li><b>Tamas (Inertia, Darkness, Ignorance):</b>
+                            <ul>
+                                <li>Characteristics: Lethargy, dullness, laziness, delusion, and sleep.</li>
+                                <li>Tech Analogy: System lag, unresponsiveness, or a frozen application.</li>
+                            </ul>
+                        </li>
+                    </ul>
+                    <p>Sattva is the ideal state for mental health, while Rajas and Tamas are considered Manasa Doshas (mental impurities) when out of balance.</p>
 
-            // Category: Inter-relationship of Disciplines
-            { q: "In ancient India, mathematics primarily evolved to serve the needs of which discipline?", options: ["Architecture", "Astronomy", "Medicine", "Linguistics"], answer: 1, category: "IKS Integration" },
-            { q: "Which mathematical concept was developed to calculate planetary orbits and spherical geometry?", options: ["Binary system", "Trigonometry", "Algebraic variables", "Fractions"], answer: 1, category: "IKS Integration" },
-            { q: "Ayurvedic health routines are dictated by:", options: ["Random selection", "Only the patient's age", "Solar and lunar cycles studied in astronomy", "The alignment of the 5 visible planets only"], answer: 2, category: "IKS Integration" },
-            { q: "Daily routines in Ayurveda are called:", options: ["Ritucharya", "Dinacharya", "Panchanga", "Muhurta"], answer: 1, category: "IKS Integration" },
-            { q: "According to IKS, lunar cycles were believed to affect:", options: ["Only the tides", "The sap and medicinal properties of plants", "The grammar of chants", "The construction of altars"], answer: 1, category: "IKS Integration" },
-            { q: "Diagnosing ailments through pulse reading (Nadi Pariksha) is fundamentally an observation of:", options: ["The patient's breath", "The alignment of stars at birth", "The body's cardiovascular rhythm (mathematical observation)", "The temperature of the skin"], answer: 2, category: "IKS Integration" },
+                    <h3>Detailed Explanation (Q&A)</h3>
+                    <p><b>Q2. Define Swasthya (Health) according to Ayurveda and explain its twofold objective. How does it differ from the modern allopathic approach?</b></p>
+                    <p><b>Answer:</b></p>
+                    <p><b>The Twofold Objective of Ayurveda:</b><br>
+                    Ayurveda is not merely a system for curing illness; it is a comprehensive lifestyle science with two main goals:</p>
+                    <ul>
+                        <li><b>Swasthyashya Swasthya Rakshanam:</b> To preserve and maintain the health of a healthy individual (Preventive care).</li>
+                        <li><b>Aturashya Vikara Prashamanam:</b> To cure the disease of a sick individual (Curative care).</li>
+                    </ul>
 
-            // Category: Relevance Today
-            { q: "Pingala's Chanda Shastra is relevant to modern computing because it introduced:", options: ["The earliest known binary numeral system", "The concept of zero", "Silicon chips", "Algebraic algorithms"], answer: 0, category: "Modern Relevance" },
-            { q: "Panini's Ashtadhyayi is heavily studied today for advancements in:", options: ["Astrophysics", "Natural Language Processing (NLP)", "Civil Engineering", "Cardiology"], answer: 1, category: "Modern Relevance" },
-            { q: "How does Ayurveda differ from typical modern medicine approaches?", options: ["It only uses surgery", "It focuses on root causes and preventive personalized health", "It ignores the environment", "It relies entirely on astrology"], answer: 1, category: "Modern Relevance" },
-            { q: "Ancient civil engineering of the Indus Valley and Vastu Shastra principles are relevant today for:", options: ["Developing new programming languages", "Space exploration", "Sustainable architecture and urban planning", "Creating new pharmaceutical drugs"], answer: 2, category: "Modern Relevance" },
-            { q: "The principle of doing one's duty without attachment to outcomes, useful in modern stress management, is called:", options: ["Nishkama Karma", "Prana-agnihotra", "Dinacharya", "Tat Tvam Asi"], answer: 0, category: "Modern Relevance" },
+                    <p><b>Definition of Swasthya (Health):</b><br>
+                    The Ayurvedic definition of health, as articulated by Sage Sushruta, is profoundly holistic. Health is not just the absence of physical disease. True Swasthya is a state of dynamic balance characterized by:</p>
+                    <ul>
+                        <li>Equilibrium of the biological humors (Doshas).</li>
+                        <li>Optimal functioning of the digestive and metabolic fire (Agni).</li>
+                        <li>Proper formation and balance of bodily tissues (Dhatus).</li>
+                        <li>Efficient elimination of waste products (Malas).</li>
+                    </ul>
+                    <p>Crucially, it also requires a state of profound bliss and clarity in the Soul (Atma), Senses (Indriya), and Mind (Manas).</p>
 
-            // Category: Six Vedangas
-            { q: "The term 'Vedanga' translates to:", options: ["Heart of the Vedas", "Limbs of the Vedas", "End of the Vedas", "Summary of the Vedas"], answer: 1, category: "Vedangas" },
-            { q: "While Vedas are Shruti (divine revelation), Vedangas are considered:", options: ["Also Shruti", "Smriti (human-authored traditions)", "Upanishads", "Puranas"], answer: 1, category: "Vedangas" },
-            { q: "Which Vedanga represents the 'Nose' of the Veda Purusha?", options: ["Kalpa", "Shiksha", "Nirukta", "Chhanda"], answer: 1, category: "Vedangas" },
-            { q: "What is the purpose of Shiksha?", options: ["Grammar rules", "Exact pronunciation, accent, and intonation", "Etymology", "Ritual instructions"], answer: 1, category: "Vedangas" },
-            { q: "Which Vedanga represents the 'Arms' of the Veda Purusha and acts as a manual for action?", options: ["Kalpa", "Vyakarana", "Jyotisha", "Shiksha"], answer: 0, category: "Vedangas" },
-            { q: "Which Kalpa Sutra provides complex geometric rules for constructing fire altars?", options: ["Shrauta Sutras", "Grihya Sutras", "Dharma Sutras", "Shulba Sutras"], answer: 3, category: "Vedangas" },
-            { q: "Vyakarana (Grammar) represents which part of the Veda Purusha?", options: ["Eyes", "Ears", "Mouth", "Feet"], answer: 2, category: "Vedangas" },
-            { q: "Sage Panini's Ashtadhyayi contains exactly how many algebraic-like rules of grammar?", options: ["1,008", "3,959", "10,000", "365"], answer: 1, category: "Vedangas" },
-            { q: "Which Vedanga is the science of etymology, acting as the 'Ears'?", options: ["Nirukta", "Chhanda", "Kalpa", "Jyotisha"], answer: 0, category: "Vedangas" },
-            { q: "Who authored the famous text Nirukta?", options: ["Panini", "Pingala", "Yaska", "Lagadha"], answer: 2, category: "Vedangas" },
-            { q: "Chhanda defines the poetic meter and represents the ______ of the Veda Purusha.", options: ["Arms", "Mouth", "Nose", "Feet"], answer: 3, category: "Vedangas" },
-            { q: "The famous Gayatri meter contains how many syllables?", options: ["12", "24", "36", "44"], answer: 1, category: "Vedangas" },
-            { q: "Jyotisha (Astronomy) represents which part of the Veda Purusha?", options: ["Eyes", "Ears", "Nose", "Mouth"], answer: 0, category: "Vedangas" },
+                    <p><b>Difference from Modern Allopathy (with a Tech Analogy):</b><br>
+                    Modern allopathic medicine often adopts a reductionist and reactive approach-it targets specific symptoms or isolated pathogens after a disease has manifested. In a technological context, this is akin to "patching a software bug" only after the system crashes or throws an error.</p>
+                    <p>Ayurveda, conversely, is holistic and proactive. It treats the individual as a complete, integrated system (mind, body, spirit). It seeks the root cause of imbalance rather than just suppressing symptoms. In tech terms, Ayurveda is like "proactive system administration"-continuously optimizing the server load, clearing the cache, and ensuring perfect synergy between hardware (body) and software (mind) to prevent the system from crashing in the first place.</p>
+                `
+            },
 
-            // Category: Khagola Shastra - Basics
-            { q: "Khagola Shastra refers to the ancient Indian science of:", options: ["Medicine", "Grammar", "The Firmament/Astronomy", "Architecture"], answer: 2, category: "Khagola Shastra" },
-            { q: "What method was primarily used for tracking celestial bodies in ancient Khagola Shastra?", options: ["Radio telescopes", "Naked-eye observation", "Optical telescopes", "Satellite imaging"], answer: 1, category: "Khagola Shastra" },
-            { q: "How many verses are in the Rigveda Recension of the Vedanga Jyotisha?", options: ["36", "43", "108", "360"], answer: 0, category: "Khagola Shastra" },
-            { q: "How many verses are in the Yajurveda Recension of the Vedanga Jyotisha?", options: ["36", "43", "108", "360"], answer: 1, category: "Khagola Shastra" },
-            { q: "Besides Yajna (timing rituals), why else did ancient Indians track the stars?", options: ["Only for philosophical reasons", "Krishi (Agriculture) and Kala (Civic Calendar)", "To predict personal fortunes only", "To navigate trade routes to Europe"], answer: 1, category: "Khagola Shastra" },
-            { q: "In Indian astronomy, Time (Kala) is considered:", options: ["An illusion", "A fundamental property of the cosmos defined by celestial motion", "Only relevant on Earth", "Unmeasurable"], answer: 1, category: "Khagola Shastra" },
+            {
+                id: 3,
+                title: "Pancha-Mahabhuta & Tridosha",
+                prompt: "Detail the five great elements (Pancha-Mahabhuta) and their corresponding human senses. Then, explain how they combine to form the Three Doshas (Vata, Pitta, Kapha) and describe the principle, location, and functions of each.",
+                content: `
+                    <h3>4. PANCHA-MAHABHUTA (THE FIVE GREAT ELEMENTS)</h3>
+                    <p>Everything in the physical universe is composed of five basic elements. Each element is linked to a specific human sense (Tanmatra).</p>
+                    <ul>
+                        <li><b>Akasha (Space/Ether):</b>
+                            <ul>
+                                <li>Attribute: Sound (Shabda). Emptiness, resistance-free.</li>
+                                <li>In the body: Hollow cavities, mouth, empty space in cells.</li>
+                            </ul>
+                        </li>
+                        <li><b>Vayu (Air):</b>
+                            <ul>
+                                <li>Attribute: Touch (Sparsha). Movement, dynamic force.</li>
+                                <li>In the body: Breathing, nerve impulses, muscle movements.</li>
+                            </ul>
+                        </li>
+                        <li><b>Agni (Fire):</b>
+                            <ul>
+                                <li>Attribute: Form/Vision (Rupa). Heat, transformation, light.</li>
+                                <li>In the body: Digestion, metabolism, body temperature, visual perception.</li>
+                            </ul>
+                        </li>
+                        <li><b>Jala (Water):</b>
+                            <ul>
+                                <li>Attribute: Taste (Rasa). Cohesion, fluidity, lubrication.</li>
+                                <li>In the body: Blood plasma, saliva, digestive juices, cerebrospinal fluid.</li>
+                            </ul>
+                        </li>
+                        <li><b>Prithvi (Earth):</b>
+                            <ul>
+                                <li>Attribute: Smell (Gandha). Solidity, mass, stability.</li>
+                                <li>In the body: Bones, teeth, muscles, solid tissues.</li>
+                            </ul>
+                        </li>
+                    </ul>
 
-            // Category: Khagola Shastra - Sun & Year
-            { q: "In Khagola Shastra, what is referred to as the 'Soul of the Universe'?", options: ["The Moon", "The Earth", "Surya (The Sun)", "Jupiter"], answer: 2, category: "Khagola Shastra" },
-            { q: "A 'Savana Day' is defined as the period from:", options: ["Midnight to Midnight", "Sunset to Sunset", "Sunrise to Sunrise", "Noon to Noon"], answer: 2, category: "Khagola Shastra" },
-            { q: "The northern drift of the Sun (from winter solstice to summer solstice) is called:", options: ["Dakshinayana", "Uttarayana", "Equinox", "Adhimasa"], answer: 1, category: "Khagola Shastra" },
-            { q: "The southern drift of the Sun (from summer solstice to winter solstice) is called:", options: ["Dakshinayana", "Uttarayana", "Yuga", "Graha"], answer: 0, category: "Khagola Shastra" },
-            { q: "Uttarayana is generally associated with:", options: ["Shorter days", "Longer days and light", "Lunar eclipses", "Monsoon season"], answer: 1, category: "Khagola Shastra" },
-            { q: "Dakshinayana is generally associated with:", options: ["Longer days", "Solar eclipses", "Shorter days", "The harvest festival"], answer: 2, category: "Khagola Shastra" },
+                    <h3>5. THE THREE DOSHAS (TRIDOSHA SIDDHANTA)</h3>
+                    <p>The Pancha-Mahabhutas combine to form three biological humors (Doshas) that govern all bodily functions.</p>
+                    
+                    <p><b>1. Vata Dosha (Akasha + Vayu)</b></p>
+                    <ul>
+                        <li>Principle: Energy of Movement.</li>
+                        <li>Primary Location: Colon, pelvic region, thighs, bones.</li>
+                        <li>Functions: Controls breathing, blinking, muscle movement, heartbeat, and nerve impulses (The body's network routing).</li>
+                        <li>Symptoms of Imbalance: Dry skin, constipation, anxiety, joint pain, insomnia.</li>
+                    </ul>
 
-            // Category: Khagola Shastra - Moon & Calendar
-            { q: "Who/what is referred to as 'The Timekeeper' due to its rapid movement?", options: ["Surya (Sun)", "Chandra (Moon)", "Shani (Saturn)", "Mangala (Mars)"], answer: 1, category: "Khagola Shastra" },
-            { q: "A Synodic Month is the duration from:", options: ["New moon to first quarter", "Full moon to full moon", "Sunrise to sunset", "Winter to summer solstice"], answer: 1, category: "Khagola Shastra" },
-            { q: "Approximately how many days are in a Synodic Month?", options: ["27.3 days", "28 days", "29.5 days", "30 days"], answer: 2, category: "Khagola Shastra" },
-            { q: "To synchronize the lunar and solar calendars over a 5-year Yuga, how many Adhika Masas (intercalary months) are added?", options: ["1", "2", "5", "7"], answer: 1, category: "Khagola Shastra" },
-            { q: "The ecliptic is mapped into how many divisions known as Lunar Mansions (Nakshatras)?", options: ["12", "27", "30", "360"], answer: 1, category: "Khagola Shastra" },
-            { q: "Each Nakshatra represents roughly how many degrees of the sky?", options: ["10°", "13° 20'", "15°", "30°"], answer: 1, category: "Khagola Shastra" },
-            { q: "The span of one Nakshatra corresponds to the distance the Moon travels in:", options: ["One solar day", "One week", "One lunar month", "One year"], answer: 0, category: "Khagola Shastra" }
+                    <p><b>2. Pitta Dosha (Agni + Jala)</b></p>
+                    <ul>
+                        <li>Principle: Energy of Transformation and Metabolism.</li>
+                        <li>Primary Location: Small intestine, stomach, blood, eyes.</li>
+                        <li>Functions: Digestion, absorption, body temperature regulation, intelligence, and understanding (The body's CPU and power supply).</li>
+                        <li>Symptoms of Imbalance: Inflammation, acidity, ulcers, anger, skin rashes.</li>
+                    </ul>
+
+                    <p><b>3. Kapha Dosha (Prithvi + Jala)</b></p>
+                    <ul>
+                        <li>Principle: Energy of Structure and Lubrication.</li>
+                        <li>Primary Location: Chest, lungs, throat, head, joints.</li>
+                        <li>Functions: Provides physical structure, hydrates cells, lubricates joints, maintains immunity (The body's physical hardware and cooling system).</li>
+                        <li>Symptoms of Imbalance: Weight gain, lethargy, congestion, mucus buildup, attachment/greed.</li>
+                    </ul>
+
+                    <h3>Detailed Explanation (Q&A)</h3>
+                    <p><b>Q3. Describe the concept of Pancha-Mahabhuta. How do these elements relate to the Tridosha Siddhanta (Three Doshas)?</b></p>
+                    <p><b>Answer:</b></p>
+                    <p><b>Pancha-Mahabhuta (The Five Great Elements):</b><br>
+                    Ayurvedic philosophy asserts that everything in the physical universe, including the human body, is composed of five fundamental elements. These are the basic building blocks of existence, each associated with a specific human sense (Tanmatra):</p>
+                    <ul>
+                        <li><b>Akasha (Space/Ether):</b> Characterized by emptiness and lack of resistance. It relates to sound and is present in hollow body cavities (e.g., mouth, empty space within cells).</li>
+                        <li><b>Vayu (Air):</b> Represents dynamic movement and force. It relates to touch and governs processes like breathing, nerve impulses, and muscle movements.</li>
+                        <li><b>Agni (Fire):</b> The principle of transformation, heat, and light. It relates to vision/form and governs digestion, metabolism, and body temperature.</li>
+                        <li><b>Jala (Water):</b> Represents cohesion, fluidity, and lubrication. It relates to taste and manifests in bodily fluids like blood plasma, saliva, and digestive juices.</li>
+                        <li><b>Prithvi (Earth):</b> Represents solidity, mass, and stability. It relates to smell and forms the solid structures of the body like bones, teeth, and tissues.</li>
+                    </ul>
+
+                    <p><b>Relationship to Tridosha Siddhanta:</b><br>
+                    The five elements do not exist in isolation in the living body; they combine to form three dynamic biological humors known as Doshas. These Doshas govern all physiological and psychological functions. Every individual has a unique baseline combination of these three (their Prakriti).</p>
+                    <ul>
+                        <li><b>Vata Dosha:</b> Formed by Akasha (Space) + Vayu (Air). It is the principle of movement, controlling the nervous system and circulation (like the body's network routing).</li>
+                        <li><b>Pitta Dosha:</b> Formed by Agni (Fire) + Jala (Water). It is the principle of transformation, controlling digestion and metabolism (like the body's CPU and power supply).</li>
+                        <li><b>Kapha Dosha:</b> Formed by Prithvi (Earth) + Jala (Water). It is the principle of structure and lubrication, providing physical form and immunity (like the body's hardware casing and cooling system).</li>
+                    </ul>
+                `
+            },
+
+            {
+                id: 4,
+                title: "Sapta-Dhatu & Ojas",
+                prompt: "List and explain the functions of the seven tissues (Sapta-Dhatu) in the sequential order they are nourished. Finally, define 'Ojas' and explain its significance using the tech analogy.",
+                content: `
+                    <h3>6. SAPTA-DHATU (THE SEVEN TISSUES)</h3>
+                    <p>Ayurveda identifies seven basic tissues that make up the human body. They are nourished sequentially-food creates Rasa, which creates Rakta, and so on.</p>
+                    
+                    <ul>
+                        <li><b>Rasa (Plasma/Chyle):</b> The nutrient fluid derived directly from digested food. Nourishes all tissues.</li>
+                        <li><b>Rakta (Blood):</b> Carries oxygen and the vital life force (Prana). Governed by Pitta.</li>
+                        <li><b>Mamsa (Muscle):</b> Provides physical strength, movement, and covers internal organs.</li>
+                        <li><b>Meda (Fat/Adipose):</b> Provides lubrication, stores energy, and insulates body heat.</li>
+                        <li><b>Asthi (Bone & Cartilage):</b> Provides structural framework and supports the body.</li>
+                        <li><b>Majja (Bone Marrow & Nerve Tissue):</b> Fills the bone cavities, responsible for nerve conduction and creating blood cells.</li>
+                        <li><b>Shukra / Artava (Reproductive Tissue):</b> The deepest tissue. Responsible for reproduction and cellular regeneration.</li>
+                    </ul>
+
+                    <p><b>Ojas (The Ultimate Essence):</b> The final, most refined product of the Sapta-Dhatu metabolic process is Ojas. It represents absolute immunity, vitality, and strength.</p>
+
+                    <h3>Detailed Explanation (Q&A)</h3>
+                    <p><b>Q4. Elaborate on the Sapta-Dhatu (Seven Tissues) concept in Ayurveda and explain the significance of Ojas.</b></p>
+                    <p><b>Answer:</b></p>
+                    <p><b>Sapta-Dhatu (The Seven Tissues):</b><br>
+                    Ayurveda identifies seven fundamental tissue layers (Dhatus) that construct and sustain the physical body. A key concept is that these tissues are nourished sequentially; the digestive process creates a nutrient fluid that feeds the first Dhatu, which in turn metabolizes to feed the second, and so on.</p>
+                    
+                    <ul>
+                        <li><b>Rasa (Plasma/Chyle):</b> The primary nutrient fluid derived directly from digested food. Its main function is to nourish all subsequent tissues.</li>
+                        <li><b>Rakta (Blood):</b> Formed from Rasa, Rakta carries oxygen and the vital life force (Prana) throughout the body. It is governed by Pitta.</li>
+                        <li><b>Mamsa (Muscle):</b> Provides physical strength, enables movement, and acts as a covering for internal organs.</li>
+                        <li><b>Meda (Fat/Adipose Tissue):</b> Provides essential lubrication, serves as an energy reserve, and insulates the body to maintain heat.</li>
+                        <li><b>Asthi (Bone & Cartilage):</b> Provides the structural framework and support for the body.</li>
+                        <li><b>Majja (Bone Marrow & Nerve Tissue):</b> Fills the cavities of the bones and is responsible for nerve conduction and the creation of blood cells.</li>
+                        <li><b>Shukra / Artava (Reproductive Tissue):</b> The deepest and most refined tissue, responsible for human reproduction and cellular regeneration.</li>
+                    </ul>
+
+                    <p><b>The Significance of Ojas:</b><br>
+                    When the metabolic process through all seven Dhatus is functioning perfectly, it yields a final, ultra-refined essence called Ojas. Ojas is not a physical tissue itself, but a vital energy. It represents a person's absolute immunity, inner vitality, physical strength, and radiant health. If the Dhatus are considered the various "software modules" and "hardware components" of the body, Ojas is the resulting state of flawless system security, optimized performance, and perfect user experience. Depletion of Ojas leads to vulnerability to disease, while abundant Ojas ensures resilience and longevity.</p>
+                `
+            },
+
+            {
+                id: 5,
+                title: "The Six Rasas (Tastes)",
+                prompt: "Name all Six Rasas. Choose three of them and detail their elemental composition, their effect on the Tridoshas (what they pacify/aggravate), and their physical effects in moderation vs excess.",
+                content: `
+                    <h3>Q1: Explain in detail the concept of the Six Rasas in Ayurveda and their relationship with the Tridoshas.</h3>
+                    <p><b>Descriptive Answer</b></p>
+                    <p>In the Ayurvedic system of medicine, the concept of Rasa encompasses not just the physical taste of a substance on the tongue, but its entire biochemical and energetic essence. Rasa represents the first point of contact between food, the sensory organs, and human consciousness. Ayurveda postulates that the entire universe, including the food we eat and the human body, is composed of the Panchamahabhuta (the Five Great Elements): Akasha (Space/Ether), Vayu (Air), Agni (Fire), Jala (Water), and Prithvi (Earth). The Six Rasas (Shad Rasa) are born from specific combinations of these elements and have a direct, profound impact on the Tridoshas (Vata, Pitta, and Kapha).</p>
+
+                    <p><b>1. Madhura (Sweet Taste)</b></p>
+                    <ul>
+                        <li>Elemental Composition: Earth + Water</li>
+                        <li>Relation to Doshas: Heavy, cooling, and unctuous. It severely pacifies Vata and Pitta but greatly aggravates Kapha.</li>
+                        <li>Effects: In moderation, it promotes tissue growth (Ojas), longevity, and strength. It is nourishing for all seven dhatus (bodily tissues). However, excess consumption leads to Kapha disorders like obesity, diabetes (prameha), lethargy, and congestion.</li>
+                    </ul>
+
+                    <p><b>2. Amla (Sour Taste)</b></p>
+                    <ul>
+                        <li>Elemental Composition: Earth + Fire</li>
+                        <li>Relation to Doshas: Liquid, light, heating, and unctuous. It pacifies Vata but aggravates Pitta and Kapha.</li>
+                        <li>Effects: It stimulates Agni (digestive fire), enhances appetite, and sharpens the mind. Excess usage leads to Pitta imbalances such as hyperacidity, inflammation, ulcers, and toxic blood conditions.</li>
+                    </ul>
+
+                    <p><b>3. Lavana (Salty Taste)</b></p>
+                    <ul>
+                        <li>Elemental Composition: Water + Fire</li>
+                        <li>Relation to Doshas: Heavy, heating, and unctuous. It balances Vata but aggravates Pitta and Kapha.</li>
+                        <li>Effects: It acts as a mild laxative, antispasmodic, and helps in maintaining water-electrolyte balance. Excessive intake causes premature wrinkling, graying of hair, hypertension, and fluid retention.</li>
+                    </ul>
+
+                    <p><b>4. Katu (Pungent/Spicy Taste)</b></p>
+                    <ul>
+                        <li>Elemental Composition: Fire + Air</li>
+                        <li>Relation to Doshas: Light, heating, and drying. It highly pacifies Kapha but severely aggravates Pitta and Vata.</li>
+                        <li>Effects: Clears sinuses, promotes sweating, and eradicates fat and sluggishness. Overconsumption leads to severe Pitta aggravation (burning sensations, thirst) and Vata aggravation (dryness, tremors, nervous system depletion).</li>
+                    </ul>
+
+                    <p><b>5. Tikta (Bitter Taste)</b></p>
+                    <ul>
+                        <li>Elemental Composition: Air + Space</li>
+                        <li>Relation to Doshas: Light, cooling, and dry. It pacifies Pitta and Kapha but aggravates Vata.</li>
+                        <li>Effects: It is considered the best purifying and detoxifying taste. It cleanses the liver, kills bacteria, and reduces fever. However, excess bitterness depletes tissues and causes Vata disorders like extreme dryness and neurological issues.</li>
+                    </ul>
+
+                    <p><b>6. Kashaya (Astringent Taste)</b></p>
+                    <ul>
+                        <li>Elemental Composition: Air + Earth</li>
+                        <li>Relation to Doshas: Heavy, cooling, and dry. It balances Pitta and Kapha but aggravates Vata.</li>
+                        <li>Effects: Known for its contracting, drying, and firming properties. It helps in healing wounds and stopping bleeding. Excess consumption causes severe constipation, flatulence, and Vata-induced systemic dryness.</li>
+                    </ul>
+
+                    <h3>Summary of the Six Rasas</h3>
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full bg-white border border-gray-300">
+                            <thead>
+                                <tr class="bg-gray-100">
+                                    <th class="py-2 px-4 border">Rasa (Taste)</th>
+                                    <th class="py-2 px-4 border">Elements</th>
+                                    <th class="py-2 px-4 border">Primary Attributes</th>
+                                    <th class="py-2 px-4 border">Effect on Vata</th>
+                                    <th class="py-2 px-4 border">Effect on Pitta</th>
+                                    <th class="py-2 px-4 border">Effect on Kapha</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr><td class="py-2 px-4 border">Madhura (Sweet)</td><td class="py-2 px-4 border">Earth + Water</td><td class="py-2 px-4 border">Heavy, Cooling, Unctuous</td><td class="py-2 px-4 border">Pacifies</td><td class="py-2 px-4 border">Pacifies</td><td class="py-2 px-4 border">Aggravates</td></tr>
+                                <tr><td class="py-2 px-4 border">Amla (Sour)</td><td class="py-2 px-4 border">Earth + Fire</td><td class="py-2 px-4 border">Light, Heating, Unctuous</td><td class="py-2 px-4 border">Pacifies</td><td class="py-2 px-4 border">Aggravates</td><td class="py-2 px-4 border">Aggravates</td></tr>
+                                <tr><td class="py-2 px-4 border">Lavana (Salty)</td><td class="py-2 px-4 border">Water + Fire</td><td class="py-2 px-4 border">Heavy, Heating, Unctuous</td><td class="py-2 px-4 border">Pacifies</td><td class="py-2 px-4 border">Aggravates</td><td class="py-2 px-4 border">Aggravates</td></tr>
+                                <tr><td class="py-2 px-4 border">Katu (Pungent)</td><td class="py-2 px-4 border">Fire + Air</td><td class="py-2 px-4 border">Light, Heating, Dry</td><td class="py-2 px-4 border">Aggravates</td><td class="py-2 px-4 border">Aggravates</td><td class="py-2 px-4 border">Pacifies</td></tr>
+                                <tr><td class="py-2 px-4 border">Tikta (Bitter)</td><td class="py-2 px-4 border">Air + Space</td><td class="py-2 px-4 border">Light, Cooling, Dry</td><td class="py-2 px-4 border">Aggravates</td><td class="py-2 px-4 border">Pacifies</td><td class="py-2 px-4 border">Pacifies</td></tr>
+                                <tr><td class="py-2 px-4 border">Kashaya (Astringent)</td><td class="py-2 px-4 border">Air + Earth</td><td class="py-2 px-4 border">Heavy, Cooling, Dry</td><td class="py-2 px-4 border">Aggravates</td><td class="py-2 px-4 border">Pacifies</td><td class="py-2 px-4 border">Pacifies</td></tr>
+                            </tbody>
+                        </table>
+                    </div>
+                    <p class="mt-4"><b>Conclusion:</b> For optimal health, Ayurveda recommends a holistic diet encompassing all six tastes in varying proportions based on an individual's constitution and the season, ensuring the Tridoshas remain in perfect equilibrium.</p>
+                `
+            },
+
+            {
+                id: 6,
+                title: "Etiology (Cause of Diseases)",
+                prompt: "Identify and thoroughly explain the Trividha Hetu (Threefold Causes) of disease in Ayurveda. Also, briefly describe the mechanism of disease manifestation (Samprapti) involving Agni and Ama.",
+                content: `
+                    <h3>Q2: Critically analyze the Ayurvedic view of the cause of diseases (Etiology/Nidana).</h3>
+                    <p><b>Descriptive Answer</b></p>
+                    <p>Unlike modern allopathic medicine, which primarily focuses on external pathogens, the Ayurvedic paradigm views disease (Vyadhi) as a state of systemic imbalance. Health (Swasthya) is defined as the perfect equilibrium of the Doshas (humors), Agni (metabolic fire), Dhatus (tissues), and Malas (waste products).</p>
+                    
+                    <p>Ayurveda categorizes the root causes of all diseases into three primary macro-categories, collectively known as the Trividha Hetu (Threefold Causes):</p>
+
+                    <p><b>1. Asatmendriyartha Samyoga (Improper Contact of Senses with Objects)</b></p>
+                    <p>This refers to the unwholesome conjunction of the five sense organs with their respective objects. It occurs in three ways:</p>
+                    <ul>
+                        <li><b>Atiyoga (Excessive utilization):</b> e.g., Staring at extremely bright screens for hours causing eye strain.</li>
+                        <li><b>Ayoga (Non-utilization):</b> e.g., Complete sensory deprivation or lack of physical movement.</li>
+                        <li><b>Mithyayoga (Wrong utilization):</b> e.g., Listening to deafening, harsh noises or consuming incompatible food combinations.</li>
+                    </ul>
+
+                    <p><b>2. Prajnaparadha (Crimes Against Wisdom / Intellectual Blasphemy)</b></p>
+                    <p>This is considered the most fundamental cause of disease. It occurs when a person's intellect (Dhi), retention (Dhriti), and memory (Smriti) are impaired, leading them to indulge in harmful actions despite knowing they are detrimental.</p>
+                    <p>Examples include ignoring natural urges (like sleep, hunger, or urination), indulging in extreme anger or greed, or eating unhealthy junk food out of temptation. It disrupts mental harmony, which directly vitiates the physical Doshas.</p>
+
+                    <p><b>3. Parinama (Time or Seasonal Variations)</b></p>
+                    <p>Also known as Kala, this relates to the natural transformations brought about by time, aging, and seasons. Disease manifests when a person fails to adapt to the changing seasons (Ritucharya). Just as specific seasons naturally accumulate certain Doshas, failing to adjust one's diet and lifestyle accordingly leads to seasonal illnesses.</p>
+
+                    <p><b>The Mechanism of Disease Manifestation (Samprapti)</b></p>
+                    <p>When the above three factors occur, they weaken the Agni (digestive and metabolic fire). Weak Agni fails to properly digest food, leading to the formation of Ama (a toxic, sticky, undigested metabolic byproduct).</p>
+                    <p>This Ama mixes with the aggravated Doshas (Vata, Pitta, Kapha), travels through the Srotas (bodily channels), and lodges in weak tissues. This localization disrupts normal cellular function, ultimately manifesting as a full-blown clinical disease.</p>
+                `
+            },
+
+            {
+                id: 7,
+                title: "Dinacharya (Daily Regimen)",
+                prompt: "List the sequence of activities in the Daily Dinacharya Flow. Pick three of the key components (e.g., Brahma Muhurta, Abhyanga, Snana) and describe their specific benefits according to Ayurveda.",
+                content: `
+                    <h3>Q3: Provide a detailed account of 'Dinacharya' (Daily Regimen) as prescribed in Ayurveda for the maintenance of good health.</h3>
+                    <p><b>Descriptive Answer</b></p>
+                    <p>Dinacharya is a Sanskrit term derived from Dina (day) and Charya (regimen or routine). It is a highly structured, scientifically designed sequence of daily activities meant to synchronize human biological clocks with nature's circadian rhythms. By adhering to Dinacharya, an individual maintains the balance of Tridoshas, optimizes digestion, and ensures longevity.</p>
+
+                    <p><b>DAILY DINACHARYA FLOW</b></p>
+                    <ol class="list-decimal pl-6 font-semibold mb-4 space-y-1 text-green-800">
+                        <li>Brahma Muhurta &rarr; Morning Awakening (Pre-sunrise)</li>
+                        <li>Malotsarga &rarr; Natural Evacuation</li>
+                        <li>Hygiene &rarr; Dantadhavana, Jihvanirlekhana & Oral Care</li>
+                        <li>Sensatory Care &rarr; Gandusha, Nasya & Anjana</li>
+                        <li>Abhyanga &rarr; Full-Body Warm Herbal Oil Massage</li>
+                        <li>Vyayama &rarr; Physical Exercise (To Half Capacity)</li>
+                        <li>Snana &rarr; Cleansing Bath</li>
+                        <li>Ahara & Nidra &rarr; Mindful Eating & Timely Rest</li>
+                    </ol>
+
+                    <p><b>Key Components of Dinacharya</b></p>
+                    <ul>
+                        <li><b>1. Brahma Muhurta Jagaranam (Waking up):</b> One should wake up approximately 90 minutes (two muhurtas) before sunrise. This time is dominated by Vata dosha, making the mind sharp, alert, and peaceful. The atmosphere is unpolluted and rich in nascent oxygen.</li>
+                        
+                        <li><b>2. Malotsarga (Evacuation):</b> Upon waking, one should immediately attend to natural urges without forcing them. Regular morning elimination prevents the accumulation of toxins (Ama) and keeps the Apana Vata functioning optimally.</li>
+                        
+                        <li><b>3. Dantadhavana and Jihvanirlekhana (Oral Hygiene):</b> Teeth should be cleaned using twigs of medicinal plants (like Neem or Babul) which are inherently bitter, pungent, or astringent. This is followed by tongue scraping using a curved instrument to remove toxic coating, eliminate bad breath, and awaken the taste buds.</li>
+                        
+                        <li><b>4. Gandusha / Kavala Graha (Oil Pulling):</b> Holding or swishing medicated oil (like sesame oil) or warm water in the mouth strengthens the jaw, voice, teeth, and prevents oral diseases.</li>
+                        
+                        <li><b>5. Nasya and Anjana (Nasal & Eye Care):</b> Instilling a few drops of medicated oil or ghee into the nostrils (Nasya) lubricates the respiratory tract. Applying herbal collyrium (Anjana) to the eyes cleanses them of excessive Kapha and improves vision.</li>
+                        
+                        <li><b>6. Abhyanga (Self-Massage):</b> Daily full-body massage with warm herbal oil. It pacifies Vata, improves blood circulation, tones muscles, induces sound sleep, and prevents aging (Rasayana effect). Special attention should be given to the head, ears, and soles of the feet.</li>
+                        
+                        <li><b>7. Vyayama (Physical Exercise):</b> Exercise should be performed to half of one's capacity until sweat appears on the forehead or armpits. It brings lightness, ability to work, stability, and tolerance to hardship.</li>
+                        
+                        <li><b>8. Snana (Bathing):</b> Bathing removes sweat, fatigue, and lethargy. Ayurveda advises pouring warm water over the lower body and cold or lukewarm water over the head, as hot water on the head is detrimental to the eyes and hair.</li>
+                        
+                        <li><b>9. Ahara (Diet) and Nidra (Sleep):</b> Meals should be consumed only when previously eaten food is completely digested, signaling true hunger. The day ends with timely sleep (early to bed), avoiding daytime sleeping as it aggravates Kapha.</li>
+                    </ul>
+                `
+            },
+
+            {
+                id: 8,
+                title: "Revival of Ayurveda & Yoga",
+                prompt: "Discuss the current global revival of Ayurveda and Yoga. Focus your answer on the shift from reactive to preventative healthcare, the synergistic relationship between Yoga and Ayurveda, and their integration into modern academia.",
+                content: `
+                    <h3>Q4: Discuss the current revival of Ayurveda and Yoga, focusing on their global acceptance and integration into modern lifestyle and academia.</h3>
+                    <p><b>Descriptive Answer</b></p>
+                    <p>The resurgence and revival of Ayurveda and Yoga in the 21st century represent a monumental shift in global health paradigms. Moving away from a strictly reductionist, disease-centric model, the world is increasingly embracing this Indian Knowledge System for its holistic, preventative, and patient-centric approach.</p>
+
+                    <p><b>1. Shift from Reactive to Preventative Healthcare</b></p>
+                    <p>Modern healthcare is heavily burdened by Non-Communicable Diseases (NCDs) or lifestyle disorders such as type 2 diabetes, hypertension, cardiovascular diseases, and mental health crises. Allopathic medicine often manages symptoms but struggles with cures for these.</p>
+                    <p>Ayurveda and Yoga offer deep-rooted lifestyle corrections-through diet, lifestyle, and herbal medicines-that address the root causes of these metabolic and psychosomatic disorders.</p>
+
+                    <p><b>2. The Synergistic Integration of Yoga and Ayurveda</b></p>
+                    <p>Yoga and Ayurveda are sister sciences derived from the same Vedic roots:</p>
+                    <ul>
+                        <li><b>Yoga:</b> (Particularly Asana, Pranayama, and Dhyana) Provides the mechanical and psychological practices to achieve spiritual discipline and mental poise.</li>
+                        <li><b>Ayurveda:</b> Provides the physiological and medical framework to keep the physical vessel healthy enough to perform Yoga.</li>
+                    </ul>
+                    <p>Their current revival emphasizes this synergy; one cannot heal completely in Ayurveda without a disciplined, calm mind.</p>
+
+                    <p><b>3. Global Recognition and Institutional Support</b></p>
+                    <ul>
+                        <li><b>Government Initiatives:</b> In India, the establishment of the Ministry of AYUSH has institutionalized, standardized, and funded extensive research.</li>
+                        <li><b>International Reach:</b> The declaration of June 21st as the International Day of Yoga by the UN highlights its massive global footprint. Ayurvedic herbs (like Ashwagandha, Turmeric/Curcumin, and Tulsi) have become billion-dollar industries globally under the umbrella of dietary supplements.</li>
+                        <li><b>Integrative Medicine:</b> Many leading global hospitals are now establishing "Integrative Medicine" wings where Ayurvedic physicians, Yoga therapists, and Allopathic doctors collaborate.</li>
+                    </ul>
+
+                    <p><b>4. Integration into Academia</b></p>
+                    <p>With the implementation of the National Education Policy (NEP) 2020 in India, the "Indian Knowledge System" (IKS) has been actively integrated into mainstream higher education. Engineering, medical, and arts students are now formally studying the scientific underpinnings of ancient Indian sciences.</p>
+                    <p>This academic rigor is moving Ayurveda and Yoga away from the realm of "mysticism" into the domain of evidence-based, scientifically validated disciplines, ensuring their preservation and evolution for future generations.</p>
+                `
+            }
         ];
 
-        // Shuffle questions function
-        function shuffleArray(array) {
-            for (let i = array.length - 1; i > 0; i--) {
-                const j = Math.floor(Math.random() * (i + 1));
-                [array[i], array[j]] = [array[j], array[i]];
-            }
-        }
+        let currentModuleId = null;
+        let unlockedModules = [1]; // Start with module 1 unlocked
+        let userScores = {}; // store scores per module { id: score }
 
-        // State variables
-        let currentQuestions = [];
-        let currentQuestionIndex = 0;
-        let score = 0;
-        let correctCount = 0;
-        let incorrectCount = 0;
-        let unansweredCount = 0;
-        let timerInterval;
-        let timeRemaining = 3600; // 60 minutes in seconds
-        let hasAnsweredCurrent = false;
-        let quizInProgress = false;
-        
-        // Student Details
-        let studentDetails = {
-            name: '',
-            rollNo: ''
+        const domElements = {
+            moduleList: document.getElementById('module-list'),
+            emptyState: document.getElementById('empty-state'),
+            activeHeader: document.getElementById('active-header'),
+            moduleNumber: document.getElementById('active-module-number'),
+            moduleTitle: document.getElementById('active-module-title'),
+            btnRead: document.getElementById('btn-read'),
+            btnTest: document.getElementById('btn-test'),
+            readingArea: document.getElementById('reading-area'),
+            studyContent: document.getElementById('study-content'),
+            btnStartTestBottom: document.getElementById('btn-start-test-bottom'),
+            testingArea: document.getElementById('testing-area'),
+            testPrompt: document.getElementById('test-prompt'),
+            studentAnswer: document.getElementById('student-answer'),
+            btnSubmit: document.getElementById('btn-submit'),
+            submitSpinner: document.getElementById('submit-spinner'),
+            feedbackArea: document.getElementById('feedback-area'),
+            scoreDisplay: document.getElementById('score-display'),
+            feedbackGeneral: document.getElementById('feedback-general'),
+            feedbackSuggestions: document.getElementById('feedback-suggestions'),
+            btnRetry: document.getElementById('btn-retry'),
+            btnNextModule: document.getElementById('btn-next-module'),
+            modeToggleContainer: document.getElementById('mode-toggle-container')
         };
-        
-        // Telegram Bot Details
-        const TELEGRAM_BOT_TOKEN = '8867692600:AAHBY_ueLG0bTPx3998gaq3IrlEku6MqZtc';
-        const TELEGRAM_CHAT_ID = '2147403583';
 
-        // DOM Elements
-        const registrationScreen = document.getElementById('registrationScreen');
-        const startScreen = document.getElementById('startScreen');
-        const quizScreen = document.getElementById('quizScreen');
-        const resultsScreen = document.getElementById('resultsScreen');
-        
-        const startBtn = document.getElementById('startBtn');
-        const restartBtn = document.getElementById('restartBtn');
-        const nextBtn = document.getElementById('nextBtn');
-        
-        const questionText = document.getElementById('questionText');
-        const optionsContainer = document.getElementById('optionsContainer');
-        const questionCounter = document.getElementById('questionCounter');
-        const categoryBadge = document.getElementById('categoryBadge');
-        const feedbackText = document.getElementById('feedbackText');
-        
-        const timerDisplay = document.getElementById('timerDisplay');
-        const scoreDisplay = document.getElementById('scoreDisplay');
-        const progressBar = document.getElementById('progressBar');
-        const completionStatus = document.getElementById('completionStatus');
-        
-        const registrationForm = document.getElementById('registrationForm');
-        const telegramStatus = document.getElementById('telegramStatus');
-
-        registrationForm.addEventListener('submit', function(e) {
-            e.preventDefault();
-            studentDetails.name = document.getElementById('studentName').value.trim();
-            studentDetails.rollNo = document.getElementById('rollNumber').value.trim();
-            
-            if(studentDetails.name && studentDetails.rollNo) {
-                document.getElementById('displayStudentName').textContent = studentDetails.name;
-                registrationScreen.classList.add('hidden');
-                startScreen.classList.remove('hidden');
-            }
-        });
-
-        startBtn.addEventListener('click', startQuiz);
-        restartBtn.addEventListener('click', () => {
-            resultsScreen.classList.add('hidden');
-            registrationScreen.classList.remove('hidden');
-            document.getElementById('registrationForm').reset();
-        });
-        nextBtn.addEventListener('click', loadNextQuestion);
-
-        function startQuiz() {
-            // Copy and shuffle
-            currentQuestions = [...questionsData];
-            shuffleArray(currentQuestions);
-            
-            // Reset state
-            currentQuestionIndex = 0;
-            score = 0;
-            correctCount = 0;
-            incorrectCount = 0;
-            unansweredCount = 0;
-            timeRemaining = 3600; // 60 minutes
-            timerDisplay.classList.remove('timer-warning');
-            telegramStatus.classList.add('hidden');
-            
-            quizInProgress = true;
-            
-            updateScoreDisplay();
-            startTimer();
-
-            startScreen.classList.add('hidden');
-            resultsScreen.classList.add('hidden');
-            quizScreen.classList.remove('hidden');
-            
-            loadQuestion();
+        function init() {
+            renderModuleList();
+            setupEventListeners();
         }
 
-        function startTimer() {
-            clearInterval(timerInterval);
-            updateTimerDisplay();
-            timerInterval = setInterval(() => {
-                timeRemaining--;
-                updateTimerDisplay();
+        function renderModuleList() {
+            domElements.moduleList.innerHTML = '';
+            
+            studyData.forEach((mod, index) => {
+                const isUnlocked = unlockedModules.includes(mod.id);
+                const isCompleted = userScores[mod.id] !== undefined && userScores[mod.id] >= 6;
+                const score = userScores[mod.id] || 0;
                 
-                if (timeRemaining <= 300) { // 5 minutes warning
-                    timerDisplay.classList.add('timer-warning');
-                }
+                const card = document.createElement('div');
+                card.className = `module-card p-4 rounded-xl border-2 ${isUnlocked ? 'bg-white border-green-200 cursor-pointer' : 'bg-gray-50 border-gray-200 locked'} ${currentModuleId === mod.id ? 'ring-2 ring-green-500 shadow-md' : ''}`;
                 
-                if (timeRemaining <= 0) {
-                    clearInterval(timerInterval);
-                    timerDisplay.textContent = "00:00";
-                    forceEndQuiz();
-                }
-            }, 1000);
-        }
-
-        function updateTimerDisplay() {
-            const minutes = Math.floor(timeRemaining / 60).toString().padStart(2, '0');
-            const seconds = (timeRemaining % 60).toString().padStart(2, '0');
-            timerDisplay.textContent = `${minutes}:${seconds}`;
-        }
-
-        function loadQuestion() {
-            hasAnsweredCurrent = false;
-            nextBtn.disabled = true;
-            feedbackText.textContent = '';
-            
-            const qData = currentQuestions[currentQuestionIndex];
-            
-            questionCounter.textContent = `Question ${currentQuestionIndex + 1} of ${currentQuestions.length}`;
-            categoryBadge.textContent = qData.category;
-            questionText.textContent = qData.q;
-            
-            // Update progress bar
-            const progress = ((currentQuestionIndex) / currentQuestions.length) * 100;
-            progressBar.style.width = `${progress}%`;
-
-            optionsContainer.innerHTML = '';
-            
-            qData.options.forEach((opt, index) => {
-                const btn = document.createElement('button');
-                btn.className = 'w-full text-left p-4 rounded-lg border-2 border-gray-200 hover:border-indigo-400 hover:bg-indigo-50 transition-colors duration-200 text-gray-700 font-medium focus:outline-none flex justify-between items-center';
-                btn.innerHTML = `
-                    <span>${opt}</span>
-                    <svg class="w-6 h-6 hidden check-icon text-green-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path></svg>
-                    <svg class="w-6 h-6 hidden cross-icon text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-                `;
-                btn.onclick = () => handleAnswer(index, btn, qData.answer);
-                optionsContainer.appendChild(btn);
-            });
-        }
-
-        function handleAnswer(selectedIndex, selectedBtn, correctIndex) {
-            if (hasAnsweredCurrent) return;
-            hasAnsweredCurrent = true;
-            nextBtn.disabled = false;
-
-            const buttons = optionsContainer.querySelectorAll('button');
-            
-            // Disable all buttons
-            buttons.forEach(btn => {
-                btn.disabled = true;
-                btn.classList.remove('hover:border-indigo-400', 'hover:bg-indigo-50', 'cursor-pointer');
-            });
-
-            if (selectedIndex === correctIndex) {
-                // Correct
-                score++;
-                correctCount++;
-                selectedBtn.classList.add('border-green-500', 'bg-green-50', 'text-green-800', 'correct-animation');
-                selectedBtn.classList.remove('border-gray-200');
-                selectedBtn.querySelector('.check-icon').classList.remove('hidden');
-                
-                feedbackText.textContent = 'Correct!';
-                feedbackText.className = 'text-sm font-bold text-green-600';
-            } else {
-                // Incorrect
-                incorrectCount++;
-                selectedBtn.classList.add('border-red-500', 'bg-red-50', 'text-red-800', 'incorrect-animation');
-                selectedBtn.classList.remove('border-gray-200');
-                selectedBtn.querySelector('.cross-icon').classList.remove('hidden');
-                
-                // Highlight correct
-                const correctBtn = buttons[correctIndex];
-                correctBtn.classList.add('border-green-500', 'bg-green-50');
-                correctBtn.classList.remove('border-gray-200');
-                correctBtn.querySelector('.check-icon').classList.remove('hidden');
-
-                feedbackText.textContent = 'Incorrect.';
-                feedbackText.className = 'text-sm font-bold text-red-600';
-            }
-            
-            updateScoreDisplay();
-        }
-
-        function updateScoreDisplay() {
-            scoreDisplay.textContent = `Score: ${score}`;
-        }
-
-        function loadNextQuestion() {
-            if (!hasAnsweredCurrent) {
-                unansweredCount++;
-            }
-
-            currentQuestionIndex++;
-            if (currentQuestionIndex < currentQuestions.length) {
-                loadQuestion();
-            } else {
-                showResults(false);
-            }
-        }
-        
-        function forceEndQuiz() {
-            // Count remaining unattempted questions
-            unansweredCount = currentQuestions.length - (correctCount + incorrectCount);
-            showResults(true);
-        }
-
-        function showResults(timedOut) {
-            clearInterval(timerInterval);
-            progressBar.style.width = '100%';
-            
-            quizInProgress = false;
-            
-            quizScreen.classList.add('hidden');
-            resultsScreen.classList.remove('hidden');
-            
-            if (timedOut) {
-                completionStatus.textContent = "Time is up! Here is how you performed.";
-                completionStatus.classList.add("text-red-500", "font-bold");
-            } else {
-                completionStatus.textContent = "Here is how you performed.";
-                completionStatus.classList.remove("text-red-500", "font-bold");
-            }
-
-            const percentage = Math.round((score / currentQuestions.length) * 100);
-            
-            document.getElementById('finalScoreText').textContent = `${percentage}%`;
-            document.getElementById('finalScoreFraction').textContent = `${score} / ${currentQuestions.length}`;
-            
-            // Animate circle
-            const circle = document.getElementById('scoreCircle');
-            circle.style.strokeDasharray = `${percentage}, 100`;
-
-            document.getElementById('correctCount').textContent = correctCount;
-            document.getElementById('incorrectCount').textContent = incorrectCount;
-            document.getElementById('unansweredCount').textContent = unansweredCount;
-            
-            const minutes = Math.floor(timeRemaining / 60).toString().padStart(2, '0');
-            const seconds = (timeRemaining % 60).toString().padStart(2, '0');
-            document.getElementById('timeTakenText').textContent = `${minutes}:${seconds}`;
-
-            const msgEl = document.getElementById('performanceMessage');
-            if (percentage >= 90) {
-                msgEl.textContent = "Excellent! You have a profound mastery of the Indian Knowledge System concepts.";
-                msgEl.className = "text-lg font-bold mb-8 text-green-600";
-            } else if (percentage >= 70) {
-                msgEl.textContent = "Great job! You have a solid understanding of the material.";
-                msgEl.className = "text-lg font-bold mb-8 text-blue-600";
-            } else if (percentage >= 50) {
-                msgEl.textContent = "Good effort. Reviewing the texts again will help solidify your knowledge.";
-                msgEl.className = "text-lg font-bold mb-8 text-yellow-600";
-            } else {
-                msgEl.textContent = "Keep studying! The IKS is vast, reviewing the source material will help.";
-                msgEl.className = "text-lg font-bold mb-8 text-red-600";
-            }
-
-            sendToTelegram();
-        }
-
-        async function sendToTelegram() {
-            telegramStatus.classList.remove('hidden');
-            telegramStatus.textContent = "Sending results...";
-            telegramStatus.className = "mb-4 text-sm font-medium rounded p-2 bg-blue-100 text-blue-700";
-
-            const message = `
-📝 *BCA IKS Assessment Completed*
-👤 Name: ${studentDetails.name}
-🔢 Roll No: ${studentDetails.rollNo}
-✅ Score: ${score} / ${currentQuestions.length}
-⏱ Time Remaining: ${Math.floor(timeRemaining / 60).toString().padStart(2, '0')}:${(timeRemaining % 60).toString().padStart(2, '0')}
-`;
-
-            const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
-            
-            try {
-                const response = await fetch(url, {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        chat_id: TELEGRAM_CHAT_ID,
-                        text: message,
-                        parse_mode: 'Markdown'
-                    })
-                });
-
-                if (response.ok) {
-                    telegramStatus.textContent = "Results successfully recorded.";
-                    telegramStatus.className = "mb-4 text-sm font-medium rounded p-2 bg-green-100 text-green-700";
+                // Icon logic
+                let iconHtml = '';
+                if (!isUnlocked) {
+                    iconHtml = `<i class="fa-solid fa-lock text-gray-400 text-lg"></i>`;
+                } else if (isCompleted) {
+                    iconHtml = `<div class="flex items-center gap-1"><i class="fa-solid fa-check-circle text-green-500"></i><span class="text-xs font-bold text-green-600">${score}/10</span></div>`;
                 } else {
-                    telegramStatus.textContent = "Failed to send results. Please notify the instructor.";
-                    telegramStatus.className = "mb-4 text-sm font-medium rounded p-2 bg-red-100 text-red-700";
-                    console.error("Telegram API Error", await response.text());
+                    iconHtml = `<i class="fa-regular fa-circle-play text-green-600 text-lg"></i>`;
                 }
-            } catch (error) {
-                telegramStatus.textContent = "Network error while sending results.";
-                telegramStatus.className = "mb-4 text-sm font-medium rounded p-2 bg-red-100 text-red-700";
-                console.error("Fetch Error", error);
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-start">
+                        <div class="flex-1 pr-2">
+                            <span class="text-xs font-bold uppercase tracking-wider text-green-600">Module ${index + 1}</span>
+                            <h4 class="font-bold text-gray-800 leading-tight mt-1 heading-font">${mod.title}</h4>
+                        </div>
+                        <div class="mt-1">${iconHtml}</div>
+                    </div>
+                `;
+
+                if (isUnlocked) {
+                    card.addEventListener('click', () => selectModule(mod.id));
+                }
+                
+                domElements.moduleList.appendChild(card);
+            });
+        }
+
+        function selectModule(id) {
+            currentModuleId = id;
+            renderModuleList(); // Update UI selection styling
+            
+            const mod = studyData.find(m => m.id === id);
+            
+            // Hide empty state, show active header
+            domElements.emptyState.classList.add('hidden');
+            domElements.activeHeader.classList.remove('hidden');
+            domElements.activeHeader.classList.add('flex');
+            domElements.modeToggleContainer.classList.remove('hidden');
+            
+            // Populate data
+            domElements.moduleNumber.textContent = `Module ${id}`;
+            domElements.moduleTitle.textContent = mod.title;
+            domElements.studyContent.innerHTML = mod.content;
+            domElements.testPrompt.textContent = mod.prompt;
+            domElements.studentAnswer.value = ''; // Reset textarea
+            
+            // Default to Read View
+            switchView('read');
+        }
+
+        function switchView(view) {
+            // Reset active states
+            domElements.btnRead.className = "px-4 py-2 bg-gray-200 text-gray-700 font-medium rounded-l-lg hover:bg-gray-300 transition-colors";
+            domElements.btnTest.className = "px-4 py-2 bg-gray-200 text-gray-700 font-medium rounded-r-lg hover:bg-gray-300 transition-colors";
+            
+            domElements.readingArea.classList.add('hidden');
+            domElements.testingArea.classList.add('hidden');
+            domElements.feedbackArea.classList.add('hidden');
+
+            if (view === 'read') {
+                domElements.btnRead.className = "px-4 py-2 bg-green-700 text-white font-medium rounded-l-lg hover:bg-green-800 transition-colors";
+                domElements.readingArea.classList.remove('hidden');
+            } else if (view === 'test') {
+                domElements.btnTest.className = "px-4 py-2 bg-green-700 text-white font-medium rounded-r-lg hover:bg-green-800 transition-colors";
+                domElements.testingArea.classList.remove('hidden');
+            } else if (view === 'feedback') {
+                domElements.modeToggleContainer.classList.add('hidden');
+                domElements.feedbackArea.classList.remove('hidden');
             }
         }
 
-        // --- Anti-Cheating & Tab Close Detection ---
+        function setupEventListeners() {
+            domElements.btnRead.addEventListener('click', () => switchView('read'));
+            domElements.btnTest.addEventListener('click', () => switchView('test'));
+            domElements.btnStartTestBottom.addEventListener('click', () => switchView('test'));
+            
+            domElements.btnSubmit.addEventListener('click', handleSubmit);
+            
+            domElements.btnRetry.addEventListener('click', () => {
+                domElements.modeToggleContainer.classList.remove('hidden');
+                switchView('test');
+            });
+            
+            domElements.btnNextModule.addEventListener('click', () => {
+                const nextId = currentModuleId + 1;
+                if (studyData.find(m => m.id === nextId)) {
+                    selectModule(nextId);
+                }
+            });
+        }
 
-        // 1. Show standard browser warning if they try to close/refresh
-        window.addEventListener('beforeunload', function (e) {
-            if (quizInProgress) {
-                e.preventDefault();
-                e.returnValue = ''; // Triggers the browser's "Leave site?" confirmation dialog
+        async function handleSubmit() {
+            const answer = domElements.studentAnswer.value.trim();
+            if (answer.length < 10) {
+                alert("Please provide a more detailed answer before submitting.");
+                return;
             }
-        });
 
-        // 2. Send alert to Telegram if they actually leave or close the tab
-        window.addEventListener('pagehide', function(event) {
-            if (quizInProgress) {
-                sendAbandonmentAlert();
+            const mod = studyData.find(m => m.id === currentModuleId);
+            
+            // UI Loading state
+            domElements.btnSubmit.disabled = true;
+            domElements.btnSubmit.classList.add('opacity-75', 'cursor-not-allowed');
+            domElements.submitSpinner.classList.remove('hidden');
+            domElements.btnSubmit.querySelector('span').textContent = 'Evaluating...';
+
+            try {
+                // Call Gemini API
+                const evaluation = await callGeminiAPI(answer, mod);
+                
+                // Process Result
+                displayFeedback(evaluation);
+                
+                // Save Score and Unlock next if passed
+                userScores[mod.id] = Math.max(userScores[mod.id] || 0, evaluation.score);
+                if (evaluation.score >= 6) {
+                    const nextId = mod.id + 1;
+                    if (studyData.find(m => m.id === nextId) && !unlockedModules.includes(nextId)) {
+                        unlockedModules.push(nextId);
+                    }
+                }
+                
+                renderModuleList();
+                switchView('feedback');
+
+            } catch (error) {
+                console.error("Evaluation error:", error);
+                alert("The AI Guru is currently meditating and couldn't process your request. Please try again later.");
+            } finally {
+                // Restore UI state
+                domElements.btnSubmit.disabled = false;
+                domElements.btnSubmit.classList.remove('opacity-75', 'cursor-not-allowed');
+                domElements.submitSpinner.classList.add('hidden');
+                domElements.btnSubmit.querySelector('span').textContent = 'Submit Answer';
             }
-        });
+        }
 
-        function sendAbandonmentAlert() {
-            const message = `
-⚠️ *WARNING: Tab Closed / Left Early*
-👤 Name: ${studentDetails.name || 'Unknown'}
-🔢 Roll No: ${studentDetails.rollNo || 'Unknown'}
-📝 Status: Student left the assessment unexpectedly!
-✅ Current Score: ${score} / ${currentQuestions.length}
-⏱ Time Remaining: ${Math.floor(timeRemaining / 60).toString().padStart(2, '0')}:${(timeRemaining % 60).toString().padStart(2, '0')}
+        async function callGeminiAPI(studentAnswer, moduleData) {
+            const apiKey = ""; // API Key injected automatically by immersive environment
+            const apiUrl = `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`;
+
+            const systemPrompt = `You are a highly knowledgeable, encouraging, and precise Ayurveda professor evaluating a student's answer.
+Your task is to compare the student's answer against the provided original source material. 
+Do not use external knowledge; base your evaluation purely on how well they understood the provided text.
+
+Provide the response STRICTLY as a JSON object matching this schema:
+{
+  "score": <number between 0 and 10 based on accuracy and completeness>,
+  "feedback": "<string: A 2-3 sentence encouraging overview of how they did>",
+  "suggestions": [
+    "<string: Specific constructive point 1 (what they missed or got wrong)>",
+    "<string: Specific constructive point 2>"
+  ]
+}
+If they did perfectly, suggestions can be praises for specific details they included.`;
+
+            const userPrompt = `
+TOPIC: ${moduleData.title}
+QUESTION PROMPT GIVEN TO STUDENT: ${moduleData.prompt}
+
+--- ORIGINAL SOURCE MATERIAL (TRUTH) ---
+${moduleData.content.replace(/<[^>]*>?/gm, '') /* Strip HTML tags for clean prompt */}
+----------------------------------------
+
+--- STUDENT'S ANSWER ---
+${studentAnswer}
+------------------------
 `;
 
-            const url = `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`;
-            
-            // Using keepalive: true ensures the request continues in the background even as the page unloads
-            fetch(url, {
+            const payload = {
+                contents: [{ parts: [{ text: userPrompt }] }],
+                systemInstruction: { parts: [{ text: systemPrompt }] },
+                generationConfig: {
+                    responseMimeType: "application/json",
+                }
+            };
+
+            const response = await fetch(apiUrl, {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    chat_id: TELEGRAM_CHAT_ID,
-                    text: message,
-                    parse_mode: 'Markdown'
-                }),
-                keepalive: true
-            }).catch(console.error);
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            });
+
+            if (!response.ok) {
+                throw new Error(`API error: ${response.status}`);
+            }
+
+            const result = await response.json();
+            
+            if (result.candidates && result.candidates[0].content.parts[0].text) {
+                const jsonText = result.candidates[0].content.parts[0].text;
+                return JSON.parse(jsonText);
+            } else {
+                throw new Error("Invalid response format from API");
+            }
         }
+
+        function displayFeedback(data) {
+            // Animate score counter
+            const targetScore = data.score;
+            let current = 0;
+            domElements.scoreDisplay.textContent = '0';
+            
+            const timer = setInterval(() => {
+                current += 1;
+                domElements.scoreDisplay.textContent = current;
+                
+                // Color coding based on score
+                if(current <= 4) domElements.scoreDisplay.className = "text-5xl font-bold text-red-600 heading-font";
+                else if(current <= 7) domElements.scoreDisplay.className = "text-5xl font-bold text-yellow-600 heading-font";
+                else domElements.scoreDisplay.className = "text-5xl font-bold text-green-600 heading-font";
+
+                if (current >= targetScore) {
+                    clearInterval(timer);
+                    domElements.scoreDisplay.textContent = targetScore;
+                }
+            }, 100);
+
+            domElements.feedbackGeneral.textContent = data.feedback;
+            
+            domElements.feedbackSuggestions.innerHTML = '';
+            if (data.suggestions && data.suggestions.length > 0) {
+                data.suggestions.forEach(sug => {
+                    const li = document.createElement('li');
+                    li.className = "flex items-start gap-3 bg-gray-50 p-4 rounded-lg border border-gray-100";
+                    li.innerHTML = `<i class="fa-solid fa-lightbulb text-yellow-500 mt-1"></i> <span class="text-gray-700">${sug}</span>`;
+                    domElements.feedbackSuggestions.appendChild(li);
+                });
+            }
+
+            // Next button logic
+            if (targetScore >= 6 && studyData.find(m => m.id === currentModuleId + 1)) {
+                domElements.btnNextModule.classList.remove('hidden');
+            } else {
+                domElements.btnNextModule.classList.add('hidden');
+            }
+        }
+
+        // Start the app
+        window.addEventListener('DOMContentLoaded', init);
+
     </script>
 </body>
 </html>
